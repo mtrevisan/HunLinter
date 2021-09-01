@@ -67,13 +67,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{
@@ -158,10 +158,10 @@ final int iconSize = 17;
             final String definition = (String)model.getValueAt(row, 0);
             final String synonyms = (String)model.getValueAt(row, 1);
             final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
-            return Arrays.stream(synonymsByDefinition)
-            .map(GUIHelper::removeHTMLCode)
-            .map(syns -> definition + ": " + syns)
-            .collect(Collectors.joining("\r\n"));
+				final StringJoiner sj = new StringJoiner("\r\n");
+				for(final String s : synonymsByDefinition)
+					sj.add(definition + ": " + GUIHelper.removeHTMLCode(s));
+				return sj.toString();
          }
       };
       synonymsRecordedLabel = new javax.swing.JLabel();
@@ -297,9 +297,9 @@ final int iconSize = 17;
          else{
             synonymsTextField.requestFocusInWindow();
 
-            final String duplicatedWords = duplicationResult.getDuplicates().stream()
-            .map(ThesaurusEntry::getDefinition)
-            .collect(Collectors.joining(", "));
+				final StringJoiner duplicatedWords = new StringJoiner(", ");
+				for(final ThesaurusEntry thesaurusEntry : duplicationResult.getDuplicates())
+					duplicatedWords.add(thesaurusEntry.getDefinition());
             LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
@@ -389,9 +389,10 @@ final int iconSize = 17;
 		final SynonymsEntry newSynonyms = new SynonymsEntry(synonymsTextField.getText());
 
 		//filter synonyms with same part-of-speech
-		final List<SynonymsEntry> filteredSynonymsEntries = synonyms.getSynonyms().stream()
-			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
-			.collect(Collectors.toList());
+		final List<SynonymsEntry> filteredSynonymsEntries = new ArrayList<>(0);
+		for(final SynonymsEntry syns : synonyms.getSynonyms())
+			if(syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
+				filteredSynonymsEntries.add(syns);
 		if(filteredSynonymsEntries.isEmpty())
 			JOptionPane.showMessageDialog(null,
 				"No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",

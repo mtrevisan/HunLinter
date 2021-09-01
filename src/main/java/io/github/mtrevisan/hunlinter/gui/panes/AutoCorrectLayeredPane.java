@@ -67,6 +67,7 @@ import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -332,9 +333,9 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          else{
             incorrectTextField.requestFocusInWindow();
 
-            final String duplicatedWords = duplicationResult.getDuplicates().stream()
-            .map(CorrectionEntry::toString)
-            .collect(Collectors.joining(", "));
+				final StringJoiner duplicatedWords = new StringJoiner(", ");
+				for(final CorrectionEntry correctionEntry : duplicationResult.getDuplicates())
+					duplicatedWords.add(correctionEntry.toString());
             LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }

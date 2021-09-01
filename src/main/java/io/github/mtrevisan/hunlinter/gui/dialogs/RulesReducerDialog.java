@@ -51,10 +51,10 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -228,11 +228,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
-		final List<String> affixEntries = affixes.stream()
-			.map(affix -> (affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX)
-				+ StringUtils.SPACE + affix.getEntries().get(0).getFlag())
-			.sorted()
-			.collect(Collectors.toList());
+		final List<String> affixEntries = new ArrayList<>();
+		for(final RuleEntry affix : affixes)
+			affixEntries.add((affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX)
+				+ StringUtils.SPACE
+				+ affix.getEntries().get(0).getFlag());
+		affixEntries.sort(null);
 
 		JavaHelper.executeOnEventDispatchThread(() -> {
 			ruleComboBox.removeAllItems();
@@ -256,9 +257,9 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				.add(Character.toString(rule.combinableChar()))
 				.add(Integer.toString(rule.getEntries().size()))
 				.toString();
-			final String rules = rule.getEntries().stream()
-				.map(AffixEntry::toString)
-				.collect(Collectors.joining(StringUtils.LF));
+			final StringJoiner rules = new StringJoiner(StringUtils.LF);
+			for(final AffixEntry affixEntry : rule.getEntries())
+				rules.add(affixEntry.toString());
 			currentSetTextArea.setText(header + StringUtils.LF + rules);
 			currentSetTextArea.setCaretPosition(0);
 			reducedSetTextArea.setText(null);

@@ -168,9 +168,11 @@ public final class WordVEC{
 	}
 
 	public static int countStresses(final CharSequence word){
-		return (int)IntStream.range(0, word.length())
-			.filter(i -> Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
-			.count();
+		int count = 0;
+		for(int i = 0; i < word.length(); i ++)
+			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
+				count ++;
+		return count;
 	}
 
 	private static String suppressStress(final String word){

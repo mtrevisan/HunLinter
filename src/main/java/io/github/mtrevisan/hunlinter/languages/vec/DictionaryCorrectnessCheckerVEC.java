@@ -156,31 +156,27 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void variantsCheck(final Inflection inflection){
-		final String derivedWord = inflection.getWord();
-		final String[] subwords = StringUtils.split(derivedWord.toLowerCase(Locale.ROOT), WORD_SEPARATORS);
+		String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
+		for(int i = 0; i < WORD_SEPARATORS.length(); i ++)
+			derivedWord = StringUtils.remove(derivedWord, WORD_SEPARATORS.charAt(i));
+
 		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
-		for(final String subword : subwords){
-			if(subword.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-				if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL))
-					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
-				if(inflection.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-					throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
-						NORTHERN_PLURAL_STRESSED_RULE, subword}));
-				if(RegexHelper.find(subword, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
-					throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
+		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
+			if(RegexHelper.find(derivedWord, PATTERN_NON_VANISHING_EL))
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
+			if(inflection.hasContinuationFlag(NORTHERN_PLURAL_RULE))
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
+					NORTHERN_PLURAL_STRESSED_RULE, derivedWord}));
+			if(RegexHelper.find(derivedWord, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
+				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 
-				variants.add(LanguageVariant.VENETIAN);
-			}
-			if(RegexHelper.find(subword, PATTERN_NON_VANISHING_EL_NOT_AT_END)
-					|| subword.contains(GraphemeVEC.GRAPHEME_D_STROKE) || subword.contains(GraphemeVEC.GRAPHEME_T_STROKE))
-				variants.add(LanguageVariant.NORTHERN);
+			variants.add(LanguageVariant.VENETIAN);
 		}
-		//check boundaries (ex. e-lo is northern variant)
-		for(int i = 1; i < subwords.length; i ++)
-			if(WordVEC.isVowel(subwords[i - 1].charAt(subwords[i - 1].length() - 1)) && subwords[i].startsWith(GraphemeVEC.GRAPHEME_L))
-				variants.add(LanguageVariant.NORTHERN);
+		if(RegexHelper.find(derivedWord, PATTERN_NON_VANISHING_EL_NOT_AT_END)
+				|| derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE))
+			variants.add(LanguageVariant.NORTHERN);
 
-		if(variants.contains(LanguageVariant.VENETIAN) && variants.contains(LanguageVariant.NORTHERN))
+		if(variants.size() > 1)
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS.format(new Object[]{derivedWord}));
 	}
 

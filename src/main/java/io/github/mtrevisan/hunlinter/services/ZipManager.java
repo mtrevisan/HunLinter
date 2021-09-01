@@ -104,10 +104,9 @@ public class ZipManager{
 
 			boolean process = true;
 			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
-				final String[] includeFolders = Arrays.stream(excludeFolderBut)
-					.map(Path::getParent)
-					.map(Path::toString)
-					.toArray(String[]::new);
+				final List<String> includeFolders = new ArrayList<>();
+				for(final Path path : excludeFolderBut)
+					includeFolders.add(path.getParent().toString());
 				process = (match(includeFolders, folder) == null);
 			}
 			if(process)
@@ -117,10 +116,10 @@ public class ZipManager{
 		return filteredFolders;
 	}
 
-	private static String match(final String[] array, final String folder){
-		final int size = (array != null? array.length: 0);
+	private static String match(final List<String> array, final String folder){
+		final int size = (array != null? array.size(): 0);
 		for(int i = 0; i < size; i ++){
-			final String elem = array[i];
+			final String elem = array.get(i);
 			if(folder.startsWith(elem))
 				return elem;
 		}

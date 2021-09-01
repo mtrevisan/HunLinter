@@ -64,11 +64,13 @@ import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
@@ -418,16 +420,16 @@ public class DictionaryStatisticsDialog extends JDialog{
 		x = (double)contractedWords / totalWords;
 		final String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ formatFrequencyVariableDecimals(x);
-		final String formattedLengthsMode = lengthsFrequencies.getMode().stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(LIST_SEPARATOR));
+		final StringJoiner formattedLengthsMode = new StringJoiner(LIST_SEPARATOR);
+		for(final Integer integer : lengthsFrequencies.getMode())
+			formattedLengthsMode.add(String.valueOf(integer));
 		final String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
 			+ " (" + longestWordCharsCount + ")";
 
 		totalWordsValueLabel.setText(formattedTotalWords);
 		uniqueWordsValueLabel.setText(formattedUniqueWords);
 		contractedWordsValueLabel.setText(formattedContractedWords);
-		lengthsModeValueLabel.setText(formattedLengthsMode);
+		lengthsModeValueLabel.setText(formattedLengthsMode.toString());
 		longestWordCharactersValueLabel.setText(formattedLongestWords);
 	}
 
@@ -436,25 +438,24 @@ public class DictionaryStatisticsDialog extends JDialog{
 		final int uniqueWords = statistics.getUniqueWords();
 		final Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
 		final List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
-		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
-			.map(Hyphenation::getSyllabes)
-			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
-			.collect(Collectors.toList());
+		List<String> longestWordSyllabes = new ArrayList<>();
+		for(final Hyphenation hyphenation : statistics.getLongestWordsBySyllabes())
+			longestWordSyllabes.add(StringUtils.join(hyphenation.getSyllabes(), HyphenationParser.SOFT_HYPHEN));
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		final int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
 		final double x = (double)compoundWords / uniqueWords;
 		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ formatFrequencyVariableDecimals(x);
-		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(LIST_SEPARATOR));
+		final StringJoiner formattedSyllabeLengthsMode = new StringJoiner(LIST_SEPARATOR);
+		for(final Integer integer : syllabeLengthsFrequencies.getMode())
+			formattedSyllabeLengthsMode.add(String.valueOf(integer));
 		final String formattedMostCommonSyllabes = StringUtils.join(mostCommonSyllabes, LIST_SEPARATOR);
 		final String formattedLongestWordSyllabes = StringUtils.join(longestWordSyllabes, LIST_SEPARATOR)
 			+ " (" + longestWordSyllabesCount + ")";
 
 		compoundWordsValueLabel.setText(formattedCompoundWords);
-		syllabeLengthsModeValueLabel.setText(formattedSyllabeLengthsMode);
+		syllabeLengthsModeValueLabel.setText(formattedSyllabeLengthsMode.toString());
 		mostCommonSyllabesValueLabel.setText(formattedMostCommonSyllabes);
 		longestWordSyllabesValueLabel.setText(formattedLongestWordSyllabes);
 

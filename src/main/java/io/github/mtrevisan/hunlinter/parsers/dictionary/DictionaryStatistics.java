@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 /**
@@ -185,9 +184,11 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	public synchronized List<String> getMostCommonSyllabes(final int size){
-		return syllabesFrequencies.getMostCommonValues(size).stream()
-			.map(value -> value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.))
-			.collect(Collectors.toList());
+		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
+		final List<String> list = new ArrayList<>(values.size());
+		for(final String value : values)
+			list.add(value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.));
+		return list;
 	}
 
 	@Override
