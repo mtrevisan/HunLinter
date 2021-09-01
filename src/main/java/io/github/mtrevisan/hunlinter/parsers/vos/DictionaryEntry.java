@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 
@@ -233,12 +232,6 @@ public class DictionaryEntry{
 			if(mf.startsWith(tag))
 				list.add(mf);
 		return list;
-	}
-
-	public void forEachMorphologicalField(final Consumer<String> fun){
-		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
-		for(int i = 0; i < size; i ++)
-			fun.accept(morphologicalFields[i]);
 	}
 
 	/**

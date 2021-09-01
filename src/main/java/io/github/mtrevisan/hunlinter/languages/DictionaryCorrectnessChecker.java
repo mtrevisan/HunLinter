@@ -90,7 +90,10 @@ public class DictionaryCorrectnessChecker{
 		if(!inflection.hasMorphologicalFields())
 			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}), IndexDataPair.of(index, null)));
 
-		inflection.forEachMorphologicalField(morphologicalField -> {
+		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
+		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		for(int i = 0; i < size; i ++){
+			String morphologicalField = morphologicalFields[i];
 			if(morphologicalField.length() < 4)
 				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
 					IndexDataPair.of(index, null)));
@@ -103,7 +106,7 @@ public class DictionaryCorrectnessChecker{
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
 				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{inflection.getWord(), morphologicalField}),
 					IndexDataPair.of(index, null)));
-		});
+		}
 	}
 
 	private void incompatibilityCheck(final Inflection inflection){
