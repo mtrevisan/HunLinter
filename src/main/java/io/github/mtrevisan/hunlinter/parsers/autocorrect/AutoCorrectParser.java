@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.autocorrect;
 
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
+import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
@@ -46,7 +47,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Matcher;
 
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
@@ -173,7 +173,7 @@ public class AutoCorrectParser{
 
 	private static String clearFilter(final String text){
 		//escape special characters
-		return Matcher.quoteReplacement(text.trim());
+		return RegexHelper.quoteReplacement(text.trim());
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String incorrect, final String correct){

@@ -54,7 +54,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -484,9 +483,7 @@ public class HyphenationParser{
 	}
 
 	public static int getIndexOfBreakpoint(final CharSequence rule){
-		final Matcher m = RegexHelper.matcher(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
-		m.find();
-		return m.start();
+		return RegexHelper.indexOf(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
 	}
 
 	public void save(final File hypFile) throws IOException{

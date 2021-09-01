@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -246,7 +245,7 @@ public class ThesaurusParser{
 				text = text.substring(idx + 2);
 		}
 		//escape special characters
-		text = Matcher.quoteReplacement(text);
+		text = RegexHelper.quoteReplacement(text);
 		//remove all \s+([^)]+)
 		return RegexHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}

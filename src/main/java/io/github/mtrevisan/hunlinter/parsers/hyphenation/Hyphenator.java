@@ -271,6 +271,7 @@ public class Hyphenator implements HyphenatorInterface{
 		String addAfter = null;
 		final int size = word.length();
 		String[] result = new String[0];
+		final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(StringUtils.EMPTY);
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
@@ -288,7 +289,7 @@ public class Hyphenator implements HyphenatorInterface{
 					final int index = HyphenationParser.getIndexOfBreakpoint(RegexHelper.clear(augmentedPatternData,
 						HyphenationParser.PATTERN_WORD_INITIAL));
 
-					final Matcher m = RegexHelper.matcher(augmentedPatternData, HyphenationParser.PATTERN_AUGMENTED_RULE);
+					m.reset(augmentedPatternData);
 					if(m.find()){
 						final String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
 						addAfter = m.group(HyphenationParser.PARAM_ADD_AFTER);

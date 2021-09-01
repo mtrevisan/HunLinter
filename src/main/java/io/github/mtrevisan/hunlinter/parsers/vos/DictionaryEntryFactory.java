@@ -88,28 +88,26 @@ public class DictionaryEntryFactory{
 		if(!m.find())
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
 
-		final String word = extractWord(m);
-		final List<String> continuationFlags = extractContinuationFlags(m);
-		final String[] morphologicalFields = extractMorphologicalFields(m, addStemTag, word);
+		final String word = extractWord(m.group(PARAM_WORD));
+		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));
+		final String[] morphologicalFields = extractMorphologicalFields(m.group(PARAM_MORPHOLOGICAL_FIELDS), addStemTag, word);
 
 		final String convertedWord = affixData.applyInputConversionTable(word);
 		final boolean combinable = true;
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
-	private String extractWord(final Matcher m){
-		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+	private String extractWord(final String word){
+		return StringUtils.replace(word, SLASH_ESCAPED, SLASH);
 	}
 
-	private List<String> extractContinuationFlags(final Matcher m){
-		final String flagsGroup = m.group(PARAM_FLAGS);
+	private List<String> extractContinuationFlags(final String flagsGroup){
 		final String rawFlags = expandAliases(flagsGroup, aliasesFlag);
 		final String[] result = strategy.parseFlags(rawFlags);
 		return (result != null? Arrays.asList(result): null);
 	}
 
-	private String[] extractMorphologicalFields(final Matcher m, final boolean addStemTag, final String word){
-		final String dicMorphologicalFields = m.group(PARAM_MORPHOLOGICAL_FIELDS);
+	private String[] extractMorphologicalFields(final String dicMorphologicalFields, final boolean addStemTag, final String word){
 		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
 		return (!addStemTag || containsStem(mfs)
 			? mfs

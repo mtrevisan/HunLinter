@@ -63,6 +63,10 @@ public final class RegexHelper{
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
 	}
 
+	public static String quoteReplacement(final String text){
+		return Matcher.quoteReplacement(text);
+	}
+
 	public static String[] split(final CharSequence text, final Pattern pattern){
 		return split(text, pattern, 0);
 	}
@@ -107,6 +111,12 @@ public final class RegexHelper{
 		while(component == null && i <= size)
 			component = matcher.group(i ++);
 		return component;
+	}
+
+	public static int indexOf(final CharSequence text, final Pattern pattern){
+		final Matcher m = matcher(text, pattern);
+		m.find();
+		return m.start();
 	}
 
 

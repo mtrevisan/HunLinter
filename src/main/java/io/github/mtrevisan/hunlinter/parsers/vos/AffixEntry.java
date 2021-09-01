@@ -110,6 +110,7 @@ public class AffixEntry{
 		final Matcher m = RegexHelper.matcher(lineParts[3], PATTERN_LINE);
 		if(!m.find())
 			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
+
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		condition = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
