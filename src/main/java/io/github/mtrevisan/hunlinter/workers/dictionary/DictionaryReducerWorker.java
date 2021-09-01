@@ -56,7 +56,7 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affixData);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {

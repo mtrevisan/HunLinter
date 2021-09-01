@@ -60,7 +60,7 @@ class WordGeneratorBase{
 
 
 	protected WordGeneratorBase(final AffixData affixData, final DictionaryCorrectnessChecker checker){
-		Objects.requireNonNull(affixData);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
 
 		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		this.affixData = affixData;
