@@ -69,7 +69,7 @@ public class WordCountWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
