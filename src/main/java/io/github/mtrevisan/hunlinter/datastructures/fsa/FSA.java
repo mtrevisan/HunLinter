@@ -33,8 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.BitSet;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
@@ -219,13 +219,13 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		}
 
 		//process nodes from second stack
-		final BitSet visited = new BitSet();
+		final Set<Integer> visited = new HashSet<>();
 		for(int i = out.size() - 1; i >= 0; i --){
 			final int n = out.get(i);
-			if(!visited.get(n) && !v.accept(n))
+			if(!visited.contains(n) && !v.accept(n))
 				break;
 
-			visited.set(n);
+			visited.add(n);
 		}
 	}
 

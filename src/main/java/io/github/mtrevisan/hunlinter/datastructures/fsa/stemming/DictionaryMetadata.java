@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -64,7 +65,7 @@ public class DictionaryMetadata{
 		.toMap();
 
 	/** Required attributes. */
-	private static final EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES =
+	private static final Set<DictionaryAttribute> REQUIRED_ATTRIBUTES =
 		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
 
 

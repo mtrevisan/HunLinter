@@ -78,7 +78,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 		//determine how much to remove (and where) from `source` to get a prefix of `target`
 		int truncatePrefixBytes = maxSubsequenceIndex;
 		int truncateSuffixBytes = (source.length - (maxSubsequenceIndex + maxSubsequenceLength));
-		if(truncatePrefixBytes >= REMOVE_EVERYTHING || truncateSuffixBytes >= REMOVE_EVERYTHING){
+		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
 			maxSubsequenceLength = 0;
 			truncatePrefixBytes = truncateSuffixBytes = REMOVE_EVERYTHING;
 		}

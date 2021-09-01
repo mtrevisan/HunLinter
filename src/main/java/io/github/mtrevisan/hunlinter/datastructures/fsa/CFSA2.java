@@ -149,7 +149,7 @@ public class CFSA2 extends FSA{
 	private final byte[] arcs;
 
 	/** Flags for this automaton version. */
-	private final EnumSet<FSAFlags> flags;
+	private final Set<FSAFlags> flags;
 
 	/** Label mapping for M-indexed labels. */
 	private final byte[] labelMapping;

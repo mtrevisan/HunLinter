@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
+import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA2;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
@@ -153,7 +154,7 @@ class FSATraversalTest{
 		FSAMatchResult m = traversalHelper.match("ax".getBytes());
 		Assertions.assertEquals(FSAMatchResult.AUTOMATON_HAS_PREFIX, m.kind);
 		Assertions.assertEquals(1, m.index);
-		Assertions.assertEquals(new HashSet<>(Arrays.asList("ba", "c")), suffixes(fsa, m.node));
+		Assertions.assertEquals(SetHelper.setOf("ba", "c"), suffixes(fsa, m.node));
 
 		Assertions.assertEquals(FSAMatchResult.EXACT_MATCH, traversalHelper.match("aba".getBytes()).kind);
 

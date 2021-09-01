@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
@@ -45,6 +44,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -172,7 +172,7 @@ public class AffixEntry{
 	}
 
 	public List<String> combineContinuationFlags(final List<String> otherContinuationFlags){
-		final Set<String> flags = new ArraySet<>();
+		final Set<String> flags = new HashSet<>();
 		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)

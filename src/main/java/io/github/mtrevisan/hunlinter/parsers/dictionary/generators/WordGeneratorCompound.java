@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
-import io.github.mtrevisan.hunlinter.datastructures.ArraySet;
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
@@ -46,6 +45,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -133,7 +133,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundAsReplacement.clear();
 
 		final StringBuffer sb = new StringBuffer();
-		final ArraySet<Inflection> inflections = new ArraySet<>();
+		final Set<Inflection> inflections = new LinkedHashSet<>();
 		//generate compounds:
 		for(final List<List<Inflection>> entry : entries){
 			//compose compound:

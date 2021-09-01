@@ -109,7 +109,7 @@ class AffixEntryTest{
 
 		final List<String> combinedFlags = entry.combineContinuationFlags(Arrays.asList("B", "A"));
 
-		Assertions.assertEquals(Arrays.asList("B", "A"), combinedFlags);
+		Assertions.assertEquals(Arrays.asList("A", "B"), combinedFlags);
 	}
 
 	@Test

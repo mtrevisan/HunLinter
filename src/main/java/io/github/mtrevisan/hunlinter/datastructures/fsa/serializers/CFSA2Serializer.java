@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.BitSet;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
@@ -60,7 +60,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
 
 	/** Supported flags. */
-	private static final EnumSet<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
+	private static final Set<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
 		FSAFlags.NEXTBIT);
 
 	/** No-state id. */
@@ -129,7 +129,7 @@ public class CFSA2Serializer implements FSASerializer{
 		//emit the header
 		FSAHeader.write(os, CFSA2.VERSION);
 
-		final EnumSet<FSAFlags> fsaFlags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
+		final Set<FSAFlags> fsaFlags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
 		if(serializeWithNumbers)
 			fsaFlags.add(FSAFlags.NUMBERS);
 		if(progressCallback != null)
@@ -233,7 +233,7 @@ public class CFSA2Serializer implements FSASerializer{
 	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets. */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
 			final IntIntHashMap offsets) throws IOException{
-		final BitSet visited = new BitSet();
+		final Set<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
 
@@ -245,7 +245,7 @@ public class CFSA2Serializer implements FSASerializer{
 		nodes.push(fsa.getRootNode());
 		while(!nodes.isEmpty()){
 			final int node = nodes.pop();
-			if(visited.get(node))
+			if(visited.contains(node))
 				continue;
 
 			linearizeState(fsa, nodes, linearized, visited, node);
@@ -264,14 +264,14 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Add a state to linearized list. */
-	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
-										 final BitSet visited, final int node){
+	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Set<Integer> visited,
+			final int node){
 		linearized.add(node);
-		visited.set(node);
+		visited.add(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
 			if(!fsa.isArcTerminal(arc)){
 				final int target = fsa.getEndNode(arc);
-				if(!visited.get(target))
+				if(!visited.contains(target))
 					nodes.push(target);
 			}
 	}
@@ -303,22 +303,22 @@ public class CFSA2Serializer implements FSASerializer{
 	/** Compute in-link count for each state. */
 	private IntIntHashMap computeInLinkCount(final FSA fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
-		final BitSet visited = new BitSet();
+		final Set<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
 
 		while(!nodes.isEmpty()){
 			final int node = nodes.pop();
-			if(visited.get(node))
+			if(visited.contains(node))
 				continue;
 
-			visited.set(node);
+			visited.add(node);
 
 			for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
 				if(!fsa.isArcTerminal(arc)){
 					final int target = fsa.getEndNode(arc);
 					inLinkCount.putOrAdd(target, 1, 1);
-					if(!visited.get(target))
+					if(!visited.contains(target))
 						nodes.push(target);
 				}
 		}

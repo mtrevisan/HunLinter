@@ -112,7 +112,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	public boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
-		return SetHelper.setOf(this.partOfSpeeches).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
+		return SetHelper.setOf(this.partOfSpeeches).equals(SetHelper.setOf(partOfSpeeches));
 	}
 
 	public List<String> getSynonyms(){
