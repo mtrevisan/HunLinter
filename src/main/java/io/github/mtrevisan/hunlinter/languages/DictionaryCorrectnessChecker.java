@@ -93,7 +93,7 @@ public class DictionaryCorrectnessChecker{
 		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
 		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
 		for(int i = 0; i < size; i ++){
-			String morphologicalField = morphologicalFields[i];
+			final String morphologicalField = morphologicalFields[i];
 			if(morphologicalField.length() < 4)
 				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
 					IndexDataPair.of(index, null)));
