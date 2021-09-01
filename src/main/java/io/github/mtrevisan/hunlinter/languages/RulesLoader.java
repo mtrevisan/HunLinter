@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.CharSequenceUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
@@ -63,7 +64,7 @@ public class RulesLoader{
 	private final Set<String> multipleStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
-	private final Map<String, Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
+	private final Map<char[], Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
 	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 
 
@@ -114,7 +115,7 @@ public class RulesLoader{
 					flags = strategy.parseFlags(elem);
 					final String correctRule = flags[flags.length - 1];
 					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new HashSet<>(1))
+					letterAndRulesNotCombinable.computeIfAbsent(CharSequenceUtils.toCharArray(letter), k -> new HashSet<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
 								? WORD_WITH_LETTER_CANNOT_HAVE_USE
 								: WORD_WITH_LETTER_CANNOT_HAVE),
@@ -191,7 +192,7 @@ public class RulesLoader{
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
-		for(final Map.Entry<String, Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
+		for(final Map.Entry<char[], Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
 			if(StringUtils.containsAny(inflection.getWord(), entry.getKey()))
 				for(final LetterMatcherEntry letterMatcherEntry : entry.getValue())
 					letterMatcherEntry.match(inflection);
