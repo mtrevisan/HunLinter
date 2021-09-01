@@ -85,7 +85,7 @@ public final class LexicographicalComparator{
 		 * BYTE_ARRAY_BASE_OFFSET doesn't get constant-folded.
 		 *
 		 * The compiler can treat static final fields as compile-time constants and can constant-fold
-		 * them while (final or not) local variables are run time values.
+		 * them while (final or not) local variables are runtime values.
 		 */
 
 		static final Unsafe theUnsafe = getUnsafe();
@@ -96,8 +96,8 @@ public final class LexicographicalComparator{
 			//fall back to the safer pure java implementation unless we're in
 			//a 64-bit JVM with an 8-byte aligned field offset.
 			if(!("64".equals(System.getProperty("sun.arch.data.model")) && (BYTE_ARRAY_BASE_OFFSET % 8) == 0
-				//sanity check - this should never fail
-				&& theUnsafe.arrayIndexScale(byte[].class) == 1))
+					//sanity check - this should never fail
+					&& theUnsafe.arrayIndexScale(byte[].class) == 1))
 				//force fallback to PureJavaComparator
 				throw new Error();
 		}

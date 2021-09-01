@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.CharSequenceUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
@@ -64,8 +63,8 @@ public class RulesLoader{
 	private final Set<String> multipleStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
-	private final Map<char[], Set<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
-	private final Map<String, Set<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
+	private final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
+	private final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
@@ -101,21 +100,21 @@ public class RulesLoader{
 			for(int i = 0; i < rules.size(); i ++){
 				final String masterFlag = rules.get(i ++);
 				final String[] wrongFlags = strategy.parseFlags(rules.get(i));
-				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new HashSet<>(1))
+				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new ArrayList<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
-			String letter = null;
+			Character letter = null;
 			rules = readPropertyAsList("letterAndRulesNotCombinable", '/');
 			for(int i = 0; i < rules.size(); i ++){
 				final String elem = rules.get(i);
 				if(elem.length() == 1)
-					letter = String.valueOf(elem.charAt(0));
+					letter = elem.charAt(0);
 				else{
 					flags = strategy.parseFlags(elem);
 					final String correctRule = flags[flags.length - 1];
 					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
-					letterAndRulesNotCombinable.computeIfAbsent(CharSequenceUtils.toCharArray(letter), k -> new HashSet<>(1))
+					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new ArrayList<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
 								? WORD_WITH_LETTER_CANNOT_HAVE_USE
 								: WORD_WITH_LETTER_CANNOT_HAVE),
@@ -192,17 +191,24 @@ public class RulesLoader{
 	}
 
 	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
-		for(final Map.Entry<char[], Set<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet())
-			if(StringUtils.containsAny(inflection.getWord(), entry.getKey()))
-				for(final LetterMatcherEntry letterMatcherEntry : entry.getValue())
+		final String word = inflection.getWord();
+		final Set<Character> keys = letterAndRulesNotCombinable.keySet();
+		for(final Character key : keys)
+			if(StringUtils.containsAny(word, key)){
+				final List<LetterMatcherEntry> letterMatcherEntries = letterAndRulesNotCombinable.get(key);
+				for(final LetterMatcherEntry letterMatcherEntry : letterMatcherEntries)
 					letterMatcherEntry.match(inflection);
+			}
 	}
 
 	public void flagToFlagIncompatibilityCheck(final Inflection inflection){
-		for(final Map.Entry<String, Set<RuleMatcherEntry>> check : ruleAndRulesNotCombinable.entrySet())
-			if(inflection.hasContinuationFlag(check.getKey()))
-				for(final RuleMatcherEntry entry : check.getValue())
+		final Set<String> rules = ruleAndRulesNotCombinable.keySet();
+		for(final String rule : rules)
+			if(inflection.hasContinuationFlag(rule)){
+				final List<RuleMatcherEntry> entries = ruleAndRulesNotCombinable.get(rule);
+				for(final RuleMatcherEntry entry : entries)
 					entry.match(inflection);
+			}
 	}
 
 }

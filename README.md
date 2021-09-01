@@ -333,7 +333,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - speed-up the loading of sorting dialog
 - understood how `ICON` and `OCONV` works
 - supported ISO-8859-10, ISO-8859-14, and ISCII-DEVANAGARI charsets
-- increased speed by 42% (for dictionary linter: from 2m 13s to 1m 17s)
+- increased speed by 50% (for dictionary linter: from 2m 13s to 1m 7s)
 
 <a name="changelog-2.1.0"></a>
 ### version 2.1.0 - 20210807

@@ -35,12 +35,12 @@ import java.text.MessageFormat;
 public class LetterMatcherEntry{
 
 	private final MessageFormat messagePattern;
-	private final String masterLetter;
+	private final Character masterLetter;
 	private final String[] wrongFlags;
 	private final String correctRule;
 
 
-	public LetterMatcherEntry(final MessageFormat messagePattern, final String masterLetter, final String[] wrongFlags,
+	public LetterMatcherEntry(final MessageFormat messagePattern, final Character masterLetter, final String[] wrongFlags,
 			final String correctRule){
 		this.messagePattern = messagePattern;
 		this.masterLetter = masterLetter;
