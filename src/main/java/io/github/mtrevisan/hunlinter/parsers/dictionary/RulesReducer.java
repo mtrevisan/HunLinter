@@ -209,7 +209,7 @@ public class RulesReducer{
 		for(final LineEntry entry : plainRules)
 			redistributeAddition(entry, map);
 		return SetHelper.collect(map.values(),
-			entry -> entry.removal + TAB + entry.condition + TAB + RegexHelper.mergeSet(entry.from, comparator),
+			entry -> entry.removal + TAB + entry.condition + TAB + RegexHelper.sortAndMergeSet(entry.from, comparator),
 			(rule, entry) -> rule.addition.addAll(entry.addition));
 	}
 
@@ -228,7 +228,7 @@ public class RulesReducer{
 	private List<LineEntry> compactRules(final Iterable<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return SetHelper.collect(rules,
-			entry -> entry.removal + TAB + RegexHelper.mergeSet(entry.addition, comparator) + TAB + entry.condition,
+			entry -> entry.removal + TAB + RegexHelper.sortAndMergeSet(entry.addition, comparator) + TAB + entry.condition,
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 

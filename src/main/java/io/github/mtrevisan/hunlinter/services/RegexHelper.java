@@ -144,16 +144,16 @@ public final class RegexHelper{
 	}
 
 	public static String makeGroup(final Collection<Character> group, final Comparator<String> comparator){
-		final String merge = mergeSet(group, comparator);
+		final String merge = sortAndMergeSet(group, comparator);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
 	}
 
 	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
-		final String merge = mergeSet(group, comparator);
+		final String merge = sortAndMergeSet(group, comparator);
 		return NOT_GROUP_START + merge + GROUP_END;
 	}
 
-	public static <V> String mergeSet(final Collection<V> set, final Comparator<String> comparator){
+	public static <V> String sortAndMergeSet(final Collection<V> set, final Comparator<String> comparator){
 		final List<String> list = new ArrayList<>(set.size());
 		for(final V v : set)
 			list.add(String.valueOf(v));
