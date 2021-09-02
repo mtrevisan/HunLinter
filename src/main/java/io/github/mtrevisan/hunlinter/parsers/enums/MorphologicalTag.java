@@ -66,6 +66,7 @@ public enum MorphologicalTag{
 		this.code = code;
 	}
 
+	//FIXME speed-up this
 	public static MorphologicalTag createFromCode(final String code){
 		return VALUES.get(code.substring(0, 3));
 	}
