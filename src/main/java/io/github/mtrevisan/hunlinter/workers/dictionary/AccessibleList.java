@@ -49,7 +49,7 @@ class AccessibleList<T>{
 		addAll(array, array.length);
 	}
 
-	void addAll(final AccessibleList<T> array){
+	synchronized void addAll(final AccessibleList<T> array){
 		addAll(array.data, array.limit);
 	}
 
@@ -70,13 +70,13 @@ class AccessibleList<T>{
 		return data.getClass().getComponentType();
 	}
 
-	void clear(){
+	synchronized void clear(){
 		data = null;
 		limit = -1;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public synchronized boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -88,7 +88,7 @@ class AccessibleList<T>{
 	}
 
 	@Override
-	public int hashCode(){
+	public synchronized int hashCode(){
 		return 31 * limit + Arrays.hashCode(data);
 	}
 

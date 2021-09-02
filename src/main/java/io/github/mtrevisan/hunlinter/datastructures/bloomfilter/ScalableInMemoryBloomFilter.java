@@ -62,7 +62,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean add(final T value){
+	public synchronized boolean add(final T value){
 		if(value == null)
 			return false;
 
@@ -91,7 +91,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public int getAddedElements(){
+	public synchronized int getAddedElements(){
 		int elements = 0;
 		for(final BloomFilterInterface<T> filter : filters)
 			elements += filter.getAddedElements();
@@ -99,7 +99,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
 		final int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
 		return (addedElements >= parameters.getExpectedNumberOfElements() / 2);
 	}

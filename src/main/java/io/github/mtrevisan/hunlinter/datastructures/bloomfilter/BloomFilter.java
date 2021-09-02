@@ -163,7 +163,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public int getAddedElements(){
+	public synchronized int getAddedElements(){
 		return addedElements;
 	}
 
@@ -196,7 +196,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter
 	 * @return {@code true} if any bit was modified when adding the value, {@code false} otherwise
 	 */
-	public boolean add(final byte[] bytes){
+	public synchronized boolean add(final byte[] bytes){
 		final boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;
@@ -233,7 +233,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public boolean contains(final byte[] bytes){
+	public synchronized boolean contains(final byte[] bytes){
 		final long hash = getLongHash64(bytes);
 		final int lowHash = (int)hash;
 		final int highHash = (int)(hash >>> 32);
@@ -293,7 +293,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean isFull(){
+	public synchronized boolean isFull(){
 		return (addedElements >= expectedElements);
 	}
 
@@ -303,7 +303,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		return getTrueFalsePositiveProbability(addedElements);
 	}
 
@@ -315,13 +315,13 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	/** Sets all bits to false in the Bloom filter. */
 	@Override
-	public void clear(){
+	public synchronized void clear(){
 		bitArray.clearAll();
 		addedElements = 0;
 	}
 
 	@Override
-	public void close(){
+	public synchronized void close(){
 		try{
 			bitArray.close();
 		}
