@@ -56,8 +56,8 @@ public class DictionaryBaseData extends BloomFilterParameters{
 	}
 
 	@Override
-	public double getGrowRatioWhenFull(){
-		return GROW_RATIO_WHEN_FULL;
+	public double getGrowthRatioWhenFull(){
+		return GROWTH_RATIO_WHEN_FULL;
 	}
 
 }

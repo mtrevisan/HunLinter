@@ -162,7 +162,7 @@ The font will be linked to the project so, opening it again later, the same font
 
 <a name="how-to-extension"></a>
 ### Create an extension
-In order to create an extension (eg. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
+In order to create an extension (e.g. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
 
 Remember that the package will have the same name of the directory, but the directory itself is not included, just the content is.
 
@@ -184,7 +184,7 @@ In case of error it is suggested to copy _all_ the synonyms for the indicated wo
 ### Linter hyphenation
 To linter the hyphenation just select `Hyphenation tools|Correctness check`.
 
-Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc).
+Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc.).
 
 <a name="how-to-sort"></a>
 ### Sort dictionary
@@ -206,7 +206,7 @@ Note: There is an uncertainty about the uniqueness count, but it should be small
 
 <a name="how-to-statistics"></a>
 ### Dictionary statistics
-Use `Dictionary tools|Statistics` to produce some statistics (graphs and values are exportable with a right click!) about word and compound word count, mode of words' length, mode of words' syllabe, most common syllabes, longest words (by letters and by syllabes).
+Use `Dictionary tools|Statistics` to produce some statistics (graphs and values are exportable with a right click!) about word and compound word count, mode of words' length, mode of words' syllabe, most common syllabes, the longest words (by letters and by syllabes).
 
 If you want to include hyphenation statistics be sure to use `Hyphenation tools|Statistics` instead, but expect a 3.6&times; or so increase in running time.
 
@@ -235,7 +235,7 @@ An external text file can be put into the directory `aids` (on the same level of
 
 This file could be used as a reminder of all the flag that can be added to a word and their meaning.
 
-The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `aid` (eg. for Venetan: `vec-IT.aid`).
+The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `aid` (e.g. for Venetan: `vec-IT.aid`).
 
 <a name="how-to-ordering"></a>
 ### Ordering table columns
@@ -249,7 +249,7 @@ Use `Ctrl+C` after selecting the row, or use the right click of the mouse to acc
 
 <a name="how-to-insertion"></a>
 ### Rule/dictionary insertion
-This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
+This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, or change them, you have plenty of tools around you. For Windows, I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
 
 <sup>1</sup>: Even if for the hyphenation file a new rule can actually be added…
 
@@ -276,7 +276,7 @@ Entries can be inserted in two ways:
 
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech if given) that are already contained into the thesaurus.
 
-It is possible to right click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
+It is possible to right-click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
 
 ![alt text](https://i.postimg.cc/yx1D0Xtz/thesaurus.png "Thesaurus")
 
@@ -351,7 +351,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### version 2.0.1 - 20210805
 - added warn for unused rules after dictionary linter
 - added the possibility to hide selected columns from dictionary table
-- (finally) added a windows installer
+- (finally) added a Windows installer
 - some minor improvements on speed and linting capabilities
 
 <a name="changelog-2.0.0"></a>
@@ -396,7 +396,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - now all the relevant files are loaded by reading the `META-INF\manifest.xml` file, no assumptions was made
 - enhancement for hyphenation section: now it is possible also to insert custom hyphenations
 - bug fix on duplicate extraction
-- some simplifications was made in the main menu (removed thesaurus validation on request because it will be done anyway at loading)
+- some simplifications were made in the main menu (removed thesaurus validation on request because it will be done anyway at loading)
 - improvements on thesaurus table filtering
 - prevented the insertion of a new thesaurus if it is already contained
 - revised the dictionary sort dialog from scratch to better handle sections between comments

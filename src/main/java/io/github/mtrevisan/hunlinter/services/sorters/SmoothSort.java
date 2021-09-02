@@ -160,7 +160,7 @@ public final class SmoothSort{
 
 				//This block gets broken into three bits.
 				//The rightmost bit is a block of length 1.
-				//The left hand part is split into two, a block of length LP[pExponent + 1] and one of LP[pExponent].
+				//The left-hand part is split into two, a block of length LP[pExponent + 1] and one of LP[pExponent].
 				//Both these two are appropriately heapified, but the root nodes are not necessarily in order. We therefore
 				//semi-trinkle both of them
 

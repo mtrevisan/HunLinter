@@ -133,10 +133,7 @@ public class FSA5 extends FSA{
 	 */
 	public final byte[] arcs;
 
-	/**
-	 * The length of the node header structure (if the automaton was compiled with
-	 * <code>NUMBERS</code> option). Otherwise zero.
-	 */
+	/** The length of the node header structure (if the automaton was compiled with <code>NUMBERS</code> option). Otherwise, zero. */
 	public final int nodeDataLength;
 
 	/** Flags for this automaton version. */

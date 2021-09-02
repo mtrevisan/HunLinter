@@ -179,7 +179,7 @@ public class BasicEventBus implements EventBusInterface{
 		final Method[] methods = subscriber.getClass().getDeclaredMethods();
 		for(final Method method : methods){
 			//look for the EventHandler annotation on the method, if it exists
-			//if not, this returns null, and go to the next method
+			//if it doesn't exist, this returns null, and go to the next method
 			final EventHandler eh = method.getAnnotation(EventHandler.class);
 			if(eh == null)
 				continue;
@@ -323,7 +323,7 @@ public class BasicEventBus implements EventBusInterface{
 
 		private void dispatchToRegularHandlers(final Collection<HandlerInfoCallable> regularHandlers){
 			//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
-			//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
+			//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise,
 			//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
 			//are accounted for here and exceptions really shouldn't be thrown.
 			if(waitForHandlers){
@@ -390,7 +390,7 @@ public class BasicEventBus implements EventBusInterface{
 		 * The call has been modified to not throw any Exceptions. It will not, unlike the interface definition,
 		 * throw an exception. All exceptions are handled locally.
 		 *
-		 * @return	If the invoke was vetoed.
+		 * @return	If the event was vetoed.
 		 */
 		@Override
 		public Boolean call(){

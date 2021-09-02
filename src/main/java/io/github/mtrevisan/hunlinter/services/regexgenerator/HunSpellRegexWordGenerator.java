@@ -90,9 +90,9 @@ public class HunSpellRegexWordGenerator{
 	/**
 	 * Initializes the NFA from the specified regular expression.
 	 * <p>
-	 * NOTE: each element should be enclosed in parentheses (eg. {@code (as)(ert)?(b)*}), the managed operations are <code>*</code> and <code>?</code>
+	 * NOTE: each element should be enclosed in parentheses (e.g. {@code (as)(ert)?(b)*}), the managed operations are <code>*</code> and <code>?</code>
 	 *
-	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
+	 * @param regexpParts	The regular expression already subdivided into input and modifiers (e.g. ["ag", "ert", "?", "b", "*"])
 	 */
 	public HunSpellRegexWordGenerator(final String[] regexpParts){
 		int offset = 0;

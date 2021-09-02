@@ -50,7 +50,7 @@ The [Project Team](#join-the-project-team) looks forward to your contributions.
 If you have a question about this project, how to use it, or just need clarification about something:
 * Open an Issue at https://github.com/mtrevisan/Boxon/issues
 * Provide as much context as you can about what you're running into.
-* Provide OS version, processor speed, RAM amount, etc, depending on what seems relevant. If not, please be ready to provide these information if maintainers ask for them.
+* Provide OS version, processor speed, RAM amount, etc., depending on what seems relevant. If not, please be ready to provide these information if maintainers ask for them.
 
 Once it's filed:
 * The project team will [label the issue](#label-issues).
@@ -63,7 +63,7 @@ Once it's filed:
 If you run into an error or bug with the project:
 * Open an Issue at https://github.com/mtrevisan/Boxon/issues
 * Include *reproduction steps* that someone else can follow to recreate the bug or error on their own.
-* Provide OS version, processor speed, RAM amount, etc, depending on what seems relevant. If not, please be ready to provide these information if maintainers ask for them.
+* Provide OS version, processor speed, RAM amount, etc., depending on what seems relevant. If not, please be ready to provide these information if maintainers ask for them.
 
 Once it's filed:
 * The project team will [label the issue](#label-issues).
@@ -73,7 +73,7 @@ Once it's filed:
 * If the team is able to reproduce the issue, it will be marked `needs-fix`, as well as possibly other tags (such as `critical`), and the issue will be left to be [implemented by someone](#contribute-code).
 * If you or the maintainers don't respond to an issue for 30 days, the [issue will be closed](#clean-up-issues-and-prs).<br>
   If you want to come back to it, reply (once, please), and we'll reopen the existing issue. Please avoid filing new issues as extensions of one you already made.
-* `critical` issues may be left open, depending on perceived immediacy and severity, even past the 30 day deadline.
+* `critical` issues may be left open, depending on perceived immediacy and severity, even past the 30-day deadline.
 
 <a name="request-a-feature"></a>
 ## Request a feature
@@ -92,9 +92,9 @@ Note: The team is unlikely to be able to accept every single feature request tha
 
 <a name="project-setup"></a>
 ## Project setup
-So you wanna contribute some code! That's great! This project uses GitHub Pull Requests to manage contributions, so [read up on how to fork a GitHub project and file a PR](https://guides.github.com/activities/forking) if you've never done it before.
+So you want to contribute some code! That's great! This project uses GitHub Pull Requests to manage contributions, so [read up on how to fork a GitHub project and file a PR](https://guides.github.com/activities/forking) if you've never done it before.
 
-If this seems like a lot or you aren't able to do all this setup, you might also be able to [edit the files directly](https://help.github.com/articles/editing-files-in-another-user-s-repository/) without having to do any of this setup. Yes, [even code](#contribute-code).
+If this seems like a lot, or you aren't able to do all this setup, you might also be able to [edit the files directly](https://help.github.com/articles/editing-files-in-another-user-s-repository/) without having to do any of this setup. Yes, [even code](#contribute-code).
 
 If you want to go the usual route and run the project locally, [fork the project](https://guides.github.com/activities/forking/#fork) and you should be ready to go!
 
@@ -149,7 +149,7 @@ Once you've filed the PR:
 ## Provide support on issues
 Helping out other users with their questions is a really awesome way of contributing to any community. It's not uncommon for most of the issues on an open source projects being support-related questions by users trying to understand something they ran into, or find their way around a known bug.
 
-Sometimes, the `support` label will be added to things that turn out to actually be other things, like bugs or feature requests. In that case, suss out the details with the person who filed the original issue, add a comment explaining what the bug is, and change the label from `support` to `bug` or `feature`. If you can't do this yourself, @mention a maintainer so they can do it.
+Sometimes, the `support` label will be added to things that turn out to actually be other things, like bugs or feature requests. In that case, suss out the details with the person who filed the original issue, add a comment explaining what the bug is, and change the label from `support` to `bug` or `feature`. If you can't do this yourself, @mention a maintainer, so they can do it.
 
 In order to help other folks out with their questions:
 * Go to the issue tracker and [filter open issues by the `support` label](https://github.com/mtrevisan/Boxon/issues?q=is%3Aopen+is%3Aissue+label%3Asupport).
@@ -193,7 +193,7 @@ In these cases, they should be closed until they're brought up again or the inte
 
 To clean up issues and PRs:
 * Search the issue tracker for issues or PRs, and add the term `updated:<=YYYY-MM-DD`, where the date is 30 days before today.
-* Go through each issue *from oldest to newest*, and close them if **all of the following are true**:
+* Go through each issue *from oldest to newest*, and close them if **all the following are true**:
   * not opened by a maintainer
   * not marked as `critical`
   * not marked as `starter` or `help wanted` (these might stick around for a while, in general, as they're intended to be available)
@@ -203,7 +203,7 @@ To clean up issues and PRs:
 
 <a name="review-pull-requests"></a>
 ## Review Pull Requests
-While anyone can comment on a PR, add feedback, etc, PRs are only *approved* by team members with Issue Tracker or higher permissions.
+While anyone can comment on a PR, add feedback, etc., PRs are only *approved* by team members with Issue Tracker or higher permissions.
 
 PR reviews use [GitHub's own review feature](https://help.github.com/articles/about-pull-request-reviews/), which manages comments, approval, and review iteration.
 
@@ -211,7 +211,7 @@ Some notes:
 * You may ask for minor changes ("nitpicks"), but consider whether they are really blockers to merging: try to err on the side of "approve, with comments".
 * *ALL PULL REQUESTS* should be covered by a test: either by a previously-failing test, an existing test that covers the entire functionality of the submitted code, or new tests to verify any new/changed behavior.<br>
   All tests must also pass and follow established conventions. Test coverage should not drop, unless the specific case is considered reasonable by maintainers.
-* Please make sure you're familiar with the code or documentation being updated, unless it's a minor change (spellchecking, minor formatting, etc).<br>
+* Please make sure you're familiar with the code or documentation being updated, unless it's a minor change (spellchecking, minor formatting, etc.).<br>
   You may @mention another project member who you think is better suited for the review, but still provide a non-approving review of your own.
 * Be extra kind: people who submit code/doc contributions are putting themselves in a pretty vulnerable position, and have put time and care into what they've done (even if that's not obvious to you!) -- always respond with respect, be understanding, but don't feel like you need to sacrifice your standards for their sake, either.
 
@@ -228,7 +228,7 @@ The most important bit here is probably that all tests must pass, and tags must 
 ## Join the Project Team
 There are many ways to contribute! Most of them don't require any official status unless otherwise noted. That said, there's a couple of positions that grant special repository abilities, and this section describes how they're granted and what they do.
 
-All of the below positions are granted based on the project team's needs, as well as their consensus opinion about whether they would like to work with the person and think that they would fit well into that position. The process is relatively informal, and it's likely that people who express interest in participating can just be granted the permissions they'd like.
+All the below positions are granted based on the project team's needs, as well as their consensus opinion about whether they would like to work with the person and think that they would fit well into that position. The process is relatively informal, and it's likely that people who express interest in participating can just be granted the permissions they'd like.
 
 You can spot a collaborator on the repo by looking for the `[Collaborator]` or `[Owner]` tags next to their names.
 

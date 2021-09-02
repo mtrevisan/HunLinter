@@ -604,7 +604,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		mainTabbedPane.setSelectedIndex(0);
 
 		//NOTE: in order to avoid concurrency problems it is necessary to transform the loader into an event for the bus
-		//so as to happen after all the clear events
+		//so to happen after all the clear events
 		EventBusService.publish(preLoadProjectEvent.convertToLoadEvent());
 	}
 

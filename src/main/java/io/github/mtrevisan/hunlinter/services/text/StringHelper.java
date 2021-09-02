@@ -254,7 +254,7 @@ public final class StringHelper{
 			//if current character matches with next
 			if(i < n - 1 && text.charAt(i) == chr && text.charAt(i + 1) == chr)
 				currentCount ++;
-			//if doesn't match, update result (if required) and reset count
+			//if it doesn't match, update result (if required) and reset count
 			else{
 				if(currentCount > count)
 					count = currentCount;

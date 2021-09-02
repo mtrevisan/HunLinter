@@ -409,7 +409,7 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * Line must contains exactly one hyphenation point
+	 * Line must contain exactly one hyphenation point
 	 *
 	 * @param rule   Rule to be validated
 	 * @param level   Level to add the rule to

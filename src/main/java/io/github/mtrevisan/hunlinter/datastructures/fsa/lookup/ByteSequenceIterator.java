@@ -41,7 +41,7 @@ import java.util.NoSuchElementException;
 public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/**
-	 * Default expected depth of the recursion stack (estimated longest sequence
+	 * Default expected depth of the recursion stack (estimated the longest sequence
 	 * in the automaton). Buffers expand by the same value if exceeded.
 	 */
 	private static final int EXPECTED_MAX_STATES = 15;

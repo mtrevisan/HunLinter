@@ -38,7 +38,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -168,7 +167,7 @@ public class ZipManager{
 		}
 	}
 
-	//This method guards against writing files to the file system outside of the target folder.
+	//This method guards against writing files to the file system outside the target folder.
 	//This vulnerability is called Zip Slip.
 	private File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
 		final File destFile = new File(destinationDir, zipEntry.getName());

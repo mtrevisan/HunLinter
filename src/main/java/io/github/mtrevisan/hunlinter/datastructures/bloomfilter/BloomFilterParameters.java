@@ -35,7 +35,7 @@ public abstract class BloomFilterParameters{
 	private static final String INVALID_TIGHTENING_RATIO = "Tightening ratio must be in the interval ]0, 1[";
 	private static final String INVALID_BIT_ARRAY_TYPE = "Bit array type must be valued";
 
-	public static final double GROW_RATIO_WHEN_FULL_DEFAULT = 2.;
+	public static final double GROWTH_RATIO_WHEN_FULL_DEFAULT = 2.;
 	public static final double TIGHTENING_RATIO_DEFAULT = 0.85;
 	public static final BitArrayBuilder.Type BIT_ARRAY_TYPE_DEFAULT = BitArrayBuilder.Type.JAVA;
 
@@ -57,10 +57,10 @@ public abstract class BloomFilterParameters{
 	/**
 	 * Defaults to 2
 	 *
-	 * @return	The grow ratio when the filter is full
+	 * @return	The growth ratio when the filter is full
 	 */
-	public double getGrowRatioWhenFull(){
-		return GROW_RATIO_WHEN_FULL_DEFAULT;
+	public double getGrowthRatioWhenFull(){
+		return GROWTH_RATIO_WHEN_FULL_DEFAULT;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public abstract class BloomFilterParameters{
 			throw new IllegalArgumentException(INVALID_NUMBER_OF_ELEMENTS);
 		if(getFalsePositiveProbability() <= 0. || getFalsePositiveProbability() >= 1.)
 			throw new IllegalArgumentException(INVALID_FALSE_POSITIVE_PROBABILITY);
-		if(getGrowRatioWhenFull() <= 1.)
+		if(getGrowthRatioWhenFull() <= 1.)
 			throw new IllegalArgumentException(INVALID_GROW_RATIO);
 		if(getTighteningRatio() <= 0. && getTighteningRatio() >= 1.)
 			throw new IllegalArgumentException(INVALID_TIGHTENING_RATIO);

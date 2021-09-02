@@ -49,7 +49,7 @@ import java.util.List;
 /**
  * `SentenceExceptList.xml` – Manages abbreviations that end with a fullstop that should be ignored when determining
  * 	the end of a sentence
- * `WordExceptList.xml` – Manages words that may contain more than 2 leading capital, eg. `CDs`
+ * `WordExceptList.xml` – Manages words that may contain more than 2 leading capital, e.g. `CDs`
  */
 public class ExceptionsParser{
 
@@ -76,10 +76,10 @@ public class ExceptionsParser{
 	/**
 	 * Parse the rows out from a `SentenceExceptList.xml` or a `WordExceptList.xml` file.
 	 *
-	 * @param wexFile	The reference to the word exceptions file
-	 * @param language	The language (used to sort)
-	 * @throws IOException	If an I/O error occurs
-	 * @throws SAXException	If an parsing error occurs on the `xml` file
+	 * @param wexFile	The reference to the word exceptions file.
+	 * @param language	The language (used to sort).
+	 * @throws IOException	If an I/O error occurs.
+	 * @throws SAXException	If a parsing error occurs on the `xml` file.
 	 */
 	public void parse(final File wexFile, final String language) throws IOException, SAXException{
 		comparator = BaseBuilder.getComparator(language);

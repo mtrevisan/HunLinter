@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
 public enum DictionaryAttribute{
 
 	/**
-	 * Logical fields separator inside the FSA.
+	 * Logical fields' separator inside the FSA.
 	 */
 	SEPARATOR("fsa.dict.separator"){
 		@Override

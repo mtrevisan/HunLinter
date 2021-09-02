@@ -143,7 +143,7 @@ public class RulesReducer{
 	private List<LineEntry> compactInflections(final List<LineEntry> rules){
 		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
 		if(rules.size() > 1){
-			//retrieve rule with longest condition (all the other conditions must be this long)
+			//retrieve rule with the longest condition (all the other conditions must be this long)
 			final LineEntry compactedRule = LoopHelper.max(rules, Comparator.comparingInt(rule -> rule.condition.length()));
 			expandAddition(rules, compactedRule);
 
@@ -503,7 +503,7 @@ public class RulesReducer{
 			//if there is only one rule, then it goes in the final set
 			if(bush.size() == 1)
 				finalRules.add(bush.get(0));
-			//otherwise process the rules
+			//otherwise, process the rules
 			else
 				finalRules.addAll(disjoinSameEndingConditionsBush(bush, overallLastGroups));
 		}

@@ -182,7 +182,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return false;
 	}
 
-	/** Transition of a node, if the node is root and it failed, then returns the root. */
+	/** Transition of a node, if the node is root, and it failed, then returns the root. */
 	private int transitionWithRoot(final int nodeId, final char character){
 		final int b = base[nodeId];
 		final int idx = b + character + 1;
@@ -204,11 +204,11 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	/**
 	 * Match exactly by a key
 	 *
-	 * @param key	The key
-	 * @param position	The begin index of char array
-	 * @param length	The length of the key
-	 * @param nodeId	The starting position of the node for searching
-	 * @return	The id of the key (you can use it as a perfect hash function)
+	 * @param key	The key.
+	 * @param position	The starting index of char array.
+	 * @param length	The length of the key.
+	 * @param nodeId	The starting position of the node for searching.
+	 * @return	The id of the key (you can use it as a perfect hash function).
 	 */
 	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
 		Objects.requireNonNull(key, "Key cannot be null");

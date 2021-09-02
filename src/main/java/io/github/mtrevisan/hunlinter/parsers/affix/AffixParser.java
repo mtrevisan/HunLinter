@@ -178,7 +178,7 @@ public class AffixParser{
 	 * @param affFile	The content of the affix file
 	 * @param configurationLanguage    The language implemented by the affix file
 	 * @throws IOException	If an I/O error occurs
-	 * @throws LinterException   If something is wrong while parsing the file (eg. a missing rule)
+	 * @throws LinterException   If something is wrong while parsing the file (e.g. a missing rule)
 	 */
 	public void parse(final File affFile, final String configurationLanguage) throws IOException{
 		clear();

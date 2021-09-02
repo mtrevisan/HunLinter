@@ -130,7 +130,7 @@ public final class JavaHelper{
 			.split(StringUtils.SPACE);
 		cmd.append(" -jar ")
 			.append(jarURL);
-		//finally add program arguments
+		//finally, add program arguments
 		for(int i = 1; i < mainCommand.length; i ++)
 			cmd.append(StringUtils.SPACE)
 				.append(mainCommand[i]);

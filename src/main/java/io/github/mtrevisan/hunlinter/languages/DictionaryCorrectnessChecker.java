@@ -122,12 +122,12 @@ public class DictionaryCorrectnessChecker{
 		return false;
 	}
 
-	//used by the minimal pairs worker:
+	//used by the minimal pairs' worker:
 	public boolean isConsonant(final char chr){
 		return true;
 	}
 
-	//used by the minimal pairs worker:
+	//used by the minimal pairs' worker:
 	public boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
 		return true;
 	}

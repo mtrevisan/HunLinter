@@ -196,8 +196,7 @@ public class CFSA2Serializer implements FSASerializer{
 		//ordered states for serialization
 		final DynamicIntArray linearized = new DynamicIntArray();
 
-		//determine which states should be linearized first (at fixed positions) so as to minimize the place occupied by
-		//goto fields
+		//determine which states should be linearized first (at fixed positions) so to minimize the place occupied by goto fields
 		final int[] states = computeFirstStates(inLinkCount, Integer.MAX_VALUE, 2);
 
 		//compute initial addresses, without node rearrangements
@@ -207,8 +206,7 @@ public class CFSA2Serializer implements FSASerializer{
 		final DynamicIntArray sublist = new DynamicIntArray();
 		sublist.addAll(states);
 
-		//probe the initial region a little bit, looking for optimal cut (it can't be binary search
-		//because the result isn't monotonic)
+		//probe the initial region a little, looking for optimal cut (it can't be binary search because the result isn't monotonic)
 		LOGGER.trace("Compacting, initial output size: {}", serializedSize);
 		int cutAt = 0;
 		for(int cut = Math.min(25, states.length); cut <= Math.min(150, states.length); cut += 25){

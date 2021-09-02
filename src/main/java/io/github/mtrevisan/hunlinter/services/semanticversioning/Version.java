@@ -269,7 +269,7 @@ public class Version implements Comparable<Version>{
 
 	private int compareToIdentifiers(final String[] preRelease, final String[] otherPreRelease){
 		final int result = compareIdentifierArrays(preRelease, otherPreRelease);
-		//a larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal
+		//a larger set of pre-release fields has a higher precedence than a smaller set, if all the preceding identifiers are equal
 		return (result != 0? result: preRelease.length - otherPreRelease.length);
 	}
 

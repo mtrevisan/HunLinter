@@ -39,7 +39,7 @@ public final class GlyphComparator{
 	 *
 	 * @param font	The font to render the character in
 	 * @param maxDifferenceThreshold	Maximum allowed difference
-	 * @param chrs	Characters to be check for equality
+	 * @param chrs	Characters to be checked for equality
 	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
 	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){

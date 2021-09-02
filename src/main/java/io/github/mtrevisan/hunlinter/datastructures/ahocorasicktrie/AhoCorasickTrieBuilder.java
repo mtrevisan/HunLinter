@@ -228,7 +228,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				resize(pos + 1);
 
 			outer:
-			//the goal of this loop body is to find n free spaces that satisfy base[begin + a1…an] == 0, a1…an are n nodes in siblings
+			//the goal of this loop body is to find `n` free spaces that satisfy `base[begin + a_1…a_n] == 0`, `a_1` to `a_n` are `n` nodes
+			//in siblings
 			while(true){
 				pos ++;
 

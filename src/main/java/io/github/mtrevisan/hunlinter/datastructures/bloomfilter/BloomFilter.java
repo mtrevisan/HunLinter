@@ -204,10 +204,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	/**
-	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
+	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et al.
 	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
 	 *		asymptotic false positive probability'.
-	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
+	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
 	private synchronized boolean calculateIndexes(final byte[] bytes){
 		boolean bitsChanged = false;
@@ -228,10 +228,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	/*
-	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et.al.
+	 * NOTE: use the trick mentioned in "Less hashing, same performance: building a better Bloom filter" by Kirsch et al.
 	 *		From abstract 'only two hash functions are necessary to effectively implement a Bloom filter without any loss in the
 	 *		asymptotic false positive probability'.
-	 *		Lets split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
+	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
 	public synchronized boolean contains(final byte[] bytes){
 		final long hash = getLongHash64(bytes);

@@ -104,7 +104,7 @@ public class RadixTrieNode{
 	/**
 	 * Add some matching pattern strings
 	 *
-	 * @param childrenIds	Id of the children to add.
+	 * @param childrenIds	Identifier of the children to add.
 	 */
 	public void addChildrenIds(final Iterable<Integer> childrenIds){
 		if(childrenIds != null)

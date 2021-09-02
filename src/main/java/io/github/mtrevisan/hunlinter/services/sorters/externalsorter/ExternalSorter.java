@@ -62,10 +62,10 @@ public class ExternalSorter{
 	 * and write the result to temporary files that have to be
 	 * merged later.
 	 *
-	 * @param file	Some flat file
-	 * @param options	Sorting options
-	 * @return a list of temporary flat files
-	 * @throws IOException generic IO exception
+	 * @param file	Some flat file.
+	 * @param options	Sorting options.
+	 * @return	A list of temporary flat files.
+	 * @throws IOException	Generic IO exception.
 	 */
 	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
 		//extract uncompressed file size

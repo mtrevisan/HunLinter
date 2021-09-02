@@ -90,7 +90,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		}
 
 		@Override
-		public double getGrowRatioWhenFull(){
+		public double getGrowthRatioWhenFull(){
 			return 1.3;
 		}
 

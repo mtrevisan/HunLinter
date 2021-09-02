@@ -146,9 +146,9 @@ public class StringList implements Iterable<String>{
 	 * If the sum does not overflow an int, then {@code Integer.MAX_VALUE} is
 	 * returned.  Otherwise, {@code OutOfMemoryError} is thrown.
 	 *
-	 * @param oldLength   current length of the array (must be non negative)
+	 * @param oldLength   current length of the array (must be non-negative)
 	 * @param minGrowth   minimum required growth of the array length (must be positive)
-	 * @param prefGrowth  preferred growth of the array length (ignored, if less then {@code minGrowth})
+	 * @param prefGrowth  preferred growth of the array length (ignored, if less than {@code minGrowth})
 	 * @return the new length of the array
 	 * @throws OutOfMemoryError if increasing {@code oldLength} by {@code minGrowth} overflows.
 	 */
@@ -237,7 +237,7 @@ public class StringList implements Iterable<String>{
 	}
 
 	/**
-	 * Removes all of the elements from this list.
+	 * Removes all the elements from this list.
 	 * The list will be empty after this call returns.
 	 */
 	public void clear(){
@@ -314,7 +314,7 @@ public class StringList implements Iterable<String>{
 	 * caller.
 	 * <p>
 	 * The behavior of this method is unspecified if the action performs
-	 * side-effects that modify the underlying source of elements, unless an
+	 * side effects that modify the underlying source of elements, unless an
 	 * overriding class has specified a concurrent modification policy.
 	 *
 	 * <p>The default implementation behaves as if:

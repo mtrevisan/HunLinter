@@ -75,7 +75,7 @@ public class Hyphenator implements HyphenatorInterface{
 		hypParser.removeRule(additionalRule, level);
 
 		//if there is an already present rule, say, `stu3a` and we overwrite it with, say, `stu4a`,
-		//the old `stu3a` is lost and it's necessary to re-add it
+		//the old `stu3a` is lost, and it's necessary to re-add it
 		if(oldRule != null)
 			hypParser.addRule(oldRule, level);
 
@@ -271,7 +271,7 @@ public class Hyphenator implements HyphenatorInterface{
 		String addAfter = null;
 		final int size = word.length();
 		String[] result = new String[0];
-		final Matcher m = HyphenationParser.PATTERN_AUGMENTED_RULE.matcher(StringUtils.EMPTY);
+		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, HyphenationParser.PATTERN_AUGMENTED_RULE);
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);

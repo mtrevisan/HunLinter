@@ -38,7 +38,7 @@ import java.util.StringJoiner;
 /**
  * The {@code Digraph} class represents a directed graph of vertices.
  * <p>
- * It supports the following two primary operations: add an edge to the digraph, iterate over all of the vertices adjacent from a given vertex.
+ * It supports the following two primary operations: add an edge to the digraph, iterate over all the vertices adjacent from a given vertex.
  * Parallel edges and self-loops are permitted.
  * <p>
  * This implementation uses an adjacency-lists representation, which is a vertex-indexed array of {@link Pair} objects.

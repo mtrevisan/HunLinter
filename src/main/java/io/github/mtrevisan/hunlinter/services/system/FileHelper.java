@@ -375,10 +375,10 @@ public final class FileHelper{
 
 	public static void moveFile(final Path source, final Path target) throws IOException{
 		if(SystemUtils.IS_OS_WINDOWS || Files.notExists(target))
-			//for windows we can't go wrong because the OS manages locking
+			//for windows, we can't go wrong because the OS manages locking
 			Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
 		else{
-			//let's unlink file first so we don't run into file-busy errors
+			//let's unlink file first, so we don't run into file-busy errors
 			final Path temp = Files.createTempFile(target.getParent(), null, null);
 			Files.move(target, temp, StandardCopyOption.REPLACE_EXISTING);
 

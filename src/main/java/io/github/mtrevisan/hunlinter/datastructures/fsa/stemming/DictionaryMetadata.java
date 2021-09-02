@@ -110,7 +110,7 @@ public class DictionaryMetadata{
 	 * Read dictionary metadata from a property file (stream).
 	 *
 	 * @param metadataStream The stream with metadata.
-	 * @return Returns {@link DictionaryMetadata} read from a the stream (property file).
+	 * @return Returns {@link DictionaryMetadata} read from a stream (property file).
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
 	public static DictionaryMetadata read(final InputStream metadataStream) throws IOException{

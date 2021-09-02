@@ -32,11 +32,11 @@ final class StringSizeEstimator{
 
 	private static final int OBJ_OVERHEAD;
 	static{
-		//by default we assume 64 bit JVM (defensive approach since we will get larger estimations in case we are not sure)
+		//by default, we assume 64 bit JVM (defensive approach since we will get larger estimations in case we are not sure)
 		boolean is64bitJVM = true;
 
 		//check the system property "sun.arch.data.model" not very safe, as it might not work for all JVM implementations
-		//nevertheless the worst thing that might happen is that the JVM is 32bit but we assume its 64bit, so we will be
+		//nevertheless the worst thing that might happen is that the JVM is 32bit, but we assume its 64bit, so we will be
 		//counting a few extra bytes per string object: no harm done here since this is just an approximation
 		final String arch = System.getProperty("sun.arch.data.model");
 		if(arch != null && arch.contains("32"))
@@ -60,7 +60,7 @@ final class StringSizeEstimator{
 	 * Estimates the size of a {@link String} object in bytes.
 	 *
 	 * This function was designed with the following goals in mind (in order of importance):
-	 * First goal is speed: this function is called repeatedly and it should execute in not much more than a nanosecond.
+	 * First goal is speed: this function is called repeatedly, and it should execute in not much more than a nanosecond.
 	 * Second goal is to never underestimate (as it would lead to memory shortage and a crash).
 	 * Third goal is to never overestimate too much (say within a factor of two), as it would mean that we are leaving
 	 *		much of the RAM underutilized.

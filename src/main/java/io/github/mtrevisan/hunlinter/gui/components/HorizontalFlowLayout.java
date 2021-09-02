@@ -100,7 +100,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	}
 
 	/**
-	 * Returns the minimum dimensions needed to layout the <i>visible</i> components contained in the specified target container.
+	 * Returns the minimum dimensions needed to lay out the <i>visible</i> components contained in the specified target container.
 	 *
 	 * @param target	The container that needs to be laid out
 	 * @return	The minimum dimensions to lay out the subcomponents of the specified container
@@ -144,7 +144,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 					rowWidth = 0;
 					rowHeight = 0;
 				}
-				//add an horizontal gap for all components after the first
+				//add a horizontal gap for all components after the first
 				rowWidth += (rowWidth > 0? getHgap(): 0) + d.width;
 				rowHeight = Math.max(rowHeight, d.height);
 			}
