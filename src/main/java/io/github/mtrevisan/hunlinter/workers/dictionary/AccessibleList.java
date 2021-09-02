@@ -45,7 +45,7 @@ class AccessibleList<T>{
 		this.growthRate = growthRate;
 	}
 
-	void addAll(final T[] array){
+	synchronized void addAll(final T[] array){
 		addAll(array, array.length);
 	}
 
