@@ -32,11 +32,10 @@ import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -305,26 +304,22 @@ public class DictionaryEntry{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final DictionaryEntry rhs = (DictionaryEntry)obj;
-		return new EqualsBuilder()
-			.append(word, rhs.word)
-			.append(continuationFlags, rhs.continuationFlags)
-			.append(morphologicalFields, rhs.morphologicalFields)
-			.isEquals();
+		return (word.equals(rhs.word)
+			&& Objects.equals(continuationFlags, rhs.continuationFlags)
+			&& Arrays.equals(morphologicalFields, rhs.morphologicalFields));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(word)
-			.append(continuationFlags)
-			.append(morphologicalFields)
-			.toHashCode();
+		int result = Objects.hash(word, continuationFlags);
+		result = 31 * result + Arrays.hashCode(morphologicalFields);
+		return result;
 	}
 
 }

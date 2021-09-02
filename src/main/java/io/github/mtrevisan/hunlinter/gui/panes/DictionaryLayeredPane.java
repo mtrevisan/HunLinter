@@ -198,35 +198,7 @@ final int iconSize = 17;
       ruleFlagsAidLabel = new javax.swing.JLabel();
       ruleFlagsAidComboBox = new javax.swing.JComboBox<>();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String inflection = (String)model.getValueAt(row, 0);
-            final String morphologicalFields = (String)model.getValueAt(row, 1);
-            final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
-					.map(AffixEntry::toString)
-					.orElse(null);
-            final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
-					.map(AffixEntry::toString)
-					.orElse(null);
-            final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
-					.map(AffixEntry::toString)
-					.orElse(null);
-            final StringJoiner sj = new StringJoiner(TAB);
-				if(Objects.nonNull(inflection))
-					sj.add(inflection);
-				if(Objects.nonNull(morphologicalFields))
-					sj.add(morphologicalFields);
-				if(Objects.nonNull(rule1))
-					sj.add(rule1);
-				if(Objects.nonNull(rule2))
-					sj.add(rule2);
-				if(Objects.nonNull(rule3))
-					sj.add(rule3);
-            return sj.toString();
-         }
-      };
+      table = new MyJCopyableTable();
       totalInflectionsLabel = new javax.swing.JLabel();
       totalInflectionsValueLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
@@ -487,6 +459,36 @@ final int iconSize = 17;
 		dm.clear();
 	}
 
+	private static class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final TableModel model = getModel();
+			final String inflection = (String)model.getValueAt(row, 0);
+			final String morphologicalFields = (String)model.getValueAt(row, 1);
+			final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final StringJoiner sj = new StringJoiner(TAB);
+			if(Objects.nonNull(inflection))
+				sj.add(inflection);
+			if(Objects.nonNull(morphologicalFields))
+				sj.add(morphologicalFields);
+			if(Objects.nonNull(rule1))
+				sj.add(rule1);
+			if(Objects.nonNull(rule2))
+				sj.add(rule2);
+			if(Objects.nonNull(rule3))
+				sj.add(rule3);
+			return sj.toString();
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
@@ -513,5 +515,5 @@ final int iconSize = 17;
    private javax.swing.JTable table;
    private javax.swing.JLabel totalInflectionsLabel;
    private javax.swing.JLabel totalInflectionsValueLabel;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 }

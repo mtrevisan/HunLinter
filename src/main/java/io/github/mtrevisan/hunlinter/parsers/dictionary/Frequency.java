@@ -25,14 +25,13 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.services.system.Memoizer;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -205,18 +204,13 @@ public class Frequency<T extends Comparable<?>>{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		@SuppressWarnings("unchecked")
-		final Frequency<? super T> other = (Frequency<? super T>)obj;
-		return new EqualsBuilder()
-			.append(frequencies, other.frequencies)
-			.isEquals();
+		final Frequency<?> rhs = (Frequency<?>)obj;
+		return frequencies.equals(rhs.frequencies);
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(frequencies)
-			.toHashCode();
+		return Objects.hash(frequencies);
 	}
 
 }

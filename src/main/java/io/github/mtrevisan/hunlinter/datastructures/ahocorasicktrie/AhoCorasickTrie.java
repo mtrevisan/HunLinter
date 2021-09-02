@@ -26,8 +26,6 @@ package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.HitProcessor;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -36,6 +34,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -256,33 +255,29 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		@SuppressWarnings("unchecked")
-		final AhoCorasickTrie<? super V> rhs = (AhoCorasickTrie<? super V>)obj;
-		return new EqualsBuilder()
-			.append(base, rhs.base)
-			.append(next, rhs.next)
-			.append(check, rhs.check)
-			.append(output, rhs.output)
-			.append(outerValue, rhs.outerValue)
-			.append(keyLength, rhs.keyLength)
-			.isEquals();
+		final AhoCorasickTrie<?> rhs = (AhoCorasickTrie<?>)obj;
+		return (Arrays.equals(base, rhs.base)
+			&& Arrays.equals(next, rhs.next)
+			&& Arrays.equals(check, rhs.check)
+			&& Arrays.deepEquals(output, rhs.output)
+			&& outerValue.equals(rhs.outerValue)
+			&& Arrays.equals(keyLength, rhs.keyLength));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(base)
-			.append(next)
-			.append(check)
-			.append(output)
-			.append(outerValue)
-			.append(keyLength)
-			.toHashCode();
+		int result = Objects.hash(outerValue);
+		result = 31 * result + Arrays.hashCode(base);
+		result = 31 * result + Arrays.hashCode(next);
+		result = 31 * result + Arrays.hashCode(check);
+		result = 31 * result + Arrays.deepHashCode(output);
+		result = 31 * result + Arrays.hashCode(keyLength);
+		return result;
 	}
 
 

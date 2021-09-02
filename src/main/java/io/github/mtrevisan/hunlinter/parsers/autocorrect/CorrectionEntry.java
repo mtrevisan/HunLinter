@@ -25,8 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.autocorrect;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Objects;
 
@@ -68,24 +66,19 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final CorrectionEntry rhs = (CorrectionEntry)obj;
-		return new EqualsBuilder()
-			.append(incorrectForm, rhs.incorrectForm)
-			.append(correctForm, rhs.correctForm)
-			.isEquals();
+		return (incorrectForm.equals(rhs.incorrectForm)
+			&& correctForm.equals(rhs.correctForm));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(incorrectForm)
-			.append(correctForm)
-			.toHashCode();
+		return Objects.hash(incorrectForm, correctForm);
 	}
 
 }

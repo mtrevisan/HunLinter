@@ -148,19 +148,7 @@ final int iconSize = 17;
       synonymsTextField = new javax.swing.JTextField();
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String definition = (String)model.getValueAt(row, 0);
-            final String synonyms = (String)model.getValueAt(row, 1);
-            final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
-				final StringJoiner sj = new StringJoiner("\r\n");
-				for(final String s : synonymsByDefinition)
-					sj.add(definition + ": " + GUIHelper.removeHTMLCode(s));
-				return sj.toString();
-         }
-      };
+      table = new MyJCopyableTable();
       synonymsRecordedLabel = new javax.swing.JLabel();
       synonymsRecordedValueLabel = new javax.swing.JLabel();
 
@@ -471,6 +459,20 @@ final int iconSize = 17;
 		return dictionaryLookup;
 	}
 
+	private static class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final TableModel model = getModel();
+			final String definition = (String)model.getValueAt(row, 0);
+			final String synonyms = (String)model.getValueAt(row, 1);
+			final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
+			final StringJoiner sj = new StringJoiner("\r\n");
+			for(final String s : synonymsByDefinition)
+				sj.add(definition + ": " + GUIHelper.removeHTMLCode(s));
+			return sj.toString();
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
@@ -493,5 +495,5 @@ final int iconSize = 17;
    private javax.swing.JLabel synonymsRecordedValueLabel;
    private javax.swing.JTextField synonymsTextField;
    private javax.swing.JTable table;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 }

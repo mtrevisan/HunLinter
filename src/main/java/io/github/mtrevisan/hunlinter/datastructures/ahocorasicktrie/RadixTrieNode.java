@@ -25,14 +25,13 @@
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -229,30 +228,22 @@ public class RadixTrieNode{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final RadixTrieNode rhs = (RadixTrieNode)obj;
-		return new EqualsBuilder()
-			.append(depth, rhs.depth)
-			.append(id, rhs.id)
-			.append(childrenIds, rhs.childrenIds)
-			.append(success, rhs.success)
-			.append(failure, rhs.failure)
-			.isEquals();
+		return (depth == rhs.depth
+			&& id == rhs.id
+			&& failure.equals(rhs.failure)
+			&& childrenIds.equals(rhs.childrenIds)
+			&& success.equals(rhs.success));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(depth)
-			.append(id)
-			.append(childrenIds)
-			.append(success)
-			.append(failure)
-			.toHashCode();
+		return Objects.hash(depth, failure, childrenIds, success, id);
 	}
 
 }

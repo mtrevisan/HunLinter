@@ -75,15 +75,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
-	private static Pattern patternNonVanishingEl;
-	private static Pattern patternNonVanishingElNotAtEnd;
-	private static Pattern patternVanishingElNextToConsonant;
-	private static Pattern patternPhonemeCijjhnhiv;
+	private Pattern patternNonVanishingEl;
+	private Pattern patternNonVanishingElNotAtEnd;
+	private Pattern patternVanishingElNextToConsonant;
+	private Pattern patternPhonemeCijjhnhiv;
 	private static final Pattern PATTERN_V_IU_V = RegexHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
 	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = RegexHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü]", Pattern.CASE_INSENSITIVE);
-	private static String northernPluralRule;
-	private static String northernPluralStressedRule;
-	private static Set<String> dontCheckProductivenessRules;
+	private String northernPluralRule;
+	private String northernPluralStressedRule;
+	private Set<String> dontCheckProductivenessRules;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("{0} have unnecessary stress");

@@ -90,7 +90,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 * @param node Restart the iterator from {@code node}.
 	 * @return Returns {@code this} for call chaining.
 	 */
-	public ByteSequenceIterator restartFrom(final int node){
+	public final ByteSequenceIterator restartFrom(final int node){
 		arcLimit = 0;
 		nextElement = null;
 

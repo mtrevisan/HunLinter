@@ -26,10 +26,10 @@ package io.github.mtrevisan.hunlinter.languages;
 
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Objects;
 
 
 public class LetterMatcherEntry{
@@ -54,31 +54,25 @@ public class LetterMatcherEntry{
 				throw new LinterException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}
 
-
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final LetterMatcherEntry rhs = (LetterMatcherEntry)obj;
-		return new EqualsBuilder()
-			.append(messagePattern, rhs.messagePattern)
-			.append(masterLetter, rhs.masterLetter)
-			.append(wrongFlags, rhs.wrongFlags)
-			.append(correctRule, rhs.correctRule)
-			.isEquals();
+		return (messagePattern.equals(rhs.messagePattern)
+			&& masterLetter.equals(rhs.masterLetter)
+			&& Arrays.equals(wrongFlags, rhs.wrongFlags)
+			&& correctRule.equals(rhs.correctRule));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(messagePattern)
-			.append(masterLetter)
-			.append(wrongFlags)
-			.append(correctRule)
-			.toHashCode();
+		int result = Objects.hash(messagePattern, masterLetter, correctRule);
+		result = 31 * result + Arrays.hashCode(wrongFlags);
+		return result;
 	}
 
 }

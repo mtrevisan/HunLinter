@@ -509,33 +509,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
-		return new ChartPanel(chart){
-			@Override
-			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save,
-					final boolean print, final boolean zoom){
-				final JPopupMenu result = new JPopupMenu("Chart:");
-				final JMenuItem propertiesItem = new JMenuItem("Properties…");
-				propertiesItem.setActionCommand("PROPERTIES");
-				propertiesItem.addActionListener(this);
-				result.add(propertiesItem);
-
-				result.addSeparator();
-
-				final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG…");
-				saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
-				saveAsPNGItem.addActionListener(this);
-				result.add(saveAsPNGItem);
-
-				result.addSeparator();
-
-				final JMenuItem printItem = new JMenuItem("Print…");
-				printItem.setActionCommand("PRINT");
-				printItem.addActionListener(this);
-				result.add(printItem);
-
-				return result;
-			}
-		};
+		return new MyChartPanel(chart);
 	}
 
 	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
@@ -667,6 +641,38 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+	private static class MyChartPanel extends ChartPanel{
+		public MyChartPanel(final JFreeChart chart){
+			super(chart);
+		}
+
+		@Override
+		protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save, final boolean print,
+				final boolean zoom){
+			final JPopupMenu result = new JPopupMenu("Chart:");
+			final JMenuItem propertiesItem = new JMenuItem("Properties…");
+			propertiesItem.setActionCommand("PROPERTIES");
+			propertiesItem.addActionListener(this);
+			result.add(propertiesItem);
+
+			result.addSeparator();
+
+			final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG…");
+			saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
+			saveAsPNGItem.addActionListener(this);
+			result.add(saveAsPNGItem);
+
+			result.addSeparator();
+
+			final JMenuItem printItem = new JMenuItem("Print…");
+			printItem.setActionCommand("PRINT");
+			printItem.addActionListener(this);
+			result.add(printItem);
+
+			return result;
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
@@ -705,6 +711,6 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel totalWordsValueLabel;
    private javax.swing.JLabel uniqueWordsLabel;
    private javax.swing.JLabel uniqueWordsValueLabel;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 
 }

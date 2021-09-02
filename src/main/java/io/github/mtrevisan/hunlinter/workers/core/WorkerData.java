@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -96,23 +93,19 @@ public class WorkerData{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public boolean equals(final Object o){
+		if(this == o)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(o == null || getClass() != o.getClass())
 			return false;
 
-		final WorkerData rhs = (WorkerData)obj;
-		return new EqualsBuilder()
-			.append(workerName, rhs.workerName)
-			.isEquals();
+		final WorkerData rhs = (WorkerData)o;
+		return workerName.equals(rhs.workerName);
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(workerName)
-			.toHashCode();
+		return Objects.hash(workerName);
 	}
 
 }

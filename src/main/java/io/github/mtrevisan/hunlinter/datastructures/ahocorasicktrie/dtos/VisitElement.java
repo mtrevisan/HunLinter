@@ -24,10 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 
 public class VisitElement<V extends Serializable>{
@@ -57,26 +55,20 @@ public class VisitElement<V extends Serializable>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final VisitElement<?> rhs = (VisitElement<?>)obj;
-		return new EqualsBuilder()
-			.append(nodeId, rhs.nodeId)
-			.append(key, rhs.key)
-			.append(value, rhs.value)
-			.isEquals();
+		return (nodeId == rhs.nodeId
+			&& key.equals(rhs.key)
+			&& value.equals(rhs.value));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(nodeId)
-			.append(key)
-			.append(value)
-			.toHashCode();
+		return Objects.hash(nodeId, key, value);
 	}
 
 }

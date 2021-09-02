@@ -25,9 +25,9 @@
 package io.github.mtrevisan.hunlinter.services.semanticversioning;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.StringTokenizer;
 
 
@@ -41,6 +41,8 @@ public class Version implements Comparable<Version>{
 	private static final String PRE_RELEASE_PREFIX = "-";
 	/** A separator that separates the build metadata from the normal version or the pre-release version. */
 	private static final String BUILD_PREFIX = "+";
+
+	private static final String[] EMPTY_ARRAY = new String[0];
 
 
 	private final Integer major;
@@ -59,7 +61,7 @@ public class Version implements Comparable<Version>{
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
 	Version(final int major, final int minor, final int patch){
-		this(major, minor, patch, null, null);
+		this(major, minor, patch, EMPTY_ARRAY, EMPTY_ARRAY);
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class Version implements Comparable<Version>{
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
 	Version(final int major, final int minor, final int patch, final String[] preRelease){
-		this(major, minor, patch, preRelease, null);
+		this(major, minor, patch, preRelease, EMPTY_ARRAY);
 	}
 
 	/**
@@ -134,7 +136,7 @@ public class Version implements Comparable<Version>{
 			}
 		}
 		else
-			preRelease = new String[0];
+			preRelease = EMPTY_ARRAY;
 		if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
 			build = StringUtils.split(tokenizer.nextToken(), DOT);
 
@@ -143,7 +145,7 @@ public class Version implements Comparable<Version>{
 					throw new IllegalArgumentException("Argument is not a valid version");
 		}
 		else
-			build = new String[0];
+			build = EMPTY_ARRAY;
 		if(tokenizer.hasMoreElements())
 			throw new IllegalArgumentException("Argument is not a valid version");
 	}
@@ -202,28 +204,25 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == null || obj.getClass() != getClass())
-			return false;
-		if(obj == this)
+		if(this == obj)
 			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
 
 		final Version rhs = (Version)obj;
-		return new EqualsBuilder()
-			.append(major, rhs.major)
-			.append(minor, rhs.minor)
-			.append(patch, rhs.patch)
-			.isEquals();
+		return (major.equals(rhs.major)
+			&& minor.equals(rhs.minor)
+			&& patch.equals(rhs.patch)
+			&& Arrays.equals(preRelease, rhs.preRelease)
+			&& Arrays.equals(build, rhs.build));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder(17, 37)
-			.append(major)
-			.append(minor)
-			.append(patch)
-			.append(preRelease)
-			.append(build)
-			.toHashCode();
+		int result = Objects.hash(major, minor, patch);
+		result = 31 * result + Arrays.hashCode(preRelease);
+		result = 31 * result + Arrays.hashCode(build);
+		return result;
 	}
 
 	/**

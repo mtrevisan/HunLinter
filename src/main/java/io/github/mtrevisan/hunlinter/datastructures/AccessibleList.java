@@ -25,8 +25,6 @@
 package io.github.mtrevisan.hunlinter.datastructures;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -248,25 +246,20 @@ public class AccessibleList<T>{
 	}
 
 	@Override
-	public synchronized boolean equals(final Object obj){
-		if(obj == this)
+	public boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final AccessibleList<?> rhs = (AccessibleList<?>)obj;
-		return new EqualsBuilder()
-			.append(data, rhs.data)
-			.append(limit, rhs.limit)
-			.isEquals();
+		return (limit == rhs.limit
+			&& Arrays.equals(data, rhs.data));
 	}
 
 	@Override
-	public synchronized int hashCode(){
-		return new HashCodeBuilder()
-			.append(data)
-			.append(limit)
-			.toHashCode();
+	public int hashCode(){
+		return 31 * limit + Arrays.hashCode(data);
 	}
 
 }

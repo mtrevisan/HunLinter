@@ -24,9 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+import java.util.Arrays;
 import java.util.Objects;
 
 
@@ -118,24 +116,21 @@ public class Hyphenation{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final Hyphenation rhs = (Hyphenation)obj;
-		return new EqualsBuilder()
-			.append(syllabes, rhs.syllabes)
-			.append(breakCharacter, rhs.breakCharacter)
-			.isEquals();
+		return (Arrays.equals(syllabes, rhs.syllabes)
+			&& breakCharacter.equals(rhs.breakCharacter));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(syllabes)
-			.append(breakCharacter)
-			.toHashCode();
+		int result = Objects.hash(breakCharacter);
+		result = 31 * result + Arrays.hashCode(syllabes);
+		return result;
 	}
 
 }

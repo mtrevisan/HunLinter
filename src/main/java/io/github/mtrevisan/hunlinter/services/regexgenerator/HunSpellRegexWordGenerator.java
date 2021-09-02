@@ -27,13 +27,12 @@ package io.github.mtrevisan.hunlinter.services.regexgenerator;
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 
 
@@ -60,26 +59,20 @@ public class HunSpellRegexWordGenerator{
 
 		@Override
 		public boolean equals(final Object obj){
-			if(obj == this)
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			final GeneratedElement rhs = (GeneratedElement)obj;
-			return new EqualsBuilder()
-				.append(word, rhs.word)
-				.append(stateIndex, rhs.stateIndex)
-				.isEquals();
+			return (stateIndex == rhs.stateIndex
+				&& word.equals(rhs.word));
 		}
 
 		@Override
 		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(word)
-				.append(stateIndex)
-				.toHashCode();
+			return Objects.hash(word, stateIndex);
 		}
-
 	}
 
 

@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.Objects;
 
 
 public final class IndexDataPair<T>{
@@ -61,24 +61,19 @@ public final class IndexDataPair<T>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final IndexDataPair<?> rhs = (IndexDataPair<?>)obj;
-		return new EqualsBuilder()
-			.append(index, rhs.index)
-			.append(data, rhs.data)
-			.isEquals();
+		return (index == rhs.index
+			&& data.equals(rhs.data));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(index)
-			.append(data)
-			.toHashCode();
+		return Objects.hash(index, data);
 	}
 
 }

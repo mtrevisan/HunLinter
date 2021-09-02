@@ -30,8 +30,6 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,25 +223,20 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		cancel(true);
 	}
 
-
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final WorkerAbstract<?> rhs = (WorkerAbstract<?>)obj;
-		return new EqualsBuilder()
-			.append(workerData.getWorkerName(), rhs.workerData.getWorkerName())
-			.isEquals();
+		return workerData.equals(rhs.workerData);
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(workerData.getWorkerName())
-			.toHashCode();
+		return Objects.hash(workerData);
 	}
 
 }

@@ -108,17 +108,7 @@ public class BasicEventBus implements EventBusInterface{
 	 * 	continuing to the next event.
 	 */
 	public BasicEventBus(final boolean waitForHandlers){
-		this(Executors.newCachedThreadPool(new ThreadFactory(){
-
-			private final ThreadFactory delegate = Executors.defaultThreadFactory();
-
-			@Override
-			public Thread newThread(final Runnable r){
-				final Thread t = delegate.newThread(r);
-				t.setDaemon(true);
-				return t;
-			}
-		}), waitForHandlers);
+		this(Executors.newCachedThreadPool(new MyThreadFactory()), waitForHandlers);
 	}
 
 	public BasicEventBus(final ExecutorService executorService, final boolean waitForHandlers){
@@ -249,6 +239,17 @@ public class BasicEventBus implements EventBusInterface{
 	 */
 	public boolean hasPendingEvents(){
 		return !queue.isEmpty();
+	}
+
+	private static class MyThreadFactory implements ThreadFactory{
+		private final ThreadFactory delegate = Executors.defaultThreadFactory();
+
+		@Override
+		public Thread newThread(final Runnable r){
+			final Thread t = delegate.newThread(r);
+			t.setDaemon(true);
+			return t;
+		}
 	}
 
 

@@ -207,15 +207,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			try{
 				final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
 				final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
-				openProjectPathFileChooser.setFileView(new FileView(){
-					//choose the right icon for the folder
-					@Override
-					public Icon getIcon(final File file){
-						return (Packager.isProjectFolder(file)
-							? projectFolderIcon
-							: FileSystemView.getFileSystemView().getSystemIcon(file));
-					}
-				});
+				openProjectPathFileChooser.setFileView(new MyFileView(projectFolderIcon));
 			}
 			catch(final IOException ignored){}
 			return openProjectPathFileChooser;
@@ -918,6 +910,22 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}
 
+	private static class MyFileView extends FileView{
+		private final Icon projectFolderIcon;
+
+		public MyFileView(final Icon projectFolderIcon){
+			this.projectFolderIcon = projectFolderIcon;
+		}
+
+		//choose the right icon for the folder
+		@Override
+		public Icon getIcon(final File file){
+			return (Packager.isProjectFolder(file)
+				? projectFolderIcon
+				: FileSystemView.getFileSystemView().getSystemIcon(file));
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
@@ -1007,6 +1015,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem acoLinterFSAMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JLayeredPane wexLayeredPane;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 
 }

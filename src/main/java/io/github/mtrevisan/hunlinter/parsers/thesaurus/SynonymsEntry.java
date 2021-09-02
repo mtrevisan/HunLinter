@@ -30,8 +30,6 @@ import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -82,13 +80,13 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 			final String[] syns = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 			final Collection<String> uniqueValues = new HashSet<>(syns.length);
-			this.synonyms = new ArrayList<>(syns.length);
+			synonyms = new ArrayList<>(syns.length);
 			for(final String synonym : syns){
 				final String trim = synonym.trim();
 				if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
-					this.synonyms.add(trim);
+					synonyms.add(trim);
 			}
-			if(this.synonyms.isEmpty())
+			if(synonyms.isEmpty())
 				throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
 		}
 		else
@@ -166,24 +164,21 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final SynonymsEntry rhs = (SynonymsEntry)obj;
-		return new EqualsBuilder()
-			.append(partOfSpeeches, rhs.partOfSpeeches)
-			.append(synonyms, rhs.synonyms)
-			.isEquals();
+		return (Arrays.equals(partOfSpeeches, rhs.partOfSpeeches)
+			&& synonyms.equals(rhs.synonyms));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(partOfSpeeches)
-			.append(synonyms)
-			.toHashCode();
+		int result = Objects.hash(synonyms);
+		result = 31 * result + Arrays.hashCode(partOfSpeeches);
+		return result;
 	}
 
 }

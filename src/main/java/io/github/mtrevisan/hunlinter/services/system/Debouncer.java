@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -111,27 +108,23 @@ public class Debouncer<T>{
 			}
 		}
 
-
 		@Override
 		public boolean equals(final Object obj){
-			if(obj == this)
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			@SuppressWarnings("unchecked")
 			final TimerTask rhs = (TimerTask)obj;
-			return new EqualsBuilder()
-				.append(key, rhs.key)
-				.isEquals();
+			return key.equals(rhs.key);
 		}
 
 		@Override
 		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(key)
-				.toHashCode();
+			return Objects.hash(key);
 		}
+
 	}
 
 }

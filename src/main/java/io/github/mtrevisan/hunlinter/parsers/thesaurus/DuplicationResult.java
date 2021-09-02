@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -59,19 +56,14 @@ public class DuplicationResult<T>{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final DuplicationResult<?> other = (DuplicationResult<?>)obj;
-		return new EqualsBuilder()
-			.append(duplicates, other.duplicates)
-			.append(forceInsertion, other.forceInsertion)
-			.isEquals();
+		final DuplicationResult<?> rhs = (DuplicationResult<?>)obj;
+		return (forceInsertion == rhs.forceInsertion
+			&& duplicates.equals(rhs.duplicates));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(duplicates)
-			.append(forceInsertion)
-			.toHashCode();
+		return Objects.hash(duplicates, forceInsertion);
 	}
 
 }

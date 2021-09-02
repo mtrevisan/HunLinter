@@ -26,8 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.vos;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.List;
 import java.util.Objects;
@@ -102,27 +100,21 @@ public class RuleEntry{
 		return (LoopHelper.match(entries, entry -> entry.canApplyTo(word)) != null);
 	}
 
-
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final RuleEntry rhs = (RuleEntry)obj;
-		return new EqualsBuilder()
-			.append(type, rhs.type)
-			.append(flag, rhs.flag)
-			.isEquals();
+		return (type == rhs.type
+			&& flag.equals(rhs.flag));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(type)
-			.append(flag)
-			.toHashCode();
+		return Objects.hash(type, flag);
 	}
 
 }

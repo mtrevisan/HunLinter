@@ -24,10 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 
 /**
@@ -85,26 +83,23 @@ public class WordData{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final WordData rhs = (WordData)obj;
-		return new EqualsBuilder()
-			.append(word, rhs.word)
-			.append(stem, rhs.stem)
-			.append(tag, rhs.tag)
-			.isEquals();
+		return (Arrays.equals(word, rhs.word)
+			&& Arrays.equals(stem, rhs.stem)
+			&& Arrays.equals(tag, rhs.tag));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(word)
-			.append(stem)
-			.append(tag)
-			.toHashCode();
+		int result = Arrays.hashCode(word);
+		result = 31 * result + Arrays.hashCode(stem);
+		result = 31 * result + Arrays.hashCode(tag);
+		return result;
 	}
 
 	@Override

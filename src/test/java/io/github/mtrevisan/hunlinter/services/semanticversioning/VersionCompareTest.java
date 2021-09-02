@@ -39,14 +39,6 @@ class VersionCompareTest{
 	}
 
 	@Test
-	void shouldIgnoreBuildMetadataWhenCheckingForEquality(){
-		Version v1 = new Version("2.3.7-beta+build");
-		Version v2 = new Version("2.3.7-beta");
-
-		Assertions.assertEquals(v1, v2);
-	}
-
-	@Test
 	void preReleaseShouldHaveLowerPrecedenceThanAssociatedNormal(){
 		Version v1 = new Version("1.3.7");
 		Version v2 = new Version("1.3.7-alpha");

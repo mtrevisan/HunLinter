@@ -26,12 +26,11 @@ package io.github.mtrevisan.hunlinter.services.text;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -72,31 +71,23 @@ public class SmithWatermanAlignment{
 		private int lastIndexB;
 		private Deque<Character> operations;
 
-
 		@Override
 		public boolean equals(final Object obj){
-			if(obj == this)
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
-			final Trace rhs = (Trace)obj;
-			return new EqualsBuilder()
-				.append(firstIndexA, rhs.firstIndexA)
-				.append(firstIndexB, rhs.firstIndexB)
-				.append(lastIndexA, rhs.lastIndexA)
-				.append(lastIndexB, rhs.lastIndexB)
-				.isEquals();
+			final Trace trace = (Trace)obj;
+			return (firstIndexA == trace.firstIndexA
+				&& firstIndexB == trace.firstIndexB
+				&& lastIndexA == trace.lastIndexA
+				&& lastIndexB == trace.lastIndexB);
 		}
 
 		@Override
 		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(firstIndexA)
-				.append(firstIndexB)
-				.append(lastIndexA)
-				.append(lastIndexB)
-				.toHashCode();
+			return Objects.hash(firstIndexA, firstIndexB, lastIndexA, lastIndexB);
 		}
 	}
 

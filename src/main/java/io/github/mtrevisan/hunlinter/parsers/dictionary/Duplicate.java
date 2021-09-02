@@ -25,8 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Objects;
 
@@ -61,22 +59,18 @@ public class Duplicate{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final Duplicate rhs = (Duplicate)obj;
-		return new EqualsBuilder()
-			.append(lineIndex, rhs.lineIndex)
-			.isEquals();
+		return (lineIndex == rhs.lineIndex);
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(lineIndex)
-			.toHashCode();
+		return Objects.hash(lineIndex);
 	}
 
 }

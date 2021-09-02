@@ -27,8 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -184,24 +182,19 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final ThesaurusEntry rhs = (ThesaurusEntry)obj;
-		return new EqualsBuilder()
-			.append(definition, rhs.definition)
-			.append(synonyms, rhs.synonyms)
-			.isEquals();
+		return (definition.equals(rhs.definition)
+			&& synonyms.equals(rhs.synonyms));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(definition)
-			.append(synonyms)
-			.toHashCode();
+		return Objects.hash(definition, synonyms);
 	}
 
 }

@@ -24,11 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class Affixes{
@@ -63,21 +61,15 @@ public class Affixes{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final Affixes other = (Affixes)obj;
-		return new EqualsBuilder()
-			.append(prefixes, other.prefixes)
-			.append(suffixes, other.suffixes)
-			.append(terminals, other.terminals)
-			.isEquals();
+		final Affixes rhs = (Affixes)obj;
+		return (prefixes.equals(rhs.prefixes)
+			&& suffixes.equals(rhs.suffixes)
+			&& terminals.equals(rhs.terminals));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(prefixes)
-			.append(suffixes)
-			.append(terminals)
-			.toHashCode();
+		return Objects.hash(prefixes, suffixes, terminals);
 	}
 
 }

@@ -36,8 +36,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.MessageFormat;
@@ -385,39 +383,24 @@ public class AffixEntry{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final AffixEntry rhs = (AffixEntry)obj;
-		final EqualsBuilder builder = new EqualsBuilder()
-			.append(parent != null, rhs.parent != null)
-			.append(continuationFlags, rhs.continuationFlags)
-			.append(condition, rhs.condition)
-			.append(removing, rhs.removing)
-			.append(appending, rhs.appending)
-			.append(morphologicalFields, rhs.morphologicalFields);
-		if(parent != null)
-			builder
-				.append(parent.getType(), rhs.parent.getType())
-				.append(parent.getFlag(), rhs.parent.getFlag());
-		return builder.isEquals();
+		return (Objects.equals(parent, rhs.parent)
+			&& removing.equals(rhs.removing)
+			&& appending.equals(rhs.appending)
+			&& Objects.equals(continuationFlags, rhs.continuationFlags)
+			&& condition.equals(rhs.condition)
+			&& Arrays.equals(morphologicalFields, rhs.morphologicalFields));
 	}
 
 	@Override
 	public int hashCode(){
-		final HashCodeBuilder builder = new HashCodeBuilder()
-			.append(continuationFlags)
-			.append(condition)
-			.append(removing)
-			.append(appending)
-			.append(morphologicalFields);
-		if(parent != null)
-			builder
-				.append(parent.getType())
-				.append(parent.getFlag());
-		return builder.toHashCode();
+		int result = Objects.hash(parent, removing, appending, continuationFlags, condition);
+		result = 31 * result + Arrays.hashCode(morphologicalFields);
+		return result;
 	}
-
 }

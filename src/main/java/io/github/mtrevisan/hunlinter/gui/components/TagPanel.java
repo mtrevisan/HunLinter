@@ -41,7 +41,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
-public class TagPanel extends JPanel{
+public final class TagPanel extends JPanel{
 
 	@Serial
 	private static final long serialVersionUID = 665517573169978352L;
@@ -159,7 +159,7 @@ public class TagPanel extends JPanel{
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	private static class JTagComponent extends JComponent{
+	private static final class JTagComponent extends JComponent{
 
 		@Serial
 		private static final long serialVersionUID = -7410352884175789897L;

@@ -32,8 +32,6 @@ import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyl
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.IOException;
@@ -49,6 +47,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -226,21 +225,15 @@ public class LineEntry implements Serializable{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final LineEntry other = (LineEntry)obj;
-		return new EqualsBuilder()
-			.append(removal, other.removal)
-			.append(addition, other.addition)
-			.append(condition, other.condition)
-			.isEquals();
+		final LineEntry rhs = (LineEntry)obj;
+		return (removal.equals(rhs.removal)
+			&& addition.equals(rhs.addition)
+			&& condition.equals(rhs.condition));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(removal)
-			.append(addition)
-			.append(condition)
-			.toHashCode();
+		return Objects.hash(removal, addition, condition);
 	}
 
 

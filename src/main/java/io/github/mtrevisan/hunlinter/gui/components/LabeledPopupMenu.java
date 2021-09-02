@@ -31,7 +31,7 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class LabeledPopupMenu extends JPopupMenu{
+public final class LabeledPopupMenu extends JPopupMenu{
 
 	private final JLabel label;
 

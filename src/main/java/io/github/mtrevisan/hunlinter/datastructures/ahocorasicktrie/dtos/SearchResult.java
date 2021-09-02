@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.Objects;
 
 
 /**
@@ -72,26 +72,20 @@ public class SearchResult<V>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final SearchResult<?> rhs = (SearchResult<?>)obj;
-		return new EqualsBuilder()
-			.append(begin, rhs.begin)
-			.append(end, rhs.end)
-			.append(value, rhs.value)
-			.isEquals();
+		return (begin == rhs.begin
+			&& end == rhs.end
+			&& Objects.equals(value, rhs.value));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(begin)
-			.append(end)
-			.append(value)
-			.toHashCode();
+		return Objects.hash(begin, end, value);
 	}
 
 }

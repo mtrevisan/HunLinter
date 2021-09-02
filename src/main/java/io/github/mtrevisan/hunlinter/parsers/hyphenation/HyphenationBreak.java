@@ -26,8 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -190,17 +188,13 @@ public class HyphenationBreak{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final HyphenationBreak other = (HyphenationBreak)obj;
-		return new EqualsBuilder()
-			.append(indexesAndRules, other.indexesAndRules)
-			.isEquals();
+		final HyphenationBreak rhs = (HyphenationBreak)obj;
+		return indexesAndRules.equals(rhs.indexesAndRules);
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(indexesAndRules)
-			.toHashCode();
+		return Objects.hash(indexesAndRules);
 	}
 
 }

@@ -120,15 +120,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       correctTextField = new javax.swing.JTextField();
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String incorrect = (String)model.getValueAt(row, 0);
-            final String correct = (String)model.getValueAt(row, 1);
-            return incorrect + " > " + correct;
-         }
-      };
+      table = new MyJCopyableTable();
       correctionsRecordedLabel = new javax.swing.JLabel();
       correctionsRecordedValueLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
@@ -428,6 +420,16 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
+	private static class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final TableModel model = getModel();
+			final String incorrect = (String)model.getValueAt(row, 0);
+			final String correct = (String)model.getValueAt(row, 1);
+			return incorrect + " > " + correct;
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
@@ -454,5 +456,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
    private javax.swing.JScrollPane scrollPane;
    private javax.swing.JTable table;
    private javax.swing.JLabel toLabel;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
+
 }
