@@ -234,7 +234,7 @@ public class CFSA2Serializer implements FSASerializer{
 	/** Linearize all states, putting {@code states} in front of the automaton and calculating stable state offsets. */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
 			final IntIntMap offsets) throws IOException{
-		final Set<Integer> visited = new HashSet<>();
+		final Collection<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
 

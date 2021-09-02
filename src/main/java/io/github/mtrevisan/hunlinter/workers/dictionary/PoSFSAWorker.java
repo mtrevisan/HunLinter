@@ -138,7 +138,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			processLines(dicPath, charset, lineProcessor);
 
 			return encodings;

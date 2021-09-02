@@ -79,7 +79,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule. */
-	private void enforceOnlyInCompound(final Collection<Inflection> inflections){
+	private void enforceOnlyInCompound(final Iterable<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();

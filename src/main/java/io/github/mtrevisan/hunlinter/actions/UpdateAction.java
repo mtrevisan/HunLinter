@@ -60,17 +60,7 @@ public class UpdateAction extends AbstractAction{
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		try{
 			final FileDownloaderDialog dialog = new FileDownloaderDialog(parentFrame);
-			GUIHelper.addCancelByEscapeKey(dialog, new AbstractAction(){
-				@Serial
-				private static final long serialVersionUID = -5644390861803492172L;
-
-				@Override
-				public void actionPerformed(final ActionEvent e){
-					dialog.interrupt();
-
-					dialog.dispose();
-				}
-			});
+			GUIHelper.addCancelByEscapeKey(dialog, new CancelAction(dialog));
 			dialog.setLocationRelativeTo(parentFrame);
 			dialog.setVisible(true);
 		}
@@ -101,6 +91,34 @@ public class UpdateAction extends AbstractAction{
 	@Serial
 	private void readObject(final ObjectInputStream is) throws IOException{
 		throw new NotSerializableException(getClass().getName());
+	}
+
+	private static class CancelAction extends AbstractAction{
+		@Serial
+		private static final long serialVersionUID = -5644390861803492172L;
+		private final FileDownloaderDialog dialog;
+
+		private CancelAction(FileDownloaderDialog dialog){this.dialog = dialog;}
+
+		@Override
+		public void actionPerformed(final ActionEvent e){
+			dialog.interrupt();
+
+			dialog.dispose();
+		}
+
+
+		@SuppressWarnings("unused")
+		@Serial
+		private void writeObject(final ObjectOutputStream os) throws IOException{
+			throw new NotSerializableException(getClass().getName());
+		}
+
+		@SuppressWarnings("unused")
+		@Serial
+		private void readObject(final ObjectInputStream is) throws IOException{
+			throw new NotSerializableException(getClass().getName());
+		}
 	}
 
 }

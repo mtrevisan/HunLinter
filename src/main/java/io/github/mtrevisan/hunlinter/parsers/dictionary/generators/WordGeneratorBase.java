@@ -177,7 +177,7 @@ class WordGeneratorBase{
 		}
 	}
 
-	private void filterInflections(final List<Inflection> inflections){
+	private void filterInflections(final Collection<Inflection> inflections){
 		enforceCircumfix(inflections);
 
 		enforceNeedAffixFlag(inflections);
@@ -201,7 +201,7 @@ class WordGeneratorBase{
 	 *    discard inflection
 	 * </pre></code>
 	 */
-	private void enforceCircumfix(final Collection<Inflection> inflections){
+	private void enforceCircumfix(final Iterable<Inflection> inflections){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();
@@ -214,7 +214,7 @@ class WordGeneratorBase{
 	}
 
 	/** Remove rules that invalidate the affix rule. */
-	private void enforceNeedAffixFlag(final Collection<Inflection> inflections){
+	private void enforceNeedAffixFlag(final Iterable<Inflection> inflections){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();

@@ -239,7 +239,7 @@ public class FSABuilder{
 
 	/**
 	 * Freeze a state: try to find an equivalent state in the interned states' dictionary first, if found, return it, otherwise, serialize
-	 * the mutable state at <code>activePathIndex</code> and return it.
+	 * the mutable state at {@code activePathIndex} and return it.
 	 */
 	private int freezeState(final int activePathIndex){
 		final int start = activePath[activePathIndex];

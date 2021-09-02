@@ -308,7 +308,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return result;
 	}
 
-	private void removeTwofolds(final Collection<Inflection> prods){
+	private void removeTwofolds(final Iterable<Inflection> prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null){
 			final Iterator<Inflection> itr = prods.iterator();

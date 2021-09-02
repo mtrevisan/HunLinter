@@ -49,9 +49,9 @@ public class AidParser{
 	public void parse(final File aidFile) throws IOException{
 		lines.clear();
 
-		final Path path = aidFile.toPath();
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+		final Path aidPath = aidFile.toPath();
+		final Charset charset = FileHelper.determineCharset(aidPath);
+		try(final Scanner scanner = FileHelper.createScanner(aidPath, charset)){
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				if(!line.isEmpty())

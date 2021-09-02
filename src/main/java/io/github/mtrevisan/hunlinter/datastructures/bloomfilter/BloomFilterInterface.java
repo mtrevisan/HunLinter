@@ -67,7 +67,7 @@ public interface BloomFilterInterface<T>{
 	 * the given/default {@link Decomposer}
 	 *
 	 * @param value	The object to be added to the bloom filter
-	 * @return {@code true} if the value was added to the bloom filter, <code>false</code> otherwise
+	 * @return {@code true} if the value was added to the bloom filter, {@code false} otherwise
 	 */
 	boolean add(final T value);
 
@@ -75,7 +75,7 @@ public interface BloomFilterInterface<T>{
 	 * Check if the value object is present in the bloom filter or not by decomposing it using the given/default decomposer
 	 *
 	 * @param value	The object to be tested for existence in bloom filter
-	 * @return {@code false} if the value is definitely (100% surety) not contained in the bloom filter, <code>true</code> otherwise.
+	 * @return {@code false} if the value is definitely (100% surety) not contained in the bloom filter, {@code true} otherwise.
 	 */
 	boolean contains(final T value);
 

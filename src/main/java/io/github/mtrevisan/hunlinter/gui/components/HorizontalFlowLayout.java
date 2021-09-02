@@ -65,7 +65,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 
 	/**
 	 * Constructs a new {@code FlowLayout} with the specified alignment and a default 5-unit horizontal and vertical gap.
-	 * The value of the alignment argument must be one of {@code WrapLayout}, <code>WrapLayout</code>,
+	 * The value of the alignment argument must be one of {@code WrapLayout}, {@code WrapLayout},
 	 * or {@code WrapLayout}.
 	 *
 	 * @param align	The alignment value
@@ -77,7 +77,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	/**
 	 * Creates a new flow layout manager with the indicated alignment and the indicated horizontal and vertical gaps.<p>
 	 * The value of the alignment argument must be one of {@code HorizontalFlowLayout.TOP},
-	 * {@code HorizontalFlowLayout.BOTTOM}, or <code>HorizontalFlowLayout.CENTER</code>.
+	 * {@code HorizontalFlowLayout.BOTTOM}, or {@code HorizontalFlowLayout.CENTER}.
 	 *
 	 * @param align The alignment value
 	 * @param hgap The horizontal gap between components and between the components and the

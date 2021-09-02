@@ -158,7 +158,7 @@ public class DictionaryMetadata{
 	public DictionaryMetadata(final Map<DictionaryAttribute, String> attributes){
 		this.attributes = attributes;
 
-		final EnumMap<DictionaryAttribute, String> allAttributes = new EnumMap<>(DEFAULT_ATTRIBUTES);
+		final Map<DictionaryAttribute, String> allAttributes = new EnumMap<>(DEFAULT_ATTRIBUTES);
 		allAttributes.putAll(attributes);
 
 		for(final DictionaryAttribute attr : REQUIRED_ATTRIBUTES)

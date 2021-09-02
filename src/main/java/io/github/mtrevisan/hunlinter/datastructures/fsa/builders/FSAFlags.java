@@ -72,7 +72,7 @@ public enum FSAFlags{
 
 	/**
 	 * @param flags The bitset with flags.
-	 * @return Returns {@code true} iff this flag is set in <code>flags</code>.
+	 * @return Returns {@code true} iff this flag is set in {@code flags}.
 	 */
 	public boolean isSet(final int flags){
 		return ((flags & bits) != 0);

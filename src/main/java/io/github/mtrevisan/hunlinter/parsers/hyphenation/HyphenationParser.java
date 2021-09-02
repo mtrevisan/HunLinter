@@ -213,10 +213,10 @@ public class HyphenationParser{
 	 * @throws LinterException   If something is wrong while parsing the file
 	 */
 	public void parse(final File hypFile){
-		final Path path = hypFile.toPath();
+		final Path hypPath = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+		final Charset charset = FileHelper.determineCharset(hypPath);
+		try(final Scanner scanner = FileHelper.createScanner(hypPath, charset)){
 			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
 
@@ -488,7 +488,8 @@ public class HyphenationParser{
 
 	public void save(final File hypFile) throws IOException{
 		final Charset charset = StandardCharsets.UTF_8;
-		try(final BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
+		final Path hypPath = hypFile.toPath();
+		try(final BufferedWriter writer = Files.newBufferedWriter(hypPath, charset)){
 			writeln(writer, charset.name());
 
 			writer.newLine();

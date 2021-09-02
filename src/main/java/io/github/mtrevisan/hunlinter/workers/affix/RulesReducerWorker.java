@@ -104,7 +104,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 			prepareProcessing("Reading dictionary file (step 1/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Reading dictionary file (step 1/3)…");
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 

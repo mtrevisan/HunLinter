@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -185,8 +186,9 @@ public class AffixParser{
 
 		int index = 0;
 		boolean encodingRead = false;
-		final Charset charset = FileHelper.determineCharset(affFile.toPath());
-		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+		final Path affPath = affFile.toPath();
+		final Charset charset = FileHelper.determineCharset(affPath);
+		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
 			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();

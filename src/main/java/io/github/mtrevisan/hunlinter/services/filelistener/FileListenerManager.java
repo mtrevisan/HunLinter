@@ -130,7 +130,8 @@ public class FileListenerManager implements FileListener, Runnable{
 		Objects.requireNonNull(listener, "Listener cannot be null");
 
 		for(final String pattern : patterns){
-			final Path dir = (new File(pattern)).getParentFile().toPath();
+			final Path dir = (new File(pattern)).getParentFile()
+				.toPath();
 			if(!dir.toFile().exists())
 				LOGGER.warn("File or folder '{}' doesn't exists", dir);
 			else{

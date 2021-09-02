@@ -68,6 +68,8 @@ public class ExceptionsParser{
 	private final List<String> dictionary = new ArrayList<>(0);
 	private Comparator<String> comparator;
 
+	private final XMLManager xmlManager = new XMLManager();
+
 
 	public ExceptionsParser(final String configurationFilename){
 		this.configurationFilename = configurationFilename;
@@ -86,15 +88,15 @@ public class ExceptionsParser{
 
 		clear();
 
-		final Document doc = XMLManager.parseXMLDocument(wexFile);
+		final Document doc = xmlManager.parseXMLDocument(wexFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 			throw new LinterException(INVALID_ROOT.format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName()}));
 
-		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
+		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
-			final Node mediaType = XMLManager.extractAttribute(child, WORD_EXCEPTIONS_WORD);
+			final Node mediaType = xmlManager.extractAttribute(child, WORD_EXCEPTIONS_WORD);
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
 		}
@@ -142,7 +144,7 @@ public class ExceptionsParser{
 	}
 
 	public void save(final File excFile) throws TransformerException{
-		final Document doc = XMLManager.newXMLDocumentStandalone();
+		final Document doc = xmlManager.newXMLDocumentStandalone();
 
 		//root element
 		final Element root = doc.createElement(WORD_EXCEPTIONS_ROOT_ELEMENT);
@@ -156,7 +158,7 @@ public class ExceptionsParser{
 			root.appendChild(elem);
 		}
 
-		XMLManager.createXML(excFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
+		xmlManager.createXML(excFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
 	}
 
 	public void clear(){

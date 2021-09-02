@@ -122,7 +122,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			processLines(dicPath, charset, lineProcessor);
 
 			return encodings;
@@ -168,6 +169,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			return builder.complete();
 		};
+		final Path outputPath = outputFile.toPath();
 		final Function<FSA, File> step4 = fsa -> {
 			resetProcessing("Compressing FSA (step 4/5)");
 
@@ -179,7 +181,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 					sleepOnPause();
 				});
 
-				Files.write(outputFile.toPath(), os.toByteArray());
+				Files.write(outputPath, os.toByteArray());
 
 				return outputFile;
 			}
@@ -192,7 +194,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			try{
 				//verify by reading
-				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
+				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputPath));
 				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());

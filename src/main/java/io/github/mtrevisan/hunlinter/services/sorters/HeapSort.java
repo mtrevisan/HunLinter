@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 
 /**

@@ -196,7 +196,7 @@ public class DictionaryMetadataBuilder{
 		return new DictionaryMetadata(attrs);
 	}
 
-	public EnumMap<DictionaryAttribute, String> toMap(){
+	public Map<DictionaryAttribute, String> toMap(){
 		return new EnumMap<>(attrs);
 	}
 

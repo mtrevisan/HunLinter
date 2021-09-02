@@ -228,7 +228,7 @@ public class CFSA2 extends FSA{
 	}
 
 	/**
-	 * Returns {@code true} if this arc has <code>NEXT</code> bit set.
+	 * Returns {@code true} if this arc has {@code NEXT} bit set.
 	 *
 	 * @param arc The node's arc identifier.
 	 * @return Returns true if the argument is the last arc of a node.

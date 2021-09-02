@@ -251,11 +251,6 @@ public class PropertiesUTF8 extends Properties{
 		return sb.toString();
 	}
 
-	@Override
-	public PropertiesUTF8 clone(){
-		return (PropertiesUTF8)super.clone();
-	}
-
 
 	@SuppressWarnings("unused")
 	@Serial

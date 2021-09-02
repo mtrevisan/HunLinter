@@ -139,10 +139,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
       familyNameLabel = new javax.swing.JLabel();
       familyNameTextField = new javax.swing.JTextField();
-      familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       final DefaultListModel<String> model = new DefaultListModel<>();
       model.addAll(FontHelper.getFamilyNamesAll());
       familyNameList = new javax.swing.JList<>(model);
+      familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       monospacedCheckBox = new javax.swing.JCheckBox();
       sampleLabel = new javax.swing.JLabel();
       sampleScrollPane = new javax.swing.JScrollPane();

@@ -37,7 +37,7 @@ public interface BitArray extends Closeable{
 	 * Get the bit at index
 	 *
 	 * @param index the index of the bit in the array
-	 * @return {@code true} if the but is set, <code>false</code> otherwise
+	 * @return {@code true} if the but is set, {@code false} otherwise
 	 */
 	boolean get(final int index);
 
@@ -45,7 +45,7 @@ public interface BitArray extends Closeable{
 	 * Set the bit at index
 	 *
 	 * @param index the index of the bit in the array
-	 * @return {@code true} if the bit was updated, <code>false</code> otherwise.
+	 * @return {@code true} if the bit was updated, {@code false} otherwise.
 	 *
 	 */
 	boolean set(final int index);

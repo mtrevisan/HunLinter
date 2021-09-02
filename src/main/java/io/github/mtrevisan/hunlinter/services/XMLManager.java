@@ -63,42 +63,40 @@ public final class XMLManager{
 	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);
 	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = getXMLProperties(StandardCharsets.US_ASCII);
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
+	@SuppressWarnings("HttpUrlsUsage")
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
 
 
-	private static DocumentBuilder DOCUMENT_BUILDER;
-	static{
+	private DocumentBuilder documentBuilder;
+
+
+	public XMLManager(){
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setExpandEntityReferences(false);
 		try{
-			DOCUMENT_BUILDER = factory.newDocumentBuilder();
-			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
+			documentBuilder = factory.newDocumentBuilder();
+			documentBuilder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
 		}
 		catch(final ParserConfigurationException e){
 			LOGGER.error("Bad error while creating the XML parser", e);
 		}
 	}
 
-
-	private XMLManager(){}
-
-	public static Document parseXMLDocument(final File file) throws SAXException, IOException{
-		final Document doc = DOCUMENT_BUILDER.parse(file);
+	public Document parseXMLDocument(final File file) throws SAXException, IOException{
+		final Document doc = documentBuilder.parse(file);
 		doc.getDocumentElement().normalize();
 		return doc;
 	}
 
-	public static Document newXMLDocumentStandalone(){
-		final Document doc = DOCUMENT_BUILDER.newDocument();
+	public Document newXMLDocumentStandalone(){
+		final Document doc = documentBuilder.newDocument();
 		//remove `standalone="no"` from XML declaration
 		doc.setXmlStandalone(true);
 		return doc;
 	}
 
 	/** Transform the DOM Object to an XML File. */
-	@SafeVarargs
-	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
-			throws TransformerException{
+	public void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties) throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
 		if(properties != null)
@@ -109,11 +107,11 @@ public final class XMLManager{
 		transformer.transform(domSource, streamResult);
 	}
 
-	public static boolean isElement(final Node entry, final String elementName){
+	public boolean isElement(final Node entry, final String elementName){
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
 	}
 
-	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
+	public List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
 		final ArrayList<Node> children = new ArrayList<>(0);
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
@@ -123,15 +121,15 @@ public final class XMLManager{
 		return children;
 	}
 
-	public static Node extractAttribute(final Node entry, final String name){
+	public Node extractAttribute(final Node entry, final String name){
 		return entry.getAttributes().getNamedItem(name);
 	}
 
-	public static String extractAttributeValue(final Node entry, final String name){
+	public String extractAttributeValue(final Node entry, final String name){
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "HttpUrlsUsage"})
 	private static Pair<String, String>[] getXMLProperties(final Charset charset){
 		return new Pair[]{
 			Pair.of(OutputKeys.VERSION, "1.0"),

@@ -49,6 +49,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Comparator;
 import java.util.Objects;
@@ -81,6 +84,19 @@ public final class GUIHelper{
 			@Override
 			public void actionPerformed(final ActionEvent e){
 				dialog.dispose();
+			}
+
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void writeObject(final ObjectOutputStream os) throws IOException{
+				throw new NotSerializableException(getClass().getName());
+			}
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void readObject(final ObjectInputStream is) throws IOException{
+				throw new NotSerializableException(getClass().getName());
 			}
 		});
 	}
@@ -277,6 +293,19 @@ public final class GUIHelper{
 					catch(final CannotUndoException ignored){}
 				}
 			}
+
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void writeObject(final ObjectOutputStream os) throws IOException{
+				throw new NotSerializableException(getClass().getName());
+			}
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void readObject(final ObjectInputStream is) throws IOException{
+				throw new NotSerializableException(getClass().getName());
+			}
 		});
 		//create a redo action and add it to the text component
 		actionMap.put(KEY_REDO, new AbstractAction(KEY_REDO){
@@ -291,6 +320,19 @@ public final class GUIHelper{
 					}
 					catch(final CannotRedoException ignored){}
 				}
+			}
+
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void writeObject(final ObjectOutputStream os) throws IOException{
+				throw new NotSerializableException(getClass().getName());
+			}
+
+			@SuppressWarnings("unused")
+			@Serial
+			private void readObject(final ObjectInputStream is) throws IOException{
+				throw new NotSerializableException(getClass().getName());
 			}
 		});
 

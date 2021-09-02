@@ -632,7 +632,7 @@ public class RulesReducer{
 		return forest;
 	}
 
-	private List<LineEntry> extractSimilarRules(final List<LineEntry> rules, final String parentCondition){
+	private List<LineEntry> extractSimilarRules(final Collection<LineEntry> rules, final String parentCondition){
 		final List<LineEntry> children = new ArrayList<>(rules.size());
 		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
@@ -647,7 +647,7 @@ public class RulesReducer{
 		return children;
 	}
 
-	private List<LineEntry> extractBubbles(final Queue<LineEntry> bush, final LineEntry parent){
+	private List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = new ArrayList<>(bush.size());
 		for(final LineEntry child : bush)

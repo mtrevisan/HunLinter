@@ -27,6 +27,11 @@ package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 import io.github.mtrevisan.hunlinter.services.sorters.SmoothSort;
 import io.github.mtrevisan.hunlinter.services.sorters.SorterHelper;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,6 +46,10 @@ import java.util.function.Consumer;
  * A fast and unsecure version of ArrayList&lt;String&gt;
  */
 public class StringList implements Iterable<String>, Serializable{
+
+	@Serial
+	private static final long serialVersionUID = -808772767994972847L;
+
 
 	/** Shared empty array instance used for empty instances. */
 	private static final String[] EMPTY_ELEMENTDATA = {};
@@ -347,6 +356,19 @@ public class StringList implements Iterable<String>, Serializable{
 	/** Assume the list is already sorted! */
 	public void removeDuplicates(){
 		SorterHelper.removeDuplicates(elementData);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

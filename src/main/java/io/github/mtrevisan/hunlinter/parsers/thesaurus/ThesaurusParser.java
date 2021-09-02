@@ -96,9 +96,9 @@ public class ThesaurusParser{
 	public void parse(final File theFile) throws IOException{
 		clear();
 
-		final Path path = theFile.toPath();
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+		final Path thePath = theFile.toPath();
+		final Charset charset = FileHelper.determineCharset(thePath);
+		try(final Scanner scanner = FileHelper.createScanner(thePath, charset)){
 			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
 

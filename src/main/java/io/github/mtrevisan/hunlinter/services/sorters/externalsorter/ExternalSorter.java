@@ -98,11 +98,7 @@ public class ExternalSorter{
 				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-pos-chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseTemporaryAsZip())
-					out = new GZIPOutputStream(out, options.getZipBufferSize()){
-						{
-							def.setLevel(Deflater.BEST_SPEED);
-						}
-					};
+					out = new MyGZIPOutputStream(out, options);
 				saveChunk(temporaryList, options, out);
 
 				//add chunk to list of chunks
@@ -242,7 +238,9 @@ public class ExternalSorter{
 	private static class MyGZIPOutputStream extends GZIPOutputStream{
 		private MyGZIPOutputStream(final OutputStream out, final ExternalSorterOptions options) throws IOException{
 			super(out, options.getZipBufferSize());
+
 			def.setLevel(Deflater.BEST_SPEED);
 		}
 	}
+
 }

@@ -31,7 +31,6 @@ import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
-import java.util.function.Consumer;
 
 
 /**

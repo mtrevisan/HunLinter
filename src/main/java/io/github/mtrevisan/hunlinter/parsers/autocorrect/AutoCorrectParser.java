@@ -69,6 +69,8 @@ public class AutoCorrectParser{
 
 	private final List<CorrectionEntry> dictionary = new ArrayList<>(0);
 
+	private final XMLManager xmlManager = new XMLManager();
+
 
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
@@ -80,18 +82,18 @@ public class AutoCorrectParser{
 	public void parse(final File acoFile) throws IOException, SAXException{
 		clear();
 
-		final Document doc = XMLManager.parseXMLDocument(acoFile);
+		final Document doc = xmlManager.parseXMLDocument(acoFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 			throw new LinterException(INVALID_ROOT.format(new Object[]{AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName()}));
 
-		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
+		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
-			final Node mediaType = XMLManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
+			final Node mediaType = xmlManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
 			if(mediaType != null){
 				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
-					XMLManager.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
+					xmlManager.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
 				dictionary.add(correctionEntry);
 			}
 		}
@@ -161,7 +163,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public boolean contains(final CharSequence incorrect, final CharSequence correct){
+	public boolean contains(final String incorrect, final String correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
@@ -186,7 +188,7 @@ public class AutoCorrectParser{
 	}
 
 	public void save(final File acoFile) throws TransformerException{
-		final Document doc = XMLManager.newXMLDocumentStandalone();
+		final Document doc = xmlManager.newXMLDocumentStandalone();
 
 		//root element
 		final Element root = doc.createElement(AUTO_CORRECT_ROOT_ELEMENT);
@@ -201,7 +203,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
+		xmlManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
 	}
 
 	public void clear(){

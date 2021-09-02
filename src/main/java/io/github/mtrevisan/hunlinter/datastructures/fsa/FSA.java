@@ -65,7 +65,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns the identifier of the next arc after {@code arc} and leaving <code>node</code>.
+	 * @return Returns the identifier of the next arc after {@code arc} and leaving {@code node}.
 	 * 	Zero is returned if no more arcs are available for the node.
 	 */
 	public abstract int getNextArc(final int arc);
@@ -73,7 +73,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	/**
 	 * @param node	Identifier of the node.
 	 * @param label	The arc's label.
-	 * @return	The identifier of an arc leaving {@code node} and labeled with <code>label</code>.
+	 * @return	The identifier of an arc leaving {@code node} and labeled with {@code label}.
 	 * 	An identifier equal to 0 means the node has no outgoing arc labeled {@code label}.
 	 */
 	public int getArc(final int node, final byte label){
@@ -92,7 +92,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns {@code true} if the destination node at the end of this <code>arc</code> corresponds to
+	 * @return Returns {@code true} if the destination node at the end of this {@code arc} corresponds to
 	 * 	an input sequence created when building this automaton.
 	 */
 	public abstract boolean isArcFinal(final int arc);

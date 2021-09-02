@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -184,6 +185,8 @@ public class Packager{
 	private String language;
 	private final Map<String, File> configurationFiles = new HashMap<>(0);
 
+	private final XMLManager xmlManager = new XMLManager();
+
 
 	public void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
 		Objects.requireNonNull(projectPath, "Project path cannot be null");
@@ -269,7 +272,7 @@ public class Packager{
 		final Node parentNode = pair.getRight();
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
 				return getLanguages(child);
 		}
@@ -280,7 +283,7 @@ public class Packager{
 		final Set<String> languageSets = new HashSet<>(0);
 		final List<Node> children = extractChildren(entry);
 		for(final Node child : children)
-			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+			if(xmlManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
 				languageSets.addAll(Arrays.asList(locales));
 			}
@@ -391,8 +394,9 @@ public class Packager{
 		final File affFile = getAffixFile();
 		if(affFile != null){
 			try{
-				//FIXME use appropriate charset!!
-				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
+				final Path affPath = affFile.toPath();
+				final Charset charset = FileHelper.determineCharset(affPath);
+				final CharSequence content = Files.readString(affPath, charset);
 				final List<String> extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
 					.mapToObj(Character::toString)
@@ -449,7 +453,8 @@ public class Packager{
 
 	/** Go up directories until description.xml or manifest.json is found. */
 	private Path getPackageBaseDirectory(final File affFile){
-		Path parentPath = affFile.toPath().getParent();
+		Path parentPath = affFile.toPath()
+			.getParent();
 		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML)
 				&& !existFile(parentPath, FILENAME_MANIFEST_JSON))
 			parentPath = parentPath.getParent();
@@ -469,7 +474,7 @@ public class Packager{
 	}
 
 	private List<String> extractFileEntries(final File manifestFile) throws IOException, SAXException{
-		final Document doc = XMLManager.parseXMLDocument(manifestFile);
+		final Document doc = xmlManager.parseXMLDocument(manifestFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!MANIFEST_ROOT_ELEMENT.equals(rootElement.getNodeName()))
@@ -479,9 +484,9 @@ public class Packager{
 		final List<Node> children = extractChildren(rootElement);
 		final ArrayList<String> configurationPaths = new ArrayList<>(children.size());
 		for(final Node child : children){
-			final Node mediaType = XMLManager.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+			final Node mediaType = xmlManager.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
 			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-				configurationPaths.add(XMLManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
+				configurationPaths.add(xmlManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
 		configurationPaths.trimToSize();
 		return configurationPaths;
@@ -490,7 +495,7 @@ public class Packager{
 	private Pair<File, Node> findConfiguration(final String configurationName, final Iterable<File> configurationFiles)
 			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
-			final Document doc = XMLManager.parseXMLDocument(configurationFile);
+			final Document doc = xmlManager.parseXMLDocument(configurationFile);
 
 			final Element rootElement = doc.getDocumentElement();
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
@@ -508,7 +513,7 @@ public class Packager{
 		final Map<String, File> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node == null)
 				continue;
 
@@ -528,7 +533,7 @@ public class Packager{
 		final List<Node> children = extractChildren(entry);
 		children.removeIf(node -> !ArrayUtils.contains(extractLocale(node), language));
 		for(final Node child : children){
-			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
+			final String attributeValue = xmlManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			final String childFolders = extractLocation(child);
 			if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final File file = absolutizeFolder(childFolders, basePath, originPath);
@@ -595,8 +600,8 @@ public class Packager{
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node node = nodes.item(i);
-			if(XMLManager.isElement(node, CONFIGURATION_PROPERTY)
-					&& propertyName.equals(XMLManager.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
+			if(xmlManager.isElement(node, CONFIGURATION_PROPERTY)
+					&& propertyName.equals(xmlManager.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
 				return node.getChildNodes().item(1).getFirstChild().getNodeValue();
 		}
 		return null;
@@ -604,13 +609,13 @@ public class Packager{
 
 	private String extractFolder(final Node parentNode){
 		final List<Node> children = extractChildren(parentNode);
-		return (!children.isEmpty()? XMLManager.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
+		return (!children.isEmpty()? xmlManager.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
 	}
 
 	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node != null && nodeName.equals(node.getNodeValue()))
 				return fun.apply(child);
 		}
@@ -618,13 +623,13 @@ public class Packager{
 	}
 
 	private List<Node> extractChildren(final Element parentElement){
-		return XMLManager.extractChildren(parentElement,
+		return xmlManager.extractChildren(parentElement,
 			node -> (node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName())));
 	}
 
 	private List<Node> extractChildren(final Node parentNode){
-		return XMLManager.extractChildren(parentNode,
-			node -> XMLManager.isElement(node, CONFIGURATION_NODE));
+		return xmlManager.extractChildren(parentNode,
+			node -> xmlManager.isElement(node, CONFIGURATION_NODE));
 	}
 
 }

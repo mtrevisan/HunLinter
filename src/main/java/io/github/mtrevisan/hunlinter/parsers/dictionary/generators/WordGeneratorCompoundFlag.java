@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +104,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 		return result;
 	}
 
-	private List<List<List<Inflection>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+	private List<List<List<Inflection>>> generateCompounds(final Collection<int[]> permutations, final List<DictionaryEntry> inputs){
 		final Map<Integer, List<Inflection>> dicEntries = new HashMap<>(0);
 		final List<List<List<Inflection>>> list = new ArrayList<>(permutations.size());
 		for(final int[] permutation : permutations){

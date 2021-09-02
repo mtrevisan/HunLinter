@@ -113,7 +113,8 @@ public class StatisticsWorker extends WorkerDictionary{
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 
