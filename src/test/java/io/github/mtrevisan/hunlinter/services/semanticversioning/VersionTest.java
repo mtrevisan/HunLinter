@@ -66,7 +66,7 @@ class VersionTest{
 	void shouldParseBuild(){
 		Version version = new Version("1.2.3+build");
 
-		Assertions.assertEquals(new Version(1, 2, 3, null, new String[]{"build"}), version);
+		Assertions.assertEquals(new Version(1, 2, 3, new String[0], new String[]{"build"}), version);
 		Assertions.assertEquals("1.2.3+build", version.toString());
 	}
 
