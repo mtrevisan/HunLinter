@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.datastructures.AccessibleList;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
@@ -35,7 +34,6 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.BufferUtils;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
@@ -120,7 +118,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		final AccessibleList<byte[]> encodings = new AccessibleList<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements());
+		final AccessibleList<byte[]> encodings = new AccessibleList<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
+			AccessibleList.GROWTH_DEFAULT);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
@@ -237,7 +236,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 													  final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		final AccessibleList<byte[]> out = new AccessibleList<>(byte[].class, inflections.size());
+		final AccessibleList<byte[]> out = new AccessibleList<>(byte[].class, inflections.size(), AccessibleList.GROWTH_DEFAULT);
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
@@ -258,7 +257,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			//extract inflection
 			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
 			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
-			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
+			tag = clearAndEnsureCapacity(tag, 512);
 			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
 			extractInflection(suffixInflection, tag);
 			extractInflection(prefixInflection, tag);
@@ -286,6 +285,24 @@ public class PoSFSAWorker extends WorkerDictionary{
 			out.addAll(encodedStems);
 		}
 		return out;
+	}
+
+	/**
+	 * Ensure the buffer's capacity is large enough to hold a given number
+	 * of elements. If the input buffer is not large enough, a new buffer is allocated
+	 * and returned.
+	 *
+	 * @param elements The required number of elements to be appended to the buffer.
+	 * @param buffer   The buffer to check or {@code null} if a new buffer should be
+	 *                 allocated.
+	 * @return Returns the same buffer or a new buffer with the given capacity.
+	 */
+	private ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
+			buffer = ByteBuffer.allocate(elements);
+		else
+			buffer.clear();
+		return buffer;
 	}
 
 	private void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){

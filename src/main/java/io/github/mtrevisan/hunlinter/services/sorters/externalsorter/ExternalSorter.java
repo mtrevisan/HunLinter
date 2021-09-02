@@ -235,7 +235,7 @@ public class ExternalSorter{
 		}
 	}
 
-	private static class MyGZIPOutputStream extends GZIPOutputStream{
+	private static final class MyGZIPOutputStream extends GZIPOutputStream{
 		private MyGZIPOutputStream(final OutputStream out, final ExternalSorterOptions options) throws IOException{
 			super(out, options.getZipBufferSize());
 

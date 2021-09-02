@@ -22,13 +22,13 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.gui;
+package io.github.mtrevisan.hunlinter.gui.renderers;
 
 import java.awt.Color;
 
 
 /** @see <a href="http://www.easyrgb.com/en/create.php">Watercolors</a>. */
-public enum Watercolors{
+enum Watercolors{
 	//http://www.color-hex.com/
 	//http://fabrizio.zellini.org/tabella-nomi-e-codici-html-rgb-dei-colori
 	SHELL("#FFF5EE"),
@@ -51,7 +51,7 @@ public enum Watercolors{
 		color = Color.decode(hexColor);
 	}
 
-	public Color getColor(){
+	Color getColor(){
 		return color;
 	}
 

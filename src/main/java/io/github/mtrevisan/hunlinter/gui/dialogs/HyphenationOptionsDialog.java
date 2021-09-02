@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.gui.IntegerFilter;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptions;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParser;

@@ -66,7 +66,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 		if(markers != null)
 			for(final Marker marker : markers)
-				map.computeIfAbsent(marker, k -> new ArrayList<>(1)).add(component);
+				map.computeIfAbsent(marker, k -> new ArrayList<>(1))
+					.add(component);
 	}
 
 	public void setEncoder(final Encoder<ILoggingEvent> encoder){

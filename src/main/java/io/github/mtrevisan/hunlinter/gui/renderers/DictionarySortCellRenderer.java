@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.gui.renderers;
 
-import io.github.mtrevisan.hunlinter.gui.Watercolors;
-
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;

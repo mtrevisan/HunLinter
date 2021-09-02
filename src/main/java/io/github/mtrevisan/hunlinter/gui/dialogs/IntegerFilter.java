@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.gui;
+package io.github.mtrevisan.hunlinter.gui.dialogs;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +32,7 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 
 
-public class IntegerFilter extends DocumentFilter{
+class IntegerFilter extends DocumentFilter{
 
 	@Override
 	public void insertString(final FilterBypass fb, final int offset, final String text, final AttributeSet attr) throws BadLocationException{

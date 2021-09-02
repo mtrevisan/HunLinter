@@ -34,14 +34,16 @@ import java.util.Scanner;
 
 public class ParsingContext{
 
-	private final String line;
-	private final int index;
-	private final Scanner scanner;
+	private String line;
+	private int index;
+	private Scanner scanner;
 
-	private final String[] lineParts;
+	private String[] lineParts;
 
 
-	public ParsingContext(final String line, final int index, final Scanner scanner){
+	public ParsingContext(){}
+
+	public void update(final String line, final int index, final Scanner scanner){
 		Objects.requireNonNull(line, "Line cannot be null");
 		Objects.requireNonNull(scanner, "Scanner cannot be null");
 

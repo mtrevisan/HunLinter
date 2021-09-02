@@ -93,7 +93,7 @@ public class UpdateAction extends AbstractAction{
 		throw new NotSerializableException(getClass().getName());
 	}
 
-	private static class CancelAction extends AbstractAction{
+	private static final class CancelAction extends AbstractAction{
 		@Serial
 		private static final long serialVersionUID = -5644390861803492172L;
 		private final FileDownloaderDialog dialog;

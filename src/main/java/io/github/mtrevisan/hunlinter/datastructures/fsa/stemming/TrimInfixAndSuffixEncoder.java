@@ -72,11 +72,12 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		int maxInfixIndex = 0;
 		int maxSubsequenceLength = ArrayHelper.longestCommonPrefix(source, target);
 		int maxInfixLength = 0;
-		for(final int i : new int[]{0, maxSubsequenceLength}){
+		for(final int i : new int[]{0, maxSubsequenceLength})
 			for(int j = 1; j <= source.length - i; j ++){
 				//compute temporary `source` with the infix removed
 				//concatenate in scratch space for simplicity
 				final int len2 = source.length - (i + j);
+				//FIXME avoid creation of a new array each time
 				final byte[] scratch = new byte[i + len2];
 				System.arraycopy(source, 0, scratch, 0, i);
 				System.arraycopy(source, i + j, scratch, i, len2);
@@ -90,7 +91,6 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 					maxInfixLength = j;
 				}
 			}
-		}
 
 		int truncateSuffixBytes = source.length - (maxInfixLength + maxSubsequenceLength);
 

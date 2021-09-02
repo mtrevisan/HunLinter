@@ -189,6 +189,7 @@ public class AffixParser{
 		final Path affPath = affFile.toPath();
 		final Charset charset = FileHelper.determineCharset(affPath);
 		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
+			final ParsingContext context = new ParsingContext();
 			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
@@ -200,7 +201,7 @@ public class AffixParser{
 					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
 				encodingRead = true;
 
-				final ParsingContext context = new ParsingContext(line, index, scanner);
+				context.update(line, index, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){

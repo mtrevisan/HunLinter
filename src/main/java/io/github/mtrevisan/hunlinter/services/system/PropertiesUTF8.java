@@ -205,7 +205,9 @@ public class PropertiesUTF8 extends Properties{
 				final String key = storeConversion((CharSequence)k);
 				final String value = storeConversion((CharSequence) get(key));
 
-				output.write(key + '=' + value);
+				output.write(key);
+				output.write('=');
+				output.write(value);
 				output.newLine();
 			}
 			output.flush();
