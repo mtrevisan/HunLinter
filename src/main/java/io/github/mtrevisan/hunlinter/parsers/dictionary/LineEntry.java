@@ -47,7 +47,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -233,7 +232,10 @@ public class LineEntry implements Serializable{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(removal, addition, condition);
+		int result = (removal == null? 0: removal.hashCode());
+		result = 31 * result + addition.hashCode();
+		result = 31 * result + condition.hashCode();
+		return result;
 	}
 
 

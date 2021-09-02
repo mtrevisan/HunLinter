@@ -34,11 +34,11 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.text.ParseException;
 import java.text.RuleBasedCollator;
@@ -51,6 +51,9 @@ import java.util.regex.Pattern;
 
 
 public final class BaseBuilder{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseBuilder.class);
+
 
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
@@ -143,10 +146,12 @@ public final class BaseBuilder{
 			.baseClass;
 		final InputStream is = cl.getResourceAsStream("rules.properties");
 		if(is != null){
-			try(final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)){
-				rulesProperties.load(isr);
+			try{
+				rulesProperties.load(is);
 			}
-			catch(final IOException ignored){}
+			catch(final IOException ioe){
+				LOGGER.error("Error while reading rules", ioe);
+			}
 		}
 		return rulesProperties;
 	}

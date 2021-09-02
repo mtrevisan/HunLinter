@@ -399,7 +399,11 @@ public class AffixEntry{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(parent, removing, appending, continuationFlags, condition);
+		int result = (parent == null? 0: parent.hashCode());
+		result = 31 * result + (removing == null? 0: removing.hashCode());
+		result = 31 * result + (appending == null? 0: appending.hashCode());
+		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
+		result = 31 * result + (condition == null? 0: condition.hashCode());
 		result = 31 * result + Arrays.hashCode(morphologicalFields);
 		return result;
 	}

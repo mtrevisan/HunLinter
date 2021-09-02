@@ -84,12 +84,14 @@ public class PropertiesUTF8 extends Properties{
 				line = removeWhiteSpaces(line);
 				if(!line.isEmpty() && COMMENT.indexOf(line.charAt(0)) < 0){
 					//removes the beginning separators
-					String property = line;
+					final StringBuilder property = new StringBuilder();
+					property.append(line);
 					//reads the whole property if it is on multiple lines
 					while(continueLine(line)){
-						property = property.substring(0, property.length() - 1);
+						//remove the `\` character
+						property.setLength(property.length() - 1);
 						line = in.readLine();
-						property += line;
+						property.append(removeWhiteSpaces(line));
 					}
 
 					if(!property.isEmpty()){
