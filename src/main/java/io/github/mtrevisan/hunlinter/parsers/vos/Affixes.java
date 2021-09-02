@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.vos;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class Affixes{
@@ -69,7 +68,10 @@ public class Affixes{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(prefixes, suffixes, terminals);
+		int result = (prefixes == null? 0: prefixes.hashCode());
+		result = 31 * result + (suffixes == null? 0: suffixes.hashCode());
+		result = 31 * result + (terminals == null? 0: terminals.hashCode());
+		return result;
 	}
 
 }

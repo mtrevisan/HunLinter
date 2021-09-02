@@ -78,7 +78,9 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(incorrectForm, correctForm);
+		int result = incorrectForm.hashCode();
+		result = 31 * result + correctForm.hashCode();
+		return result;
 	}
 
 }

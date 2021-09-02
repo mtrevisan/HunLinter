@@ -317,7 +317,8 @@ public class DictionaryEntry{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(word, continuationFlags);
+		int result = (word == null? 0: word.hashCode());
+		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
 		result = 31 * result + Arrays.hashCode(morphologicalFields);
 		return result;
 	}

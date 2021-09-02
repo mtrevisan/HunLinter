@@ -63,7 +63,9 @@ public class DuplicationResult<T>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(duplicates, forceInsertion);
+		int result = duplicates.hashCode();
+		result = 31 * result + Boolean.hashCode(forceInsertion);
+		return result;
 	}
 
 }

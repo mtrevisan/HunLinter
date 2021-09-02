@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -243,7 +242,12 @@ public class RadixTrieNode{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(depth, failure, childrenIds, success, id);
+		int result = Integer.hashCode(depth);
+		result = 31 * result + failure.hashCode();
+		result = 31 * result + childrenIds.hashCode();
+		result = 31 * result + success.hashCode();
+		result = 31 * result + Integer.hashCode(id);
+		return result;
 	}
 
 }

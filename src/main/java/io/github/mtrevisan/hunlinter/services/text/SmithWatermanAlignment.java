@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -87,7 +86,11 @@ public class SmithWatermanAlignment{
 
 		@Override
 		public int hashCode(){
-			return Objects.hash(firstIndexA, firstIndexB, lastIndexA, lastIndexB);
+			int result = Integer.hashCode(firstIndexA);
+			result = 31 * result + Integer.hashCode(firstIndexB);
+			result = 31 * result + Integer.hashCode(lastIndexA);
+			result = 31 * result + Integer.hashCode(lastIndexB);
+			return result;
 		}
 	}
 

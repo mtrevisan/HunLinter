@@ -96,7 +96,9 @@ public final class XMLManager{
 	}
 
 	/** Transform the DOM Object to an XML File. */
-	public void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties) throws TransformerException{
+	@SafeVarargs
+	public final void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
+			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
 		if(properties != null)

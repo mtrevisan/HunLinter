@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
 
-
 import java.util.Objects;
 
 
@@ -85,7 +84,10 @@ public class SearchResult<V>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(begin, end, value);
+		int result = Integer.hashCode(begin);
+		result = 31 * result + Integer.hashCode(end);
+		result = 31 * result + value.hashCode();
+		return result;
 	}
 
 }

@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 
 public class VisitElement<V extends Serializable>{
@@ -68,7 +67,10 @@ public class VisitElement<V extends Serializable>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(nodeId, key, value);
+		int result = Integer.hashCode(nodeId);
+		result = 31 * result + key.hashCode();
+		result = 31 * result + value.hashCode();
+		return result;
 	}
 
 }

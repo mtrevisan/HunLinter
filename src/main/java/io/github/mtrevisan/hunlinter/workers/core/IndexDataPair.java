@@ -25,9 +25,6 @@
 package io.github.mtrevisan.hunlinter.workers.core;
 
 
-import java.util.Objects;
-
-
 public final class IndexDataPair<T>{
 
 	public static final IndexDataPair<Object> NULL_INDEX_DATA_PAIR = new IndexDataPair<>(-1, null);
@@ -73,7 +70,9 @@ public final class IndexDataPair<T>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(index, data);
+		int result = Integer.hashCode(index);
+		result = 31 * result + data.hashCode();
+		return result;
 	}
 
 }

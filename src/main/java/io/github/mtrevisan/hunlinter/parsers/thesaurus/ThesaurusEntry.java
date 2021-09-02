@@ -194,7 +194,9 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(definition, synonyms);
+		int result = definition.hashCode();
+		result = 31 * result + synonyms.hashCode();
+		return result;
 	}
 
 }

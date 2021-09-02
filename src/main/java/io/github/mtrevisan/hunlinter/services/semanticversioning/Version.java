@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.services.semanticversioning;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.StringTokenizer;
 
 
@@ -219,7 +218,9 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(major, minor, patch);
+		int result = Integer.hashCode(major);
+		result = 31 * result + Integer.hashCode(minor);
+		result = 31 * result + patch.hashCode();
 		result = 31 * result + Arrays.hashCode(preRelease);
 		result = 31 * result + Arrays.hashCode(build);
 		return result;

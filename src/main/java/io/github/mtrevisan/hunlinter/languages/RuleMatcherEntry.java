@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Objects;
 
 
 public class RuleMatcherEntry{
@@ -66,7 +65,8 @@ public class RuleMatcherEntry{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(messagePattern, masterFlag);
+		int result = messagePattern.hashCode();
+		result = 31 * result + masterFlag.hashCode();
 		result = 31 * result + Arrays.hashCode(wrongFlags);
 		return result;
 	}

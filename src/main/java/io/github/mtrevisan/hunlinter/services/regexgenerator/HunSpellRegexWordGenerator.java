@@ -32,7 +32,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Queue;
 
 
@@ -71,7 +70,9 @@ public class HunSpellRegexWordGenerator{
 
 		@Override
 		public int hashCode(){
-			return Objects.hash(word, stateIndex);
+			int result = (word == null? 0: word.hashCode());
+			result = 31 * result + Integer.hashCode(stateIndex);
+			return result;
 		}
 	}
 

@@ -114,7 +114,9 @@ public class RuleEntry{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(type, flag);
+		int result = type.hashCode();
+		result = 31 * result + flag.hashCode();
+		return result;
 	}
 
 }
