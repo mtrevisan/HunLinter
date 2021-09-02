@@ -48,18 +48,16 @@ public class PaginatedList extends JList<String>{
 	 * @param pageSize	The number of rows visible in the JList.
 	 */
 	public PaginatedList(final int pageSize){
-		super();
-
-		this.list = new JList<>();
+		list = new JList<>();
 		this.pageSize = pageSize;
 	}
 
 	public void loadLines(final List<String> listData){
 		this.listData = listData;
 		//work out how many pages there are
-		this.currentPage = 1;
+		currentPage = 1;
 		final int size = listData.size();
-		this.lastPage = size / pageSize + (size % pageSize != 0? 1: 0);
+		lastPage = size / pageSize + (size % pageSize != 0? 1: 0);
 
 		updatePage();
 	}
@@ -77,13 +75,13 @@ public class PaginatedList extends JList<String>{
 	}
 
 	public void setFirstPage(){
-		this.currentPage = 1;
+		currentPage = 1;
 
 		updatePage();
 	}
 
 	public void setLastPage(){
-		this.currentPage = lastPage;
+		currentPage = lastPage;
 
 		updatePage();
 	}

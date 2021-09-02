@@ -61,11 +61,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private static final String WRONG_NUMBER_OF_ELEMENTS = "Number of elements must be strictly positive";
 	private static final String WRONG_FALSE_POSITIVE_PROBABILITY = "False positive probability must be in ]0, 1[ interval";
 
-	private static final double LN2 = Math.log(2);
+	private static final double LN2 = Math.log(2.);
 	private static final double LN2_SQUARE = LN2 * LN2;
 
 	/** The decomposer to use when there is none specified at construction. */
-	private final Decomposer<T> DECOMPOSER_DEFAULT = new DefaultDecomposer<>();
+	private final Decomposer<T> decomposerDefault = new DefaultDecomposer<>();
 	/** The default hasher to use if one is not specified. */
 	private static final HashFunction HASHER_DEFAULT = new Murmur3HashFunction();
 
@@ -117,7 +117,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param charset							The {@link Charset} to be used
 	 * @param parameters						The parameters object
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link #HASHER_DEFAULT} will be used
+	 * @param hasher							The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used
 	 */
 	public BloomFilter(final Charset charset, final BloomFilterParameters parameters, final Decomposer<T> decomposer, final HashFunction hasher){
 		this(charset, parameters.getExpectedNumberOfElements(), parameters.getFalsePositiveProbability(), parameters.getBitArrayType(),
@@ -132,7 +132,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
 	 * @param bitArrayType					The type of the bit array
 	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param hasher							The hash function to use. If <code>null</code> is specified the {@link #HASHER_DEFAULT} will be used
+	 * @param hasher							The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used
 	 */
 	protected BloomFilter(final Charset charset, final int expectedNumberOfElements, final double falsePositiveProbability,
 			final BitArrayBuilder.Type bitArrayType, final Decomposer<T> decomposer, final HashFunction hasher){
@@ -169,21 +169,21 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	//Default bloom filter functions follow
 	/**
-	 * Compute the optimal size <code>m</code> of the bloom filter in bits.
+	 * Compute the optimal size {@code m} of the bloom filter in bits.
 	 *
-	 * @param expectedNumberOfElements	The number of expected insertions, or <code>n</code>
-	 * @param falsePositiveProbability	The maximum false positive rate expected, or <code>p</code>
-	 * @return the optimal size in bits for the filter, or <code>m</code>
+	 * @param expectedNumberOfElements	The number of expected insertions, or {@code n}
+	 * @param falsePositiveProbability	The maximum false positive rate expected, or {@code p}
+	 * @return the optimal size in bits for the filter, or {@code m}
 	 */
 	public static int optimalBitSize(final double expectedNumberOfElements, final double falsePositiveProbability){
 		return (int)Math.round(-expectedNumberOfElements * Math.log(falsePositiveProbability) / LN2_SQUARE);
 	}
 
 	/**
-	 * Compute the optimal number of hash functions, <code>k</code>
+	 * Compute the optimal number of hash functions, {@code k}
 	 *
 	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @return the optimal number of hash functions to be used also known as <code>k</code>
+	 * @return the optimal number of hash functions to be used also known as {@code k}
 	 */
 	public static int optimalNumberOfHashFunctions(final double falsePositiveProbability){
 		return Math.max(1, (int)Math.round(-Math.log(falsePositiveProbability) / LN2));
@@ -194,7 +194,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * Add the given value represented as bytes in to the bloom filter.
 	 *
 	 * @param bytes	The bytes to be added to bloom filter
-	 * @return <code>true</code> if any bit was modified when adding the value, <code>false</code> otherwise
+	 * @return {@code true} if any bit was modified when adding the value, <code>false</code> otherwise
 	 */
 	public synchronized boolean add(final byte[] bytes){
 		final boolean bitsChanged = calculateIndexes(bytes);
@@ -257,7 +257,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *
 	 * @param bytes	The byte-array to use for hash computation
 	 * @return the 64-bit hash
-	 * @throws NullPointerException	if the byte array is <code>null</code>
+	 * @throws NullPointerException	if the byte array is {@code null}
 	 */
 	private long getLongHash64(final byte[] bytes){
 		Objects.requireNonNull(bytes, "Bytes to add to bloom filter cannot be null");
@@ -276,7 +276,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	private byte[] decomposeValue(final T value){
 		final ByteSink sink = new ByteSink();
-		Objects.requireNonNullElse(decomposer, DECOMPOSER_DEFAULT)
+		Objects.requireNonNullElse(decomposer, decomposerDefault)
 			.decompose(value, sink, charset);
 		return sink.getByteArray();
 	}
@@ -310,7 +310,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public double getTrueFalsePositiveProbability(final int insertedElements){
 		//(1 - e^(-k * n / m)) ^ k
-		return Math.pow((1 - Math.exp(-hashFunctions * (double)insertedElements / bitsRequired)), hashFunctions);
+		return Math.pow((1. - Math.exp(-hashFunctions * (double)insertedElements / bitsRequired)), hashFunctions);
 	}
 
 	/** Sets all bits to false in the Bloom filter. */

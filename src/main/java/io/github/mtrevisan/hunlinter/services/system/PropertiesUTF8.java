@@ -29,6 +29,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serial;
@@ -251,6 +254,19 @@ public class PropertiesUTF8 extends Properties{
 	@Override
 	public PropertiesUTF8 clone(){
 		return (PropertiesUTF8)super.clone();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

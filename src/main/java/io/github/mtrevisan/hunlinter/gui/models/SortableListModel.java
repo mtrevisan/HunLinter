@@ -25,6 +25,10 @@
 package io.github.mtrevisan.hunlinter.gui.models;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +40,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	private static final long serialVersionUID = -2766941679426379241L;
 
 
-	private final ArrayList<String> delegate = new ArrayList<>();
+	private final ArrayList<String> delegate = new ArrayList<>(0);
 
 
 	/**
@@ -45,7 +49,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	 * @param c	The collection which contains the elements to add
 	 * @throws NullPointerException	If {@code c} is {@code null}
 	 */
-	public void addAll(final Collection<? extends String> c){
+	public void addAll(final Collection<String> c){
 		if(!c.isEmpty()){
 			final int startIndex = getSize();
 
@@ -60,7 +64,7 @@ public class SortableListModel extends AbstractListModel<String>{
 		return delegate.get(index);
 	}
 
-	public void replaceAll(final Collection<? extends String> c, final int startIndex){
+	public void replaceAll(final Collection<String> c, final int startIndex){
 		if(!c.isEmpty()){
 			final int size = getSize();
 			if(startIndex >= size)
@@ -99,6 +103,19 @@ public class SortableListModel extends AbstractListModel<String>{
 	@Override
 	public String toString(){
 		return delegate.toString();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -83,18 +83,18 @@ public class DictionaryMetadata{
 	private final Map<DictionaryAttribute, String> attributes;
 
 	/** Replacement pairs for non-obvious candidate search in a speller dictionary. */
-	private Map<String, List<String>> replacementPairs = new HashMap<>();
+	private Map<String, List<String>> replacement = new HashMap<>(0);
 	/** Conversion pairs for input conversion, for example to replace ligatures. */
-	private Map<String, String> inputConversion = new HashMap<>();
+	private Map<String, String> inputConversion = new HashMap<>(0);
 	/** Conversion pairs for output conversion, for example to replace ligatures. */
-	private Map<String, String> outputConversion = new HashMap<>();
+	private Map<String, String> outputConversion = new HashMap<>(0);
 	/**
 	 * Equivalent characters (treated similarly as equivalent chars with and without
 	 * diacritics). For example, Polish <tt>ł</tt> can be specified as equivalent to <tt>l</tt>.
 	 * <p>
 	 * This implements a feature similar to hunspell MAP in the affix file.
 	 */
-	private Map<Character, List<Character>> equivalentChars = new HashMap<>();
+	private Map<Character, List<Character>> equivalentChars = new HashMap<>(0);
 
 	/** All "enabled" boolean attributes. */
 	private final EnumMap<DictionaryAttribute, Boolean> boolAttributes = new EnumMap<>(DictionaryAttribute.class);
@@ -110,7 +110,7 @@ public class DictionaryMetadata{
 	 * Read dictionary metadata from a property file (stream).
 	 *
 	 * @param metadataStream The stream with metadata.
-	 * @return Returns {@link DictionaryMetadata} read from a stream (property file).
+	 * @return Returns the metadata read from a stream (property file).
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
 	public static DictionaryMetadata read(final InputStream metadataStream) throws IOException{
@@ -177,7 +177,7 @@ public class DictionaryMetadata{
 				case ENCODER -> encoderType = (EncoderType)value;
 				case INPUT_CONVERSION -> inputConversion = (Map<String, String>)value;
 				case OUTPUT_CONVERSION -> outputConversion = (Map<String, String>)value;
-				case REPLACEMENT_PAIRS -> replacementPairs = (Map<String, List<String>>)value;
+				case REPLACEMENT_PAIRS -> replacement = (Map<String, List<String>>)value;
 				case EQUIVALENT_CHARS -> equivalentChars = (Map<Character, List<Character>>)value;
 				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> boolAttributes.put(e.getKey(), (Boolean)value);
 				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
@@ -203,7 +203,7 @@ public class DictionaryMetadata{
 
 	public Map<String, String> getOutputConversionPairs(){ return outputConversion; }
 
-	public Map<String, List<String>> getReplacementPairs(){ return replacementPairs; }
+	public Map<String, List<String>> getReplacementPairs(){ return replacement; }
 
 	public Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
 
@@ -235,10 +235,10 @@ public class DictionaryMetadata{
 	/**
 	 * Returns the expected name of the metadata file, based on the name of the
 	 * dictionary file. The expected name is resolved by truncating any
-	 * file extension of <code>name</code> and appending
+	 * file extension of {@code name} and appending
 	 * {@link DictionaryMetadata#METADATA_FILE_EXTENSION}.
 	 *
-	 * @param dictionaryFile	The name of the dictionary (<code>*.dict</code>) file.
+	 * @param dictionaryFile	The name of the dictionary ({@code *.dict}) file.
 	 * @return	The expected name of the metadata file.
 	 */
 	public static String getExpectedMetadataFileName(final String dictionaryFile){

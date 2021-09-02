@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.workers.thesaurus;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -148,7 +149,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
+		final ProgressCallback progressCallback = lineIndex -> {
 			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();

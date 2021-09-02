@@ -70,17 +70,21 @@ public class HelpDialog extends JDialog{
 		productNameValue.setText(artifactID);
 		productVersionValue.setText(version);
 		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
-		managedOptionsTextArea.setText(
-			"General:\n"
-				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n\n"
-			+ "Suggestions:\n"
-				+ "\tTRY (only read), NOSUGGEST (only read), REP, MAP (only read)\n\n"
-			+ "Compounding:\n"
-				+ "\tBREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n\n"
-			+ "Affix creation:\n"
-				+ "\tPFX, SFX\n\n"
-			+ "Others:\n"
-				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
+		managedOptionsTextArea.setText("""
+			General:
+			\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
+
+			Suggestions:
+			\tTRY (only read), NOSUGGEST (only read), REP, MAP (only read)
+
+			Compounding:
+			\tBREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
+
+			Affix creation:
+			\tPFX, SFX
+
+			Others:
+			\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX""");
 		managedOptionsTextArea.setCaretPosition(0);
 		copyright.setText("Copyright © 2019-" + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
 	}
@@ -149,7 +153,7 @@ public class HelpDialog extends JDialog{
 
       managedOptionsTextArea.setEditable(false);
       managedOptionsTextArea.setColumns(20);
-      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
       managedOptionsTextArea.setLineWrap(true);
       managedOptionsTextArea.setRows(1);
       managedOptionsTextArea.setTabSize(3);

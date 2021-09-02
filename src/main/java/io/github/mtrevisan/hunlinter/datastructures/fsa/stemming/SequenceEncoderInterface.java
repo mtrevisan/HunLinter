@@ -45,20 +45,20 @@ public interface SequenceEncoderInterface{
 
 
 	/**
-	 * Encodes <code>target</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
+	 * Encodes {@code target} relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param source   The source byte sequence.
-	 * @param target   The target byte sequence to encode relative to <code>source</code>
-	 * @return	The {@link ByteBuffer} with encoded <code>target</code>.
+	 * @param target   The target byte sequence to encode relative to {@code source}
+	 * @return	The {@link ByteBuffer} with encoded {@code target}.
 	 */
 	byte[] encode(final byte[] source, final byte[] target);
 
 	/**
-	 * Decodes <code>encoded</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
+	 * Decodes {@code encoded} relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param source	The source byte sequence.
 	 * @param encoded	The {@linkplain #encode previously encoded} byte sequence.
-	 * @return	The {@link ByteBuffer} with decoded <code>target</code>.
+	 * @return	The {@link ByteBuffer} with decoded {@code target}.
 	 */
 	byte[] decode(final byte[] source, final byte[] encoded);
 

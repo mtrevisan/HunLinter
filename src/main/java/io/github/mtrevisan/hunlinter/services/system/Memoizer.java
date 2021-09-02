@@ -41,12 +41,12 @@ public final class Memoizer{
 	private Memoizer(){}
 
 	public static <T> Supplier<T> memoize(final Supplier<T> supplier){
-		final Map<Object, T> cache = new ConcurrentHashMap<>();
+		final Map<Object, T> cache = new ConcurrentHashMap<>(0);
 		return () -> cache.computeIfAbsent(DEFAULT_OBJECT, t -> supplier.get());
 	}
 
 	public static <T, U> Function<T, U> memoize(final Function<T, U> function){
-		final Map<T, U> cache = new ConcurrentHashMap<>();
+		final Map<T, U> cache = new ConcurrentHashMap<>(0);
 		return input -> cache.computeIfAbsent(input, function);
 	}
 
@@ -59,7 +59,7 @@ public final class Memoizer{
 	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
 	 */
 	public static <T> Supplier<T> memoizeThreadAndRecursionSafe(final Supplier<T> supplier){
-		final Map<Object, T> cache = new HashMap<>();
+		final Map<Object, T> cache = new HashMap<>(0);
 		final Lock lock = new ReentrantLock();
 		return () -> {
 			lock.lock();
@@ -82,7 +82,7 @@ public final class Memoizer{
 	 * @see <a href="https://opencredo.com/lambda-memoization-in-java-8/">Lambda memoization in Java 8</a>
 	 */
 	public static <T, U> Function<T, U> memoizeThreadAndRecursionSafe(final Function<T, U> function){
-		final Map<T, U> cache = new HashMap<>();
+		final Map<T, U> cache = new HashMap<>(0);
 		final Lock lock = new ReentrantLock();
 		return input -> {
 			lock.lock();

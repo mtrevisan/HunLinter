@@ -52,7 +52,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	private final ByteSequenceIterator finalStatesIterator;
 
 	/** Private internal array of reusable word data objects. */
-	private final List<WordData> forms = new ArrayList<>();
+	private final List<WordData> forms = new ArrayList<>(0);
 
 	/** The {@link Dictionary} this lookup is using. */
 	private final Dictionary dictionary;
@@ -83,7 +83,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 	/**
 	 * Returns a list of {@link WordData} entries for a given word. The returned
-	 * list is never <code>null</code>. Depending on the stemmer's
+	 * list is never {@code null}. Depending on the stemmer's
 	 * implementation the {@link WordData} may carry the stem and additional
 	 * information (tag) or just the stem.
 	 * <p>

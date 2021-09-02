@@ -108,8 +108,6 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	protected void finalizeProcessing(final String message){
 		watch.stop();
 
-		System.gc();
-
 		setProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
@@ -153,7 +151,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	public final void pause(){
 		if(!isDone() && paused.compareAndSet(false, true))
-			firePropertyChange("paused", false, true);
+			firePropertyChange("paused", Boolean.FALSE, Boolean.TRUE);
 	}
 
 	public final boolean isPaused(){
@@ -170,7 +168,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 				PAUSE_LOCK.unlock();
 			}
 
-			firePropertyChange("paused", true, false);
+			firePropertyChange("paused", Boolean.TRUE, Boolean.FALSE);
 		}
 	}
 

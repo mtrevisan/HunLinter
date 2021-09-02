@@ -40,7 +40,7 @@ public final class BufferUtils{
 	 * and returned.
 	 *
 	 * @param elements The required number of elements to be appended to the buffer.
-	 * @param buffer   The buffer to check or <code>null</code> if a new buffer should be
+	 * @param buffer   The buffer to check or {@code null} if a new buffer should be
 	 *                 allocated.
 	 * @return Returns the same buffer or a new buffer with the given capacity.
 	 */

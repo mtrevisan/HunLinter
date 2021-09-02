@@ -58,8 +58,8 @@ public class DictionaryStatistics implements Closeable{
 	private final Frequency<String> syllabesFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
 	private final Frequency<Integer> stressFromLastFrequencies = new Frequency<>();
-	private final List<String> longestWordsByCharacters = new ArrayList<>();
-	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
+	private final List<String> longestWordsByCharacters = new ArrayList<>(0);
+	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>(0);
 
 	private final BloomFilterInterface<String> bloomFilter;
 	private final Orthography orthography;

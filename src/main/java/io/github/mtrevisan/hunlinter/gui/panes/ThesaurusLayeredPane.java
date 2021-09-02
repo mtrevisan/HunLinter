@@ -362,7 +362,7 @@ final int iconSize = 17;
 
 		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
+		if(unmodifiedSearchText.equals(formerFilterThesaurusText))
 			return;
 
 		formerFilterThesaurusText = unmodifiedSearchText;

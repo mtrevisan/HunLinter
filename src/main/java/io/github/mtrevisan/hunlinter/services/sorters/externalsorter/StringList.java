@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 import io.github.mtrevisan.hunlinter.services.sorters.SmoothSort;
 import io.github.mtrevisan.hunlinter.services.sorters.SorterHelper;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -39,7 +40,7 @@ import java.util.function.Consumer;
 /**
  * A fast and unsecure version of ArrayList&lt;String&gt;
  */
-public class StringList implements Iterable<String>{
+public class StringList implements Iterable<String>, Serializable{
 
 	/** Shared empty array instance used for empty instances. */
 	private static final String[] EMPTY_ELEMENTDATA = {};
@@ -206,7 +207,7 @@ public class StringList implements Iterable<String>{
 		elementData[size ++] = elem;
 	}
 
-	public void addAll(final Collection<? extends String> collection){
+	public void addAll(final Collection<String> collection){
 		if(!collection.isEmpty()){
 			grow(size + collection.size());
 

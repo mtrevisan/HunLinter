@@ -155,10 +155,10 @@ public final class StringHelper{
 	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
 	 * Out-of-range indexes return false.
 	 */
-	private static boolean validSurrogatePairAt(final CharSequence string, final int index){
-		return (index >= 0 && index <= (string.length() - 2)
-			&& Character.isHighSurrogate(string.charAt(index))
-			&& Character.isLowSurrogate(string.charAt(index + 1)));
+	private static boolean validSurrogatePairAt(final CharSequence text, final int index){
+		return (index >= 0 && index <= (text.length() - 2)
+			&& Character.isHighSurrogate(text.charAt(index))
+			&& Character.isLowSurrogate(text.charAt(index + 1)));
 	}
 
 	public static int getLastCommonLetterIndex(final CharSequence word1, final CharSequence word2){

@@ -143,7 +143,7 @@ public final class FSATraversal{
 
 	/**
 	 * Finds a matching path in the dictionary for a given sequence of labels from
-	 * <code>sequence</code> and starting at node <code>node</code>.
+	 * {@code sequence} and starting at node <code>node</code>.
 	 *
 	 * @param sequence	Input sequence to look for in the automaton.
 	 * @param start	Start index in the sequence array.

@@ -27,7 +27,7 @@ package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
 class Location{
 
-	private static final double LN2 = Math.log(2);
+	private static final double LN2 = Math.log(2.);
 
 	final int block;
 	final int element;

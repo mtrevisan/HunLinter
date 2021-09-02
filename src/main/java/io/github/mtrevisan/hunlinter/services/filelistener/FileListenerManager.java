@@ -88,9 +88,9 @@ public class FileListenerManager implements FileListener, Runnable{
 	public FileListenerManager(){
 		watcher = createWatcher();
 		running = new AtomicBoolean(false);
-		watchKeyToDirPath = new ConcurrentHashMap<>();
-		dirPathToListeners = new ConcurrentHashMap<>();
-		listenerToFilePatterns = new ConcurrentHashMap<>();
+		watchKeyToDirPath = new ConcurrentHashMap<>(0);
+		dirPathToListeners = new ConcurrentHashMap<>(0);
+		listenerToFilePatterns = new ConcurrentHashMap<>(0);
 	}
 
 	private WatchService createWatcher() throws RuntimeException{
@@ -270,8 +270,8 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private Set<FileChangeListener> matchedListeners(final Path dir, final Path file){
-		final Set<FileChangeListener> set = new HashSet<>();
 		final Set<FileChangeListener> listeners = getListeners(dir);
+		final Set<FileChangeListener> set = new HashSet<>(listeners.size());
 		for(final FileChangeListener listener : listeners){
 			if(matchesAny(file, getPatterns(listener)))
 				set.add(listener);

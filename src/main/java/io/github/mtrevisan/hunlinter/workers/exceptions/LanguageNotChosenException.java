@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
-
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -34,8 +37,21 @@ public class LanguageNotChosenException extends Exception{
 	private static final long serialVersionUID = 7746149848221945649L;
 
 
-	public LanguageNotChosenException(final String description){
-		super(description);
+	public LanguageNotChosenException(final String message){
+		super(message);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

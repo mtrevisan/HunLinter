@@ -67,7 +67,7 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_CORRECT_FORM = AUTO_CORRECT_NAMESPACE + "name";
 
 
-	private final List<CorrectionEntry> dictionary = new ArrayList<>();
+	private final List<CorrectionEntry> dictionary = new ArrayList<>(0);
 
 
 	/**
@@ -152,7 +152,7 @@ public class AutoCorrectParser{
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
-		final ArrayList<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
+		final List<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
 		for(final CorrectionEntry correction : dictionary){
 			if(correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
 				duplicates.add(correction);
@@ -161,7 +161,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public boolean contains(final String incorrect, final String correct){
+	public boolean contains(final CharSequence incorrect, final CharSequence correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);

@@ -108,8 +108,8 @@ public class RadixTrieNode{
 	 */
 	public void addChildrenIds(final Iterable<Integer> childrenIds){
 		if(childrenIds != null)
-			for(final Integer id : childrenIds)
-				addChildrenId(id);
+			for(final Integer childrenId : childrenIds)
+				addChildrenId(childrenId);
 	}
 
 	/**

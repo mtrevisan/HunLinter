@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  */
 public class Frequency<T extends Comparable<?>>{
 
-	private final Function<Integer, Long> SUM_OF_FREQUENCIES = Memoizer.memoize(this::sumOfFrequencies);
+	private final Function<Integer, Long> sumOfFrequencies = Memoizer.memoize(this::sumOfFrequencies);
 
 
 	private final TreeMap<T, Long> frequencies = new TreeMap<>();
@@ -167,7 +167,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @return	the total frequency count.
 	 */
 	public long getSumOfFrequencies(){
-		return SUM_OF_FREQUENCIES.apply(frequencies.hashCode());
+		return sumOfFrequencies.apply(frequencies.hashCode());
 	}
 
 	private long sumOfFrequencies(final int hashCode){

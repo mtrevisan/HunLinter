@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 
 /**
@@ -73,7 +74,7 @@ public final class MetadataBuilder{
 		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
-			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(Locale.ROOT),
 			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
 			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
 		if(affixData.getLanguage() != null)
@@ -97,7 +98,7 @@ public final class MetadataBuilder{
 		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
-			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(Locale.ROOT),
 			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
 			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
 		if(affixData.getLanguage() != null)

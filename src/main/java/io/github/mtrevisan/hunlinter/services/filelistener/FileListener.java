@@ -36,7 +36,7 @@ public interface FileListener{
 	/**
 	 * Notifies the implementation of <em>this</em> interface that {@code dirPath}
 	 * should be monitored for file system events. If the changed file matches any
-	 * of the {@code globPatterns}, <code>listener</code> should be notified.
+	 * of the {@code globPatterns}, {@code listener} should be notified.
 	 *
 	 * @param listener	The listener.
 	 * @param patterns	Zero or more file patterns to be matched against file names.

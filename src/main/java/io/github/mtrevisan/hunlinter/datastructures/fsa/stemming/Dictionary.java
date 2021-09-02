@@ -76,7 +76,7 @@ public class Dictionary{
 	 * Attempts to load a dictionary using the path to the FSA file and the
 	 * expected metadata extension.
 	 *
-	 * @param location The location of the dictionary file (<code>*.dict</code>).
+	 * @param location The location of the dictionary file ({@code *.dict}).
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */
@@ -92,7 +92,7 @@ public class Dictionary{
 	 * Attempts to load a dictionary using the URL to the FSA file and the
 	 * expected metadata extension.
 	 *
-	 * @param dictURL The URL pointing to the dictionary file (<code>*.dict</code>).
+	 * @param dictURL The URL pointing to the dictionary file ({@code *.dict}).
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */

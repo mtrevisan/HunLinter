@@ -25,11 +25,11 @@
 package io.github.mtrevisan.hunlinter.services.regexgenerator;
 
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -90,7 +90,7 @@ public class HunSpellRegexWordGenerator{
 	/**
 	 * Initializes the NFA from the specified regular expression.
 	 * <p>
-	 * NOTE: each element should be enclosed in parentheses (e.g. {@code (as)(ert)?(b)*}), the managed operations are <code>*</code> and <code>?</code>
+	 * NOTE: each element should be enclosed in parentheses (e.g. {@code (as)(ert)?(b)*}), the managed operations are {@code *} and <code>?</code>
 	 *
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (e.g. ["ag", "ert", "?", "b", "*"])
 	 */
@@ -146,10 +146,10 @@ public class HunSpellRegexWordGenerator{
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				final Iterable<Pair<Integer, String>> transitions = graph.adjacentVertices(stateIndex);
-				for(final Pair<Integer, String> transition : transitions){
-					final int key = transition.getKey();
-					final String value = transition.getValue();
+				final Iterable<IndexDataPair<String>> transitions = graph.adjacentVertices(stateIndex);
+				for(final IndexDataPair<String> transition : transitions){
+					final int key = transition.getIndex();
+					final String value = transition.getData();
 
 					List<String> nextWord = subword;
 					if(StringUtils.isNotBlank(value)){

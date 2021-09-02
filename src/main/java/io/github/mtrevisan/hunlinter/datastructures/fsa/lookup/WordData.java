@@ -58,14 +58,14 @@ public class WordData{
 	}
 
 	/**
-	 * @return	Stem data decoded to a character sequence or <code>null</code> if no associated stem data exists.
+	 * @return	Stem data decoded to a character sequence or {@code null} if no associated stem data exists.
 	 */
 	public byte[] getStem(){
 		return stem;
 	}
 
 	/**
-	 * @return	Tag data decoded to a character sequence or <code>null</code> if no associated tag data exists.
+	 * @return	Tag data decoded to a character sequence or {@code null} if no associated tag data exists.
 	 */
 	public byte[] getTag(){
 		return tag;

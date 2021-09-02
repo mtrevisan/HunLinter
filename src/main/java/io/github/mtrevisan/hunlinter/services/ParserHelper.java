@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +79,7 @@ public final class ParserHelper{
 	}
 
 	public static void forEachDictionaryLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
-			final Consumer<Integer> progressCallback){
+			final ProgressCallback progressCallback){
 		final int totalLines = FileHelper.getLinesCount(file, charset);
 		int progress = 0;
 		int progressIndex = 0;

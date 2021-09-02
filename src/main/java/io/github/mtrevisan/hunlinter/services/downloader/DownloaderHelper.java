@@ -62,11 +62,10 @@ public final class DownloaderHelper{
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
 
-	@SuppressWarnings("CanBeFinal")
-	private static Comparator<Pair<Version, String>> VERSION_COMPARATOR;
+	private static final Comparator<Pair<Version, String>> VERSION_COMPARATOR;
 	static{
-		VERSION_COMPARATOR = Comparator.comparing(Pair::getKey);
-		VERSION_COMPARATOR = VERSION_COMPARATOR.reversed();
+		final Comparator<Pair<Version, String>> cmp = Comparator.comparing(Pair::getKey);
+		VERSION_COMPARATOR = cmp.reversed();
 	}
 
 
@@ -82,7 +81,7 @@ public final class DownloaderHelper{
 
 	public static final Map<String, Object> APPLICATION_PROPERTIES;
 	static{
-		APPLICATION_PROPERTIES = new HashMap<>();
+		APPLICATION_PROPERTIES = new HashMap<>(3);
 		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
 			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);
@@ -117,12 +116,12 @@ public final class DownloaderHelper{
 	 */
 	public static List<Pair<Version, String>> extractNewerVersions() throws Exception{
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
-			final String response = new String(is.readAllBytes());
+			final String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
 			final JSONParser parser = new JSONParser();
 			final JSONArray jsonArray = (JSONArray)parser.parse(response);
 			final Version applicationVersion = new Version((String)APPLICATION_PROPERTIES.get(PROPERTY_KEY_VERSION));
-			final List<Pair<Version, String>> whatsNew = new ArrayList<>();
+			final List<Pair<Version, String>> whatsNew = new ArrayList<>(jsonArray.size());
 			for(final Object elem : jsonArray){
 				final JSONObject obj = (JSONObject)elem;
 				final Version tagName = new Version((String)obj.get(PROPERTY_KEY_TAG_NAME));

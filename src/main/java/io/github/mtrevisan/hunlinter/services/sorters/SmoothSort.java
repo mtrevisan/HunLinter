@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters;
 
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
+
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -70,7 +72,7 @@ public final class SmoothSort{
 	}
 
 	public static <T> void sort(final T[] data, final Comparator<? super T> comparator,
-			final Consumer<Integer> progressCallback){
+			final ProgressCallback progressCallback){
 		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
@@ -80,7 +82,7 @@ public final class SmoothSort{
 	}
 
 	public static synchronized <T> void sort(final T[] data, final int low, int high,
-			final Comparator<? super T> comparator, final Consumer<Integer> progressCallback){
+			final Comparator<? super T> comparator, final ProgressCallback progressCallback){
 		Objects.requireNonNull(data, "Data cannot be null");
 		Objects.requireNonNull(comparator, "Comparator cannot be null");
 

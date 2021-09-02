@@ -238,8 +238,6 @@ public final class GUIHelper{
 			"Do you really want to abort the " + worker.getWorkerData().getWorkerName() + " task?", "Warning!",
 			JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		if(answer == JOptionPane.YES_OPTION){
-			System.gc();
-
 			Optional.ofNullable(onAbort)
 				.ifPresent(Runnable::run);
 

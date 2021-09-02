@@ -26,6 +26,10 @@ package io.github.mtrevisan.hunlinter.workers.exceptions;
 
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -62,6 +66,19 @@ public class LinterWarning extends Exception{
 
 	public IndexDataPair<?> getData(){
 		return data;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

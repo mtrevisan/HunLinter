@@ -126,7 +126,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
-			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlag();
+			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlags();
 			unusedFlags.removeAll(flags);
 			if(!unusedFlags.isEmpty())
 				manageException(new LinterException(

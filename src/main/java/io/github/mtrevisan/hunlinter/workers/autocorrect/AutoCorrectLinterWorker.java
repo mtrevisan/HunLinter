@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.workers.autocorrect;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
@@ -87,7 +88,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				.toLowerCase(Locale.ROOT);
 
 			boolean containsSpecialChars = false;
-			int bound = correctForm.length();
+			final int bound = correctForm.length();
 			for(int i = 0; i < bound; i ++){
 				final char chr = correctForm.charAt(i);
 				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
@@ -143,7 +144,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
+		final ProgressCallback progressCallback = lineIndex -> {
 			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();

@@ -72,7 +72,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.FutureTask;
-import java.util.stream.Collectors;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -438,7 +437,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		final int uniqueWords = statistics.getUniqueWords();
 		final Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
 		final List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
-		List<String> longestWordSyllabes = new ArrayList<>();
+		List<String> longestWordSyllabes = new ArrayList<>(0);
 		for(final Hyphenation hyphenation : statistics.getLongestWordsBySyllabes())
 			longestWordSyllabes.add(StringUtils.join(hyphenation.getSyllabes(), HyphenationParser.SOFT_HYPHEN));
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);

@@ -96,7 +96,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
-		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>();
+		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>(0);
 		for(final String inputCompound : inputCompounds){
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
 

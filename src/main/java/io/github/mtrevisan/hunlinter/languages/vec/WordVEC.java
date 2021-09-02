@@ -27,6 +27,8 @@ package io.github.mtrevisan.hunlinter.languages.vec;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.Collator;
 import java.text.ParseException;
@@ -39,6 +41,8 @@ import java.util.stream.IntStream;
 
 
 public final class WordVEC{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
 	private static final String PIPE = "|";
 
@@ -65,7 +69,9 @@ public final class WordVEC{
 		try{
 			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
 		}
-		catch(final ParseException ignored){}
+		catch(final ParseException e){
+			LOGGER.error("Bad error while creating the collator", e);
+		}
 	}
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");

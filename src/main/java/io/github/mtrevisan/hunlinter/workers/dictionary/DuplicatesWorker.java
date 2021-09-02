@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -56,7 +57,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -169,7 +169,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
+		final ProgressCallback progressCallback = lineIndex -> {
 			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();
@@ -192,7 +192,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 	}
 
 	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
-		final ArrayList<Duplicate> result = new ArrayList<>();
+		final ArrayList<Duplicate> result = new ArrayList<>(0);
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			resetProcessing("Extracting duplicates (step 2/3)");
@@ -218,7 +218,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 				}
 			};
-			final Consumer<Integer> progressCallback = lineIndex -> {
+			final ProgressCallback progressCallback = lineIndex -> {
 				setProgress(Math.min(lineIndex, 100));
 
 				sleepOnPause();
@@ -251,10 +251,14 @@ public class DuplicatesWorker extends WorkerDictionary{
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Inflection prod = entries.get(0).getInflection();
-					String origin = prod.getWord();
+					final StringBuilder origin = new StringBuilder();
+					origin.append(prod.getWord());
 					if(!prod.getMorphologicalFieldPartOfSpeech().isEmpty())
-						origin += "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech()) + ")";
-					writer.write(origin + ": ");
+						origin.append("(")
+							.append(String.join(", ", prod.getMorphologicalFieldPartOfSpeech()))
+							.append(")");
+					origin.append(": ");
+					writer.write(origin.toString());
 					final StringJoiner sj = new StringJoiner(", ");
 					for(final Duplicate duplicate : entries)
 						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),

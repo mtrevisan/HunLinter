@@ -87,12 +87,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	protected List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
 			final Map<String, List<DictionaryEntry>> inputs){
-		final List<List<List<Inflection>>> entries = new ArrayList<>();
-		final Map<String, List<Inflection>> dicEntries = new HashMap<>();
+		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
+		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
 		outer:
 		for(final List<String> permutation : permutations){
 			//expand permutation
-			final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>();
+			final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.size());
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					final List<Inflection> dicEntriesPerFlag = new ArrayList<>(0);
@@ -133,7 +133,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		compoundAsReplacement.clear();
 
 		final StringBuffer sb = new StringBuffer();
-		final Set<Inflection> inflections = new LinkedHashSet<>();
+		final Set<Inflection> inflections = new LinkedHashSet<>(0);
 		//generate compounds:
 		for(final List<List<Inflection>> entry : entries){
 			//compose compound:
@@ -188,7 +188,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private List<Inflection> generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
-			final List<List<String>> continuationFlags){
+			final Collection<List<String>> continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
@@ -308,7 +308,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return result;
 	}
 
-	private void removeTwofolds(final List<Inflection> prods){
+	private void removeTwofolds(final Collection<Inflection> prods){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null){
 			final Iterator<Inflection> itr = prods.iterator();
@@ -353,7 +353,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
-		final Map<String, List<DictionaryEntry>> map = new HashMap<>();
+		final Map<String, List<DictionaryEntry>> map = new HashMap<>(list.size());
 		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
 			final List<DictionaryEntry> entries = m.getValue();
 			final List<DictionaryEntry> value = new ArrayList<>(0);

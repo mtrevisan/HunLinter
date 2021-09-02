@@ -80,10 +80,10 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			for(int i = 0; i < partOfSpeeches.length; i ++)
 				partOfSpeeches[i] = partOfSpeeches[i].trim();
 
-			final String[] synonyms = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
-			final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
-			this.synonyms = new ArrayList<>(synonyms.length);
-			for(final String synonym : synonyms){
+			final String[] syns = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
+			final Collection<String> uniqueValues = new HashSet<>(syns.length);
+			this.synonyms = new ArrayList<>(syns.length);
+			for(final String synonym : syns){
 				final String trim = synonym.trim();
 				if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
 					this.synonyms.add(trim);

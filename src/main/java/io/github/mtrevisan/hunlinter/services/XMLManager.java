@@ -114,7 +114,7 @@ public final class XMLManager{
 	}
 
 	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
-		final ArrayList<Node> children = new ArrayList<>();
+		final ArrayList<Node> children = new ArrayList<>(0);
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
 			children.ensureCapacity(nodes.getLength());

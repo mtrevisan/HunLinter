@@ -54,7 +54,6 @@ public final class FontHelper{
 		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 
 
-	private static String LANGUAGE_SAMPLE;
 	private static final FutureTask<List<Font>> FUTURE_ALL_FONTS;
 	static{
 		FUTURE_ALL_FONTS = JavaHelper.createFuture(() -> {
@@ -81,9 +80,11 @@ public final class FontHelper{
 			return allFonts;
 		});
 	}
-	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>();
-	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>();
-	private static Font CURRENT_FONT = FontChooserDialog.getDefaultFont();
+	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
+	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
+
+	private static String languageSample;
+	private static Font currentFont = FontChooserDialog.getDefaultFont();
 
 
 	private FontHelper(){}
@@ -112,8 +113,8 @@ public final class FontHelper{
 	public static void extractFonts(final String languageSample){
 		Objects.requireNonNull(languageSample, "Language sample cannot be null");
 
-		if(!languageSample.equals(LANGUAGE_SAMPLE)){
-			LANGUAGE_SAMPLE = languageSample;
+		if(!languageSample.equals(FontHelper.languageSample)){
+			FontHelper.languageSample = languageSample;
 
 			FAMILY_NAMES_ALL.clear();
 			FAMILY_NAMES_MONOSPACED.clear();
@@ -149,18 +150,18 @@ public final class FontHelper{
 	}
 
 	public static Font getCurrentFont(){
-		return CURRENT_FONT;
+		return currentFont;
 	}
 
 	public static void addFontableProperty(final JComponent... components){
 		if(components != null)
 			for(final JComponent component : components)
-				component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, true);
+				component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, Boolean.TRUE);
 	}
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
-		if(!font.equals(CURRENT_FONT)){
-			CURRENT_FONT = font;
+		if(!font.equals(currentFont)){
+			currentFont = font;
 
 			if(parentFrames != null)
 				for(final Component parentFrame : parentFrames)

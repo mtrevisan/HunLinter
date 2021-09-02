@@ -34,7 +34,6 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
 
 
@@ -78,7 +77,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		//initialize the rest
 		maxElements = bits;
 		try(final FileChannel channel = this.backingFile.getChannel()){
-			buffer = channel.map(MapMode.READ_WRITE, 0, this.backingFile.length());
+			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, this.backingFile.length());
 		}
 	}
 

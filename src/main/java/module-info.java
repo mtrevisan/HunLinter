@@ -2,7 +2,6 @@ module io.github.mtrevisan.hunlinter{
 	requires java.desktop;
 	requires java.management;
 	requires java.prefs;
-	requires java.naming;
 	requires jdk.unsupported;
 	requires json.simple;
 	requires org.apache.commons.lang3;

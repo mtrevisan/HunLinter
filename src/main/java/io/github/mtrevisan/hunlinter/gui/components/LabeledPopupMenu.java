@@ -50,15 +50,15 @@ public class LabeledPopupMenu extends JPopupMenu{
 	}
 
 	@Override
-	public void setLabel(final String text){
-		if(label == null)
+	public void setLabel(final String label){
+		if(this.label == null)
 			return;
 
-		final String oldValue = label.getText();
-		label.setText(composeTitle(text));
-		firePropertyChange("label", oldValue, label);
+		final String oldValue = this.label.getText();
+		this.label.setText(composeTitle(label));
+		firePropertyChange("label", oldValue, this.label);
 		if(accessibleContext != null)
-			accessibleContext.firePropertyChange(AccessibleContext.ACCESSIBLE_VISIBLE_DATA_PROPERTY, oldValue, label);
+			accessibleContext.firePropertyChange(AccessibleContext.ACCESSIBLE_VISIBLE_DATA_PROPERTY, oldValue, this.label);
 
 		invalidate();
 		repaint();

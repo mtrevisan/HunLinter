@@ -154,7 +154,7 @@ public class CFSA2 extends FSA{
 	/** Label mapping for M-indexed labels. */
 	private final byte[] labelMapping;
 
-	/** If <code>true</code> states are prepended with numbers. */
+	/** If {@code true} states are prepended with numbers. */
 	private final boolean hasNumbers;
 
 
@@ -183,51 +183,33 @@ public class CFSA2 extends FSA{
 		arcs = readRemaining(in);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getRootNode(){
 		//skip dummy node marking terminating state
 		return getDestinationNodeOffset(getFirstArc(EPSILON));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getFirstArc(final int node){
 		return (hasNumbers? skipVInt(node): node);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getNextArc(final int arc){
 		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getEndNode(final int arc){
 		return getDestinationNodeOffset(arc);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public byte getArcLabel(final int arc){
 		final int index = arcs[arc] & LABEL_INDEX_MASK;
 		return (index > 0? labelMapping[index]: arcs[arc + 1]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getRightLanguageCount(final int node){
 		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
@@ -235,24 +217,18 @@ public class CFSA2 extends FSA{
 		return readVInt(arcs, node);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean isArcFinal(final int arc){
 		return ((arcs[arc] & BIT_FINAL_ARC) != 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean isArcTerminal(final int arc){
 		return (getDestinationNodeOffset(arc) == 0);
 	}
 
 	/**
-	 * Returns <code>true</code> if this arc has <code>NEXT</code> bit set.
+	 * Returns {@code true} if this arc has <code>NEXT</code> bit set.
 	 *
 	 * @param arc The node's arc identifier.
 	 * @return Returns true if the argument is the last arc of a node.
@@ -271,9 +247,6 @@ public class CFSA2 extends FSA{
 		return ((arcs[arc] & BIT_TARGET_NEXT) != 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public Set<FSAFlags> getFlags(){
 		return flags;

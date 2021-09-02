@@ -43,6 +43,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -172,7 +173,7 @@ public class AffixEntry{
 		return (hasContinuationFlags() && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public List<String> combineContinuationFlags(final List<String> otherContinuationFlags){
+	public List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){
 		final Set<String> flags = new HashSet<>();
 		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);

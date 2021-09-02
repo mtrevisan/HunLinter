@@ -79,63 +79,59 @@ public class WordlistWorker extends WorkerDictionary{
 		final Charset charset = dicParser.getCharset();
 
 
-		final BufferedWriter writer;
-		try{
-			writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
+			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
+			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+
+				for(final Inflection inflection : inflections)
+					writeLine(writer, toString.apply(inflection), NEW_LINE);
+			};
+
+			getWorkerData()
+				.withDataCancelledCallback(e -> closeWriter(writer));
+
+			final Function<Void, File> step1 = ignored -> {
+				prepareProcessing("Execute " + workerData.getWorkerName());
+
+				final File dicFile = dicParser.getDicFile();
+				processLines(dicFile.toPath(), charset, lineProcessor);
+				closeWriter(writer);
+
+				return outputFile;
+			};
+			final Function<File, File> step2 = file -> {
+				resetProcessing("Sorting");
+
+				//sort file & remove duplicates
+				final ExternalSorter sorter = new ExternalSorter();
+				final ExternalSorterOptions options = ExternalSorterOptions.builder()
+					.charset(charset)
+					.sortInParallel()
+					.comparator(dicParser.getComparator())
+					.useTemporaryAsZip()
+					.removeDuplicates()
+					.build();
+				try{
+					sorter.sort(outputFile, options, outputFile);
+				}
+				catch(final Exception e){
+					throw new RuntimeException(e);
+				}
+
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
+
+				finalizeProcessing("Wordlist extracted successfully");
+
+				return file;
+			};
+			final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
+			setProcessor(step1.andThen(step2).andThen(step3));
 		}
 		catch(final IOException e){
 			throw new RuntimeException(e);
 		}
-
-
-		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
-		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
-
-			for(final Inflection inflection : inflections)
-				writeLine(writer, toString.apply(inflection), NEW_LINE);
-		};
-
-		getWorkerData()
-			.withDataCancelledCallback(e -> closeWriter(writer));
-
-		final Function<Void, File> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
-
-			final File dicFile = dicParser.getDicFile();
-			processLines(dicFile.toPath(), charset, lineProcessor);
-			closeWriter(writer);
-
-			return outputFile;
-		};
-		final Function<File, File> step2 = file -> {
-			resetProcessing("Sorting");
-
-			//sort file & remove duplicates
-			final ExternalSorter sorter = new ExternalSorter();
-			final ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(charset)
-				.sortInParallel()
-				.comparator(dicParser.getComparator())
-				.useTemporaryAsZip()
-				.removeDuplicates()
-				.build();
-			try{
-				sorter.sort(outputFile, options, outputFile);
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
-
-			finalizeProcessing("Wordlist extracted successfully");
-
-			return file;
-		};
-		final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
 }

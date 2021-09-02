@@ -254,7 +254,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 	private void filterSentenceExceptions(){
 		final String unmodifiedException = textField.getText().trim();
-		if(formerFilterSentenceException != null && formerFilterSentenceException.equals(unmodifiedException))
+		if(unmodifiedException.equals(formerFilterSentenceException))
 			return;
 
 		formerFilterSentenceException = unmodifiedException;

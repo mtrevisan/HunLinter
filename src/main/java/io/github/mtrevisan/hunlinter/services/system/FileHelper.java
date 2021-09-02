@@ -255,7 +255,7 @@ public final class FileHelper{
 	public static List<String> readAllLines(final Path path, final Charset charset, final int inputBufferSize) throws IOException{
 		final List<String> lines;
 		if(isGZipped(path.toFile())){
-			lines = new ArrayList<>();
+			lines = new ArrayList<>(0);
 			final Scanner scanner = createScanner(path, charset, inputBufferSize);
 			while(scanner.hasNextLine())
 				lines.add(scanner.nextLine());

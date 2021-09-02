@@ -37,7 +37,7 @@ import java.util.Map;
 
 public class ISO8859_10Charset extends Charset{
 
-	static final char[] TABLE = new char[]{
+	static final char[] TABLE = {
 		0x00A0, 0x0104, 0x0112, 0x0122, 0x012A, 0x0128, 0x0136, 0x00A7,
 		0x013B, 0x0110, 0x0160, 0x0166, 0x017D, 0x00AD, 0x016A, 0x014A,
 		0x00B0, 0x0105, 0x0113, 0x0123, 0x012B, 0x0129, 0x0137, 0x00B7,
@@ -59,7 +59,7 @@ public class ISO8859_10Charset extends Charset{
 	}
 
 
-	protected class ISO8859_14Decoder extends CharsetDecoder{
+	protected static class ISO8859_14Decoder extends CharsetDecoder{
 
 		protected ISO8859_14Decoder(){
 			super(StandardCharsets.ISO_8859_1, 1.f, 1.f);
@@ -75,7 +75,7 @@ public class ISO8859_10Charset extends Charset{
 		}
 	}
 
-	protected class ISO8859_14Encoder extends CharsetEncoder{
+	protected static class ISO8859_14Encoder extends CharsetEncoder{
 
 		protected ISO8859_14Encoder(){
 			super(StandardCharsets.ISO_8859_1, 1.f, 1.f);
@@ -97,7 +97,7 @@ public class ISO8859_10Charset extends Charset{
 	}
 
 	@Override
-	public boolean contains(Charset cs){
+	public boolean contains(final Charset cs){
 		return false;
 	}
 

@@ -28,6 +28,10 @@ import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -46,6 +50,19 @@ public class IssueReporterAction extends AbstractAction{
 	@Override
 	public void actionPerformed(final ActionEvent event){
 		FileHelper.browseURL(URL_REPORT_ISSUE);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

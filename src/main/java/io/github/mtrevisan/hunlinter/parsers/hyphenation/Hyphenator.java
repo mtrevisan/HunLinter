@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchR
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -148,11 +149,11 @@ public class Hyphenator implements HyphenatorInterface{
 		if(customHyphenation != null){
 			//hyphenation is custom, extract break point positions:
 			final String[] hyphenations = StringUtils.split(customHyphenation, HyphenationParser.EQUALS_SIGN);
-			final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
+			final Map<Integer, IndexDataPair<String>> indexesAndRules = new HashMap<>(wordSize);
 			int charCount = getNormalizedLength(hyphenations[0]);
 			for(int i = 1; i < hyphenations.length; i ++){
 				final String customRule = hyphenations[i - 1] + HyphenationParser.EQUALS_SIGN + hyphenations[i];
-				indexesAndRules.put(charCount, Pair.of(1, customRule));
+				indexesAndRules.put(charCount, IndexDataPair.of(1, customRule));
 
 				charCount += getNormalizedLength(hyphenations[i]);
 			}
@@ -170,7 +171,7 @@ public class Hyphenator implements HyphenatorInterface{
 	private HyphenationBreak calculateBreakpoints(final String word, final AhoCorasickTrie<String> patterns,
 			final HyphenationOptions options){
 		final int wordSize = word.length();
-		final Map<Integer, Pair<Integer, String>> indexesAndRules = new HashMap<>(wordSize);
+		final Map<Integer, IndexDataPair<String>> indexesAndRules = new HashMap<>(wordSize);
 		if(patterns != null){
 			final String w = HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY;
 			final int leftMin = options.getLeftMin();
@@ -199,8 +200,8 @@ public class Hyphenator implements HyphenatorInterface{
 						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 							final int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far
-							if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getKey())
-								indexesAndRules.put(idx, Pair.of(dd, rule));
+							if(dd > indexesAndRules.getOrDefault(idx, HyphenationBreak.EMPTY_PAIR).getIndex())
+								indexesAndRules.put(idx, IndexDataPair.of(dd, rule));
 						}
 					}
 				}

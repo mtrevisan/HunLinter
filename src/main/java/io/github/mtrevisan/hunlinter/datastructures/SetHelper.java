@@ -55,7 +55,7 @@ public final class SetHelper{
 	}
 
 	public static <T> Set<T> newConcurrentSet(){
-		return Collections.newSetFromMap(new ConcurrentHashMap<>());
+		return Collections.newSetFromMap(new ConcurrentHashMap<>(0));
 	}
 
 	@SafeVarargs
@@ -110,7 +110,7 @@ public final class SetHelper{
 	 * @return	The union of {@code sets}
 	 */
 	public static <T> Set<T> union(final Iterable<Set<T>> sets){
-		final Set<T> union = new HashSet<>();
+		final Set<T> union = new HashSet<>(0);
 		if(sets != null)
 			for(final Set<T> elem : sets)
 				union.addAll(elem);
@@ -251,7 +251,7 @@ public final class SetHelper{
 	}
 
 	public static <K, V> Map<K, List<V>> bucket(final Iterable<V> entries, final Function<V, K> keyMapper){
-		final Map<K, List<V>> bucket = new HashMap<>();
+		final Map<K, List<V>> bucket = new HashMap<>(0);
 		for(final V entry : entries)
 			processBucketEntry(bucket, keyMapper, entry);
 		return bucket;
@@ -266,7 +266,7 @@ public final class SetHelper{
 
 	public static <K, V> List<V> collect(final Iterable<V> entries, final Function<V, K> keyMapper,
 			final BiConsumer<V, V> mergeFunction){
-		final Map<K, V> compaction = new HashMap<>();
+		final Map<K, V> compaction = new HashMap<>(0);
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			final V rule = compaction.putIfAbsent(key, entry);

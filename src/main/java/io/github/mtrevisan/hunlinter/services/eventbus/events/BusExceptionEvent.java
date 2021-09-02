@@ -24,6 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.services.eventbus.events;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.EventObject;
 
@@ -54,6 +58,19 @@ public class BusExceptionEvent extends EventObject{
 
 	public Throwable getCause(){
 		return cause;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -31,6 +31,10 @@ import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 
@@ -77,6 +81,19 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 				worker -> setEnabled(true),
 				dictionaryLookup
 			);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

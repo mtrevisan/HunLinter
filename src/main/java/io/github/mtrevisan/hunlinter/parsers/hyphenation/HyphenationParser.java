@@ -158,8 +158,8 @@ public class HyphenationParser{
 		this.comparator = comparator;
 
 		for(final Level level : Level.values()){
-			rules.put(level, new HashMap<>());
-			customHyphenations.put(level, new HashMap<>());
+			rules.put(level, new HashMap<>(0));
+			customHyphenations.put(level, new HashMap<>(0));
 		}
 		options = new HyphenationOptionsParser();
 	}

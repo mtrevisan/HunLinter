@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,10 +53,19 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 		return applyAffixRules(dicEntry, null);
 	}
 
+	List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
+		return applyAffixRules(dicEntry, null, false);
+	}
+
 	List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+		return applyAffixRules(dicEntry, overriddenRule, true);
+	}
+
+	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule, final boolean enforceOnlyInCompound){
 		final List<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
 
-		enforceOnlyInCompound(inflections);
+		if(enforceOnlyInCompound)
+			enforceOnlyInCompound(inflections);
 
 		//convert using output table
 		for(final Inflection inflection : inflections)
@@ -69,7 +79,7 @@ class WordGeneratorAffixRules extends WordGeneratorBase{
 	}
 
 	/** Remove rules that invalidate the onlyInCompound rule. */
-	private void enforceOnlyInCompound(final List<Inflection> inflections){
+	private void enforceOnlyInCompound(final Collection<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
 		if(onlyInCompoundFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();

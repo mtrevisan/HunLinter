@@ -30,7 +30,7 @@ import java.io.OutputStream;
 
 
 /**
- * Standard FSA file header, as described in <code>fsa</code> package documentation.
+ * Standard FSA file header, as described in {@code fsa} package documentation.
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
@@ -60,7 +60,7 @@ public class FSAHeader{
 	 * Read FSA header and version from a stream, consuming read bytes.
 	 *
 	 * @param in The input stream to read data from.
-	 * @return Returns a valid {@link FSAHeader} with version information.
+	 * @return Returns a valid header with version information.
 	 * @throws IOException If the stream ends prematurely or if it contains invalid data.
 	 */
 	public static FSAHeader read(final InputStream in) throws IOException{

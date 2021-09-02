@@ -97,7 +97,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param siblings	Parent node's child nodes, i.e. the siblings
 	 * @return	The amount of the siblings
 	 */
-	private int fetch(final RadixTrieNode parent, final List<Map.Entry<Integer, RadixTrieNode>> siblings){
+	private int fetch(final RadixTrieNode parent, final Collection<Map.Entry<Integer, RadixTrieNode>> siblings){
 		if(parent.isAcceptable()){
 			final RadixTrieNode fakeNode = new RadixTrieNode(-parent.getDepth() - 1);
 			fakeNode.addChildrenId(parent.getLargestChildrenId());

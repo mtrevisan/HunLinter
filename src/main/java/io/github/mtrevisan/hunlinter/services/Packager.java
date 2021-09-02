@@ -129,7 +129,7 @@ public class Packager{
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
 	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
 
-	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>();
+	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>(9);
 	static{
 		KEY_FILE_MAPPER.put(KEY_FILE_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX);
 		KEY_FILE_MAPPER.put(KEY_FILE_DICTIONARY, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY);
@@ -154,7 +154,7 @@ public class Packager{
 		}
 
 		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath) throws IOException{
-			final Map<String, File> folders = new HashMap<>();
+			final Map<String, File> folders = new HashMap<>(2);
 			final int splitIndex = childFolders.indexOf(foldersSeparator);
 			final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
 			final File fileAff = absolutizeFolder(folderAff, basePath, originPath);
@@ -165,7 +165,7 @@ public class Packager{
 			return folders;
 		}
 	}
-	private static final Map<String, ConfigurationData> CONFIG_DATA = new HashMap<>();
+	private static final Map<String, ConfigurationData> CONFIG_DATA = new HashMap<>(2);
 	static{
 		CONFIG_DATA.put(CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, new ConfigurationData(".aff ",
 			CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_DICTIONARY));
@@ -178,11 +178,11 @@ public class Packager{
 	private Path mainManifestPath;
 	private Path autoCorrectPath;
 	private Path autoTextPath;
-	private final List<File> manifestFiles = new ArrayList<>();
+	private final Collection<File> manifestFiles = new ArrayList<>(0);
 	private List<String> languages;
 
 	private String language;
-	private final Map<String, File> configurationFiles = new HashMap<>();
+	private final Map<String, File> configurationFiles = new HashMap<>(0);
 
 
 	public void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
@@ -277,7 +277,7 @@ public class Packager{
 	}
 
 	private List<String> getLanguages(final Node entry){
-		final Set<String> languageSets = new HashSet<>();
+		final Set<String> languageSets = new HashSet<>(0);
 		final List<Node> children = extractChildren(entry);
 		for(final Node child : children)
 			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
@@ -306,7 +306,7 @@ public class Packager{
 		final Node node = pair.getRight();
 		if(node != null){
 			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
-			final Set<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
+			final Collection<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
 			final Collection<File> collection = configurationFiles.values();
 			for(final File f : collection)
 				uniqueFolders.add(f.toString());
@@ -391,6 +391,7 @@ public class Packager{
 		final File affFile = getAffixFile();
 		if(affFile != null){
 			try{
+				//FIXME use appropriate charset
 				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
 				final List<String> extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
@@ -504,7 +505,7 @@ public class Packager{
 	}
 
 	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
-		final Map<String, File> folders = new HashMap<>();
+		final Map<String, File> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
 			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
@@ -552,7 +553,7 @@ public class Packager{
 		Objects.requireNonNull(folder, "Folder cannot be null");
 
 		final File file = absolutizeFolder(folder, basePath, originPath);
-		final Map<String, File> children = new HashMap<>();
+		final Map<String, File> children = new HashMap<>(3);
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
 			autoCorrectPath = file.toPath();
 

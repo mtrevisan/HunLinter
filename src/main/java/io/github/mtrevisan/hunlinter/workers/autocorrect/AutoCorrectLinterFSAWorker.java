@@ -71,7 +71,7 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 				.toLowerCase(Locale.ROOT);
 
 			boolean containsSpecialChars = false;
-			int bound = correctForm.length();
+			final int bound = correctForm.length();
 			for(int i = 0; i < bound; i ++){
 				final char chr = correctForm.charAt(i);
 				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){

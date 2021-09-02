@@ -68,7 +68,7 @@ public class DictionaryParser{
 	private final Charset charset;
 
 	private final Comparator<String> comparator;
-	private boolean boundariesCalculated = false;
+	private boolean boundariesCalculated;
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 

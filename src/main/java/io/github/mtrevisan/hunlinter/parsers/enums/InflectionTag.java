@@ -232,7 +232,7 @@ public enum InflectionTag{
 	NORDIC("nordic", "n");
 
 
-	private static final Map<String, InflectionTag> VALUES = new HashMap<>();
+	private static final Map<String, InflectionTag> VALUES = new HashMap<>(InflectionTag.values().length);
 	static{
 		for(final InflectionTag tag : EnumSet.allOf(InflectionTag.class))
 			VALUES.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);

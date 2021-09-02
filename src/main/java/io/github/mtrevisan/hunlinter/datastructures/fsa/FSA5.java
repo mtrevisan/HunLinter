@@ -185,49 +185,31 @@ public class FSA5 extends FSA{
 		return getDestinationNodeOffset(getFirstArc(epsilonNode));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getFirstArc(final int node){
 		return (nodeDataLength + node);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getNextArc(final int arc){
 		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int getEndNode(final int arc){
 		return getDestinationNodeOffset(arc);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public byte getArcLabel(final int arc){
 		return arcs[arc];
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean isArcFinal(final int arc){
 		return ((arcs[arc + ADDRESS_OFFSET] & BIT_FINAL_ARC) != 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public boolean isArcTerminal(final int arc){
 		return (getDestinationNodeOffset(arc) == 0);
@@ -235,7 +217,7 @@ public class FSA5 extends FSA{
 
 	/**
 	 * @return	The number encoded at the given node. The number equals the count
-	 *		of the set of suffixes reachable from <code>node</code> (called its right language).
+	 *		of the set of suffixes reachable from {@code node} (called its right language).
 	 */
 	@Override
 	public int getRightLanguageCount(final int node){
@@ -258,7 +240,7 @@ public class FSA5 extends FSA{
 	}
 
 	/**
-	 * Returns <code>true</code> if this arc has <code>NEXT</code> bit set.
+	 * Returns {@code true} if this arc has <code>NEXT</code> bit set.
 	 *
 	 * @param arc The node's arc identifier.
 	 * @return Returns true if the argument is the last arc of a node.

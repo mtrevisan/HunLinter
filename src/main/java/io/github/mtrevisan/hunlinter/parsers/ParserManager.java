@@ -61,6 +61,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class ParserManager implements FileChangeListener{
@@ -178,7 +179,7 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile};
+		final File[] files = {affFile, dicFile, hypFile, aidFile, sexFile, wexFile};
 		for(final File file : files)
 			if(file != null)
 				flm.register(this, file.getAbsolutePath());
@@ -374,9 +375,11 @@ public class ParserManager implements FileChangeListener{
 
 	public List<String> getDictionaryLines() throws IOException{
 		final File dicFile = packager.getDictionaryFile();
-		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
-			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
-			.collect(Collectors.toList());
+		try(final Stream<String> lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())){
+			return lines
+				.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
+				.collect(Collectors.toList());
+		}
 	}
 
 	public boolean hasHyphenationRule(final String addedRule, final HyphenationParser.Level level){

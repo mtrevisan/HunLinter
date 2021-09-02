@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,10 +48,10 @@ public interface FSASerializer{
 	 * @param os The output stream to serialize to.
 	 * @param progressCallback	The progress callback
 	 * @param <T> A subclass of {@link OutputStream}, returned for chaining.
-	 * @return Returns <code>T</code> for chaining.
+	 * @return Returns {@code T} for chaining.
 	 * @throws IOException Rethrown if an I/O error occurs.
 	 */
-	<T extends OutputStream> T serialize(final FSA fsa, final T os, final Consumer<Integer> progressCallback) throws IOException;
+	<T extends OutputStream> T serialize(final FSA fsa, final T os, final ProgressCallback progressCallback) throws IOException;
 
 	/**
 	 * @return Returns the set of flags supported by the serializer (and the output automaton).
@@ -61,7 +62,7 @@ public interface FSASerializer{
 	 * Sets the filler separator (only if {@link #getFlags()} returns {@link FSAFlags#SEPARATORS}).
 	 *
 	 * @param filler The filler separator byte.
-	 * @return Returns <code>this</code> for call chaining.
+	 * @return Returns {@code this} for call chaining.
 	 */
 	FSASerializer withFiller(final byte filler);
 
@@ -69,7 +70,7 @@ public interface FSASerializer{
 	 * Sets the annotation separator (only if {@link #getFlags()} returns {@link FSAFlags#SEPARATORS}).
 	 *
 	 * @param annotationSeparator The filler separator byte.
-	 * @return Returns <code>this</code> for call chaining.
+	 * @return Returns {@code this} for call chaining.
 	 */
 	FSASerializer withAnnotationSeparator(final byte annotationSeparator);
 
@@ -77,7 +78,7 @@ public interface FSASerializer{
 	 * Enables support for right language count on nodes, speeding up perfect hash
 	 * counts (only if {@link #getFlags()} returns {@link FSAFlags#NUMBERS}).
 	 *
-	 * @return Returns <code>this</code> for call chaining.
+	 * @return Returns {@code this} for call chaining.
 	 */
 	FSASerializer serializeWithNumbers();
 

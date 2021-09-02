@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * Generates permutations of {@code n} items taken <code>k</code> at a time, in lexicographic order, with repetitions
+ * Generates permutations of {@code n} items taken {@code k} at a time, in lexicographic order, with repetitions
  *
  * @see <a href="https://github.com/dasanjos/java-examples/blob/master/src/main/java/com/dasanjos/java/util/math/PermutationWithRepetitionIterator.java">dasanjos/java-examples</a>
  * @see <a href="https://stackoverflow.com/questions/51946590/sequence-of-numbers-without-repeating-subsequent-digits">Sequence of numbers without repeating adjacent digits</a>
@@ -78,13 +78,13 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	/**
 	 * @param limit	Count limit for the results
-	 * @return	Total permutations with repetitions of {@code n} elements taken <code>2…maxCompounds</code> at a time
+	 * @return	Total permutations with repetitions of {@code n} elements taken {@code 2…maxCompounds} at a time
 	 */
 	public List<int[]> permutations(final int limit){
 		if(limit < 1)
 			throw new IllegalArgumentException(ONE_OUTPUT_MINIMUM);
 
-		final List<int[]> all = new ArrayList<>();
+		final List<int[]> all = new ArrayList<>(0);
 		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++)
 			all.addAll(extractAllKPermutations(kk, all.size(), limit));
 		return all;

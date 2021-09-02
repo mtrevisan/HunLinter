@@ -26,6 +26,10 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -35,8 +39,21 @@ public class NoApplicableRuleException extends LinterException{
 	private static final long serialVersionUID = 2059064935572242745L;
 
 
-	public NoApplicableRuleException(final String text){
-		super(text);
+	public NoApplicableRuleException(final String message){
+		super(message);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

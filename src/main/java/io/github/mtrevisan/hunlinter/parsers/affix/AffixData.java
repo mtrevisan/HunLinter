@@ -292,7 +292,7 @@ public class AffixData{
 		return applyConversionTable(word, table);
 	}
 
-	private String applyConversionTable(String word, final ConversionTable table){
+	private String applyConversionTable(final String word, final ConversionTable table){
 		return (table != null? table.applyConversionTable(word): word);
 	}
 
@@ -379,12 +379,12 @@ public class AffixData{
 		return getData(AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG);
 	}
 
-	public Set<String> getProductableFlag(){
+	public Set<String> getProductableFlags(){
 		return productableFlags;
 	}
 
 	public List<RuleEntry> getRuleEntries(){
-		final ArrayList<RuleEntry> list = new ArrayList<>(data.size());
+		final List<RuleEntry> list = new ArrayList<>(data.size());
 		for(final Object entry : data.values())
 			if(RuleEntry.class.isAssignableFrom(entry.getClass()))
 				list.add((RuleEntry)entry);

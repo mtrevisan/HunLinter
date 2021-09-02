@@ -32,7 +32,7 @@ import java.util.List;
 
 class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends TableRowSorter<M>{
 
-	public AscendingDescendingUnsortedTableRowSorter(final M model){
+	AscendingDescendingUnsortedTableRowSorter(final M model){
 		super(model);
 	}
 

@@ -26,6 +26,10 @@ package io.github.mtrevisan.hunlinter.services.eventbus.exceptions;
 
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -42,5 +46,18 @@ public class VetoException extends RuntimeException{
 
 	@Serial
 	private static final long serialVersionUID = -9216228586704212839L;
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
 
 }

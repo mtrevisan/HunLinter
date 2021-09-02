@@ -27,11 +27,11 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 
 
-public class DictionaryBaseData extends BloomFilterParameters{
+public final class DictionaryBaseData extends BloomFilterParameters{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
-	private static final double GROW_RATIO_WHEN_FULL = 1.3;
+	private static final double GROWTH_RATIO_WHEN_FULL = 1.3;
 
 
 	private static class SingletonHelper{

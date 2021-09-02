@@ -24,24 +24,26 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
+import com.carrotsearch.hppcrt.IntIntMap;
 import com.carrotsearch.hppcrt.cursors.IntIntCursor;
 import com.carrotsearch.hppcrt.maps.IntIntHashMap;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA2;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 
 
 /**
@@ -66,6 +68,7 @@ public class CFSA2Serializer implements FSASerializer{
 	/** No-state id. */
 	private static final int NO_STATE = -1;
 
+	@SuppressWarnings("SubtractionInCompareTo")
 	private static final Comparator<IntIntHolder> COMPARATOR = (o1, o2) -> {
 		final int countDiff = o2.b - o1.b;
 		return (countDiff == 0? o1.a - o2.a: countDiff);
@@ -73,7 +76,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 
 	/**
-	 * <code>true</code> if we should serialize with numbers.
+	 * {@code true} if we should serialize with numbers.
 	 *
 	 * @see #serializeWithNumbers()
 	 */
@@ -107,11 +110,11 @@ public class CFSA2Serializer implements FSASerializer{
 	/**
 	 * Serializes any {@link FSA} to {@link CFSA2} stream.
 	 *
-	 * @return	<code>os</code> for chaining.
+	 * @return	{@code os} for chaining.
 	 * @see #serializeWithNumbers()
 	 */
 	@Override
-	public <T extends OutputStream> T serialize(final FSA fsa, final T os, final Consumer<Integer> progressCallback)
+	public <T extends OutputStream> T serialize(final FSA fsa, final T os, final ProgressCallback progressCallback)
 			throws IOException{
 		//calculate the most frequent labels and build indexed labels dictionary
 		computeLabelsIndex(fsa);
@@ -228,9 +231,9 @@ public class CFSA2Serializer implements FSASerializer{
 		return linearized;
 	}
 
-	/** Linearize all states, putting <code>states</code> in front of the automaton and calculating stable state offsets. */
+	/** Linearize all states, putting {@code states} in front of the automaton and calculating stable state offsets. */
 	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-			final IntIntHashMap offsets) throws IOException{
+			final IntIntMap offsets) throws IOException{
 		final Set<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
@@ -262,7 +265,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Add a state to linearized list. */
-	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Set<Integer> visited,
+	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Collection<Integer> visited,
 			final int node){
 		linearized.add(node);
 		visited.add(node);
@@ -301,7 +304,7 @@ public class CFSA2Serializer implements FSASerializer{
 	/** Compute in-link count for each state. */
 	private IntIntHashMap computeInLinkCount(final FSA fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
-		final Set<Integer> visited = new HashSet<>();
+		final Collection<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
 

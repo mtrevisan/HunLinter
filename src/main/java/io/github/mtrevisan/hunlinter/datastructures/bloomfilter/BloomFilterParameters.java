@@ -41,7 +41,7 @@ public abstract class BloomFilterParameters{
 
 
 	/**
-	 * Expected (maximum) number of elements to be added without transcending the <code>falsePositiveProbability</code>
+	 * Expected (maximum) number of elements to be added without transcending the {@code falsePositiveProbability}
 	 *
 	 * @return	The expected number of elements
 	 */

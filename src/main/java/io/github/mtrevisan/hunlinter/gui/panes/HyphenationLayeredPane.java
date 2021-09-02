@@ -72,7 +72,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 	private static final int DEBOUNCER_INTERVAL = 600;
 
 	private static final String SYLLABATION_PREFIX = "<html>";
-	private final String SYLLABATION_SUFFIX = "</html>";
+	private static final String SYLLABATION_SUFFIX = "</html>";
 
 
 	private final Debouncer<HyphenationLayeredPane> debouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);

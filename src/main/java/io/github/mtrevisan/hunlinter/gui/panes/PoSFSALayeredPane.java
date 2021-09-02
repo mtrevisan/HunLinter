@@ -53,6 +53,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -230,7 +231,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		}
 
 		final String inputText = textField.getText().trim();
-		if(formerFilterInputText != null && formerFilterInputText.equals(inputText))
+		if(inputText.equals(formerFilterInputText))
 			return;
 
 		formerFilterInputText = inputText;
@@ -244,9 +245,10 @@ public class PoSFSALayeredPane extends JLayeredPane{
 			for(final String token : tokens){
 				final StringJoiner readings = new StringJoiner(READINGS_DELIMITER);
 				final String lowercaseToken = token.toLowerCase(Locale.ROOT);
-				final List<WordData> datas = dictionaryLookup.lookup(lowercaseToken);
-				for(final WordData data : datas){
-					final byte[] wholeArray = ArrayHelper.concatenate(data.getStem(), LEMMA_START.getBytes(), data.getWord(), LEMMA_END.getBytes(), data.getTag());
+				final List<WordData> data = dictionaryLookup.lookup(lowercaseToken);
+				for(final WordData dt : data){
+					final byte[] wholeArray = ArrayHelper.concatenate(dt.getStem(), LEMMA_START.getBytes(StandardCharsets.UTF_8), dt.getWord(),
+						LEMMA_END.getBytes(StandardCharsets.UTF_8), dt.getTag());
 					readings.add(new String(wholeArray, charset));
 				}
 				sj.add(readings.toString());

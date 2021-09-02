@@ -33,6 +33,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,13 +59,13 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @param node Identifier of the node.
-	 * @return Returns the identifier of the first arc leaving <code>node</code> or 0 if the node has no outgoing arcs.
+	 * @return Returns the identifier of the first arc leaving {@code node} or 0 if the node has no outgoing arcs.
 	 */
 	public abstract int getFirstArc(final int node);
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns the identifier of the next arc after <code>arc</code> and leaving <code>node</code>.
+	 * @return Returns the identifier of the next arc after {@code arc} and leaving <code>node</code>.
 	 * 	Zero is returned if no more arcs are available for the node.
 	 */
 	public abstract int getNextArc(final int arc);
@@ -72,8 +73,8 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	/**
 	 * @param node	Identifier of the node.
 	 * @param label	The arc's label.
-	 * @return	The identifier of an arc leaving <code>node</code> and labeled with <code>label</code>.
-	 * 	An identifier equal to 0 means the node has no outgoing arc labeled <code>label</code>.
+	 * @return	The identifier of an arc leaving {@code node} and labeled with <code>label</code>.
+	 * 	An identifier equal to 0 means the node has no outgoing arc labeled {@code label}.
 	 */
 	public int getArc(final int node, final byte label){
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
@@ -85,27 +86,27 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Return the label associated with a given <code>arc</code>.
+	 * @return Return the label associated with a given {@code arc}.
 	 */
 	public abstract byte getArcLabel(final int arc);
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns <code>true</code> if the destination node at the end of this <code>arc</code> corresponds to
+	 * @return Returns {@code true} if the destination node at the end of this <code>arc</code> corresponds to
 	 * 	an input sequence created when building this automaton.
 	 */
 	public abstract boolean isArcFinal(final int arc);
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Returns whether this <code>arc</code> does NOT have a terminating node
+	 * @return Returns whether this {@code arc} does NOT have a terminating node
 	 * 	(@link {@link #getEndNode(int)} will throw an exception). Implies {@link #isArcFinal(int)}.
 	 */
 	public abstract boolean isArcTerminal(final int arc);
 
 	/**
 	 * @param arc The arc's identifier.
-	 * @return Return the end node pointed to by a given <code>arc</code>.
+	 * @return Return the end node pointed to by a given {@code arc}.
 	 * 	Terminal arcs (those that point to a terminal state) have no end node representation and throw a runtime exception.
 	 */
 	public abstract int getEndNode(final int arc);
@@ -152,8 +153,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	}
 
 	/**
-	 * An alias of calling {@link #iterator} directly ({@link FSA} is also
-	 * {@link Iterable}).
+	 * An alias of calling {@link #iterator} directly.
 	 *
 	 * @return Returns all sequences encoded in the automaton.
 	 */
@@ -219,7 +219,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		}
 
 		//process nodes from second stack
-		final Set<Integer> visited = new HashSet<>();
+		final Collection<Integer> visited = new HashSet<>(out.size() - 1);
 		for(int i = out.size() - 1; i >= 0; i --){
 			final int n = out.get(i);
 			if(!visited.contains(n) && !v.accept(n))
@@ -270,7 +270,7 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	 * @return Returns an instantiated automaton. Never null.
 	 * @throws IOException If the input stream does not represent an automaton, is otherwise
 	 *                     invalid or the class of the automaton read from the input stream
-	 *                     is not assignable to <code>clazz</code>.
+	 *                     is not assignable to {@code clazz}.
 	 */
 	public static <T extends FSA> T read(final InputStream stream, final Class<? extends T> clazz) throws IOException{
 		final FSA fsa = read(stream);

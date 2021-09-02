@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -32,5 +35,18 @@ public class RuntimeInterruptedException extends RuntimeException{
 
 	@Serial
 	private static final long serialVersionUID = -4900866992135800875L;
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
 
 }

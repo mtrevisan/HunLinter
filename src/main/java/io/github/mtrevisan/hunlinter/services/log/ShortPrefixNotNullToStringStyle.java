@@ -26,6 +26,10 @@ package io.github.mtrevisan.hunlinter.services.log;
 
 import org.apache.commons.lang3.builder.ToStringStyle;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -54,6 +58,19 @@ public final class ShortPrefixNotNullToStringStyle extends ToStringStyle{
 	@Serial
 	private Object readResolve(){
 		return SHORT_PREFIX_NOT_NULL_STYLE;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

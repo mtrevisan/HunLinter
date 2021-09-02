@@ -85,10 +85,10 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	}
 
 	/**
-	 * Restart walking from <code>node</code>. Allows iterator reuse.
+	 * Restart walking from {@code node}. Allows iterator reuse.
 	 *
-	 * @param node Restart the iterator from <code>node</code>.
-	 * @return Returns <code>this</code> for call chaining.
+	 * @param node Restart the iterator from {@code node}.
+	 * @return Returns {@code this} for call chaining.
 	 */
 	public ByteSequenceIterator restartFrom(final int node){
 		arcLimit = 0;
@@ -98,7 +98,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		return this;
 	}
 
-	/** Returns <code>true</code> if there are still elements in this iterator. */
+	/** Returns {@code true} if there are still elements in this iterator. */
 	@Override
 	public boolean hasNext(){
 		if(nextElement == null)

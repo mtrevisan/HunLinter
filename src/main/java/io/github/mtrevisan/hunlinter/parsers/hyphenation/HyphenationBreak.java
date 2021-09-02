@@ -24,10 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class HyphenationBreak{
 
 	@FunctionalInterface
 	public interface NoHyphenationManageFunction{
-		String[] manage(final Map<Integer, Pair<Integer, String>> indexesAndRules, final String[] syllabes, final String nohyp,
+		String[] manage(final Map<Integer, IndexDataPair<String>> indexesAndRules, final String[] syllabes, final String nohyp,
 			final int wordLength);
 	}
 
@@ -50,13 +50,13 @@ public class HyphenationBreak{
 		NO_HYPHENATION_MANAGE_METHODS.put("^$", HyphenationBreak::manageWhole);
 	}
 
-	public static final Pair<Integer, String> EMPTY_PAIR = Pair.of(0, null);
+	public static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
 
 
-	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
+	private final Map<Integer, IndexDataPair<String>> indexesAndRules;
 
 
-	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules){
+	public HyphenationBreak(final Map<Integer, IndexDataPair<String>> indexesAndRules){
 		Objects.requireNonNull(indexesAndRules, "Indexes and rules cannot be null");
 
 		this.indexesAndRules = indexesAndRules;
@@ -64,18 +64,18 @@ public class HyphenationBreak{
 
 
 	public boolean isBreakpoint(final int index){
-		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getKey() % 2 != 0);
+		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getIndex() % 2 != 0);
 	}
 
 	public String getRule(final int index){
-		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getValue();
+		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getData();
 	}
 
 	public String[] getRules(){
 		int offset = 0;
 		final String[] list = new String[indexesAndRules.size()];
-		for(final Pair<Integer, String> pair : indexesAndRules.values())
-			list[offset ++] = pair.getValue();
+		for(final IndexDataPair<String> pair : indexesAndRules.values())
+			list[offset ++] = pair.getData();
 		return list;
 	}
 
@@ -95,7 +95,7 @@ public class HyphenationBreak{
 		return syllabes;
 	}
 
-	private static String[] manageInside(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static String[] manageInside(final Map<Integer, IndexDataPair<String>> indexesAndRules, String[] syllabes,
 			final CharSequence nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
 
@@ -124,7 +124,7 @@ public class HyphenationBreak{
 		return syllabes;
 	}
 
-	private static String[] manageStartsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static String[] manageStartsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, String[] syllabes,
 			final String nohyp, final int wordLength){
 		if(syllabes[0].equals(nohyp.substring(1))){
 			indexesAndRules.remove(1);
@@ -136,7 +136,7 @@ public class HyphenationBreak{
 		return syllabes;
 	}
 
-	private static String[] manageEndsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static String[] manageEndsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, String[] syllabes,
 			final String nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
 		if(syllabes[syllabes.length - 1].equals(nohyp.substring(0, nohypLength - 1))){
@@ -149,7 +149,7 @@ public class HyphenationBreak{
 		return syllabes;
 	}
 
-	private static String[] manageWhole(final Map<Integer, Pair<Integer, String>> indexesAndRules, final String[] syllabes,
+	private static String[] manageWhole(final Map<Integer, IndexDataPair<String>> indexesAndRules, final String[] syllabes,
 			String nohyp, final int wordLength){
 		nohyp = nohyp.substring(1, nohyp.length() - 1);
 		manageInside(indexesAndRules, syllabes, nohyp, wordLength);

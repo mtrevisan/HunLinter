@@ -99,6 +99,7 @@ public final class OrthographyVEC extends Orthography{
 
 	private OrthographyVEC(){}
 
+	@SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
 	public static Orthography getInstance(){
 		return SingletonHelper.INSTANCE;
 	}

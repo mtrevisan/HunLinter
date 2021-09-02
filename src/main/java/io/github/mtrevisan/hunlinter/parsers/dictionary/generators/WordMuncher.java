@@ -37,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +98,7 @@ public class WordMuncher{
 		final String word = dicEntry.getWord();
 		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
-		final List<DictionaryEntry> originators = new ArrayList<>();
+		final List<DictionaryEntry> originators = new ArrayList<>(0);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
 		for(final RuleEntry ruleEntry : ruleEntries)
@@ -129,11 +128,11 @@ public class WordMuncher{
 	}
 
 	private List<Inflection> extractAllAffixes(final String word, final String partOfSpeech){
-		final List<Inflection> originatingRules = new ArrayList<>();
+		final List<Inflection> originatingRules = new ArrayList<>(0);
 		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		for(final RuleEntry ruleEntry : ruleEntries){
-			final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>();
+			final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);

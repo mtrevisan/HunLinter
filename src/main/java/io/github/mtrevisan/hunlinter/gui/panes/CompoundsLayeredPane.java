@@ -166,7 +166,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       table.setModel(new CompoundTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+      final KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       table.setRowSelectionAllowed(true);
@@ -297,7 +297,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             else
 					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
-            final CompoundTableModel dm = (CompoundTableModel)table.getModel();
+            final HunLinterTableModelInterface<Inflection> dm = (CompoundTableModel)table.getModel();
             dm.setInflections(words);
          }
          catch(final Exception e){
@@ -328,6 +328,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 				if(compounds != null)
 					for(final Inflection compound : compounds)
 						sj.add(compound.toString(strategy));
+
             inputTextArea.setText(sj.toString());
             inputTextArea.setCaretPosition(0);
          },
@@ -335,7 +336,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             inputComboBox.setEnabled(true);
             limitComboBox.setEnabled(true);
             inputTextArea.setEnabled(true);
-            if(worker.isCancelled())
             loadInputButton.setEnabled(true);
          }
       );
@@ -423,7 +423,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
-		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
+		if(inputText.equals(formerCompoundInputText))
 			return;
 		formerCompoundInputText = inputText;
 

@@ -29,6 +29,10 @@ import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchR
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -83,7 +87,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			final int position = index + 1;
 			for(final int hit : hits)
 				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
-			return true;
+			return Boolean.TRUE;
 		};
 		searchInText(text, consumer);
 		return collectedHits;
@@ -103,9 +107,9 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			for(final int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 				if(!proceed)
-					return false;
+					return Boolean.FALSE;
 			}
-			return true;
+			return Boolean.TRUE;
 		};
 		searchInText(text, consumer);
 	}
@@ -114,10 +118,10 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * Checks if the text contains at least one substring
 	 *
 	 * @param text	Source text to check
-	 * @return	<code>true</code> if string contains at least one substring
+	 * @return	{@code true} if string contains at least one substring
 	 */
 	public boolean containsKey(final String text){
-		return searchInText(text, (hits, index) -> false);
+		return searchInText(text, (hits, index) -> Boolean.FALSE);
 	}
 
 	/**
@@ -279,6 +283,19 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			.append(outerValue)
 			.append(keyLength)
 			.toHashCode();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.languages.vec.WordTokenizerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 
 import java.io.IOException;
@@ -46,12 +47,15 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 
 public final class BaseBuilder{
 
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
+
+	private static final Pattern PATTERN_REPLACEMENT = RegexHelper.pattern("<'_'");
 
 	private static class LanguageData{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
@@ -71,7 +75,7 @@ public final class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 		LANGUAGE_DATA_DEFAULT.wordTokenizer = new WordTokenizer();
 	}
-	private static final Map<String, LanguageData> DATA = new HashMap<>();
+	private static final Map<String, LanguageData> DATA = new HashMap<>(1);
 	static{
 		final LanguageData langData = new LanguageData();
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
@@ -98,10 +102,10 @@ public final class BaseBuilder{
 				if(collator instanceof RuleBasedCollator){
 					try{
 						//insert a collation rule to sort the space character before the underscore
-						String rules = ((RuleBasedCollator)collator).getRules();
-						collator = new RuleBasedCollator(rules.replaceAll("<'_'", "<' '='\t'<'_'"));
+						final String rules = ((RuleBasedCollator)collator).getRules();
+						collator = new RuleBasedCollator(RegexHelper.replaceAll(rules, PATTERN_REPLACEMENT, "<' '='\t'<'_'"));
 					}
-					catch(ParseException ignored){}
+					catch(final ParseException ignored){}
 				}
 
 				languageData.comparator = collator::compare;

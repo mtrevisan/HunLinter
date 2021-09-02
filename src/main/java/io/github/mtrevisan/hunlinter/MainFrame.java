@@ -355,7 +355,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filEmptyRecentProjectsMenuItem.setMnemonic('e');
       filEmptyRecentProjectsMenuItem.setText("Empty recent projects list");
       filEmptyRecentProjectsMenuItem.setEnabled(false);
-      filEmptyRecentProjectsMenuItem.addActionListener(evt -> filEmptyRecentProjectsMenuItemActionPerformed(evt));
+      filEmptyRecentProjectsMenuItem.addActionListener(this::filEmptyRecentProjectsMenuItemActionPerformed);
       filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
@@ -897,20 +897,17 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
-			case "progress":
+			case "progress" -> {
 				final int progress = (int)evt.getNewValue();
 				mainProgressBar.setValue(progress);
-				break;
-
-			case "state":
+			}
+			case "state" -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerData().getWorkerName();
 					workerManager.callOnEnd(workerName);
 				}
-				break;
-
-			default:
+			}
 		}
 	}
 

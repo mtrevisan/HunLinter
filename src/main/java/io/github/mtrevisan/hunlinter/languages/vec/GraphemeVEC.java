@@ -62,7 +62,7 @@ final class GraphemeVEC{
 
 	private static final Pattern SINGLE_SYLLABE_IU = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[iu][aeiou]$");
 	private static final Pattern SINGLE_SYLLABE_IU_UMLAUT = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[ïü][aeiou]$");
-	private static final Map<Character, Character> IU_UMLAUT = new HashMap<>();
+	private static final Map<Character, Character> IU_UMLAUT = new HashMap<>(4);
 	static{
 		IU_UMLAUT.put('i', 'ï');
 		IU_UMLAUT.put('u', 'ü');

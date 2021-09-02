@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -113,8 +114,8 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	private List<Inflection> collectInflections(final Inflection baseInflection, final List<Inflection> onefoldInflections,
-			final List<Inflection> twofoldInflections, final List<Inflection> lastfoldInflections){
+	private List<Inflection> collectInflections(final Inflection baseInflection, final Collection<Inflection> onefoldInflections,
+															  final Collection<Inflection> twofoldInflections, final Collection<Inflection> lastfoldInflections){
 		final int size = 1 + onefoldInflections.size() + twofoldInflections.size()
 			+ (lastfoldInflections != null? lastfoldInflections.size(): 0);
 		final List<Inflection> inflections = new ArrayList<>(size);
@@ -127,7 +128,7 @@ class WordGeneratorBase{
 	}
 
 
-	private void printInflections(final String title, final List<Inflection> inflections){
+	private void printInflections(final String title, final Collection<Inflection> inflections){
 		if(LOGGER.isDebugEnabled() && !inflections.isEmpty()){
 			LOGGER.debug(title);
 			for(final Inflection inflection : inflections)
@@ -146,8 +147,8 @@ class WordGeneratorBase{
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
-	private List<Inflection> getTwofoldInflections(final List<Inflection> onefoldInflections, final boolean isCompound,
-			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	private List<Inflection> getTwofoldInflections(final Iterable<Inflection> onefoldInflections, final boolean isCompound,
+																  final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<Inflection> twofoldInflections = new ArrayList<>(0);
 		for(final Inflection inflection : onefoldInflections)
 			if(inflection.isCombinable()){
@@ -163,7 +164,7 @@ class WordGeneratorBase{
 		return twofoldInflections;
 	}
 
-	private void checkTwofoldCorrectness(final List<Inflection> twofoldInflections){
+	private void checkTwofoldCorrectness(final Iterable<Inflection> twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(final Inflection prod : twofoldInflections){
 			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
@@ -200,7 +201,7 @@ class WordGeneratorBase{
 	 *    discard inflection
 	 * </pre></code>
 	 */
-	private void enforceCircumfix(final List<Inflection> inflections){
+	private void enforceCircumfix(final Collection<Inflection> inflections){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();
@@ -213,7 +214,7 @@ class WordGeneratorBase{
 	}
 
 	/** Remove rules that invalidate the affix rule. */
-	private void enforceNeedAffixFlag(final List<Inflection> inflections){
+	private void enforceNeedAffixFlag(final Collection<Inflection> inflections){
 		final String needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();
@@ -236,18 +237,17 @@ class WordGeneratorBase{
 			boolean lastPrefixNeedAffix = false;
 			for(int i = appliedRules.length - 1; (!lastSuffix || !lastPrefix) && i >= 0; i --){
 				final AffixEntry appliedRule = appliedRules[i];
-				switch(appliedRule.getType()){
-					case SUFFIX -> {
-						if(!lastSuffix){
-							lastSuffix = true;
-							lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
-						}
+				final AffixType type = appliedRule.getType();
+				if(type == AffixType.SUFFIX){
+					if(!lastSuffix){
+						lastSuffix = true;
+						lastSuffixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 					}
-					case PREFIX -> {
-						if(!lastPrefix){
-							lastPrefix = true;
-							lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
-						}
+				}
+				else if(type == AffixType.PREFIX){
+					if(!lastPrefix){
+						lastPrefix = true;
+						lastPrefixNeedAffix = appliedRule.hasContinuationFlag(needAffixFlag);
 					}
 				}
 			}
@@ -347,7 +347,7 @@ class WordGeneratorBase{
 		return false;
 	}
 
-	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final List<String> appliedAffixes, final String forbiddenWordFlag){
+	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final Collection<String> appliedAffixes, final String forbiddenWordFlag){
 		return (!appliedAffixes.isEmpty() && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 

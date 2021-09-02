@@ -267,7 +267,7 @@ final int iconSize = 17;
       table.setRowSelectionAllowed(true);
       final TableCellRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)
-      table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
+      	table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       scrollPane.setViewportView(table);
 
       totalInflectionsLabel.setText("Total inflections:");
@@ -432,7 +432,7 @@ final int iconSize = 17;
 	private void calculateInflections(){
 		final String text = inputTextField.getText().trim();
 
-		if(formerInputText != null && formerInputText.equals(text))
+		if(text.equals(formerInputText))
 			return;
 		formerInputText = text;
 
@@ -443,7 +443,7 @@ final int iconSize = 17;
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final InflectionTableModel dm = (InflectionTableModel)table.getModel();
+				final HunLinterTableModelInterface<Inflection> dm = (InflectionTableModel)table.getModel();
 				dm.setInflections(inflections);
 
 				//show first row

@@ -86,8 +86,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final AffixType type = ruleToBeReduced.getType();
 
-		final Collection<String> originalLines = new ArrayList<>();
-		final Collection<LineEntry> originalRules = new ArrayList<>();
+		final Collection<String> originalLines = new ArrayList<>(0);
+		final Collection<LineEntry> originalRules = new ArrayList<>(0);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
@@ -114,13 +114,11 @@ public class RulesReducerWorker extends WorkerDictionary{
 			resetProcessing("Extracting minimal rules (step 2/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
-			final List<LineEntry> compactedRules = rulesReducer.reduceRules(originalRules, percent -> {
+			return rulesReducer.reduceRules(originalRules, percent -> {
 				setProgress(percent, 100);
 
 				sleepOnPause();
 			});
-
-			return compactedRules;
 		};
 		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
 			resetProcessing("Verifying correctness (step 3/3)");

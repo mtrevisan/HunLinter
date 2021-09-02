@@ -36,6 +36,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -78,8 +82,8 @@ public class LineEntry implements Serializable{
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final Iterable<LineEntry> parentRulesFrom){
-		final List<String> words = new ArrayList<>();
+	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
+		final List<String> words = new ArrayList<>(parentRulesFrom.size());
 		for(final LineEntry rule : parentRulesFrom)
 			words.addAll(rule.extractFromEndingWith(condition));
 		return createFromWithWords(entry, condition, words);
@@ -174,7 +178,7 @@ public class LineEntry implements Serializable{
 	}
 
 	public void expandConditionToMaxLength(final Comparator<String> comparator){
-		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[from.size()]));
+		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[0]));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
 			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
@@ -237,6 +241,19 @@ public class LineEntry implements Serializable{
 			.append(addition)
 			.append(condition)
 			.toHashCode();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

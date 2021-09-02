@@ -256,7 +256,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	private void filterWordExceptions(){
 		final String unmodifiedException = textField.getText().trim();
-		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
+		if(unmodifiedException.equals(formerFilterWordException))
 			return;
 
 		formerFilterWordException = unmodifiedException;

@@ -193,8 +193,8 @@ public enum DictionaryAttribute{
 	INPUT_CONVERSION("fsa.dict.input-conversion"){
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, String> conversionPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -218,8 +218,8 @@ public enum DictionaryAttribute{
 	OUTPUT_CONVERSION("fsa.dict.output-conversion"){
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, String> conversionPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -243,8 +243,8 @@ public enum DictionaryAttribute{
 	REPLACEMENT_PAIRS("fsa.dict.speller.replacement-pairs"){
 		@Override
 		public Map<String, List<String>> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, List<String>> replacementPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, List<String>> replacementPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = StringUtils.split(stringPair.trim(), StringUtils.SPACE, 2);
 				final String replacement = StringUtils.replace(twoStrings[1], " ", "_");
@@ -269,8 +269,8 @@ public enum DictionaryAttribute{
 	EQUIVALENT_CHARS("fsa.dict.speller.equivalent-chars"){
 		@Override
 		public Map<Character, List<Character>> fromString(final String value) throws IllegalArgumentException{
-			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
 			final String[] eqChars = RegexHelper.split(value, SPLITTER);
+			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>(eqChars.length);
 			for(final String characterPair : eqChars){
 				final String[] twoChars = characterPair.trim().split(StringUtils.SPACE);
 				if(twoChars.length != 2 || twoChars[0].length() != 1 || twoChars[1].length() != 1)
@@ -311,24 +311,21 @@ public enum DictionaryAttribute{
 	}
 
 	/**
-	 * @param propertyName The property of a {@link DictionaryAttribute}.
-	 * @return Return a {@link DictionaryAttribute} associated with
-	 * a given {@link #propertyName}.
+	 * @param propertyName The property name.
+	 * @return Return am associated with a given {@link #propertyName}.
 	 */
 	public static DictionaryAttribute fromPropertyName(final String propertyName){
-		final DictionaryAttribute value = attrsByPropertyName.get(propertyName);
+		final DictionaryAttribute value = ATTRS_BY_PROPERTY_NAME.get(propertyName);
 		if(value == null)
 			throw new IllegalArgumentException("No attribute for property: " + propertyName);
 
 		return value;
 	}
 
-	private static final Map<String, DictionaryAttribute> attrsByPropertyName;
-
+	private static final Map<String, DictionaryAttribute> ATTRS_BY_PROPERTY_NAME = new HashMap<>(values().length);
 	static{
-		attrsByPropertyName = new HashMap<>();
 		for(final DictionaryAttribute attr : values())
-			if(attrsByPropertyName.put(attr.propertyName, attr) != null)
+			if(ATTRS_BY_PROPERTY_NAME.put(attr.propertyName, attr) != null)
 				throw new RuntimeException("Duplicate property key for: " + attr);
 	}
 

@@ -77,7 +77,7 @@ public final class RegexHelper{
 
 	public static String[] extract(final CharSequence text, final Pattern pattern){
 		final List<String> result = extract(text, pattern, - 1);
-		return result.toArray(new String[result.size()]);
+		return result.toArray(new String[0]);
 	}
 
 	public static List<String> extract(final CharSequence text, final Pattern pattern, final int limit){
@@ -96,7 +96,7 @@ public final class RegexHelper{
 	}
 
 	private static List<String> extractUnlimited(final Matcher matcher){
-		final List<String> result = new ArrayList<>();
+		final List<String> result = new ArrayList<>(0);
 		while(matcher.find()){
 			final String component = getNextGroup(matcher);
 			result.add(component != null? component: matcher.group());

@@ -31,7 +31,7 @@ class Block<T>{
 	private int limit;
 
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "SuspiciousArrayCast"})
 	Block(final int capacity){
 		data = (T[])new Object[capacity];
 	}

@@ -28,17 +28,17 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 
 
 /**
- * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
- * non-equal suffix and infix <code>source</code> and <code>target</code> have. The
+ * Encodes {@code target} relative to <code>source</code> by trimming whatever
+ * non-equal suffix and infix {@code source} and <code>target</code> have. The
  * output code is (bytes):
  *
  * <pre>
  * {X}{L}{K}{suffix}
  * </pre>
  *
- * where <code>source</code>'s infix at position (<code>X</code> - 'A') and of
- * length (<code>L</code> - 'A') should be removed, then (<code>K</code> -
- * 'A') bytes should be trimmed from the end and then the <code>suffix</code>
+ * where {@code source}'s infix at position (<code>X</code> - 'A') and of
+ * length ({@code L} - 'A') should be removed, then (<code>K</code> -
+ * 'A') bytes should be trimmed from the end and then the {@code suffix}
  * should be appended to the resulting byte sequence.
  *
  * <p>

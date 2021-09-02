@@ -65,7 +65,7 @@ public class ExceptionsParser{
 
 
 	private final String configurationFilename;
-	private final List<String> dictionary = new ArrayList<>();
+	private final List<String> dictionary = new ArrayList<>(0);
 	private Comparator<String> comparator;
 
 

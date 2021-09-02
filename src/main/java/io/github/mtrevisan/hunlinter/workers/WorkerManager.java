@@ -66,8 +66,8 @@ import java.util.function.Supplier;
 
 public class WorkerManager{
 
-	private static final Map<String, WorkerAbstract<?>> WORKERS = new HashMap<>();
-	private static final Map<String, Consumer<WorkerAbstract<?>>> ON_ENDS = new HashMap<>();
+	private static final Map<String, WorkerAbstract<?>> WORKERS = new HashMap<>(0);
+	private static final Map<String, Consumer<WorkerAbstract<?>>> ON_ENDS = new HashMap<>(0);
 
 	private final Packager packager;
 	private final ParserManager parserManager;
@@ -206,7 +206,7 @@ public class WorkerManager{
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();
 			final String compoundFlag = affixData.getCompoundFlag();
-			final List<Inflection> compounds = new ArrayList<>();
+			final List<Inflection> compounds = new ArrayList<>(0);
 			final BiConsumer<Inflection, Integer> inflectionReader = (inflection, row) -> {
 				if(!inflection.distributeByCompoundRule(affixData).isEmpty() || inflection.hasContinuationFlag(compoundFlag))
 					compounds.add(inflection);

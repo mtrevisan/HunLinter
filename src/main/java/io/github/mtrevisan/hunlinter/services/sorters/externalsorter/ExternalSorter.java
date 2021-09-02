@@ -240,7 +240,7 @@ public class ExternalSorter{
 	}
 
 	private static class MyGZIPOutputStream extends GZIPOutputStream{
-		public MyGZIPOutputStream(OutputStream out, ExternalSorterOptions options) throws IOException{
+		private MyGZIPOutputStream(final OutputStream out, final ExternalSorterOptions options) throws IOException{
 			super(out, options.getZipBufferSize());
 			def.setLevel(Deflater.BEST_SPEED);
 		}

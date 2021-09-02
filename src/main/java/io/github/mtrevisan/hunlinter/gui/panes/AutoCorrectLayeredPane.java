@@ -70,7 +70,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 
 public class AutoCorrectLayeredPane extends JLayeredPane{
@@ -197,7 +196,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                      //… and save the files
                      parserManager.storeAutoCorrectFile();
                   }
-                  catch(Exception ex){
+                  catch(final Exception ex){
                      LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
                   }
                };
@@ -206,7 +205,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                GUIHelper.addCancelByEscapeKey(dialog);
                dialog.addWindowListener(new WindowAdapter(){
                   @Override
-                  public void windowClosed(final WindowEvent e){
+                  public void windowClosed(final WindowEvent we){
                      table.clearSelection();
                   }
                });
@@ -321,8 +320,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             correctTextField.setText(null);
             addButton.setEnabled(false);
             incorrectTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked")
-            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
+            @SuppressWarnings("unchecked") final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateAutoCorrectionsCounter();

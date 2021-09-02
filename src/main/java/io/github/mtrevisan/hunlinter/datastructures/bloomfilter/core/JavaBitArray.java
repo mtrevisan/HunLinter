@@ -38,7 +38,7 @@ public class JavaBitArray implements BitArray{
 
 
 	/**
-	 * Construct an instance of the {@link JavaBitArray} that can hold the given number of bits.
+	 * Construct an instance of this class that can hold the given number of bits.
 	 *
 	 * @param bits the number of bits this instance can hold.
 	 */

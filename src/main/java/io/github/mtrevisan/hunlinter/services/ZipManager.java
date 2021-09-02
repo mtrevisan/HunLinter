@@ -103,7 +103,7 @@ public class ZipManager{
 
 			boolean process = true;
 			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
-				final List<String> includeFolders = new ArrayList<>();
+				final List<String> includeFolders = new ArrayList<>(excludeFolderBut.length);
 				for(final Path path : excludeFolderBut)
 					includeFolders.add(path.getParent().toString());
 				process = (match(includeFolders, folder) == null);

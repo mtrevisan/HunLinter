@@ -105,7 +105,7 @@ public class WordTokenizer{
 			StringHelper.maxRepeating(text, '\0') + 1);
 
 		//find all urls and emails, substitute with placeholder
-		final List<String> unbreakableText = new ArrayList<>();
+		final List<String> unbreakableText = new ArrayList<>(0);
 		text = RegexHelper.matcher(text, PATTERN_UNBREAKABLE)
 			.replaceAll(m -> {
 				unbreakableText.add(m.group(1));
@@ -116,7 +116,7 @@ public class WordTokenizer{
 	}
 
 	private List<String> extractTokens(final String text, final String placeholder, final List<String> unbreakableText){
-		final List<String> result = new ArrayList<>();
+		final List<String> result = new ArrayList<>(0);
 		int index = 0;
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
 		while(st.hasMoreElements()){

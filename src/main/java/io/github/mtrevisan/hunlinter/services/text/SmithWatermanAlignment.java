@@ -25,9 +25,9 @@
 package io.github.mtrevisan.hunlinter.services.text;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -135,11 +135,11 @@ public class SmithWatermanAlignment{
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Deque<IndexDataPair<Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
 		final Set<Trace> traces = new HashSet<>(maxScoreIndices.size());
 		//extract edit operations
-		for(final Pair<Integer, Integer> score : maxScoreIndices)
-			traces.add(traceback(score.getLeft(), score.getRight()));
+		for(final IndexDataPair<Integer> score : maxScoreIndices)
+			traces.add(traceback(score.getIndex(), score.getData()));
 		return traces;
 	}
 
@@ -177,13 +177,13 @@ public class SmithWatermanAlignment{
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Deque<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
+	private Deque<IndexDataPair<Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		final Deque<Pair<Integer, Integer>> maxScores = new ArrayDeque<>();
+		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>(0);
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
-					maxScores.push(Pair.of(i, j));
+					maxScores.push(IndexDataPair.of(i, j));
 		return maxScores;
 	}
 
@@ -191,7 +191,7 @@ public class SmithWatermanAlignment{
 		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
-		trace.operations = new ArrayDeque<>();
+		trace.operations = new ArrayDeque<>(0);
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){

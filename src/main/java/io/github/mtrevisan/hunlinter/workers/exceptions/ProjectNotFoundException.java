@@ -24,6 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
 
@@ -51,6 +55,19 @@ public class ProjectNotFoundException extends Exception{
 
 	public Path getProjectPath(){
 		return projectPath;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

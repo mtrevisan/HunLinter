@@ -290,7 +290,7 @@ public class FSABuilder{
 		return arc - state + ConstantArcSizeFSA.ARC_SIZE;
 	}
 
-	/** Return <code>true</code> if two regions in {@link #serialized} are identical. */
+	/** Return {@code true} if two regions in {@link #serialized} are identical. */
 	private boolean equivalent(int start1, int start2, int len){
 		if(Math.max(start1, start2) + len > size)
 			return false;

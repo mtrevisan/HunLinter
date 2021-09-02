@@ -39,7 +39,7 @@ public interface HitProcessor<V>{
 	 * @param begin	The beginning index, inclusive.
 	 * @param end	The ending index, exclusive.
 	 * @param value	The value assigned to the keyword
-	 * @return	<code>true</code> for continuing the search and <code>false</code> for stopping it.
+	 * @return	{@code true} for continuing the search and <code>false</code> for stopping it.
 	 */
 	boolean hit(final int begin, final int end, final V value);
 

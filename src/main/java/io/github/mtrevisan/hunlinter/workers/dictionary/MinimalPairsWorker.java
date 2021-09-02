@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
@@ -58,7 +59,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -136,7 +136,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	}
 
 	private List<String> extractWords(){
-		final List<String> list = new ArrayList<>();
+		final List<String> list = new ArrayList<>(0);
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
@@ -152,7 +152,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
+		final ProgressCallback progressCallback = lineIndex -> {
 			setProgress(Math.min(lineIndex, 100));
 
 			sleepOnPause();
@@ -177,7 +177,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private Map<String, List<String>> extractMinimalPairs(final File outputFile){
 		final Charset charset = dicParser.getCharset();
 		int totalPairs = 0;
-		final Map<String, List<String>> minimalPairs = new HashMap<>();
+		final Map<String, List<String>> minimalPairs = new HashMap<>(0);
 		try(final BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), dicParser.getCharset())){
 			String sourceLine;
 			long readSoFarSource = 0;

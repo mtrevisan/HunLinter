@@ -26,6 +26,10 @@ package io.github.mtrevisan.hunlinter.workers.exceptions;
 
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -39,7 +43,7 @@ public class LinterException extends RuntimeException{
 
 	private final IndexDataPair<?> data;
 	//FIXME useful?
-	private final Runnable fix;
+	private final Runnable fixAction;
 	private final FixActionType fixActionType;
 
 
@@ -63,17 +67,17 @@ public class LinterException extends RuntimeException{
 		this(message, cause, data, null, null);
 	}
 
-	public LinterException(final String message, final IndexDataPair<?> data, final Runnable fix,
+	public LinterException(final String message, final IndexDataPair<?> data, final Runnable fixAction,
 			final FixActionType fixActionType){
-		this(message, null, data, fix, fixActionType);
+		this(message, null, data, fixAction, fixActionType);
 	}
 
-	public LinterException(final String message,  final Throwable cause, final IndexDataPair<?> data, final Runnable fix,
+	public LinterException(final String message,  final Throwable cause, final IndexDataPair<?> data, final Runnable fixAction,
 			final FixActionType fixActionType){
 		super(message, cause);
 
 		this.data = data;
-		this.fix = fix;
+		this.fixAction = fixAction;
 		this.fixActionType = fixActionType;
 	}
 
@@ -82,15 +86,28 @@ public class LinterException extends RuntimeException{
 	}
 
 	public boolean canFix(){
-		return (fix != null);
+		return (fixAction != null);
 	}
 
 	public Runnable getFixAction(){
-		return fix;
+		return fixAction;
 	}
 
 	public FixActionType getFixActionType(){
 		return fixActionType;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

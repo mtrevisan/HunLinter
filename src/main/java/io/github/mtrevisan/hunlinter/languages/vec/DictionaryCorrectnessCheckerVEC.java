@@ -75,15 +75,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private static final int MINIMAL_PAIR_MINIMUM_LENGTH = 3;
 
-	private static Pattern PATTERN_NON_VANISHING_EL;
-	private static Pattern PATTERN_NON_VANISHING_EL_NOT_AT_END;
-	private static Pattern PATTERN_VANISHING_EL_NEXT_TO_CONSONANT;
-	private static Pattern PATTERN_PHONEME_CIJJHNHIV;
+	private static Pattern patternNonVanishingEl;
+	private static Pattern patternNonVanishingElNotAtEnd;
+	private static Pattern patternVanishingElNextToConsonant;
+	private static Pattern patternPhonemeCijjhnhiv;
 	private static final Pattern PATTERN_V_IU_V = RegexHelper.pattern("[aeiou][iu][aeiou]", Pattern.CASE_INSENSITIVE);
 	private static final Pattern PATTERN_NOT_V_IU_DIERESIS_V = RegexHelper.pattern("[aeiou][ïü][^aeiou]|[^aeiou][ïü]", Pattern.CASE_INSENSITIVE);
-	private static String NORTHERN_PLURAL_RULE;
-	private static String NORTHERN_PLURAL_STRESSED_RULE;
-	private static Set<String> DONT_CHECK_PRODUCTIVENESS_RULES;
+	private static String northernPluralRule;
+	private static String northernPluralStressedRule;
+	private static Set<String> dontCheckProductivenessRules;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final MessageFormat UNNECESSARY_STRESS = new MessageFormat("{0} have unnecessary stress");
@@ -115,19 +115,19 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 
-		PATTERN_NON_VANISHING_EL = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
+		patternNonVanishingEl = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_NON_VANISHING_EL_NOT_AT_END = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingElNotAtEnd"),
+		patternNonVanishingElNotAtEnd = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingElNotAtEnd"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_VANISHING_EL_NEXT_TO_CONSONANT = RegexHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
+		patternVanishingElNextToConsonant = RegexHelper.pattern(rulesLoader.readProperty("patternVanishingElNextToConsonant"),
 			Pattern.CASE_INSENSITIVE);
-		PATTERN_PHONEME_CIJJHNHIV = RegexHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"),
+		patternPhonemeCijjhnhiv = RegexHelper.pattern(rulesLoader.readProperty("patternPhonemeCIJJHNHIV"),
 			Pattern.CASE_INSENSITIVE);
 
-		NORTHERN_PLURAL_RULE = rulesLoader.readProperty("northernPlural");
-		NORTHERN_PLURAL_STRESSED_RULE = rulesLoader.readProperty("northernPluralStressed");
+		northernPluralRule = rulesLoader.readProperty("northernPlural");
+		northernPluralStressedRule = rulesLoader.readProperty("northernPluralStressed");
 
-		DONT_CHECK_PRODUCTIVENESS_RULES = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
+		dontCheckProductivenessRules = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
 	}
 
 	@Override
@@ -162,17 +162,16 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
-			if(RegexHelper.find(derivedWord, PATTERN_NON_VANISHING_EL))
+			if(RegexHelper.find(derivedWord, patternNonVanishingEl))
 				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.format(new Object[]{derivedWord}));
-			if(inflection.hasContinuationFlag(NORTHERN_PLURAL_RULE))
-				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{NORTHERN_PLURAL_RULE,
-					NORTHERN_PLURAL_STRESSED_RULE, derivedWord}));
-			if(RegexHelper.find(derivedWord, PATTERN_VANISHING_EL_NEXT_TO_CONSONANT))
+			if(inflection.hasContinuationFlag(northernPluralRule))
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.format(new Object[]{northernPluralRule, northernPluralStressedRule, derivedWord}));
+			if(RegexHelper.find(derivedWord, patternVanishingElNextToConsonant))
 				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.format(new Object[]{derivedWord}));
 
 			variants.add(LanguageVariant.VENETIAN);
 		}
-		if(RegexHelper.find(derivedWord, PATTERN_NON_VANISHING_EL_NOT_AT_END)
+		if(RegexHelper.find(derivedWord, patternNonVanishingElNotAtEnd)
 				|| derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE))
 			variants.add(LanguageVariant.NORTHERN);
 
@@ -246,7 +245,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void ciuiCheck(final String subword, final Inflection inflection){
 		if(!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
-			if(RegexHelper.find(phonemizedSubword, PATTERN_PHONEME_CIJJHNHIV))
+			if(RegexHelper.find(phonemizedSubword, patternPhonemeCijjhnhiv))
 				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV.format(new Object[]{inflection.getWord()}));
 		}
 
@@ -289,7 +288,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	@Override
 	public boolean shouldNotCheckProductiveness(final String flag){
-		return DONT_CHECK_PRODUCTIVENESS_RULES.contains(flag);
+		return dontCheckProductivenessRules.contains(flag);
 	}
 
 	@Override

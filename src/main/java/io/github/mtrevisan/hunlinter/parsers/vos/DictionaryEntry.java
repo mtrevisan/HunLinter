@@ -167,18 +167,13 @@ public class DictionaryEntry{
 	}
 
 	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
-		final Map<String, List<DictionaryEntry>> result = new HashMap<>();
 		final int size = (continuationFlags != null? continuationFlags.size(): 0);
+		final Map<String, List<DictionaryEntry>> result = new HashMap<>(size);
 		for(int i = 0; i < size; i ++){
 			final String cf = continuationFlags.get(i);
-			if(affixData.isManagedByCompoundRule(cf)){
-				final List<DictionaryEntry> vv = new ArrayList<>();
-				final List<DictionaryEntry> v = result.get(cf);
-				if(v != null)
-					vv.addAll(v);
-				vv.add(this);
-				result.put(cf, vv);
-			}
+			if(affixData.isManagedByCompoundRule(cf))
+				result.computeIfAbsent(cf, k -> new ArrayList<>(1))
+					.add(this);
 		}
 		return result;
 	}

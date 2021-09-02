@@ -398,13 +398,13 @@ public class BasicEventBus implements EventBusInterface{
 				final Object subscriber = handlerInfo.getSubscriber();
 				if(subscriber == null){
 					killQueue.put(handlerInfo);
-					return false;
+					return Boolean.FALSE;
 				}
 
 				final Method m = handlerInfo.getMethod();
 				m.setAccessible(true);
 				m.invoke(subscriber, event);
-				return false;
+				return Boolean.FALSE;
 			}
 			catch(final Exception e){
 				Throwable cause = e;
@@ -414,11 +414,11 @@ public class BasicEventBus implements EventBusInterface{
 					cause = cause.getCause();
 				if(cause instanceof VetoException){
 					publish(new VetoEvent(event));
-					return true;
+					return Boolean.TRUE;
 				}
 
 				publish(new BusExceptionEvent(handlerInfo, cause));
-				return false;
+				return Boolean.FALSE;
 			}
 		}
 

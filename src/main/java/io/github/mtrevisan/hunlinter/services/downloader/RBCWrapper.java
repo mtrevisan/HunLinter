@@ -51,9 +51,9 @@ class RBCWrapper implements ReadableByteChannel{
 	public boolean isOpen(){ return rbc.isOpen(); }
 
 	@Override
-	public int read(final ByteBuffer bb) throws IOException{
+	public int read(final ByteBuffer dst) throws IOException{
 		final int readBytes;
-		if((readBytes = rbc.read(bb)) > 0){
+		if((readBytes = rbc.read(dst)) > 0){
 			readSoFar += readBytes;
 
 			final double progress = (expectedSize > 0? readSoFar * 100. / expectedSize: -1.);

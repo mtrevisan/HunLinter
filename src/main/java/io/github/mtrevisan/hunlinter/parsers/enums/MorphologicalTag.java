@@ -53,7 +53,7 @@ public enum MorphologicalTag{
 	FLAG("fl:");
 
 
-	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>();
+	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>(MorphologicalTag.values().length);
 	static{
 		for(final MorphologicalTag tag : EnumSet.allOf(MorphologicalTag.class))
 			VALUES.put(tag.code, tag);

@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
@@ -84,6 +88,19 @@ public class UpdateAction extends AbstractAction{
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }
