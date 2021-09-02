@@ -391,7 +391,7 @@ public class Packager{
 		final File affFile = getAffixFile();
 		if(affFile != null){
 			try{
-				//FIXME use appropriate charset
+				//FIXME use appropriate charset!!
 				final CharSequence content = new String(Files.readAllBytes(affFile.toPath()));
 				final List<String> extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()
