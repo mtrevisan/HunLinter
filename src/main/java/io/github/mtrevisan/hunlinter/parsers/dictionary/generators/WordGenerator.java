@@ -49,9 +49,9 @@ public class WordGenerator{
 	public WordGenerator(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
 		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData, checker);
-		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, this, checker);
-		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, this, checker);
-		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, this, checker);
+		wordGeneratorCompoundRules = new WordGeneratorCompoundRules(affixData, dicParser, checker);
+		wordGeneratorCompoundFlag = new WordGeneratorCompoundFlag(affixData, dicParser, checker);
+		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, checker);
 	}
 
 	public DictionaryEntry createFromDictionaryLine(final String line){

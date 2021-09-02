@@ -49,9 +49,8 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	private static final MessageFormat NON_POSITIVE_MAX_COMPOUNDS = new MessageFormat("Max compounds cannot be non-positive: {0}");
 
 
-	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryCorrectnessChecker checker){
-		super(affixData, dicParser, wordGenerator, checker);
+	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, checker);
 	}
 
 	/**

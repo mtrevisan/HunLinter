@@ -74,7 +74,7 @@ public class WordMuncher{
 
 	private void loadDictionaryForInclusionTest(final DictionaryParser dicParser){
 		if(dicInclusionTestWorker == null){
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 
 			dicInclusionTestWorker.executeSynchronously();
 		}

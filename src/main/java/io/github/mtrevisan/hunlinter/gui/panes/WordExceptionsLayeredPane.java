@@ -33,7 +33,6 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
@@ -87,8 +86,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 		FontHelper.addFontableProperty(textField, tagPanel);
 
 		GUIHelper.addUndoManager(textField);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

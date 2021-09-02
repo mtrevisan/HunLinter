@@ -39,7 +39,6 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
@@ -108,8 +107,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		FontHelper.addFontableProperty(inputTextArea, table);
 
 		GUIHelper.addUndoManager(inputTextArea);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

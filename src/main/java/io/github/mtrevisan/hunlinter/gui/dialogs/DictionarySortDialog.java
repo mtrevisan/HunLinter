@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.gui.models.SortableListModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
 import javax.swing.*;
@@ -72,8 +71,6 @@ public class DictionarySortDialog extends JDialog{
 		reloadDictionaryParser(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 
 		lblMessage.setText("Select a section from the list:");
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

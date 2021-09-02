@@ -70,19 +70,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 
-	private final DictionaryParser dicParser;
-	private final WordGenerator wordGenerator;
-
 	private DictionaryInclusionTestWorker dicInclusionTestWorker;
 	private final Collection<String> compoundAsReplacement = new HashSet<>(0);
 
 
-	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryCorrectnessChecker checker){
+	WordGeneratorCompound(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
 		super(affixData, checker);
 
-		this.dicParser = dicParser;
-		this.wordGenerator = wordGenerator;
+		if(dicInclusionTestWorker == null && affixData.isCheckCompoundReplacement())
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 	}
 
 	protected List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
@@ -374,11 +370,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	protected void loadDictionaryForInclusionTest(){
-		if(dicInclusionTestWorker == null && affixData.isCheckCompoundReplacement()){
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
-
+		if(dicInclusionTestWorker != null)
 			dicInclusionTestWorker.executeSynchronously();
-		}
 	}
 
 }

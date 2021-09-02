@@ -41,7 +41,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
@@ -139,8 +138,6 @@ final int iconSize = 17;
 			GUIHelper.addPopupMenu(hideColumnsPopupMenu, table.getTableHeader());
 		}
 		catch(final IOException ignored){}
-
-		EventBusService.subscribe(this);
 	}
 
 	private void hideMorphologicalFieldsColumn(final Component invoker){

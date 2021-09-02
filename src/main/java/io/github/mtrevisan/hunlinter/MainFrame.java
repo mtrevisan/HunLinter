@@ -182,6 +182,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public MainFrame(){
 		packager = new Packager();
 		parserManager = new ParserManager(packager);
+		//FIXME move `this` from the constructor
 		workerManager = new WorkerManager(packager, parserManager, this);
 
 
@@ -232,8 +233,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				}
 				catch(final Exception ignored){}
 			});
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -244,13 +243,21 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainProgressBar = new javax.swing.JProgressBar();
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
+		EventBusService.subscribe(dicLayeredPane);
       cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
+		EventBusService.subscribe(cmpLayeredPane);
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
+		EventBusService.subscribe(theLayeredPane);
       hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
+		EventBusService.subscribe(hypLayeredPane);
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
+		EventBusService.subscribe(acoLayeredPane);
       sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
+		EventBusService.subscribe(sexLayeredPane);
       wexLayeredPane = new WordExceptionsLayeredPane(packager, parserManager);
+		EventBusService.subscribe(wexLayeredPane);
       pdcLayeredPane = new PoSFSALayeredPane(parserManager);
+		EventBusService.subscribe(pdcLayeredPane);
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
@@ -935,7 +942,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 
 		//create and display the form
-		JavaHelper.executeOnEventDispatchThread(() -> (new MainFrame()).setVisible(true));
+		JavaHelper.executeOnEventDispatchThread(() -> {
+			final MainFrame mainFrame = new MainFrame();
+			EventBusService.subscribe(mainFrame);
+			mainFrame.setVisible(true);
+		});
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables

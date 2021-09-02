@@ -46,9 +46,9 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule `{0}` in compound begin-middle-end");
 
 
-	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser,
 			final DictionaryCorrectnessChecker checker){
-		super(affixData, dicParser, wordGenerator, checker);
+		super(affixData, dicParser, checker);
 	}
 
 	/**

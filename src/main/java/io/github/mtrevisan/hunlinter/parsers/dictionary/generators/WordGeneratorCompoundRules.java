@@ -47,9 +47,8 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule {0} in compound rule {1}");
 
 
-	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryCorrectnessChecker checker){
-		super(affixData, dicParser, wordGenerator, checker);
+	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, checker);
 	}
 
 	/**

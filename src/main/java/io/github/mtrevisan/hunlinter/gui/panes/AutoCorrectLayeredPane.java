@@ -39,7 +39,6 @@ import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
@@ -109,8 +108,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		FontHelper.addFontableProperty(table, incorrectTextField, correctTextField);
 
 		GUIHelper.addUndoManager(incorrectTextField, correctTextField);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

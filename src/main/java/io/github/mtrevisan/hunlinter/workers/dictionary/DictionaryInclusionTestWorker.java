@@ -29,9 +29,11 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParam
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGeneratorAffixRules;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -56,23 +58,26 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public DictionaryInclusionTestWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	public DictionaryInclusionTestWorker(final AffixData affixData, final DictionaryParser dicParser){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
 			.withCancelOnException();
 
+		final String language = affixData.getLanguage();
 		Objects.requireNonNull(language, "Language cannot be null");
-		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
+		final WordGeneratorAffixRules wordGeneratorAffixRules = new WordGeneratorAffixRules(affixData, null);
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
+			final List<Inflection> inflections = wordGeneratorAffixRules.applyAffixRules(dicEntry);
 
 			for(final Inflection prod : inflections)
 				dictionary.add(prod.getWord());

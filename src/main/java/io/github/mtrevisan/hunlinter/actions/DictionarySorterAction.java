@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.DictionarySortDialog;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
@@ -71,6 +72,7 @@ public class DictionarySorterAction extends AbstractAction{
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final DictionarySortDialog dialog = new DictionarySortDialog(parserManager, parentFrame);
+		EventBusService.subscribe(dialog);
 
 		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
@@ -92,6 +94,7 @@ public class DictionarySorterAction extends AbstractAction{
 					worker -> {
 						dialog.setDictionaryEnabled(true);
 
+						EventBusService.unsubscribe(dialog);
 						parserManager.startFileListener();
 					}
 				);

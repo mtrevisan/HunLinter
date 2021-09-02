@@ -40,16 +40,16 @@ import java.util.List;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
-class WordGeneratorAffixRules extends WordGeneratorBase{
+public class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	WordGeneratorAffixRules(final AffixData affixData, final DictionaryCorrectnessChecker checker){
+	public WordGeneratorAffixRules(final AffixData affixData, final DictionaryCorrectnessChecker checker){
 		super(affixData, checker);
 	}
 
-	List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
+	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 

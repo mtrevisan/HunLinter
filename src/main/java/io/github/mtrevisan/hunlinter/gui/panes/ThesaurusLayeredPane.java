@@ -41,7 +41,6 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
@@ -140,8 +139,6 @@ final int iconSize = 17;
 			GUIHelper.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
