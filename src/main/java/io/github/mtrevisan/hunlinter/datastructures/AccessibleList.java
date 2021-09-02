@@ -60,17 +60,17 @@ public class AccessibleList<T>{
 		this.growthRate = growthRate;
 	}
 
-	public synchronized void add(final T elem){
+	public void add(final T elem){
 		grow(1);
 
 		data[limit ++] = elem;
 	}
 
-	public synchronized void addAll(final T[] array){
+	public void addAll(final T[] array){
 		addAll(array, array.length);
 	}
 
-	public synchronized void addAll(final AccessibleList<T> array){
+	public void addAll(final AccessibleList<T> array){
 		addAll(array.data, array.limit);
 	}
 
@@ -81,11 +81,11 @@ public class AccessibleList<T>{
 		limit += size;
 	}
 
-	public synchronized void addAllUnique(final T[] array){
+	public void addAllUnique(final T[] array){
 		addAllUnique(array, array.length);
 	}
 
-	public synchronized void addAllUnique(final AccessibleList<T> array){
+	public void addAllUnique(final AccessibleList<T> array){
 		addAllUnique(array.data, array.limit);
 	}
 
@@ -101,7 +101,7 @@ public class AccessibleList<T>{
 		return (indexOf(elem) >= 0);
 	}
 
-	public synchronized void remove(final T elem){
+	public void remove(final T elem){
 		int index = limit;
 		while(limit > 0 && (index = lastIndexOf(elem, index)) >= 0){
 			final int delta = limit - index - 1;
@@ -111,7 +111,7 @@ public class AccessibleList<T>{
 		}
 	}
 
-	public synchronized void removeAtIndex(final int index){
+	public void removeAtIndex(final int index){
 		data = ArrayUtils.remove(data, index);
 		limit --;
 	}
@@ -141,7 +141,7 @@ public class AccessibleList<T>{
 		return indexOf(elem, 0);
 	}
 
-	public synchronized int indexOf(final T elem, final int startIndex){
+	public int indexOf(final T elem, final int startIndex){
 		return (elem != null
 			? indexOfNonNull(elem, startIndex)
 			: indexOfNull(startIndex));
@@ -161,7 +161,7 @@ public class AccessibleList<T>{
 		return -1;
 	}
 
-	public synchronized int lastIndexOf(final T elem, final int startIndex){
+	public int lastIndexOf(final T elem, final int startIndex){
 		return (elem != null
 			? lastIndexOfNonNull(elem, startIndex)
 			: lastIndexOfNull(startIndex));
@@ -207,7 +207,7 @@ public class AccessibleList<T>{
 		return collect;
 	}
 
-	public synchronized boolean isEmpty(){
+	public boolean isEmpty(){
 		return (limit == 0);
 	}
 
@@ -216,7 +216,7 @@ public class AccessibleList<T>{
 	 *
 	 * @return	A copy of the array
 	 */
-	public synchronized T[] extractCopyOrNull(){
+	public T[] extractCopyOrNull(){
 		if(isEmpty())
 			return null;
 
@@ -228,7 +228,7 @@ public class AccessibleList<T>{
 	 *
 	 * @return	A copy of the array
 	 */
-	public synchronized T[] extractCopy(){
+	public T[] extractCopy(){
 		final Class<?> type = getDataType();
 		@SuppressWarnings("unchecked")
 		final T[] reducedData = (T[])Array.newInstance(type, limit);
@@ -236,11 +236,11 @@ public class AccessibleList<T>{
 		return reducedData;
 	}
 
-	public synchronized void reset(){
+	public void reset(){
 		limit = 0;
 	}
 
-	public synchronized void clear(){
+	public void clear(){
 		data = null;
 		limit = -1;
 	}

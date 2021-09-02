@@ -50,7 +50,7 @@ public class DynamicArray<T>{
 		clear();
 	}
 
-	public final synchronized void clear(){
+	public final void clear(){
 		blocks = new Object[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new Block<>(1);
@@ -71,7 +71,7 @@ public class DynamicArray<T>{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized T get(final int i){
+	public T get(final int i){
 		// We need to find which Block contains the requested element, also in what position of that Block.
 		// locate() gives us a Location object.
 		// The object will contain the index of Block that we want,
@@ -88,7 +88,7 @@ public class DynamicArray<T>{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized void set(final int index, final T x){
+	public void set(final int index, final T x){
 		final Location location = new Location(index);
 		@SuppressWarnings("unchecked")
 		final Block<T> block = (Block<T>)blocks[location.block];
@@ -149,37 +149,37 @@ public class DynamicArray<T>{
 
 	}
 
-	public synchronized void push(final T x){
+	public void push(final T x){
 		add(x);
 	}
 
 	// Grows the DynamicArray by one space, increases the size of the
 	// DynamicArray, and sets the last element to x.
 	// Target complexity: O(1)
-	public synchronized void add(final T x){
+	public void add(final T x){
 		grow();
 
 		size ++;
 		set(size - 1, x);
 	}
 
-	public synchronized void addAll(final DynamicArray<T> array){
+	public void addAll(final DynamicArray<T> array){
 		for(int i = 0; i < array.size; i ++)
 			add(array.get(i));
 	}
 
-	public synchronized void addAll(final T[] array){
+	public void addAll(final T[] array){
 		for(final T t : array)
 			add(t);
 	}
 
-	public synchronized T pop(){
+	public T pop(){
 		final T elem = get(size - 1);
 		remove();
 		return elem;
 	}
 
-	public synchronized void shrink(final int newSize){
+	public void shrink(final int newSize){
 		while(size > newSize)
 			remove();
 	}
@@ -193,7 +193,7 @@ public class DynamicArray<T>{
 	 * @throws IllegalStateException	If the DynamicArray is empty when remove is called
 	 */
 	@SuppressWarnings("unchecked")
-	public synchronized void remove(){
+	public void remove(){
 		set(size - 1, null);
 
 		final Block<T> lastNonEmptyDataBlock = (Block<T>)blocks[indexOfLastNonEmptyDataBlock];
@@ -265,11 +265,11 @@ public class DynamicArray<T>{
 
 	// Returns the size of the DynamicArray which is the number of elements that
 	// have been added to it with the add(x) method but not removed.
-	public synchronized int size(){
+	public int size(){
 		return size;
 	}
 
-	public synchronized boolean isEmpty(){
+	public boolean isEmpty(){
 		return (size == 0);
 	}
 

@@ -160,7 +160,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		if(!isDone() && paused.compareAndSet(true, false)){
 			PAUSE_LOCK.lock();
 			try{
-				UNPAUSE.signal();
+				UNPAUSE.signalAll();
 			}
 			finally{
 				PAUSE_LOCK.unlock();
@@ -173,6 +173,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	/**
 	 * NOTE: this should be called inside `SwingWorker.doInBackground()` to allow process abortion
 	 */
+	@SuppressWarnings("AwaitNotInLoop")
 	protected void sleepOnPause(){
 		if(paused.get()){
 			PAUSE_LOCK.lock();
@@ -236,7 +237,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(workerData);
+		return workerData.hashCode();
 	}
 
 }

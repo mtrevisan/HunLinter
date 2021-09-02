@@ -70,7 +70,7 @@ public class Duplicate{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(lineIndex);
+		return Integer.hashCode(lineIndex);
 	}
 
 }

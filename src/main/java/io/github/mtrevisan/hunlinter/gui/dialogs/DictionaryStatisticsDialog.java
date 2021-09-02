@@ -642,7 +642,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	private static class MyChartPanel extends ChartPanel{
-		public MyChartPanel(final JFreeChart chart){
+		private MyChartPanel(final JFreeChart chart){
 			super(chart);
 		}
 

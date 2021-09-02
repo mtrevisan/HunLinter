@@ -78,6 +78,9 @@ public class BasicEventBus implements EventBusInterface{
 	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<HandlerInfo> killQueue = new LinkedBlockingQueue<>();
 
+	private final Thread eventQueueThread;
+	private final Thread killQueueThread;
+
 	/** The ExecutorService used to handle event delivery to the event handlers. */
 	private final ExecutorService executorService;
 
@@ -113,16 +116,20 @@ public class BasicEventBus implements EventBusInterface{
 
 	public BasicEventBus(final ExecutorService executorService, final boolean waitForHandlers){
 		//start the background daemon consumer thread
-		final Thread eventQueueThread = new Thread(new EventQueueRunner(), "EventQueue Consumer Thread");
+		eventQueueThread = new Thread(new EventQueueRunner(), "EventQueue Consumer Thread");
 		eventQueueThread.setDaemon(true);
-		eventQueueThread.start();
 
-		final Thread killQueueThread = new Thread(new KillQueueRunner(), "KillQueue Consumer Thread");
+		killQueueThread = new Thread(new KillQueueRunner(), "KillQueue Consumer Thread");
 		killQueueThread.setDaemon(true);
-		killQueueThread.start();
 
 		this.executorService = executorService;
 		this.waitForHandlers = waitForHandlers;
+	}
+
+	@Override
+	public void start(){
+		eventQueueThread.start();
+		killQueueThread.start();
 	}
 
 

@@ -41,6 +41,9 @@ import java.util.ServiceLoader;
 public final class EventBusService{
 
 	private static final EventBusInterface EVENT_BUS = new BasicEventBus(true);
+	static{
+		EVENT_BUS.start();
+	}
 
 
 	private EventBusService(){}

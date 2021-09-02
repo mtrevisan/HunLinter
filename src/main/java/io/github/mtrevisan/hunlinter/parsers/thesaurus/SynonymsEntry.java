@@ -176,7 +176,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(synonyms);
+		int result = synonyms.hashCode();
 		result = 31 * result + Arrays.hashCode(partOfSpeeches);
 		return result;
 	}

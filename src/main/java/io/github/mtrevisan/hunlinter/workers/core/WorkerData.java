@@ -105,7 +105,7 @@ public class WorkerData{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(workerName);
+		return workerName.hashCode();
 	}
 
 }

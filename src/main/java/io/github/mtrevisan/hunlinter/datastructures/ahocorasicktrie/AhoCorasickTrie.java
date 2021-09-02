@@ -271,7 +271,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 
 	@Override
 	public int hashCode(){
-		int result = Objects.hash(outerValue);
+		int result = outerValue.hashCode();
 		result = 31 * result + Arrays.hashCode(base);
 		result = 31 * result + Arrays.hashCode(next);
 		result = 31 * result + Arrays.hashCode(check);

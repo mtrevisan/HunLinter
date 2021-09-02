@@ -403,4 +403,5 @@ public class AffixEntry{
 		result = 31 * result + Arrays.hashCode(morphologicalFields);
 		return result;
 	}
+
 }

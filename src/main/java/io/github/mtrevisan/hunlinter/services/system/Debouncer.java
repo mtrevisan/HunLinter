@@ -122,7 +122,7 @@ public class Debouncer<T>{
 
 		@Override
 		public int hashCode(){
-			return Objects.hash(key);
+			return key.hashCode();
 		}
 
 	}

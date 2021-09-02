@@ -194,7 +194,7 @@ public class HyphenationBreak{
 
 	@Override
 	public int hashCode(){
-		return Objects.hash(indexesAndRules);
+		return indexesAndRules.hashCode();
 	}
 
 }

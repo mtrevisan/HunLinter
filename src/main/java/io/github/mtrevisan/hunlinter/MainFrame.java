@@ -913,7 +913,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private static class MyFileView extends FileView{
 		private final Icon projectFolderIcon;
 
-		public MyFileView(final Icon projectFolderIcon){
+		private MyFileView(final Icon projectFolderIcon){
 			this.projectFolderIcon = projectFolderIcon;
 		}
 

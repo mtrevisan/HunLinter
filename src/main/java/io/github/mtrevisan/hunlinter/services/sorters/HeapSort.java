@@ -53,7 +53,7 @@ public final class HeapSort{
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
+	public static <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
 			final ProgressCallback progressCallback){
 		Objects.requireNonNull(data, "Data cannot be null");
 		Objects.requireNonNull(comparator, "Comparator cannot be null");
