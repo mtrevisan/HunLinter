@@ -93,8 +93,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param charset							The {@link Charset} to be used
-	 * @param parameters						The parameters object
+	 * @param charset	The {@link Charset} to be used.
+	 * @param parameters	The parameters object.
 	 */
 	public BloomFilter(final Charset charset, final BloomFilterParameters parameters){
 		this(charset, parameters, null, null);
@@ -103,9 +103,9 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param charset							The {@link Charset} to be used
-	 * @param parameters						The parameters object
-	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
+	 * @param charset	The {@link Charset} to be used.
+	 * @param parameters	The parameters object.
+	 * @param decomposer	A {@link Decomposer} that helps decompose the given object.
 	 */
 	public BloomFilter(final Charset charset, final BloomFilterParameters parameters, final Decomposer<T> decomposer){
 		this(charset, parameters, decomposer, null);
@@ -114,10 +114,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param charset							The {@link Charset} to be used
-	 * @param parameters						The parameters object
-	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param hasher							The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used
+	 * @param charset	The {@link Charset} to be used.
+	 * @param parameters	The parameters object.
+	 * @param decomposer	A {@link Decomposer} that helps decompose the given object.
+	 * @param hasher	The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used.
 	 */
 	public BloomFilter(final Charset charset, final BloomFilterParameters parameters, final Decomposer<T> decomposer, final HashFunction hasher){
 		this(charset, parameters.getExpectedNumberOfElements(), parameters.getFalsePositiveProbability(), parameters.getBitArrayType(),
@@ -127,12 +127,12 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Create a new bloom filter.
 	 *
-	 * @param charset							The {@link Charset} to be used
-	 * @param expectedNumberOfElements	The number of max expected insertions
-	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @param bitArrayType					The type of the bit array
-	 * @param decomposer						A {@link Decomposer} that helps decompose the given object
-	 * @param hasher							The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used
+	 * @param charset	The {@link Charset} to be used.
+	 * @param expectedNumberOfElements	The number of max expected insertions.
+	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give.
+	 * @param bitArrayType	The type of the bit array.
+	 * @param decomposer	A {@link Decomposer} that helps decompose the given object.
+	 * @param hasher	The hash function to use. If {@code null} is specified the {@link #HASHER_DEFAULT} will be used.
 	 */
 	protected BloomFilter(final Charset charset, final int expectedNumberOfElements, final double falsePositiveProbability,
 			final BitArrayBuilder.Type bitArrayType, final Decomposer<T> decomposer, final HashFunction hasher){
@@ -171,19 +171,19 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Compute the optimal size {@code m} of the bloom filter in bits.
 	 *
-	 * @param expectedNumberOfElements	The number of expected insertions, or {@code n}
-	 * @param falsePositiveProbability	The maximum false positive rate expected, or {@code p}
-	 * @return the optimal size in bits for the filter, or {@code m}
+	 * @param expectedNumberOfElements	The number of expected insertions, or {@code n}.
+	 * @param falsePositiveProbability	The maximum false positive rate expected, or {@code p}.
+	 * @return the optimal size in bits for the filter, or {@code m}.
 	 */
 	public static int optimalBitSize(final double expectedNumberOfElements, final double falsePositiveProbability){
 		return (int)Math.round(-expectedNumberOfElements * Math.log(falsePositiveProbability) / LN2_SQUARE);
 	}
 
 	/**
-	 * Compute the optimal number of hash functions, {@code k}
+	 * Compute the optimal number of hash functions, {@code k}.
 	 *
-	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give
-	 * @return the optimal number of hash functions to be used also known as {@code k}
+	 * @param falsePositiveProbability	The max false positive probability rate that the bloom filter can give.
+	 * @return the optimal number of hash functions to be used also known as {@code k}.
 	 */
 	public static int optimalNumberOfHashFunctions(final double falsePositiveProbability){
 		return Math.max(1, (int)Math.round(-Math.log(falsePositiveProbability) / LN2));
@@ -193,8 +193,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	/**
 	 * Add the given value represented as bytes in to the bloom filter.
 	 *
-	 * @param bytes	The bytes to be added to bloom filter
-	 * @return {@code true} if any bit was modified when adding the value, {@code false} otherwise
+	 * @param bytes	The bytes to be added to bloom filter.
+	 * @return {@code true} if any bit was modified when adding the value, {@code false} otherwise.
 	 */
 	public synchronized boolean add(final byte[] bytes){
 		final boolean bitsChanged = calculateIndexes(bytes);
@@ -209,7 +209,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private boolean calculateIndexes(final byte[] bytes){
+	private synchronized boolean calculateIndexes(final byte[] bytes){
 		boolean bitsChanged = false;
 		final long hash = getLongHash64(bytes);
 		final int lowHash = (int)hash;

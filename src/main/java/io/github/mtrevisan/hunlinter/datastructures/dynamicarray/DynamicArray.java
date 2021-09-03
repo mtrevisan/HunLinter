@@ -149,7 +149,7 @@ public class DynamicArray<T>{
 
 	}
 
-	public void push(final T x){
+	public synchronized void push(final T x){
 		add(x);
 	}
 
@@ -168,7 +168,7 @@ public class DynamicArray<T>{
 			add(array.get(i));
 	}
 
-	public void addAll(final T[] array){
+	public synchronized void addAll(final T[] array){
 		for(final T t : array)
 			add(t);
 	}

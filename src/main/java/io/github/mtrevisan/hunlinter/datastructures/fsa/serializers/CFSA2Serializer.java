@@ -76,7 +76,7 @@ public class CFSA2Serializer implements FSASerializer{
 
 
 	/**
-	 * {@code true} if we should serialize with numbers.
+	 * Whether to serialize with numbers.
 	 *
 	 * @see #serializeWithNumbers()
 	 */

@@ -86,7 +86,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public boolean contains(final T value){
+	public synchronized boolean contains(final T value){
 		return (value != null && match(filters, filter -> filter.contains(value)) != null);
 	}
 
@@ -121,7 +121,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	//P = 1 - Prod(i = 0 to n - 1 of (1 - P0 * r^i)) <= P0 / (1 - r)
 	@Override
-	public double getTrueFalsePositiveProbability(){
+	public synchronized double getTrueFalsePositiveProbability(){
 		final int size = filters.size();
 		final double p0 = filters.getLast().getFalsePositiveProbability();
 		final double probability = IntStream.range(0, size)
@@ -133,13 +133,13 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public void clear(){
+	public synchronized void clear(){
 		for(final BloomFilterInterface<T> filter : filters)
 			filter.clear();
 	}
 
 	@Override
-	public void close(){
+	public synchronized void close(){
 		for(final BloomFilterInterface<T> filter : filters)
 			filter.close();
 	}

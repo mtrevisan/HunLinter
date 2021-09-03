@@ -146,7 +146,7 @@ public class DynamicIntArray{
 
 	}
 
-	public void push(final int x){
+	public synchronized void push(final int x){
 		add(x);
 	}
 
@@ -165,7 +165,7 @@ public class DynamicIntArray{
 			add(array.get(i));
 	}
 
-	public void addAll(final int[] array){
+	public synchronized void addAll(final int[] array){
 		for(final int value : array)
 			add(value);
 	}
