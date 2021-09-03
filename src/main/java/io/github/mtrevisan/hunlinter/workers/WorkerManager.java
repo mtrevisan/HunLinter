@@ -54,6 +54,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +207,7 @@ public class WorkerManager{
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();
 			final String compoundFlag = affixData.getCompoundFlag();
-			final List<Inflection> compounds = new ArrayList<>(0);
+			final List<Inflection> compounds = Collections.synchronizedList(new ArrayList<>(0));
 			final BiConsumer<Inflection, Integer> inflectionReader = (inflection, row) -> {
 				if(!inflection.distributeByCompoundRule(affixData).isEmpty() || inflection.hasContinuationFlag(compoundFlag))
 					compounds.add(inflection);

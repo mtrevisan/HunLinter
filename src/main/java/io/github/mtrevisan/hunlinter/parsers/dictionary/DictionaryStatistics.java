@@ -158,7 +158,7 @@ public class DictionaryStatistics implements Closeable{
 		}
 	}
 
-	private synchronized void storeLongestWord(final String word){
+	private void storeLongestWord(final String word){
 		final int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -171,7 +171,7 @@ public class DictionaryStatistics implements Closeable{
 		bloomFilter.add(word);
 	}
 
-	private synchronized void storeHyphenation(final Hyphenation hyphenation){
+	private void storeHyphenation(final Hyphenation hyphenation){
 		final String[] syllabes = hyphenation.getSyllabes();
 		final int syllabeCount = syllabes.length;
 		if(syllabeCount > longestWordCountBySyllabes){

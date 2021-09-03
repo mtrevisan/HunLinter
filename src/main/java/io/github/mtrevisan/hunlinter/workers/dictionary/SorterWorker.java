@@ -66,6 +66,8 @@ public class SorterWorker extends WorkerDictionary{
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 		//here `boundary` cannot be null
+		final int sectionStart = boundary.getKey();
+		final int sectionEnd = boundary.getValue() + 1;
 
 		final Function<Void, List<String>> step1 = ignored -> {
 			prepareProcessing("Load dictionary file (step 1/3)");
@@ -86,7 +88,7 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sort selected section (step 2/3)");
 
 			//sort the chosen section
-			lines.subList(boundary.getKey(), boundary.getValue() + 1)
+			lines.subList(sectionStart, sectionEnd)
 				.sort(comparator);
 
 			setProgress(67);
@@ -99,7 +101,7 @@ public class SorterWorker extends WorkerDictionary{
 			try{
 				FileHelper.saveFile(dicParser.getDicFile().toPath(), System.lineSeparator(), dicParser.getCharset(), lines);
 
-				dicParser.removeBoundary(boundary.getKey());
+				dicParser.removeBoundary(sectionStart);
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			}

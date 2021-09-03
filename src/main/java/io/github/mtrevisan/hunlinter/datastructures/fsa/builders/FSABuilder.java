@@ -131,7 +131,7 @@ public class FSABuilder{
 	 *
 	 * @param sequence The array holding input sequence of bytes.
 	 */
-	public final void add(final byte[] sequence){
+	public synchronized final void add(final byte[] sequence){
 		if(serialized == null)
 			throw new IllegalArgumentException("Automaton already built");
 		final int len = sequence.length;
@@ -170,7 +170,7 @@ public class FSABuilder{
 	 *
 	 * @return	The {@link FSA} just constructed
 	 */
-	public final FSA complete(){
+	public synchronized final FSA complete(){
 		add(new byte[0]);
 
 		if(nextArcOffset[0] - activePath[0] == 0)

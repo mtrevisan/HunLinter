@@ -132,7 +132,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<byte[]> fsaProcessor = builder::add;
 
 		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
@@ -168,7 +167,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final int progressStep = (int)Math.ceil(list.limit / 100.f);
 			for(int index = 0; index < list.limit; index ++){
 				final byte[] encoding = list.data[index];
-				fsaProcessor.accept(encoding);
+				builder.add(encoding);
 
 				//release memory
 				list.data[index] = null;

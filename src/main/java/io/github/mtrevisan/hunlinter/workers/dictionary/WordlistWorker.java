@@ -78,7 +78,6 @@ public class WordlistWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 
-
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
 			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
 			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {

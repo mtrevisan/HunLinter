@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures;
 
-import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ class AccessibleListTest{
 
 	@Test
 	void add(){
-		DynamicArray<Integer> array = new DynamicArray<>();
+		DynamicIntArray array = new DynamicIntArray();
 
 		for(int i = 0; i < 1_000_000; i ++)
 			array.add(i);
@@ -44,7 +44,7 @@ class AccessibleListTest{
 
 	@Test
 	void remove(){
-		DynamicArray<Integer> array = new DynamicArray<>();
+		DynamicIntArray array = new DynamicIntArray();
 
 		for(int i = 0; i < 1_000_000; i ++)
 			array.add(i);
