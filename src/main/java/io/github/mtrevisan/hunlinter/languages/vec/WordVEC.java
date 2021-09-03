@@ -66,6 +66,17 @@ public final class WordVEC{
 
 	private static final String COLLATOR_RULE = "; ̿  < ' '='\t' < '-';\u00AD;‐;‑;‒;–;—;―;− < ’=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	private static Collator COLLATOR;
+	static{
+		try{
+			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
+		}
+		catch(final ParseException e){
+			final Locale fallbackLocale = Locale.ITALIAN;
+			LOGGER.error("Bad error while creating the collator, use {} as default", fallbackLocale.getLanguage(), e);
+
+			COLLATOR = RuleBasedCollator.getInstance(fallbackLocale);
+		}
+	}
 
 	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
 
@@ -112,17 +123,7 @@ public final class WordVEC{
 	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "ÀÉÍÓÚàéíóúÍÚíú".toCharArray();
 
 
-	private WordVEC(){
-		try{
-			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
-		}
-		catch(final ParseException e){
-			final Locale fallbackLocale = Locale.ITALIAN;
-			LOGGER.error("Bad error while creating the collator, use {} as default", fallbackLocale.getLanguage(), e);
-
-			COLLATOR = RuleBasedCollator.getInstance(fallbackLocale);
-		}
-	}
+	private WordVEC(){}
 
 	public static int countGraphemes(final String word){
 		return (int)IntStream.range(0, word.length())
