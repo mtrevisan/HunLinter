@@ -79,7 +79,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	private BloomFilterInterface<T> fork(final int count){
-		return new BloomFilter<>(charset, (int)Math.ceil(parameters.getExpectedNumberOfElements() * Math.pow(parameters.getGrowthRatioWhenFull(), count)),
+		return new BloomFilter<>(charset, (int)Math.ceil(parameters.getExpectedNumberOfElements() * Math.pow(parameters.getGrowthRateWhenFull(), count)),
 			parameters.getFalsePositiveProbability() * Math.pow(parameters.getTighteningRatio(), count), parameters.getBitArrayType(), null, null);
 	}
 

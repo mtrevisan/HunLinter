@@ -52,8 +52,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	private boolean[] used;
 	/** The allocation size of the dynamic array. */
 	private int allocSize;
-	/** A parameter that controls the memory growth speed of the dynamic array. */
-	private int memoryGrowthSpeed;
+	/** A parameter that controls the memory growth rate of the dynamic array. */
+	private int memoryGrowthRate;
 	/** The next position to check for unused memory. */
 	private int nextCheckPos;
 	/** The size of the key-pair sets. */
@@ -183,7 +183,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	}
 
 	private void buildTrie(final int keySize){
-		memoryGrowthSpeed = 0;
+		memoryGrowthRate = 0;
 		this.keySize = keySize;
 
 		int totalKeysLen = 0;
@@ -249,7 +249,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				begin = pos - siblings.get(0).getKey();
 				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
 					//prevent progress from generating zero divide errors
-					final double l = Math.max(1.05, (double) keySize / (memoryGrowthSpeed + 1));
+					final double l = Math.max(1.05, (double) keySize / (memoryGrowthRate + 1));
 					resize((int)(allocSize * l));
 				}
 
@@ -283,7 +283,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){
 					trie.base[begin + sibling.getKey()] = (-sibling.getValue().getLargestChildrenId() - 1);
-					memoryGrowthSpeed ++;
+					memoryGrowthRate++;
 				}
 				else{
 					//DFS

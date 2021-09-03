@@ -24,12 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
+import java.util.RandomAccess;
+
 
 /**
  * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays in optimal time and space</a>
  * @see <a href="https://github.com/LHongy/DynamicArray">DynamicArray</a>
  */
-public class DynamicIntArray{
+public class DynamicIntArray implements RandomAccess{
 
 	private static final int CAPACITY_DEFAULT = 4;
 

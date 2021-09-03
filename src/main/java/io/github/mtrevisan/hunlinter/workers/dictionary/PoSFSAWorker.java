@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
@@ -37,7 +36,6 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerialize
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
@@ -47,7 +45,6 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.enums.PartOfSpeechTag;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.sorters.SmoothSort;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
@@ -117,23 +114,19 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
 
 
-		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		final AccessibleList<byte[]> encodings = new AccessibleList<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
-			AccessibleList.GROWTH_DEFAULT);
+		final ByteArrayList encodings = new ByteArrayList(1_000_000.f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final AccessibleList<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
-
-			encodings.addAll(currentEncodings);
+			encode(encodings, inflections, separator, sequenceEncoder);
 
 			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
 
-		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
+		final Function<Void, ByteArrayList> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
 
 			final Path dicPath = dicParser.getDicFile()
@@ -142,20 +135,21 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return encodings;
 		};
-		final Function<AccessibleList<byte[]>, AccessibleList<byte[]>> step2 = list -> {
+		final Function<ByteArrayList, ByteArrayList> step2 = list -> {
 			resetProcessing("Sorting (step 2/5)");
 
 			//sort list
-			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
-				percent -> {
-					setProgress(percent, 100);
-
-					sleepOnPause();
-				});
+//			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
+//				percent -> {
+//					setProgress(percent, 100);
+//
+//					sleepOnPause();
+//				});
+			list.parallelSort(LexicographicalComparator.lexicographicalComparator());
 
 			return list;
 		};
-		final Function<AccessibleList<byte[]>, FSA> step3 = list -> {
+		final Function<ByteArrayList, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/5)");
 
 			getWorkerData()
@@ -164,13 +158,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			int progress = 0;
 			int progressIndex = 0;
-			final int progressStep = (int)Math.ceil(list.limit / 100.f);
-			for(int index = 0; index < list.limit; index ++){
+			final int progressStep = (int)Math.ceil(list.size() / 100.f);
+			for(int index = 0; index < list.size(); index ++){
 				final byte[] encoding = list.data[index];
 				builder.add(encoding);
-
-				//release memory
-				list.data[index] = null;
 
 				if(++ progress % progressStep == 0)
 					setProgress(++ progressIndex, 100);
@@ -231,11 +222,10 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return MetadataBuilder.read(metadataPath);
 	}
 
-	private AccessibleList<byte[]> encode(final Collection<Inflection> inflections, final byte separator,
+	private void encode(final ByteArrayList encodings, final Collection<Inflection> inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		final AccessibleList<byte[]> out = new AccessibleList<>(byte[].class, inflections.size(), AccessibleList.GROWTH_DEFAULT);
 		for(final Inflection inflection : inflections){
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
@@ -251,7 +241,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			//extract stem
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);
-			final byte[][] encodedStems = new byte[stems.size()][];
 
 			//extract inflection
 			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
@@ -262,7 +251,6 @@ public class PoSFSAWorker extends WorkerDictionary{
 			extractInflection(prefixInflection, tag);
 			tag.flip();
 
-			int position = 0;
 			for(final String stem : stems){
 				//source
 				byte[] inflectionStem = StringHelper.getRawBytes(stem);
@@ -279,11 +267,9 @@ public class PoSFSAWorker extends WorkerDictionary{
 				offset += encoded.length;
 				assembled[offset ++] = separator;
 				System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
-				encodedStems[position ++] = assembled;
+				encodings.add(assembled);
 			}
-			out.addAll(encodedStems);
 		}
-		return out;
 	}
 
 	/**

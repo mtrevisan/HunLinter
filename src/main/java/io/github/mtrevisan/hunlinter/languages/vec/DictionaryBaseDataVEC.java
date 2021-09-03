@@ -31,7 +31,7 @@ public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 30_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
-	private static final double GROWTH_RATIO_WHEN_FULL = 1.3;
+	private static final double GROWTH_RATE_WHEN_FULL = 1.3;
 
 
 	private static class SingletonHelper{
@@ -56,8 +56,8 @@ public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 	}
 
 	@Override
-	public double getGrowthRatioWhenFull(){
-		return GROWTH_RATIO_WHEN_FULL;
+	public double getGrowthRateWhenFull(){
+		return GROWTH_RATE_WHEN_FULL;
 	}
 
 }

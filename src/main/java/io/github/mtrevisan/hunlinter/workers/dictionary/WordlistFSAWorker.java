@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
@@ -34,14 +33,12 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.sorters.SmoothSort;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
@@ -55,9 +52,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -104,19 +98,12 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		}
 
 
-		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-//		final AccessibleList<byte[]> encodings = new AccessibleList<>(byte[].class, dictionaryBaseData.getExpectedNumberOfElements(),
-//			AccessibleList.GROWTH_DEFAULT);
-		final List<byte[]> encodings = new ArrayList<>(dictionaryBaseData.getExpectedNumberOfElements());
+		final ByteArrayList encodings = new ByteArrayList(1_000_000.f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-//			final byte[][] words = new byte[inflections.size()][];
-//			for(int i = 0; i < inflections.size(); i ++)
-//				words[i] = StringHelper.getRawBytes(inflections.get(i).getWord().toLowerCase(Locale.ROOT));
-//			encodings.addAll(words);
 			for(final Inflection inflection : inflections)
 				encodings.add(StringHelper.getRawBytes(inflection.getWord().toLowerCase(Locale.ROOT)));
 
@@ -124,8 +111,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		};
 		final FSABuilder builder = new FSABuilder();
 
-//		final Function<Void, AccessibleList<byte[]>> step1 = ignored -> {
-		final Function<Void, List<byte[]>> step1 = ignored -> {
+		final Function<Void, ByteArrayList> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/5)");
 
 			final Path dicPath = dicParser.getDicFile()
@@ -134,8 +120,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 			return encodings;
 		};
-//		final Function<AccessibleList<byte[]>, AccessibleList<byte[]>> step2 = list -> {
-		final Function<List<byte[]>, byte[][]> step2 = list -> {
+		final Function<ByteArrayList, ByteArrayList> step2 = list -> {
 			resetProcessing("Sorting (step 2/5)");
 
 			//sort list
@@ -145,63 +130,23 @@ public class WordlistFSAWorker extends WorkerDictionary{
 //
 //					sleepOnPause();
 //				});
-//			list.sort(LexicographicalComparator.lexicographicalComparator());
-			final byte[][] array = list.toArray(new byte[0][]);
-			list.clear();
-			Arrays.parallelSort(array, LexicographicalComparator.lexicographicalComparator());
-//			list = Arrays.asList(array);
+			list.parallelSort(LexicographicalComparator.lexicographicalComparator());
 
-//			return list;
-			return array;
+			return list;
 		};
-//		final Function<AccessibleList<byte[]>, FSA> step3 = list -> {
-//		final Function<List<byte[]>, FSA> step3 = list -> {
-		final Function<byte[][], FSA> step3 = list -> {
+		final Function<ByteArrayList, FSA> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/5)");
 
 			getWorkerData()
 				.withNoHeader()
 				.withSequentialProcessing();
 
-//			int progress = 0;
-//			int progressIndex = 0;
-//			final int progressStep = (int)Math.ceil(list.limit / 100.f);
-//			for(int index = 0; index < list.limit; index ++){
-//				final byte[] encoding = list.data[index];
-//				builder.add(encoding);
-//
-//				//release memory
-//				list.data[index] = null;
-//
-//				if(++ progress % progressStep == 0)
-//					setProgress(++ progressIndex, 100);
-//
-//				sleepOnPause();
-//			}
-//			int progress = 0;
-//			int progressIndex = 0;
-//			final int progressStep = (int)Math.ceil(list.size() / 100.f);
-//			for(int index = 0; index < list.size(); index ++){
-//				final byte[] encoding = list.get(index);
-//				builder.add(encoding);
-//
-//				//release memory
-//				list.set(index, null);
-//
-//				if(++ progress % progressStep == 0)
-//					setProgress(++ progressIndex, 100);
-//
-//				sleepOnPause();
-//			}
 			int progress = 0;
 			int progressIndex = 0;
-			final int progressStep = (int)Math.ceil(list.length / 100.f);
-			for(int index = 0; index < list.length; index ++){
-				final byte[] encoding = list[index];
+			final int progressStep = (int)Math.ceil(list.size() / 100.f);
+			for(int index = 0; index < list.size(); index ++){
+				final byte[] encoding = list.data[index];
 				builder.add(encoding);
-
-				//release memory
-				list[index] = null;
 
 				if(++ progress % progressStep == 0)
 					setProgress(++ progressIndex, 100);
@@ -210,7 +155,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			}
 
 			//release memory
-//			list.clear();
+			list.clear();
 
 			return builder.complete();
 		};
