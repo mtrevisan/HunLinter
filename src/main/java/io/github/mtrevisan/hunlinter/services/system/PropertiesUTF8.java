@@ -77,7 +77,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @throws IllegalArgumentException	If the input stream contains a malformed Unicode escape sequence.
 	 */
 	@Override
-	public void load(final InputStream inStream) throws IOException{
+	public synchronized void load(final InputStream inStream) throws IOException{
 		try(final BufferedReader in = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8))){
 			String line;
 			while((line = in.readLine()) != null){
@@ -193,7 +193,7 @@ public class PropertiesUTF8 extends Properties{
 
 	//we do not want that a thread could modify this instance while storing it, hence the synchronization
 	@Override
-	public void store(final OutputStream out, final String header) throws IOException{
+	public synchronized void store(final OutputStream out, final String header) throws IOException{
 		try(final BufferedWriter output = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8))){
 			if(header != null){
 				output.write('#' + header);

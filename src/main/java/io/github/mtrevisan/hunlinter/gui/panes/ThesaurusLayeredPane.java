@@ -495,5 +495,5 @@ final int iconSize = 17;
    private javax.swing.JLabel synonymsRecordedValueLabel;
    private javax.swing.JTextField synonymsTextField;
    private javax.swing.JTable table;
-	// End of variables declaration//GEN-END:variables
+   // End of variables declaration//GEN-END:variables
 }

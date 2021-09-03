@@ -71,8 +71,8 @@ public class LetterMatcherEntry{
 	public int hashCode(){
 		int result = (messagePattern == null? 0: messagePattern.hashCode());
 		result = 31 * result + Integer.hashCode(masterLetter);
-		result = 31 * result + correctRule.hashCode();
 		result = 31 * result + Arrays.hashCode(wrongFlags);
+		result = 31 * result + correctRule.hashCode();
 		return result;
 	}
 

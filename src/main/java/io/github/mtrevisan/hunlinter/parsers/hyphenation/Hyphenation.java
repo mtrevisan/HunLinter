@@ -128,8 +128,8 @@ public class Hyphenation{
 
 	@Override
 	public int hashCode(){
-		int result = breakCharacter.hashCode();
-		result = 31 * result + Arrays.hashCode(syllabes);
+		int result = Arrays.hashCode(syllabes);
+		result = 31 * result + breakCharacter.hashCode();
 		return result;
 	}
 

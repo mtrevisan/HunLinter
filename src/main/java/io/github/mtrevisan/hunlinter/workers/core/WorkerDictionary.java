@@ -203,7 +203,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 
-	protected void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
+	protected synchronized void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
 		try{
 			writer.write(line);
 			writer.write(lineSeparator);

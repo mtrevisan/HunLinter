@@ -75,9 +75,9 @@ public class AutoCorrectParser{
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoFile	The reference to the auto-correct file
-	 * @throws IOException	If an I/O error occurs
-	 * @throws SAXException	If a parsing error occurs on the `xml` file
+	 * @param acoFile	The reference to the auto-correct file.
+	 * @throws IOException	If an I/O error occurs.
+	 * @throws SAXException	If a parsing error occurs on the `xml` file.
 	 */
 	public void parse(final File acoFile) throws IOException, SAXException{
 		clear();

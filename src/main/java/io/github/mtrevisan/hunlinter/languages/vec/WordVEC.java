@@ -112,7 +112,17 @@ public final class WordVEC{
 	private static final char[] ACUTE_STRESSED_VOWELS_ARRAY = "ÀÉÍÓÚàéíóúÍÚíú".toCharArray();
 
 
-	private WordVEC(){}
+	private WordVEC(){
+		try{
+			COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
+		}
+		catch(final ParseException e){
+			final Locale fallbackLocale = Locale.ITALIAN;
+			LOGGER.error("Bad error while creating the collator, use {} as default", fallbackLocale.getLanguage(), e);
+
+			COLLATOR = RuleBasedCollator.getInstance(fallbackLocale);
+		}
+	}
 
 	public static int countGraphemes(final String word){
 		return (int)IntStream.range(0, word.length())
@@ -246,18 +256,6 @@ public final class WordVEC{
 	}
 
 	public static Comparator<String> sorterComparator(){
-		if(COLLATOR == null){
-			try{
-				COLLATOR = new RuleBasedCollator(COLLATOR_RULE);
-			}
-			catch(final ParseException e){
-				final Locale fallbackLocale = Locale.ITALIAN;
-				LOGGER.error("Bad error while creating the collator, use {} as default", fallbackLocale.getLanguage(), e);
-
-				COLLATOR = RuleBasedCollator.getInstance(fallbackLocale);
-			}
-		}
-
 		return COLLATOR::compare;
 	}
 

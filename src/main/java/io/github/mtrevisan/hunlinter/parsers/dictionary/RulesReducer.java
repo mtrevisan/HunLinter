@@ -318,6 +318,7 @@ public class RulesReducer{
 	private Map<Integer, Set<Character>> collectOverallLastGroups(final Collection<LineEntry> plainRules){
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>(0);
 		if(!plainRules.isEmpty()){
+			//FIXME is a `try` block useful? is `maxLength` correctly calculated?
 			try{
 				final Collection<String> overallFrom = new HashSet<>(plainRules.size());
 				for(final LineEntry entry : plainRules)

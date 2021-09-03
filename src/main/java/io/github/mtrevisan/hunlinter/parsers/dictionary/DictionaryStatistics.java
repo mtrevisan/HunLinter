@@ -97,27 +97,27 @@ public class DictionaryStatistics implements Closeable{
 		return contractedWords;
 	}
 
-	public Frequency<Integer> getLengthsFrequencies(){
+	public synchronized Frequency<Integer> getLengthsFrequencies(){
 		return lengthsFrequencies;
 	}
 
-	public Frequency<Integer> getSyllabeLengthsFrequencies(){
+	public synchronized Frequency<Integer> getSyllabeLengthsFrequencies(){
 		return syllabeLengthsFrequencies;
 	}
 
-	public Frequency<Integer> getStressFromLastFrequencies(){
+	public synchronized Frequency<Integer> getStressFromLastFrequencies(){
 		return stressFromLastFrequencies;
 	}
 
-	public List<String> getLongestWordsByCharacters(){
+	public synchronized List<String> getLongestWordsByCharacters(){
 		return longestWordsByCharacters;
 	}
 
-	public List<Hyphenation> getLongestWordsBySyllabes(){
+	public synchronized List<Hyphenation> getLongestWordsBySyllabes(){
 		return longestWordsBySyllabes;
 	}
 
-	public boolean hasSyllabeStatistics(){
+	public synchronized boolean hasSyllabeStatistics(){
 		return (totalInflections > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 	}
 
@@ -125,7 +125,7 @@ public class DictionaryStatistics implements Closeable{
 		addData(word, null);
 	}
 
-	public void addData(final String word, final Hyphenation hyphenation){
+	public synchronized void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
 			final String[] syllabes = hyphenation.getSyllabes();
 
@@ -158,7 +158,7 @@ public class DictionaryStatistics implements Closeable{
 		}
 	}
 
-	private void storeLongestWord(final String word){
+	private synchronized void storeLongestWord(final String word){
 		final int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -171,7 +171,7 @@ public class DictionaryStatistics implements Closeable{
 		bloomFilter.add(word);
 	}
 
-	private void storeHyphenation(final Hyphenation hyphenation){
+	private synchronized void storeHyphenation(final Hyphenation hyphenation){
 		final String[] syllabes = hyphenation.getSyllabes();
 		final int syllabeCount = syllabes.length;
 		if(syllabeCount > longestWordCountBySyllabes){
@@ -183,7 +183,7 @@ public class DictionaryStatistics implements Closeable{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
-	public List<String> getMostCommonSyllabes(final int size){
+	public synchronized List<String> getMostCommonSyllabes(final int size){
 		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
 		final List<String> list = new ArrayList<>(values.size());
 		for(final String value : values)
@@ -196,7 +196,7 @@ public class DictionaryStatistics implements Closeable{
 		bloomFilter.close();
 	}
 
-	public void clear(){
+	public synchronized void clear(){
 		totalInflections = 0;
 		longestWordCountByCharacters = 0;
 		longestWordCountBySyllabes = 0;

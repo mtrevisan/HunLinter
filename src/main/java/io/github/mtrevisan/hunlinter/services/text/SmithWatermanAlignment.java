@@ -77,11 +77,11 @@ public class SmithWatermanAlignment{
 			if(obj == null || getClass() != obj.getClass())
 				return false;
 
-			final Trace trace = (Trace)obj;
-			return (firstIndexA == trace.firstIndexA
-				&& firstIndexB == trace.firstIndexB
-				&& lastIndexA == trace.lastIndexA
-				&& lastIndexB == trace.lastIndexB);
+			final Trace rhs = (Trace)obj;
+			return (firstIndexA == rhs.firstIndexA
+				&& firstIndexB == rhs.firstIndexB
+				&& lastIndexA == rhs.lastIndexA
+				&& lastIndexB == rhs.lastIndexB);
 		}
 
 		@Override

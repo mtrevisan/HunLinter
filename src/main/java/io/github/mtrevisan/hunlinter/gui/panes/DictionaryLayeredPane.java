@@ -515,5 +515,5 @@ final int iconSize = 17;
    private javax.swing.JTable table;
    private javax.swing.JLabel totalInflectionsLabel;
    private javax.swing.JLabel totalInflectionsValueLabel;
-	// End of variables declaration//GEN-END:variables
+   // End of variables declaration//GEN-END:variables
 }

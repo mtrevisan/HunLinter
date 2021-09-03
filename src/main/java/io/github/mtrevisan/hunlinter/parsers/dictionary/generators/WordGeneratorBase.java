@@ -115,7 +115,7 @@ class WordGeneratorBase{
 	}
 
 	private List<Inflection> collectInflections(final Inflection baseInflection, final Collection<Inflection> onefoldInflections,
-															  final Collection<Inflection> twofoldInflections, final Collection<Inflection> lastfoldInflections){
+			final Collection<Inflection> twofoldInflections, final Collection<Inflection> lastfoldInflections){
 		final int size = 1 + onefoldInflections.size() + twofoldInflections.size()
 			+ (lastfoldInflections != null? lastfoldInflections.size(): 0);
 		final List<Inflection> inflections = new ArrayList<>(size);
@@ -148,7 +148,7 @@ class WordGeneratorBase{
 	}
 
 	private List<Inflection> getTwofoldInflections(final Iterable<Inflection> onefoldInflections, final boolean isCompound,
-																  final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<Inflection> twofoldInflections = new ArrayList<>(0);
 		for(final Inflection inflection : onefoldInflections)
 			if(inflection.isCombinable()){

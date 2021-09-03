@@ -309,7 +309,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             correctTextField.setText(null);
             addButton.setEnabled(false);
             incorrectTextField.requestFocusInWindow();
-            @SuppressWarnings("unchecked") final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
+            @SuppressWarnings("unchecked")
+            final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateAutoCorrectionsCounter();
@@ -456,6 +457,5 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
    private javax.swing.JScrollPane scrollPane;
    private javax.swing.JTable table;
    private javax.swing.JLabel toLabel;
-	// End of variables declaration//GEN-END:variables
-
+   // End of variables declaration//GEN-END:variables
 }

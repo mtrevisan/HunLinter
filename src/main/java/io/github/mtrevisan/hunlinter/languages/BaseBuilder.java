@@ -54,7 +54,6 @@ public final class BaseBuilder{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseBuilder.class);
 
-
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
 

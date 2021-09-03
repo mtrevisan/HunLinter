@@ -80,19 +80,6 @@ public class UpdateAction extends AbstractAction{
 		}
 	}
 
-
-	@SuppressWarnings("unused")
-	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
-		throw new NotSerializableException(getClass().getName());
-	}
-
-	@SuppressWarnings("unused")
-	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
-		throw new NotSerializableException(getClass().getName());
-	}
-
 	private static final class CancelAction extends AbstractAction{
 		@Serial
 		private static final long serialVersionUID = -5644390861803492172L;
@@ -119,6 +106,19 @@ public class UpdateAction extends AbstractAction{
 		private void readObject(final ObjectInputStream is) throws IOException{
 			throw new NotSerializableException(getClass().getName());
 		}
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

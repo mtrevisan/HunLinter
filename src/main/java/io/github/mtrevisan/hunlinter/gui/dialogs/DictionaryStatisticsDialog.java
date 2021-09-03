@@ -711,6 +711,5 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel totalWordsValueLabel;
    private javax.swing.JLabel uniqueWordsLabel;
    private javax.swing.JLabel uniqueWordsValueLabel;
-	// End of variables declaration//GEN-END:variables
-
+   // End of variables declaration//GEN-END:variables
 }

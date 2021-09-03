@@ -233,7 +233,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 	}
 
 	private AccessibleList<byte[]> encode(final Collection<Inflection> inflections, final byte separator,
-													  final SequenceEncoderInterface sequenceEncoder){
+			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
 		final AccessibleList<byte[]> out = new AccessibleList<>(byte[].class, inflections.size(), AccessibleList.GROWTH_DEFAULT);

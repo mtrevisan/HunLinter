@@ -114,6 +114,17 @@ public class BasicEventBus implements EventBusInterface{
 		this(Executors.newCachedThreadPool(new MyThreadFactory()), waitForHandlers);
 	}
 
+	private static class MyThreadFactory implements ThreadFactory{
+		private final ThreadFactory delegate = Executors.defaultThreadFactory();
+
+		@Override
+		public Thread newThread(final Runnable r){
+			final Thread t = delegate.newThread(r);
+			t.setDaemon(true);
+			return t;
+		}
+	}
+
 	public BasicEventBus(final ExecutorService executorService, final boolean waitForHandlers){
 		//start the background daemon consumer thread
 		eventQueueThread = new Thread(new EventQueueRunner(), "EventQueue Consumer Thread");
@@ -246,17 +257,6 @@ public class BasicEventBus implements EventBusInterface{
 	 */
 	public boolean hasPendingEvents(){
 		return !queue.isEmpty();
-	}
-
-	private static class MyThreadFactory implements ThreadFactory{
-		private final ThreadFactory delegate = Executors.defaultThreadFactory();
-
-		@Override
-		public Thread newThread(final Runnable r){
-			final Thread t = delegate.newThread(r);
-			t.setDaemon(true);
-			return t;
-		}
 	}
 
 

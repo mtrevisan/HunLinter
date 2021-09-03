@@ -37,9 +37,9 @@ public final class GlyphComparator{
 	 * Perform glyph comparison, returning a list of matching codepoint tuples.
 	 * Stops prematurely (or never starts) if run == false.
 	 *
-	 * @param font	The font to render the character in
-	 * @param maxDifferenceThreshold	Maximum allowed difference
-	 * @param chrs	Characters to be checked for equality
+	 * @param font	The font to render the character in.
+	 * @param maxDifferenceThreshold	Maximum allowed difference.
+	 * @param chrs	Characters to be checked for equality.
 	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
 	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
