@@ -163,7 +163,7 @@ public class CFSA2Serializer implements FSASerializer{
 	private void computeLabelsIndex(final FSA fsa){
 		//compute labels count
 		final int[] countByValue = new int[256];
-		fsa.visitAllStates(state -> {
+		fsa.visitPostOrder(state -> {
 			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
 				countByValue[fsa.getArcLabel(arc) & 0xFF] ++;
 			return true;

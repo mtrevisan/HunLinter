@@ -180,18 +180,6 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 	}
 
 	/**
-	 * Visit all states. The order of visiting is undefined. This method may be
-	 * faster than traversing the automaton in post- or pre-order since it can scan
-	 * states linearly. Returning false from {@link StateVisitor#accept(int)}
-	 * immediately terminates the traversal.
-	 *
-	 * @param v   Visitor to receive traversal calls.
-	 */
-	public void visitAllStates(final StateVisitor v){
-		visitPostOrder(v);
-	}
-
-	/**
 	 * Visits all states reachable from the root node in post-order.
 	 * Returning false from {@link StateVisitor#accept(int)} skips traversal of all sub-states of a given state.
 	 *
@@ -221,11 +209,11 @@ public abstract class FSA implements Iterable<ByteBuffer>{
 		//process nodes from second stack
 		final Collection<Integer> visited = new HashSet<>(out.size() - 1);
 		for(int i = out.size() - 1; i >= 0; i --){
-			final int n = out.get(i);
-			if(!visited.contains(n) && !v.accept(n))
+			final int state = out.get(i);
+			if(!visited.contains(state) && !v.accept(state))
 				break;
 
-			visited.add(n);
+			visited.add(state);
 		}
 	}
 
