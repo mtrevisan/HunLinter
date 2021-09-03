@@ -29,11 +29,8 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.MetadataBuilder;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
@@ -63,7 +60,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -127,7 +123,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final FSABuilder builder = new FSABuilder();
 
 		final Function<Void, ByteArrayList> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/5)");
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
@@ -136,21 +132,15 @@ public class PoSFSAWorker extends WorkerDictionary{
 			return encodings;
 		};
 		final Function<ByteArrayList, ByteArrayList> step2 = list -> {
-			resetProcessing("Sorting (step 2/5)");
+			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
-//			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
-//				percent -> {
-//					setProgress(percent, 100);
-//
-//					sleepOnPause();
-//				});
 			list.parallelSort(LexicographicalComparator.lexicographicalComparator());
 
 			return list;
 		};
 		final Function<ByteArrayList, FSA> step3 = list -> {
-			resetProcessing("Creating FSA (step 3/5)");
+			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -175,7 +165,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			return builder.complete();
 		};
 		final Function<FSA, File> step4 = fsa -> {
-			resetProcessing("Compressing FSA (step 4/5)");
+			resetProcessing("Compressing FSA (step 4/4)");
 
 			final FSASerializer serializer = new CFSA2Serializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
@@ -193,24 +183,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, File> step5 = fsa -> {
-			resetProcessing("Verifying correctness (step 5/5)");
+		final Function<File, Void> step5 = fsa -> {
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
 
-			try{
-				//verify by reading
-				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
-				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
+			WorkerManager.openFolderStep(LOGGER);
 
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
-			}
-
-			return outputFile;
+			return null;
 		};
-		final Function<File, Void> step6 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5).andThen(step6));
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
 	private DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)

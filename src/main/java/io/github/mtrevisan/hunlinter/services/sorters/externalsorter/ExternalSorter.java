@@ -75,7 +75,7 @@ public class ExternalSorter{
 
 		final List<File> files = new ArrayList<>((int)Math.ceil((double)dataLength / blockSize));
 		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize())){
-			final StringList temporaryList = new StringList(5_000_000);
+			final StringArrayList temporaryList = new StringArrayList(5_000_000);
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
@@ -90,7 +90,7 @@ public class ExternalSorter{
 				//sort list
 				final Comparator<String> comparator = options.getComparator();
 				if(options.isSortInParallel())
-					temporaryList.sortParallel(comparator);
+					temporaryList.parallelSort(comparator);
 				else
 					temporaryList.sort(comparator);
 
@@ -146,12 +146,13 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final Iterable<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private void saveChunk(final StringArrayList sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
 			String lastLine = null;
-			for(final String line : sortedLines)
+			for(int i = 0; i < sortedLines.size(); i ++){
+				final String line = sortedLines.data[i];
 				//skip duplicated lines
 				if(!removeDuplicates || !line.equals(lastLine)){
 					writer.write(line);
@@ -159,6 +160,7 @@ public class ExternalSorter{
 
 					lastLine = line;
 				}
+			}
 		}
 	}
 

@@ -22,31 +22,34 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.workers.dictionary;
+package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.RandomAccess;
 
 
-public class ByteArrayList implements RandomAccess{
+public class StringArrayList implements RandomAccess{
+
+	public static final float GROWTH_RATE_DEFAULT = 1.2f;
+
 
 	/**
 	 * The array buffer into which the elements of the list are stored.
 	 * The capacity of the ArrayList is the length of this array buffer.
 	 */
-	byte[][] data;
+	String[] data;
 	/** The size of the ArrayList (the number of elements it contains). */
 	private int size;
 	private final float growthRate;
 
 
-	ByteArrayList(final float growthRate){
-		this(0, growthRate);
+	StringArrayList(final int capacity){
+		this(capacity, GROWTH_RATE_DEFAULT);
 	}
 
-	ByteArrayList(final int capacity, final float growthRate){
-		data = new byte[capacity][];
+	StringArrayList(final int capacity, final float growthRate){
+		data = new String[capacity];
 
 		this.growthRate = growthRate;
 	}
@@ -65,7 +68,7 @@ public class ByteArrayList implements RandomAccess{
 	 *
 	 * @param element	Element to be appended to this list.
 	 */
-	public synchronized void add(final byte[] element){
+	public synchronized void add(final String element){
 		if(size == data.length)
 			grow(size + 1);
 
@@ -94,11 +97,11 @@ public class ByteArrayList implements RandomAccess{
 			data[i] = null;
 	}
 
-	public synchronized void sort(final Comparator<? super byte[]> comparator){
+	public synchronized void sort(final Comparator<? super String> comparator){
 		Arrays.sort(data, 0, size, comparator);
 	}
 
-	public synchronized void parallelSort(final Comparator<? super byte[]> comparator){
+	public synchronized void parallelSort(final Comparator<? super String> comparator){
 		Arrays.parallelSort(data, 0, size, comparator);
 	}
 
@@ -109,7 +112,7 @@ public class ByteArrayList implements RandomAccess{
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final ByteArrayList rhs = (ByteArrayList)obj;
+		final StringArrayList rhs = (StringArrayList)obj;
 		return (size == rhs.size
 			&& Arrays.deepEquals(data, rhs.data));
 	}
