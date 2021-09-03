@@ -26,6 +26,8 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
 import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 
+import java.nio.ByteBuffer;
+
 
 /**
  * Encodes {@code target} relative to {@code source} by trimming whatever
@@ -72,15 +74,15 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		int maxInfixIndex = 0;
 		int maxSubsequenceLength = ArrayHelper.longestCommonPrefix(source, target);
 		int maxInfixLength = 0;
+		ByteBuffer scratch = ByteBuffer.allocate(0);
 		for(final int i : new int[]{0, maxSubsequenceLength})
 			for(int j = 1; j <= source.length - i; j ++){
 				//compute temporary `source` with the infix removed
 				//concatenate in scratch space for simplicity
 				final int len2 = source.length - (i + j);
-				//FIXME avoid creation of a new array each time
-				final byte[] scratch = new byte[i + len2];
-				System.arraycopy(source, 0, scratch, 0, i);
-				System.arraycopy(source, i + j, scratch, i, len2);
+				scratch = clearAndEnsureCapacity(scratch, i + len2);
+				scratch.put(source, 0, i);
+				scratch.put(source, i + j, len2);
 
 				final int sharedPrefix = ArrayHelper.longestCommonPrefix(scratch, target);
 
@@ -112,6 +114,23 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		encoded[2] = encodeValue(truncateSuffixBytes);
 		System.arraycopy(target, maxSubsequenceLength, encoded, 3, len1);
 		return encoded;
+	}
+
+	/**
+	 * Ensure the buffer's capacity is large enough to hold a given number
+	 * of elements. If the input buffer is not large enough, a new buffer is allocated
+	 * and returned.
+	 *
+	 * @param elements The required number of elements to be appended to the buffer.
+	 * @param buffer   The buffer to check or {@code null} if a new buffer should be allocated.
+	 * @return Returns the same buffer or a new buffer with the given capacity.
+	 */
+	private ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
+			buffer = ByteBuffer.allocate(elements);
+		else
+			buffer.clear();
+		return buffer;
 	}
 
 	@Override

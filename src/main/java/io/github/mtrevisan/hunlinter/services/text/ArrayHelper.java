@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.text;
 
+import java.nio.ByteBuffer;
+
 
 public final class ArrayHelper{
 
@@ -46,16 +48,31 @@ public final class ArrayHelper{
 	}
 
 	/**
-	 * Compute the length of the shared prefix between two byte sequences
+	 * Compute the length of the shared prefix between two byte sequences.
 	 *
-	 * @param a	First array
-	 * @param b	Second array
-	 * @return	The longest common prefix
+	 * @param a	First array.
+	 * @param b	Second array.
+	 * @return	The longest common prefix.
 	 */
 	public static int longestCommonPrefix(final byte[] a, final byte[] b){
 		int i = 0;
 		final int max = Math.min(a.length, b.length);
 		while(i < max && a[i] == b[i])
+			i ++;
+		return i;
+	}
+
+	/**
+	 * Compute the length of the shared prefix between two byte sequences.
+	 *
+	 * @param a	First {@link ByteBuffer}.
+	 * @param b	Second array.
+	 * @return	The longest common prefix.
+	 */
+	public static int longestCommonPrefix(final ByteBuffer a, final byte[] b){
+		int i = 0;
+		final int max = Math.min(a.limit(), b.length);
+		while(i < max && a.get(i) == b[i])
 			i ++;
 		return i;
 	}

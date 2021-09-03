@@ -163,19 +163,15 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 				Files.write(outputPath, os.toByteArray());
 
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+
 				return outputFile;
 			}
 			catch(final Exception e){
 				throw new RuntimeException(e.getMessage());
 			}
 		};
-		final Function<File, Void> step5 = fsa -> {
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
-
-			WorkerManager.openFolderStep(LOGGER);
-
-			return null;
-		};
+		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
