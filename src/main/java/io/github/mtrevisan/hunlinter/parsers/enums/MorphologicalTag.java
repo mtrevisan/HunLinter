@@ -24,10 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /** Default morphological fields. */
 public enum MorphologicalTag{
@@ -53,22 +49,21 @@ public enum MorphologicalTag{
 	FLAG("fl:");
 
 
-	private static final Map<String, MorphologicalTag> VALUES = new HashMap<>(values().length);
-	static{
-		for(final MorphologicalTag tag : EnumSet.allOf(MorphologicalTag.class))
-			VALUES.put(tag.code, tag);
-	}
-
 	private final String code;
+	private final int hash;
 
 
 	MorphologicalTag(final String code){
 		this.code = code;
+		hash = partialHash(code);
 	}
 
-	//FIXME speed-up this
 	public static MorphologicalTag createFromCode(final String code){
-		return VALUES.get(code.substring(0, 3));
+		final int hash = partialHash(code);
+		for(final MorphologicalTag tag : values())
+			if(tag.hash == hash)
+				return tag;
+		return null;
 	}
 
 	public String getCode(){
@@ -76,11 +71,15 @@ public enum MorphologicalTag{
 	}
 
 	public boolean isSupertypeOf(final String codeAndValue){
-		return codeAndValue.startsWith(code);
+		return (partialHash(codeAndValue) == hash);
 	}
 
 	public String attachValue(final String value){
 		return code + value;
+	}
+
+	private static int partialHash(final String key){
+		return (key.codePointAt(0) << 8) | key.codePointAt(1);
 	}
 
 }

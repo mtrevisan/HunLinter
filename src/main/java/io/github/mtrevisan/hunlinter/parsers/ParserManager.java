@@ -342,7 +342,6 @@ public class ParserManager implements FileChangeListener{
 	public void fileDeleted(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName());
 
-		//FIXME
 		final File file = path.toFile();
 		if(file.equals(packager.getAffixFile()))
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);

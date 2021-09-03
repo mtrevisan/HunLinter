@@ -42,17 +42,9 @@ public enum PartOfSpeechTag{
 	ARTICLE_PARTITIVE("article_partitive", "AT"),
 
 	//adjective
-//FIXME to be replaced
-ADJECTIVE("adjective", "JJ"),
-ADJECTIVE_QUALIFICATIVE("adjective_qualificative", "JQ"),
-//	ADJECTIVE_QUALIFICATIVE_PRIMITIVE("adjective_primitive", "JP"),
-//	ADJECTIVE_QUALIFICATIVE_DERIVED("adjective_derived", "JD"),
-//	ADJECTIVE_QUALIFICATIVE_ALTERED("adjective_altered", "JA"),
-//	ADJECTIVE_QUALIFICATIVE_COMPOUNDED("adjective_compounded", "JC"),
+	ADJECTIVE_QUALIFICATIVE("adjective_qualificative", "JQ"),
 	ADJECTIVE_DETERMINATIVE_POSSESSIVE_STRONG("adjective_possessive_strong", "JPS"),
 	ADJECTIVE_DETERMINATIVE_POSSESSIVE_WEAK("adjective_possessive_weak", "JPW"),
-//FIXME to be replaced
-ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_NEAR("adjective_demonstrative_near", "JDN"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_FAR("adjective_demonstrative_far", "JDF"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_WEAK("adjective_demonstrative_far_weak", "JDFW"),

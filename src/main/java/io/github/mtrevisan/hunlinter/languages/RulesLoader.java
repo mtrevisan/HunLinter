@@ -76,13 +76,16 @@ public class RulesLoader{
 		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
 		wordCanHaveMultipleStresses = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleStresses"));
 
-		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
-		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
-		fillDataFields(MorphologicalTag.DERIVATIONAL_PREFIX, "derivationalPrefixes");
-		fillDataFields(MorphologicalTag.INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
-		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
 		dataFields.put(MorphologicalTag.STEM, null);
 		dataFields.put(MorphologicalTag.ALLOMORPH, null);
+		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
+
+		fillDataFields(MorphologicalTag.DERIVATIONAL_PREFIX, "derivationalPrefixes");
+
+		fillDataFields(MorphologicalTag.DERIVATIONAL_SUFFIX, "derivationalSuffixes");
+		fillDataFields(MorphologicalTag.INFLECTIONAL_SUFFIX, "inflectionalSuffixes");
+		fillDataFields(MorphologicalTag.TERMINAL_SUFFIX, "terminalSuffixes");
+
 		dataFields.put(MorphologicalTag.PART, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
