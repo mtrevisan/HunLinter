@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSAUtils;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -223,7 +222,7 @@ public class FSA5 extends FSA{
 	public int getRightLanguageCount(final int node){
 		assert flags.contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
 
-		return FSAUtils.decodeFromBytes(arcs, node, nodeDataLength);
+		return decodeFromBytes(arcs, node, nodeDataLength);
 	}
 
 	/**
@@ -266,7 +265,7 @@ public class FSA5 extends FSA{
 			return skipArc(arc);
 		else
 			//the destination node address has to be extracted from the arc's goto field
-			return FSAUtils.decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
+			return decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
 	}
 
 	/** Read the arc's layout and skip as many bytes, as needed. */
@@ -276,6 +275,14 @@ public class FSA5 extends FSA{
 			? 1 + 1
 			//label + flags/address
 			: 1 + gtl);
+	}
+
+	/** Returns an n-byte integer encoded in byte-packed representation. */
+	private int decodeFromBytes(final byte[] arcs, final int start, final int n){
+		int r = 0;
+		for(int i = n; -- i >= 0; )
+			r = r << 8 | (arcs[start + i] & 0xFF);
+		return r;
 	}
 
 }

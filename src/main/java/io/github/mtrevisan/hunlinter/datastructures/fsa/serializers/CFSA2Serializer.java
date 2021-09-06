@@ -122,7 +122,7 @@ public class CFSA2Serializer implements FSASerializer{
 			progressCallback.accept(20);
 
 		//calculate the number of bytes required for the node data, if serializing with numbers
-		numbers = (serializeWithNumbers? FSAUtils.rightLanguageForAllStates(fsa): new IntIntHashMap());
+		numbers = (serializeWithNumbers? rightLanguageForAllStates(fsa): new IntIntHashMap());
 
 		//linearize all the states, optimizing their layout
 		final DynamicIntArray linearized = linearize(fsa);
@@ -157,6 +157,27 @@ public class CFSA2Serializer implements FSASerializer{
 			progressCallback.accept(100);
 
 		return os;
+	}
+
+	/**
+	 * Calculate the size of "right language" for each state in an FSA.
+	 * The right language is the number of sequences encoded from a given node in the automaton.
+	 *
+	 * @param fsa	The automaton to calculate right language for
+	 * @return	A map with node identifiers as keys and their right language counts as associated values
+	 */
+	private IntIntHashMap rightLanguageForAllStates(final FSA fsa){
+		final IntIntHashMap numbers = new IntIntHashMap();
+		fsa.visitPostOrder(state -> {
+			int thisNodeNumber = 0;
+			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
+				thisNodeNumber += (fsa.isArcFinal(arc)? 1: 0)
+					+ (fsa.isArcTerminal(arc)? 0: numbers.get(fsa.getEndNode(arc)));
+			numbers.put(state, thisNodeNumber);
+
+			return true;
+		});
+		return numbers;
 	}
 
 	/** Compute a set of labels to be integrated with the flags field. */
