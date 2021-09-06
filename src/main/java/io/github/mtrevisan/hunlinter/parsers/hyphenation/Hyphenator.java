@@ -267,6 +267,7 @@ public class Hyphenator implements HyphenatorInterface{
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
+	//FIXME speed-up this, if possible
 	private List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
 		int startIndex = 0;
 		int after = 0;
