@@ -94,8 +94,8 @@ public class StatisticsWorker extends WorkerDictionary{
 				for(final Inflection inflection : inflections){
 					//collect statistics
 					final String word = inflection.getWord();
-					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
-					if(subwords == null || subwords.length == 0)
+					final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
+					if(subwords == null || subwords.isEmpty())
 						dicStatistics.addData(word);
 					else
 						for(final String subword : subwords){

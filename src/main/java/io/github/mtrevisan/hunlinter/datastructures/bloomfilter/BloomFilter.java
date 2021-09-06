@@ -260,8 +260,6 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @throws NullPointerException	if the byte array is {@code null}
 	 */
 	private long getLongHash64(final byte[] bytes){
-		Objects.requireNonNull(bytes, "Bytes to add to bloom filter cannot be null");
-
 		return (hasher.isSingleValued()? hasher.hash(bytes): hasher.hashMultiple(bytes)[0]);
 	}
 

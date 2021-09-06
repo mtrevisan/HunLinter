@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import java.util.List;
+
 
 public interface HyphenatorInterface{
 
@@ -31,6 +33,6 @@ public interface HyphenatorInterface{
 
 	Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level);
 
-	String[] splitIntoCompounds(final String word);
+	List<String> splitIntoCompounds(final String word);
 
 }

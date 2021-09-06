@@ -28,14 +28,16 @@ import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickT
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -96,13 +98,13 @@ public class Hyphenator implements HyphenatorInterface{
 		HyphenationOptions options = hypParser.getOptions().getNonCompoundOptions();
 		final HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND, options);
 
-		final String[] compounds = createHyphenatedWord(word, hyphBreak);
-		String[] syllabes = compounds;
+		final List<String> compounds = createHyphenatedWord(word, hyphBreak);
+		List<String> syllabes = new ArrayList<>(compounds);
 		String[] rules = hyphBreak.getRules();
 
 		//if there is a second level
 		if(hypParser.isSecondLevelPresent()){
-			String[] syllabes2ndLevel = new String[0];
+			final List<String> syllabes2ndLevel = new ArrayList<>(0);
 			String[] rules2ndLevel = new String[0];
 
 			//apply second level hyphenation for the word parts
@@ -112,7 +114,7 @@ public class Hyphenator implements HyphenatorInterface{
 				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);
 
-				syllabes2ndLevel = ArrayUtils.addAll(syllabes2ndLevel, createHyphenatedWord(compound, subHyph));
+				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
 				rules2ndLevel = ArrayUtils.addAll(rules2ndLevel, subHyph.getRules());
 				if(i < parentRulesSize)
 					rules2ndLevel = ArrayUtils.add(rules2ndLevel, rules[i ++]);
@@ -123,9 +125,9 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 
 		//enforce no-hyphens
-		syllabes = hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
+		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
 
-		return new Hyphenation(syllabes, compounds, rules, breakCharacter);
+		return new Hyphenation(syllabes.toArray(new String[0]), compounds.toArray(new String[0]), rules, breakCharacter);
 	}
 
 	/**
@@ -211,50 +213,50 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	@Override
-	public String[] splitIntoCompounds(final String word){
-		String[] response;
+	public List<String> splitIntoCompounds(final String word){
+		final List<String> response;
 		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non-compound
 			final HyphenationBreak hyphBreak = hyphenate(word, hypParser.getPatterns(), HyphenationParser.Level.NON_COMPOUND,
 				hypParser.getOptions().getNonCompoundOptions());
 			response = createHyphenatedWord(word, hyphBreak);
 
-			response = manageNoHyphen(response);
+			manageNoHyphen(response);
 		}
 		else if(hypParser.getPatternNoHyphen() != null)
 			//apply retro-compatibility word separators
-			response = RegexHelper.split(word, hypParser.getPatternNoHyphen());
+			response = Arrays.asList(RegexHelper.split(word, hypParser.getPatternNoHyphen()));
 		else
-			response = new String[0];
+			response = Collections.emptyList();
 		return response;
 	}
 
-	private String[] manageNoHyphen(String[] response){
+	private void manageNoHyphen(final List<String> response){
 		for(final String nohyp : hypParser.getOptions().getNoHyphen()){
 			if(isStarting(nohyp))
-				response = manageNoHyphenAtStart(response, nohyp);
+				manageNoHyphenAtStart(response, nohyp);
 			else if(isEnding(nohyp))
-				response = manageNoHyphenAtEnd(response, nohyp);
+				manageNoHyphenAtEnd(response, nohyp);
 			else
-				response = manageNoHyphenAtMiddle(response, nohyp);
+				manageNoHyphenAtMiddle(response, nohyp);
 		}
-		return response;
 	}
 
-	private String[] manageNoHyphenAtStart(String[] response, final String nohyp){
-		if(response[0].equals(nohyp.substring(1)))
-			response = ArrayUtils.remove(response, 0);
-		return response;
+	private void manageNoHyphenAtStart(final List<String> response, final String nohyp){
+		if(response.get(0).equals(nohyp.substring(1)))
+			response.remove(0);
 	}
 
-	private String[] manageNoHyphenAtEnd(String[] response, final String nohyp){
-		if(response[response.length - 1].equals(nohyp.substring(0, nohyp.length() - 1)))
-			response = ArrayUtils.remove(response, response.length - 1);
-		return response;
+	private void manageNoHyphenAtEnd(final List<String> response, final String nohyp){
+		if(response.get(response.size() - 1).equals(nohyp.substring(0, nohyp.length() - 1)))
+			response.remove(response.size() - 1);
 	}
 
-	private String[] manageNoHyphenAtMiddle(final String[] response, final String nohyp){
-		return LoopHelper.removeIf(response, nohyp::equals);
+	private void manageNoHyphenAtMiddle(final List<String> response, final String nohyp){
+		final Iterator<String> itr = response.iterator();
+		while(itr.hasNext())
+			if(nohyp.equals(itr.next()))
+				itr.remove();
 	}
 
 	private boolean isStarting(final CharSequence key){
@@ -265,12 +267,12 @@ public class Hyphenator implements HyphenatorInterface{
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
-	private String[] createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
+	private List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
 		int startIndex = 0;
 		int after = 0;
 		String addAfter = null;
 		final int size = word.length();
-		String[] result = new String[0];
+		final List<String> result = new ArrayList<>(0);
 		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, HyphenationParser.PATTERN_AUGMENTED_RULE);
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
@@ -312,14 +314,14 @@ public class Hyphenator implements HyphenatorInterface{
 					}
 				}
 
-				result = ArrayUtils.add(result, subword);
+				result.add(subword);
 				startIndex = endIndex;
 			}
 
 		String subword = word.substring(startIndex);
 		if(StringUtils.isNotBlank(addAfter))
 			subword = addAfter + subword.substring(Math.min(Math.max(after, 0), subword.length()));
-		result = ArrayUtils.add(result, subword);
+		result.add(subword);
 
 		return result;
 	}
