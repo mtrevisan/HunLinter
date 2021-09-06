@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 
 /**
@@ -50,7 +50,7 @@ public enum FSAFlags{
 	/**
 	 * The FSA contains right-language count numbers on states.
 	 *
-	 * @see FSA#getRightLanguageCount(int)
+	 * @see FSAAbstract#getRightLanguageCount(int)
 	 */
 	NUMBERS(0x0100),
 

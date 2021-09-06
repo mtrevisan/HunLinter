@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 
 
@@ -36,7 +36,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 public final class FSATraversal{
 
 	/** target automaton. */
-	private final FSA fsa;
+	private final FSAAbstract fsa;
 
 
 	/**
@@ -44,7 +44,7 @@ public final class FSATraversal{
 	 *
 	 * @param fsa	The target automaton for traversals.
 	 */
-	public FSATraversal(final FSA fsa){
+	public FSATraversal(final FSAAbstract fsa){
 		this.fsa = fsa;
 	}
 
@@ -62,13 +62,13 @@ public final class FSATraversal{
 
 	/**
 	 * Calculate perfect hash for a given input sequence of bytes. The perfect hash requires
-	 * that {@link FSA} is built with {@link FSAFlags#NUMBERS} and corresponds to the sequential
+	 * that {@link FSAAbstract} is built with {@link FSAFlags#NUMBERS} and corresponds to the sequential
 	 * order of input sequences used at automaton construction time.
 	 *
 	 * @param sequence The byte sequence to calculate perfect hash for.
 	 * @param start    Start index in the sequence array.
 	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node     The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return Returns a unique integer assigned to the input sequence in the automaton (reflecting
 	 * the number of that sequence in the input used to build the automaton). Returns a negative
 	 * integer if the input sequence was not part of the input from which the automaton was created.
@@ -134,7 +134,7 @@ public final class FSATraversal{
 
 	/**
 	 * @param sequence	Input sequence to look for in the automaton.
-	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return	{@link FSAMatchResult} with updated match {@link FSAMatchResult#kind}.
 	 */
 	public FSAMatchResult match(final byte[] sequence, final int node){
@@ -148,7 +148,7 @@ public final class FSATraversal{
 	 * @param sequence	Input sequence to look for in the automaton.
 	 * @param start	Start index in the sequence array.
 	 * @param length	Length of the byte sequence, must be at least 1.
-	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return	{@link FSAMatchResult} with updated match {@link FSAMatchResult#kind}.
 	 */
 	public FSAMatchResult match(final byte[] sequence, final int start, final int length, int node){

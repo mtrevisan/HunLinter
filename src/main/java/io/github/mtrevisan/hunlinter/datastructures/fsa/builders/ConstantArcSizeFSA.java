@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.util.Collections;
 import java.util.Set;
@@ -36,7 +36,7 @@ import java.util.Set;
  * @see FSABuilder
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class ConstantArcSizeFSA extends FSA{
+public class ConstantArcSizeFSA extends FSAAbstract{
 
 	/** Size of the target address field (constant for the builder). */
 	public static final int TARGET_ADDRESS_SIZE = 4;

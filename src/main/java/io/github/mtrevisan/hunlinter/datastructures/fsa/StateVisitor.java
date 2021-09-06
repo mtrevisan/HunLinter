@@ -28,7 +28,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa;
 /**
  * State visitor.
  *
- * @see FSA#visitPostOrder(StateVisitor)
+ * @see FSAAbstract#visitPostOrder(StateVisitor)
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public interface StateVisitor{

@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 
 	/** The FSA to which this iterator belongs. */
-	private final FSA fsa;
+	private final FSAAbstract fsa;
 
 	/** An internal cache for the next element in the FSA. */
 	private ByteBuffer nextElement;
@@ -67,7 +67,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 *
 	 * @param fsa The automaton to iterate over.
 	 */
-	public ByteSequenceIterator(final FSA fsa){
+	public ByteSequenceIterator(final FSAAbstract fsa){
 		this(fsa, fsa.getRootNode());
 	}
 
@@ -75,9 +75,9 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 * Create an instance of the iterator for a given node.
 	 *
 	 * @param fsa	The automaton to iterate over.
-	 * @param node	The starting node's identifier (can be the {@link FSA#getRootNode()}).
+	 * @param node	The starting node's identifier (can be the {@link FSAAbstract#getRootNode()}).
 	 */
-	public ByteSequenceIterator(final FSA fsa, final int node){
+	public ByteSequenceIterator(final FSAAbstract fsa, final int node){
 		this.fsa = fsa;
 
 		if(fsa.getFirstArc(node) != 0)

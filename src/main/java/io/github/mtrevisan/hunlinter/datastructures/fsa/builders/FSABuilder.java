@@ -24,13 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.util.Arrays;
 
 
 /**
- * Fast, memory-conservative, Finite State Automaton builder, returning an in-memory {@link FSA} that is a trade-off
+ * Fast, memory-conservative, Finite State Automaton builder, returning an in-memory {@link FSAAbstract} that is a trade-off
  * between construction speed and memory consumption.
  *
  * @see <a href="https://www.aclweb.org/anthology/J00-1002.pdf">Incremental Construction of Minimal Acyclic Finite-State Automata</a>
@@ -113,13 +113,13 @@ public class FSABuilder{
 	 * @param input	Input sequences to build automaton from.
 	 * @return	The automaton encoding of all input sequences.
 	 */
-	public FSA build(final Iterable<byte[]> input){
+	public FSAAbstract build(final Iterable<byte[]> input){
 		for(final byte[] chs : input)
 			add(chs);
 		return complete();
 	}
 
-	public FSA build(final byte[][] input){
+	public FSAAbstract build(final byte[][] input){
 		for(final byte[] chs : input)
 			add(chs);
 		return complete();
@@ -168,9 +168,9 @@ public class FSABuilder{
 	/**
 	 * Finalizes the construction of the automaton and returns it
 	 *
-	 * @return	The {@link FSA} just constructed
+	 * @return	The {@link FSAAbstract} just constructed
 	 */
-	public synchronized final FSA complete(){
+	public synchronized final FSAAbstract complete(){
 		add(new byte[0]);
 
 		if(nextArcOffset[0] - activePath[0] == 0)
@@ -182,7 +182,7 @@ public class FSABuilder{
 			setArcTarget(epsilon, root);
 		}
 
-		final FSA fsa = new ConstantArcSizeFSA(Arrays.copyOf(serialized, size), epsilon);
+		final FSAAbstract fsa = new ConstantArcSizeFSA(Arrays.copyOf(serialized, size), epsilon);
 
 		//clear support data:
 		serialized = null;

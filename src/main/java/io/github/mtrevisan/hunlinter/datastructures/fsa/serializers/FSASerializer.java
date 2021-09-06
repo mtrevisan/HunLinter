@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 
@@ -50,7 +50,7 @@ public interface FSASerializer{
 	 * @return Returns {@code T} for chaining.
 	 * @throws IOException Rethrown if an I/O error occurs.
 	 */
-	<T extends OutputStream> T serialize(final FSA fsa, final T os, final ProgressCallback progressCallback) throws IOException;
+	<T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback) throws IOException;
 
 	/**
 	 * @return Returns the set of flags supported by the serializer (and the output automaton).

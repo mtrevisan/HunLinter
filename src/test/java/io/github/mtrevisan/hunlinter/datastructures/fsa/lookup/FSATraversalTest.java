@@ -25,8 +25,8 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA2;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
@@ -48,7 +48,7 @@ class FSATraversalTest{
 	@Test
 	void automatonHasPrefixBug(){
 		FSABuilder builder = new FSABuilder();
-		FSA fsa = builder.build(Arrays.asList("a".getBytes(StandardCharsets.UTF_8), "ab".getBytes(StandardCharsets.UTF_8),
+		FSAAbstract fsa = builder.build(Arrays.asList("a".getBytes(StandardCharsets.UTF_8), "ab".getBytes(StandardCharsets.UTF_8),
 			"abc".getBytes(StandardCharsets.UTF_8), "ad".getBytes(StandardCharsets.UTF_8), "bcd".getBytes(StandardCharsets.UTF_8),
 			"bce".getBytes(StandardCharsets.UTF_8)));
 
@@ -78,7 +78,7 @@ class FSATraversalTest{
 
 	@Test
 	void traversalWithIterable() throws IOException{
-		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict"));
+		FSAAbstract fsa = FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict"));
 		int count = 0;
 		for(ByteBuffer bb : fsa.getSequences()){
 			Assertions.assertEquals(0, bb.arrayOffset());
@@ -93,7 +93,7 @@ class FSATraversalTest{
 		byte[][] input = new byte[][]{{'a'}, {'a', 'b', 'a'}, {'a', 'c'}, {'b'}, {'b', 'a'}, {'c'}};
 
 		Arrays.sort(input, LexicographicalComparator.lexicographicalComparator());
-		FSA s = new FSABuilder()
+		FSAAbstract s = new FSABuilder()
 			.build(input);
 
 		final byte[] fsaData = new CFSA2Serializer()
@@ -101,7 +101,7 @@ class FSATraversalTest{
 			.serialize(s, new ByteArrayOutputStream(), null)
 			.toByteArray();
 
-		final CFSA2 fsa = FSA.read(new ByteArrayInputStream(fsaData), CFSA2.class);
+		final CFSA fsa = FSAAbstract.read(new ByteArrayInputStream(fsaData), CFSA.class);
 		final FSATraversal traversal = new FSATraversal(fsa);
 
 		int i = 0;
@@ -121,7 +121,7 @@ class FSATraversalTest{
 
 	@Test
 	void recursiveTraversal() throws IOException{
-		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict"));
+		FSAAbstract fsa = FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict"));
 
 		final int[] counter = new int[]{0};
 
@@ -148,7 +148,7 @@ class FSATraversalTest{
 
 	@Test
 	void match() throws IOException{
-		final FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa"));
+		final FSAAbstract fsa = FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa"));
 		final FSATraversal traversalHelper = new FSATraversal(fsa);
 
 		FSAMatchResult m = traversalHelper.match("ax".getBytes());
@@ -169,7 +169,7 @@ class FSATraversalTest{
 
 
 	/** Return all sequences reachable from a given node, as strings. */
-	private HashSet<String> suffixes(FSA fsa, int node){
+	private HashSet<String> suffixes(FSAAbstract fsa, int node){
 		HashSet<String> result = new HashSet<>();
 		for(ByteBuffer bb : fsa.getSequences(node))
 			result.add(new String(bb.array(), bb.position(), bb.remaining(), StandardCharsets.UTF_8));

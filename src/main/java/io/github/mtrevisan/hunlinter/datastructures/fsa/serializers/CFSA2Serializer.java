@@ -28,8 +28,8 @@ import com.carrotsearch.hppcrt.IntIntMap;
 import com.carrotsearch.hppcrt.cursors.IntIntCursor;
 import com.carrotsearch.hppcrt.maps.IntIntHashMap;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA2;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import org.slf4j.Logger;
@@ -47,14 +47,14 @@ import java.util.TreeSet;
 
 
 /**
- * Serializes in-memory {@link FSA} graphs to {@link CFSA2 Compact Finite State Automata, version 2}.
+ * Serializes in-memory {@link FSAAbstract} graphs to {@link CFSA Compact Finite State Automata, version 2}.
  *
  * <p>
  * It is possible to serialize the automaton with numbers required for perfect hashing.
  * See {@link #serializeWithNumbers()} method.
  * </p>
  *
- * @see CFSA2
+ * @see CFSA
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class CFSA2Serializer implements FSASerializer{
@@ -108,13 +108,13 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/**
-	 * Serializes any {@link FSA} to {@link CFSA2} stream.
+	 * Serializes any {@link FSAAbstract} to {@link CFSA} stream.
 	 *
 	 * @return	{@code os} for chaining.
 	 * @see #serializeWithNumbers()
 	 */
 	@Override
-	public <T extends OutputStream> T serialize(final FSA fsa, final T os, final ProgressCallback progressCallback)
+	public <T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback)
 			throws IOException{
 		//calculate the most frequent labels and build indexed labels dictionary
 		computeLabelsIndex(fsa);
@@ -130,7 +130,7 @@ public class CFSA2Serializer implements FSASerializer{
 			progressCallback.accept(40);
 
 		//emit the header
-		FSAHeader.write(os, CFSA2.VERSION);
+		FSAHeader.write(os, CFSA.VERSION);
 
 		final Set<FSAFlags> fsaFlags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
 		if(serializeWithNumbers)
@@ -166,7 +166,7 @@ public class CFSA2Serializer implements FSASerializer{
 	 * @param fsa	The automaton to calculate right language for
 	 * @return	A map with node identifiers as keys and their right language counts as associated values
 	 */
-	private IntIntHashMap rightLanguageForAllStates(final FSA fsa){
+	private IntIntHashMap rightLanguageForAllStates(final FSAAbstract fsa){
 		final IntIntHashMap numbers = new IntIntHashMap();
 		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
@@ -181,7 +181,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute a set of labels to be integrated with the flags field. */
-	private void computeLabelsIndex(final FSA fsa){
+	private void computeLabelsIndex(final FSAAbstract fsa){
 		//compute labels count
 		final int[] countByValue = new int[256];
 		fsa.visitPostOrder(state -> {
@@ -196,7 +196,7 @@ public class CFSA2Serializer implements FSASerializer{
 			if(countByValue[label] > 0)
 				labelAndCount.add(new IntIntHolder(label, countByValue[label]));
 
-		labelsIndex = new byte[1 + Math.min(labelAndCount.size(), CFSA2.LABEL_INDEX_SIZE)];
+		labelsIndex = new byte[1 + Math.min(labelAndCount.size(), CFSA.LABEL_INDEX_SIZE)];
 		invertedLabelsIndex = new int[256];
 		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); --i){
 			final IntIntHolder p = labelAndCount.pollFirst();
@@ -212,7 +212,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Linearization of states. */
-	private DynamicIntArray linearize(final FSA fsa) throws IOException{
+	private DynamicIntArray linearize(final FSAAbstract fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
 		final IntIntHashMap inLinkCount = computeInLinkCount(fsa);
@@ -253,8 +253,8 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Linearize all states, putting {@code states} in front of the automaton and calculating stable state offsets. */
-	private int linearizeAndCalculateOffsets(final FSA fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-			final IntIntMap offsets) throws IOException{
+	private int linearizeAndCalculateOffsets(final FSAAbstract fsa, final DynamicIntArray states, final DynamicIntArray linearized,
+														  final IntIntMap offsets) throws IOException{
 		final Collection<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
@@ -286,8 +286,8 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Add a state to linearized list. */
-	private void linearizeState(final FSA fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Collection<Integer> visited,
-			final int node){
+	private void linearizeState(final FSAAbstract fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Collection<Integer> visited,
+										 final int node){
 		linearized.add(node);
 		visited.add(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
@@ -323,7 +323,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Compute in-link count for each state. */
-	private IntIntHashMap computeInLinkCount(final FSA fsa){
+	private IntIntHashMap computeInLinkCount(final FSAAbstract fsa){
 		final IntIntHashMap inLinkCount = new IntIntHashMap();
 		final Collection<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
@@ -349,13 +349,13 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Update arc offsets assuming the given goto length. */
-	private int emitNodes(final FSA fsa, final OutputStream os, final DynamicIntArray linearized) throws IOException{
+	private int emitNodes(final FSAAbstract fsa, final OutputStream os, final DynamicIntArray linearized) throws IOException{
 		int offset = 0;
 
 		//add epsilon state
 		offset += emitNodeData(os, 0);
 		final int targetOffset = (fsa.getRootNode() != 0? offsets.get(fsa.getRootNode()): 0);
-		offset += emitArc(os, CFSA2.BIT_LAST_ARC, (byte)'^', targetOffset);
+		offset += emitArc(os, CFSA.BIT_LAST_ARC, (byte)'^', targetOffset);
 
 		boolean offsetsChanged = false;
 		final int max = linearized.size();
@@ -380,7 +380,7 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	/** Emit all arcs of a single node. */
-	private int emitNodeArcs(final FSA fsa, final OutputStream os, final int state, final int nextState) throws IOException{
+	private int emitNodeArcs(final FSAAbstract fsa, final OutputStream os, final int state, final int nextState) throws IOException{
 		int offset = 0;
 		for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc)){
 			final boolean arcTerminal = fsa.isArcTerminal(arc);
@@ -389,11 +389,11 @@ public class CFSA2Serializer implements FSASerializer{
 
 			int flags = 0;
 			if(fsa.isArcFinal(arc))
-				flags |= CFSA2.BIT_FINAL_ARC;
+				flags |= CFSA.BIT_FINAL_ARC;
 			if(fsa.getNextArc(arc) == 0)
-				flags |= CFSA2.BIT_LAST_ARC;
+				flags |= CFSA.BIT_LAST_ARC;
 			if(targetOffset != 0 && target == nextState){
-				flags |= CFSA2.BIT_TARGET_NEXT;
+				flags |= CFSA.BIT_TARGET_NEXT;
 				targetOffset = 0;
 			}
 
@@ -420,7 +420,7 @@ public class CFSA2Serializer implements FSASerializer{
 			length += 2;
 		}
 
-		if((flags & CFSA2.BIT_TARGET_NEXT) == 0){
+		if((flags & CFSA.BIT_TARGET_NEXT) == 0){
 			final byte[] scratch = new byte[5];
 			final int len = writeVInt(scratch, targetOffset);
 			if(os != null)

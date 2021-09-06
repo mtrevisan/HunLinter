@@ -34,7 +34,7 @@ import java.util.Set;
 
 
 /**
- * CFSA (Compact Finite State Automaton) binary format implementation, version 2:
+ * CFSA (Compact Finite State Automaton) binary format implementation:
  * <ul>
  *  <li>{@link #BIT_TARGET_NEXT} applicable on all arcs, not necessarily the last one.</li>
  *  <li>v-coded goto field</li>
@@ -112,7 +112,7 @@ import java.util.Set;
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class CFSA2 extends FSA{
+public class CFSA extends FSAAbstract{
 
 	/** Automaton header version value. */
 	public static final byte VERSION = (byte)0xC6;
@@ -159,7 +159,7 @@ public class CFSA2 extends FSA{
 
 
 	/** Reads an automaton from a byte stream. */
-	CFSA2(final InputStream stream) throws IOException{
+	CFSA(final InputStream stream) throws IOException{
 		final DataInputStream in = new DataInputStream(stream);
 
 		//read flags

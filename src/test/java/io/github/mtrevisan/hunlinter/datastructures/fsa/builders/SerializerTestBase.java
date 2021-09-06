@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
@@ -59,7 +59,7 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		checkSerialization(in, s);
 	}
@@ -73,7 +73,7 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		checkSerialization(in, s);
 	}
@@ -87,7 +87,7 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		checkSerialization(in, s);
 	}
@@ -101,7 +101,7 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		checkSerialization(in, s);
 	}
@@ -123,7 +123,7 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		checkSerialization(in, s);
 	}
@@ -132,39 +132,39 @@ public class SerializerTestBase{
 	void emptyInput() throws IOException{
 		List<byte[]> input = Collections.emptyList();
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(input);
+		FSAAbstract s = builder.build(input);
 
 		checkSerialization(input, s);
 	}
 
 	@Test
 	void abc() throws IOException{
-		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa")));
+		testBuiltIn(FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/abc.fsa")));
 	}
 
 	@Test
 	void minimal() throws IOException{
-		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal.fsa")));
+		testBuiltIn(FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/minimal.fsa")));
 	}
 
 	@Test
 	void minimal2() throws IOException{
-		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
+		testBuiltIn(FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/minimal2.fsa")));
 	}
 
 	@Test
 	void en_tst() throws IOException{
-		testBuiltIn(FSA.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict")));
+		testBuiltIn(FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/builders/en_tst.dict")));
 	}
 
-	private void testBuiltIn(FSA fsa) throws IOException{
+	private void testBuiltIn(FSAAbstract fsa) throws IOException{
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
 			input.add(Arrays.copyOf(bb.array(), bb.remaining()));
 		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
 
 		FSABuilder builder = new FSABuilder();
-		FSA root = builder.build(input);
+		FSAAbstract root = builder.build(input);
 
 		//check if the DFSA is correct first
 		FSATestUtils.checkCorrect(input, root);
@@ -173,17 +173,17 @@ public class SerializerTestBase{
 		checkSerialization(input, root);
 	}
 
-	private void checkSerialization(List<byte[]> input, FSA root) throws IOException{
+	private void checkSerialization(List<byte[]> input, FSAAbstract root) throws IOException{
 		FSASerializer serializer = createSerializer();
 		checkSerialization0(serializer, input, root);
 		if(serializer.getFlags().contains(FSAFlags.NUMBERS))
 			checkSerialization0(serializer.serializeWithNumbers(), input, root);
 	}
 
-	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSA root) throws IOException{
+	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSAAbstract root) throws IOException{
 		byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream(), null).toByteArray();
 
-		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
+		FSAAbstract fsa = FSAAbstract.read(new ByteArrayInputStream(fsaData));
 		FSATestUtils.checkCorrect(in, fsa);
 	}
 
@@ -198,14 +198,14 @@ public class SerializerTestBase{
 			.collect(Collectors.toList());
 
 		FSABuilder builder = new FSABuilder();
-		FSA s = builder.build(in);
+		FSAAbstract s = builder.build(in);
 
 		byte[] fsaData = createSerializer()
 			.serializeWithNumbers()
 			.serialize(s, new ByteArrayOutputStream(), null)
 			.toByteArray();
 
-		FSA fsa = FSA.read(new ByteArrayInputStream(fsaData));
+		FSAAbstract fsa = FSAAbstract.read(new ByteArrayInputStream(fsaData));
 
 		//ensure we have the NUMBERS flag set
 		Assertions.assertTrue(fsa.getFlags().contains(FSAFlags.NUMBERS));

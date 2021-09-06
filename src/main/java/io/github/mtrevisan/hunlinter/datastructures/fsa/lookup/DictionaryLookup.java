@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
@@ -69,7 +69,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
 		Objects.requireNonNull(dictionary, "Dictionary cannot be null");
-		final FSA fsa = dictionary.fsa;
+		final FSAAbstract fsa = dictionary.fsa;
 		final DictionaryMetadata metadata = dictionary.metadata;
 		Objects.requireNonNull(fsa, "FSA cannot be null");
 		Objects.requireNonNull(metadata, "Metadata cannot be null");

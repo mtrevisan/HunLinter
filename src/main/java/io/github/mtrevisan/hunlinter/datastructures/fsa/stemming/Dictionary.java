@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ import java.nio.file.Path;
 
 
 /**
- * A dictionary combines {@link FSA} automaton and {@link DictionaryMetadata}
+ * A dictionary combines {@link FSAAbstract} automaton and {@link DictionaryMetadata}
  * describing the way terms are encoded in the automaton.
  *
  * <p>
@@ -50,9 +50,9 @@ import java.nio.file.Path;
 public class Dictionary{
 
 	/**
-	 * {@link FSA} automaton with the compiled dictionary data.
+	 * {@link FSAAbstract} automaton with the compiled dictionary data.
 	 */
-	public final FSA fsa;
+	public final FSAAbstract fsa;
 
 	/**
 	 * Metadata associated with the dictionary.
@@ -63,11 +63,11 @@ public class Dictionary{
 	 * It is strongly recommended to use static methods in this class for
 	 * reading dictionaries.
 	 *
-	 * @param fsa	An instantiated {@link FSA} instance.
+	 * @param fsa	An instantiated {@link FSAAbstract} instance.
 	 * @param metadata	A map of attributes describing the compression format and other settings not contained in the FSA automaton. For an
 	 *		explanation of available attributes and their possible values, see {@link DictionaryMetadata}.
 	 */
-	public Dictionary(final FSA fsa, final DictionaryMetadata metadata){
+	public Dictionary(final FSAAbstract fsa, final DictionaryMetadata metadata){
 		this.fsa = fsa;
 		this.metadata = metadata;
 	}
@@ -121,7 +121,7 @@ public class Dictionary{
 	 * @throws IOException	If an I/O error occurs.
 	 */
 	public static Dictionary read(final InputStream fsaStream, final InputStream metadataStream) throws IOException{
-		return new Dictionary(FSA.read(fsaStream), DictionaryMetadata.read(metadataStream));
+		return new Dictionary(FSAAbstract.read(fsaStream), DictionaryMetadata.read(metadataStream));
 	}
 
 }

@@ -25,7 +25,7 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.MetadataBuilder;
@@ -139,7 +139,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return list;
 		};
-		final Function<ByteArrayList, FSA> step3 = list -> {
+		final Function<ByteArrayList, FSAAbstract> step3 = list -> {
 			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
@@ -164,7 +164,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step4 = fsa -> {
+		final Function<FSAAbstract, File> step4 = fsa -> {
 			resetProcessing("Compressing FSA (step 4/4)");
 
 			final FSASerializer serializer = new CFSA2Serializer();

@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadataBuilder;
@@ -193,7 +193,7 @@ class DictionaryLookupTest{
 
 	@Test
 	void separatorInLookupTerm() throws IOException{
-		FSA fsa = FSA.read(getClass().getResourceAsStream("/services/fsa/lookup/separator-in-lookup.fsa"));
+		FSAAbstract fsa = FSAAbstract.read(getClass().getResourceAsStream("/services/fsa/lookup/separator-in-lookup.fsa"));
 
 		DictionaryMetadata metadata = new DictionaryMetadataBuilder()
 			.separator('+')
