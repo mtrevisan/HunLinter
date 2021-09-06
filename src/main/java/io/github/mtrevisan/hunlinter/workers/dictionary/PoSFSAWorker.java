@@ -29,8 +29,8 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.MetadataBuilder;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSASerializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializerInterface;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
@@ -167,7 +167,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Function<FSAAbstract, File> step4 = fsa -> {
 			resetProcessing("Compressing FSA (step 4/4)");
 
-			final FSASerializer serializer = new CFSA2Serializer();
+			final FSASerializerInterface serializer = new CFSASerializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
 					setProgress(percent, 100);

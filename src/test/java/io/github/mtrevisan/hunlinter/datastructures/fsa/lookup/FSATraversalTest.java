@@ -29,7 +29,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSASerializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -96,7 +96,7 @@ class FSATraversalTest{
 		FSAAbstract s = new FSABuilder()
 			.build(input);
 
-		final byte[] fsaData = new CFSA2Serializer()
+		final byte[] fsaData = new CFSASerializer()
 			.serializeWithNumbers()
 			.serialize(s, new ByteArrayOutputStream(), null)
 			.toByteArray();

@@ -141,7 +141,7 @@ class CFSASerializerTest{
 			checkSerialization0(createSerializer().serializeWithNumbers(), input, root);
 	}
 
-	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSAAbstract root) throws IOException{
+	private void checkSerialization0(FSASerializerInterface serializer, List<byte[]> in, FSAAbstract root) throws IOException{
 		final byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream(), null).toByteArray();
 
 		FSAAbstract fsa = FSAAbstract.read(new ByteArrayInputStream(fsaData));
@@ -177,8 +177,8 @@ class CFSASerializerTest{
 		Assertions.assertEquals(Arrays.asList("0 a", "1 aba", "2 ac", "3 b", "4 ba", "5 c"), result);
 	}
 
-	private FSASerializer createSerializer(){
-		return new CFSA2Serializer();
+	private FSASerializerInterface createSerializer(){
+		return new CFSASerializer();
 	}
 
 }

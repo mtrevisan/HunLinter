@@ -26,8 +26,8 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSASerializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializerInterface;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,8 +45,8 @@ import java.util.stream.Collectors;
 
 public class SerializerTestBase{
 
-	protected FSASerializer createSerializer(){
-		return new CFSA2Serializer();
+	protected FSASerializerInterface createSerializer(){
+		return new CFSASerializer();
 	}
 
 
@@ -174,13 +174,13 @@ public class SerializerTestBase{
 	}
 
 	private void checkSerialization(List<byte[]> input, FSAAbstract root) throws IOException{
-		FSASerializer serializer = createSerializer();
+		FSASerializerInterface serializer = createSerializer();
 		checkSerialization0(serializer, input, root);
 		if(serializer.getFlags().contains(FSAFlags.NUMBERS))
 			checkSerialization0(serializer.serializeWithNumbers(), input, root);
 	}
 
-	private void checkSerialization0(FSASerializer serializer, List<byte[]> in, FSAAbstract root) throws IOException{
+	private void checkSerialization0(FSASerializerInterface serializer, List<byte[]> in, FSAAbstract root) throws IOException{
 		byte[] fsaData = serializer.serialize(root, new ByteArrayOutputStream(), null).toByteArray();
 
 		FSAAbstract fsa = FSAAbstract.read(new ByteArrayInputStream(fsaData));

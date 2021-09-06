@@ -57,9 +57,9 @@ import java.util.TreeSet;
  * @see CFSA
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class CFSA2Serializer implements FSASerializer{
+public class CFSASerializer implements FSASerializerInterface{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CFSA2Serializer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CFSASerializer.class);
 
 	/** Supported flags. */
 	private static final Set<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
@@ -96,14 +96,17 @@ public class CFSA2Serializer implements FSASerializer{
 
 
 	/**
-	 * Serialize the automaton with the number of right-language sequences in each node. This is required to implement
-	 * perfect hashing. The numbering also preserves the order of input sequences.
+	 * Serialize the automaton with the number of right-language sequences in each node.
+	 * <p>
+	 * This is required to implement perfect hashing. The numbering also preserves the order of input sequences.
+	 * </p>
 	 *
 	 * @return Returns the same object for easier call chaining.
 	 */
 	@Override
-	public CFSA2Serializer serializeWithNumbers(){
+	public CFSASerializer serializeWithNumbers(){
 		serializeWithNumbers = true;
+
 		return this;
 	}
 
@@ -443,12 +446,12 @@ public class CFSA2Serializer implements FSASerializer{
 	}
 
 	@Override
-	public CFSA2Serializer withFiller(final byte filler){
+	public CFSASerializer withFiller(final byte filler){
 		throw new UnsupportedOperationException("CFSA2 does not support filler. Use .info file.");
 	}
 
 	@Override
-	public CFSA2Serializer withAnnotationSeparator(final byte annotationSeparator){
+	public CFSASerializer withAnnotationSeparator(final byte annotationSeparator){
 		throw new UnsupportedOperationException("CFSA2 does not support separator. Use .info file.");
 	}
 
