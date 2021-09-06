@@ -99,12 +99,12 @@ public class Hyphenator implements HyphenatorInterface{
 		final HyphenationBreak hyphBreak = hyphenate(word, patterns, HyphenationParser.Level.NON_COMPOUND, options);
 
 		final List<String> compounds = createHyphenatedWord(word, hyphBreak);
-		List<String> syllabes = new ArrayList<>(compounds);
+		final List<String> syllabes = new ArrayList<>(compounds);
 		String[] rules = hyphBreak.getRules();
 
 		//if there is a second level
 		if(hypParser.isSecondLevelPresent()){
-			final List<String> syllabes2ndLevel = new ArrayList<>(0);
+			syllabes.clear();
 			String[] rules2ndLevel = new String[0];
 
 			//apply second level hyphenation for the word parts
@@ -114,13 +114,12 @@ public class Hyphenator implements HyphenatorInterface{
 				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);
 
-				syllabes2ndLevel.addAll(createHyphenatedWord(compound, subHyph));
+				syllabes.addAll(createHyphenatedWord(compound, subHyph));
 				rules2ndLevel = ArrayUtils.addAll(rules2ndLevel, subHyph.getRules());
 				if(i < parentRulesSize)
 					rules2ndLevel = ArrayUtils.add(rules2ndLevel, rules[i ++]);
 			}
 
-			syllabes = syllabes2ndLevel;
 			rules = rules2ndLevel;
 		}
 

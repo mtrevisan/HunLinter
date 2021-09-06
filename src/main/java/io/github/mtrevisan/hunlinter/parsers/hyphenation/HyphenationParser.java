@@ -102,7 +102,7 @@ public class HyphenationParser{
 
 	private static final String ONE = "1";
 	public static final String WORD_BOUNDARY = ".";
-	public static final String AUGMENTED_RULE = "/";
+	public static final char AUGMENTED_RULE = '/';
 
 	private static final String COMMA = ",";
 
@@ -263,9 +263,6 @@ public class HyphenationParser{
 			buildTrie(lev, rules.get(lev));
 
 		secondLevelPresent = (level == Level.COMPOUND);
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
 	}
 
 	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`). */
@@ -316,7 +313,7 @@ public class HyphenationParser{
 	}
 
 	public static boolean isAugmentedRule(final String line){
-		return line.contains(AUGMENTED_RULE);
+		return StringUtils.contains(line, AUGMENTED_RULE);
 	}
 
 	public static boolean isCustomRule(final String line){
