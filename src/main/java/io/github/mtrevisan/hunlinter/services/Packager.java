@@ -128,7 +128,7 @@ public class Packager{
 	private static final String FOLDER_ORIGIN = "%origin%";
 	private static final Pattern FOLDER_SPLITTER = RegexHelper.pattern("[/\\\\]");
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
-	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
+	private static final String FILENAME_STANDARD_AUTO_TEXT = "standard";
 
 	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>(9);
 	static{
@@ -327,7 +327,7 @@ public class Packager{
 			final Path autoCorrectOutputPath = packageAutoCorrectFiles(language);
 			final Path autoTextOutputPath = packageAutoTextFiles(language);
 
-			packageExtension(projectPath, autoCorrectOutputPath, autoTextOutputPath);
+			packageExtension(projectPath.toFile(), autoCorrectOutputPath, autoTextOutputPath);
 
 			//remove created sub-packages
 			if(autoCorrectOutputPath != null)
@@ -357,25 +357,30 @@ public class Packager{
 
 	private Path packageAutoTextFiles(final String language) throws IOException{
 		final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		return packageFiles(FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU, autoTextFile);
+		//FIXME package with the same name of the folder it was unzipped into
+		return packageFiles(FILENAME_STANDARD_AUTO_TEXT + EXTENSION_BAU, autoTextFile);
 	}
 
 	private Path packageFiles(final String packageFilename, final File file) throws IOException{
 		Path outputPath = null;
 		if(file != null){
 			outputPath = Path.of(file.getParent(), packageFilename);
-			ZIPPER.zipDirectory(file.toPath().getParent(), Deflater.BEST_COMPRESSION, outputPath.toFile());
+			final File folder = file.getParentFile();
+			ZIPPER.zipDirectory(folder, Deflater.BEST_COMPRESSION, outputPath.toFile());
 		}
 		return outputPath;
 	}
 
-	private void packageExtension(final Path projectPath, final Path autoCorrectOutputPath, final Path autoTextOutputPath) throws IOException{
+	private void packageExtension(final File projectFile, final Path autoCorrectOutputPath, final Path autoTextOutputPath) throws IOException{
+		final Path projectPath = projectFile.toPath();
 		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
 			+ EXTENSION_ZIP)
 			.toFile();
 		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 		//that are not autoCorrectOutputFilename or autoTextOutputFilename
-		ZIPPER.zipDirectory(projectPath, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputPath, autoTextOutputPath);
+		final File autoCorrectOutputFile = (autoCorrectOutputPath != null? autoCorrectOutputPath.toFile(): null);
+		final File autoTextOutputFile = (autoTextOutputPath != null? autoTextOutputPath.toFile(): null);
+		ZIPPER.zipDirectory(projectFile, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputFile, autoTextOutputFile);
 	}
 
 	public String getLanguage(){
