@@ -47,7 +47,7 @@ import java.util.TreeSet;
 
 
 /**
- * Serializes in-memory {@link FSAAbstract} graphs to {@link CFSA Compact Finite State Automata, version 2}.
+ * Serializes in-memory {@link FSAAbstract} graphs to {@link CFSA Compact Finite State Automata}.
  *
  * <p>
  * It is possible to serialize the automaton with numbers required for perfect hashing.

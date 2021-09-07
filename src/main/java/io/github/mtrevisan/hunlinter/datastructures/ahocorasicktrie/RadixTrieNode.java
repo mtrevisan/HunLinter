@@ -36,11 +36,11 @@ import java.util.TreeMap;
 
 
 /**
- * A node has the following functions
+ * A node has the following functions:
  * <ul>
- *		<li><b>success</b>: successfully transferred to another node</li>
- *		<li><b>failure</b>: if you cannot jump along the string, jump to a shallow node</li>
- *		<li><b>emits</b>: hit a pattern string</li>
+ *		<li><b>success</b>: successfully transferred to another node.</li>
+ *		<li><b>failure</b>: if you cannot jump along the string, jump to a shallow node.</li>
+ *		<li><b>emits</b>: hit a pattern string.</li>
  * </ul>
  * <p>
  * The root node is slightly different.

@@ -73,8 +73,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 		//save the outer values
 		final int size = map.size();
-		trie.outerValue = new ArrayList<>(size);
-		trie.outerValue.addAll(map.values());
+		trie.outerValue = new ArrayList<>(map.values());
 		trie.keyLength = new int[size];
 
 		//construct a two-point trie tree
