@@ -174,7 +174,8 @@ public class HyphenationParser{
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
 		for(final Level level : Level.values())
 			this.patterns.put(level, patterns.get(level));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new EnumMap<>(Level.class));
+		customHyphenations = Optional.ofNullable(customHyphenations)
+			.orElse(new EnumMap<>(Level.class));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
@@ -279,16 +280,18 @@ public class HyphenationParser{
 		if(customHyphenations.get(level).containsKey(key))
 			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
 
-		customHyphenations.get(level).put(key, line);
+		customHyphenations.get(level)
+			.put(key, line);
 	}
 
 	private void parseCommonRule(final String line, final Level level){
+		//remove all (breaking) numbers
 		final String key = getKeyFromData(line);
 		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 		if(duplicatedRule)
 			throw new LinterException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
 
-		//insert current pattern into the radix tree (remove all numbers)
+		//insert current pattern into the radix tree
 		rules.get(level)
 			.put(key, line);
 	}
@@ -385,9 +388,11 @@ public class HyphenationParser{
 		final String oldRule;
 		if(isCustomRule(rule)){
 			final String key = StringHelper.removeAll(rule, EQUALS_SIGN);
-			oldRule = customHyphenations.get(level).get(key);
+			oldRule = customHyphenations.get(level)
+				.get(key);
 			if(oldRule != null)
-				customHyphenations.get(level).remove(key);
+				customHyphenations.get(level)
+					.remove(key);
 		}
 		else{
 			final String key = getKeyFromData(rule);

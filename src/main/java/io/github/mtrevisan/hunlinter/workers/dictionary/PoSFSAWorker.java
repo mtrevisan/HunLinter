@@ -107,7 +107,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 			throw new RuntimeException(e);
 		}
 		final byte separator = metadata.getSeparator();
-		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
+		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType()
+			.get();
 
 
 		final ByteArrayList encodings = new ByteArrayList(1_000_000.f);
@@ -228,24 +229,28 @@ public class PoSFSAWorker extends WorkerDictionary{
 			tag.flip();
 
 			for(final String stem : stems){
-				//source
-				byte[] inflectionStem = StringHelper.getRawBytes(stem);
-				//remove the initial part `st:`
-				inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length);
-
-				final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
-
-				int offset = inflectedWord.length;
-				final byte[] assembled = new byte[offset + 1 + encoded.length + 1 + tag.remaining()];
-				System.arraycopy(inflectedWord, 0, assembled, 0, offset);
-				assembled[offset ++] = separator;
-				System.arraycopy(encoded, 0, assembled, offset, encoded.length);
-				offset += encoded.length;
-				assembled[offset ++] = separator;
-				System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
+				final byte[] assembled = encode(inflectedWord, tag, stem, separator, sequenceEncoder);
 				encodings.add(assembled);
 			}
 		}
+	}
+
+	private byte[] encode(final byte[] inflectedWord, final ByteBuffer tag, final String stem, final byte separator,
+			final SequenceEncoderInterface sequenceEncoder){
+		byte[] inflectionStem = StringHelper.getRawBytes(stem);
+		//remove the initial part `st:`
+		inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length);
+
+		final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
+		int offset = inflectedWord.length;
+		final byte[] assembled = new byte[offset + 1 + encoded.length + 1 + tag.remaining()];
+		System.arraycopy(inflectedWord, 0, assembled, 0, offset);
+		assembled[offset ++] = separator;
+		System.arraycopy(encoded, 0, assembled, offset, encoded.length);
+		offset += encoded.length;
+		assembled[offset ++] = separator;
+		System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
+		return assembled;
 	}
 
 	/**
