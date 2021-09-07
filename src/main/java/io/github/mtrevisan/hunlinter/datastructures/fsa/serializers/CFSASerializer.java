@@ -83,9 +83,9 @@ public class CFSASerializer implements FSASerializerInterface{
 	private boolean serializeWithNumbers;
 
 	/** A hash map of [state, offset] pairs. */
-	private final IntIntHashMap offsets = new IntIntHashMap();
+	private final IntIntMap offsets = new IntIntHashMap();
 	/** A hash map of [state, right-language-count] pairs. */
-	private IntIntHashMap numbers;
+	private IntIntMap numbers;
 	/** The most frequent labels for integrating with the flags field. */
 	private byte[] labelsIndex;
 	/**
@@ -169,8 +169,8 @@ public class CFSASerializer implements FSASerializerInterface{
 	 * @param fsa	The automaton to calculate right language for
 	 * @return	A map with node identifiers as keys and their right language counts as associated values
 	 */
-	private IntIntHashMap rightLanguageForAllStates(final FSAAbstract fsa){
-		final IntIntHashMap numbers = new IntIntHashMap();
+	private IntIntMap rightLanguageForAllStates(final FSAAbstract fsa){
+		final IntIntMap numbers = new IntIntHashMap();
 		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
 			for(int arc = fsa.getFirstArc(state); arc != 0; arc = fsa.getNextArc(arc))
@@ -218,7 +218,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	private DynamicIntArray linearize(final FSAAbstract fsa) throws IOException{
 		//states with most in-links (these should be placed as close to the start of the automaton as possible
 		//so that v-coded addresses are tiny)
-		final IntIntHashMap inLinkCount = computeInLinkCount(fsa);
+		final IntIntMap inLinkCount = computeInLinkCount(fsa);
 
 		//ordered states for serialization
 		final DynamicIntArray linearized = new DynamicIntArray();
@@ -326,8 +326,8 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Compute in-link count for each state. */
-	private IntIntHashMap computeInLinkCount(final FSAAbstract fsa){
-		final IntIntHashMap inLinkCount = new IntIntHashMap();
+	private IntIntMap computeInLinkCount(final FSAAbstract fsa){
+		final IntIntMap inLinkCount = new IntIntHashMap();
 		final Collection<Integer> visited = new HashSet<>();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
