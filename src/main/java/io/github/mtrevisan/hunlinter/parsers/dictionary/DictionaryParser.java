@@ -82,28 +82,28 @@ public class DictionaryParser{
 		comparator = BaseBuilder.getComparator(language);
 	}
 
-	public File getDicFile(){
+	public final File getDicFile(){
 		return dicFile;
 	}
 
-	public Charset getCharset(){
+	public final Charset getCharset(){
 		return charset;
 	}
 
-	public Comparator<String> getComparator(){
+	public final Comparator<String> getComparator(){
 		return comparator;
 	}
 
-	public Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
+	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-	public boolean removeBoundary(final int boundaryIndex){
+	public final boolean removeBoundary(final int boundaryIndex){
 		return (boundaries.remove(boundaryIndex) != null);
 	}
 
-	public int getBoundaryIndex(final int lineIndex){
+	public final int getBoundaryIndex(final int lineIndex){
 		if(!boundariesCalculated)
 			calculateDictionaryBoundaries();
 
@@ -154,17 +154,17 @@ public class DictionaryParser{
 		boundariesCalculated = true;
 	}
 
-	public int getNextBoundaryIndex(final int lineIndex){
+	public final int getNextBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.higherEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public int getPreviousBoundaryIndex(final int lineIndex){
+	public final int getPreviousBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.lowerEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public boolean isInBoundary(final int lineIndex){
+	public final boolean isInBoundary(final int lineIndex){
 		return (searchBoundary(lineIndex) != null);
 	}
 
@@ -173,11 +173,11 @@ public class DictionaryParser{
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-	public void clear(){
+	public final void clear(){
 		clearBoundaries();
 	}
 
-	public void clearBoundaries(){
+	public final void clearBoundaries(){
 		boundariesCalculated = false;
 		boundaries.clear();
 	}

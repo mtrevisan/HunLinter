@@ -54,7 +54,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		super(workerData);
 	}
 
-	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
+	protected final void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		try{
@@ -203,7 +203,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 
-	protected void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
+	protected final void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
 		try{
 			writer.write(line);
 			writer.write(lineSeparator);
@@ -213,7 +213,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
-	protected void closeWriter(final Writer writer){
+	protected final void closeWriter(final Writer writer){
 		try{
 			writer.close();
 		}

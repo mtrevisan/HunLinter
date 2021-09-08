@@ -94,7 +94,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @param word	The word (typically inflected) to look up base forms for.
 	 * @return	A list of {@link WordData} entries (possibly empty).
 	 */
-	public List<WordData> lookup(String word){
+	public final List<WordData> lookup(String word){
 		final byte separator = dictionary.metadata.getSeparator();
 
 		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
@@ -193,7 +193,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary}. */
 	@Override
-	public Iterator<WordData> iterator(){
+	public final Iterator<WordData> iterator(){
 		return new DictionaryIterator(dictionary, true);
 	}
 

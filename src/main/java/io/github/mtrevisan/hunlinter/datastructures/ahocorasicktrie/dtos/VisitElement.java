@@ -40,20 +40,20 @@ public class VisitElement<V extends Serializable>{
 		this.key = key;
 	}
 
-	public int getNodeId(){
+	public final int getNodeId(){
 		return nodeId;
 	}
 
-	public String getKey(){
+	public final String getKey(){
 		return key;
 	}
 
-	public V getValue(){
+	public final V getValue(){
 		return value;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -66,7 +66,7 @@ public class VisitElement<V extends Serializable>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Integer.hashCode(nodeId);
 		result = 31 * result + key.hashCode();
 		result = 31 * result + value.hashCode();

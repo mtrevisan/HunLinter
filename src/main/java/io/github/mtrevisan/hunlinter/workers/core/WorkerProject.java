@@ -54,7 +54,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 	}
 
 	@Override
-	protected Void doInBackground(){
+	protected final Void doInBackground(){
 		prepareProcessing("Opening project");
 
 		final Packager packager = workerData.getPackager();

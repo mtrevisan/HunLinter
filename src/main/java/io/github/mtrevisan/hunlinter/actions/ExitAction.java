@@ -48,7 +48,7 @@ public class ExitAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		parentFrame.dispose();
 
@@ -57,7 +57,7 @@ public class ExitAction extends AbstractAction{
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException{
+	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}
 

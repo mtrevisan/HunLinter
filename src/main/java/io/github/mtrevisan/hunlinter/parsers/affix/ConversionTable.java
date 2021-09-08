@@ -68,7 +68,7 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public void parse(final ParsingContext context){
+	public final void parse(final ParsingContext context){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -113,7 +113,7 @@ public class ConversionTable{
 	 * @param word	Word to be converted
 	 * @return	The list of conversions
 	 */
-	public String applyConversionTable(final String word){
+	public final String applyConversionTable(final String word){
 		String convertedWord = word;
 		if(table != null){
 			final String inputWord = StringUtils.replace(word, StringUtils.SPACE, "_");
@@ -190,7 +190,7 @@ public class ConversionTable{
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
-	public String extractAsList(){
+	public final String extractAsList(){
 		final StringJoiner sj = new StringJoiner(", ");
 		for(final List<Pair<String, String>> pairs : table.values())
 			for(final Pair<String, String> entry : pairs)
@@ -199,7 +199,7 @@ public class ConversionTable{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return "[affixOption=" + affixOption + ',' + "table=" + table + ']';
 	}
 

@@ -56,7 +56,7 @@ public class RuleEntry{
 		this.combinable = (combinable == COMBINABLE);
 	}
 
-	public void setEntries(final List<AffixEntry> entries){
+	public final void setEntries(final List<AffixEntry> entries){
 		this.entries = entries;
 
 		final int size = (entries != null? entries.size(): 0);
@@ -76,32 +76,32 @@ public class RuleEntry{
 //	this.suffixEntries = suffixEntries;
 //}
 
-	public AffixType getType(){
+	public final AffixType getType(){
 		return type;
 	}
 
-	public String getFlag(){
+	public final String getFlag(){
 		return flag;
 	}
 
-	public boolean isCombinable(){
+	public final boolean isCombinable(){
 		return combinable;
 	}
 
-	public char combinableChar(){
+	public final char combinableChar(){
 		return (combinable? COMBINABLE: NOT_COMBINABLE);
 	}
 
-	public List<AffixEntry> getEntries(){
+	public final List<AffixEntry> getEntries(){
 		return entries;
 	}
 
-	public boolean isProductiveFor(final String word){
+	public final boolean isProductiveFor(final String word){
 		return (LoopHelper.match(entries, entry -> entry.canApplyTo(word)) != null);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -113,7 +113,7 @@ public class RuleEntry{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = type.hashCode();
 		result = 31 * result + flag.hashCode();
 		return result;

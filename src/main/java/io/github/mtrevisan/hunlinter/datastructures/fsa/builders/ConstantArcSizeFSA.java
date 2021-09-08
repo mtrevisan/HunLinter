@@ -82,22 +82,22 @@ public class ConstantArcSizeFSA extends FSAAbstract{
 	}
 
 	@Override
-	public int getRootNode(){
+	public final int getRootNode(){
 		return getEndNode(getFirstArc(epsilon));
 	}
 
 	@Override
-	public int getFirstArc(final int node){
+	public final int getFirstArc(final int node){
 		return node;
 	}
 
 	@Override
-	public int getNextArc(final int arc){
+	public final int getNextArc(final int arc){
 		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
 	@Override
-	public byte getArcLabel(final int arc){
+	public final byte getArcLabel(final int arc){
 		return data[arc + LABEL_OFFSET];
 	}
 
@@ -111,12 +111,12 @@ public class ConstantArcSizeFSA extends FSAAbstract{
 	}
 
 	@Override
-	public boolean isArcFinal(final int arc){
+	public final boolean isArcFinal(final int arc){
 		return ((data[arc + FLAGS_OFFSET] & BIT_ARC_FINAL) != 0);
 	}
 
 	@Override
-	public boolean isArcTerminal(final int arc){
+	public final boolean isArcTerminal(final int arc){
 		return (getArcTarget(arc) == 0);
 	}
 
@@ -125,12 +125,12 @@ public class ConstantArcSizeFSA extends FSAAbstract{
 	}
 
 	@Override
-	public int getEndNode(final int arc){
+	public final int getEndNode(final int arc){
 		return getArcTarget(arc);
 	}
 
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return Collections.emptySet();
 	}
 

@@ -48,10 +48,10 @@ class RBCWrapper implements ReadableByteChannel{
 	}
 
 	@Override
-	public boolean isOpen(){ return rbc.isOpen(); }
+	public final boolean isOpen(){ return rbc.isOpen(); }
 
 	@Override
-	public int read(final ByteBuffer dst) throws IOException{
+	public final int read(final ByteBuffer dst) throws IOException{
 		final int readBytes;
 		if((readBytes = rbc.read(dst)) > 0){
 			readSoFar += readBytes;
@@ -62,9 +62,9 @@ class RBCWrapper implements ReadableByteChannel{
 		return readBytes;
 	}
 
-	public long getReadSoFar(){ return readSoFar; }
+	public final long getReadSoFar(){ return readSoFar; }
 
 	@Override
-	public void close() throws IOException{ rbc.close(); }
+	public final void close() throws IOException{ rbc.close(); }
 
 }

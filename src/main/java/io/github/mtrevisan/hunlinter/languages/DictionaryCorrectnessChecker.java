@@ -68,7 +68,7 @@ public class DictionaryCorrectnessChecker{
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 
-	public void checkCircumfix(final DictionaryEntry dicEntry){
+	public final void checkCircumfix(final DictionaryEntry dicEntry){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null && dicEntry.hasContinuationFlag(circumfixFlag))
 			throw new LinterException(INVALID_CIRCUMFIX_FLAG.get().format(new Object[]{dicEntry.getWord(), circumfixFlag}));

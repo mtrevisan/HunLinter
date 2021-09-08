@@ -57,7 +57,7 @@ public class HunSpellRegexWordGenerator{
 		}
 
 		@Override
-		public boolean equals(final Object obj){
+		public final boolean equals(final Object obj){
 			if(this == obj)
 				return true;
 			if(obj == null || getClass() != obj.getClass())
@@ -69,7 +69,7 @@ public class HunSpellRegexWordGenerator{
 		}
 
 		@Override
-		public int hashCode(){
+		public final int hashCode(){
 			int result = (word == null? 0: word.hashCode());
 			result = 31 * result + Integer.hashCode(stateIndex);
 			return result;
@@ -128,7 +128,7 @@ public class HunSpellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<List<String>> generateAll(final int minimumSubwords, final int limit){
+	public final List<List<String>> generateAll(final int minimumSubwords, final int limit){
 		final List<List<String>> matchedWords = new ArrayList<>(limit);
 
 		final Queue<GeneratedElement> queue = new LinkedList<>();
@@ -167,7 +167,7 @@ public class HunSpellRegexWordGenerator{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("graph", graph)
 			.append("finalStateIndex", finalStateIndex)

@@ -48,15 +48,15 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 		super(affixData, checker);
 	}
 
-	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
+	public final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 
-	List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
+	final List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null, false);
 	}
 
-	List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		return applyAffixRules(dicEntry, overriddenRule, true);
 	}
 

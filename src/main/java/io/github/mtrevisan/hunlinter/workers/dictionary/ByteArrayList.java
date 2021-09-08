@@ -56,7 +56,7 @@ public class ByteArrayList implements RandomAccess{
 	 *
 	 * @return	The number of elements in this list.
 	 */
-	public synchronized int size(){
+	public final synchronized int size(){
 		return size;
 	}
 
@@ -65,7 +65,7 @@ public class ByteArrayList implements RandomAccess{
 	 *
 	 * @param element	Element to be appended to this list.
 	 */
-	public synchronized void add(final byte[] element){
+	public final synchronized void add(final byte[] element){
 		if(size == data.length)
 			grow(size + 1);
 
@@ -73,7 +73,7 @@ public class ByteArrayList implements RandomAccess{
 		size ++;
 	}
 
-	public synchronized byte[] get(final int index){
+	public final synchronized byte[] get(final int index){
 		return data[index];
 	}
 
@@ -93,21 +93,21 @@ public class ByteArrayList implements RandomAccess{
 	 * Removes all the elements from this list.
 	 * The list will be empty after this call returns.
 	 */
-	public synchronized void clear(){
+	public final synchronized void clear(){
 		for(int i = 0; i < size; i ++)
 			data[i] = null;
 	}
 
-	public synchronized void sort(final Comparator<? super byte[]> comparator){
+	public final synchronized void sort(final Comparator<? super byte[]> comparator){
 		Arrays.sort(data, 0, size, comparator);
 	}
 
-	public synchronized void parallelSort(final Comparator<? super byte[]> comparator){
+	public final synchronized void parallelSort(final Comparator<? super byte[]> comparator){
 		Arrays.parallelSort(data, 0, size, comparator);
 	}
 
 	@Override
-	public synchronized boolean equals(final Object obj){
+	public final synchronized boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -119,7 +119,7 @@ public class ByteArrayList implements RandomAccess{
 	}
 
 	@Override
-	public synchronized int hashCode(){
+	public final synchronized int hashCode(){
 		return 31 * size + Arrays.deepHashCode(data);
 	}
 

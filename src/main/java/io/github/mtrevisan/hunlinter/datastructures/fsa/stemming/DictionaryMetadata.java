@@ -189,45 +189,45 @@ public class DictionaryMetadata{
 	/**
 	 * @return Return all metadata attributes.
 	 */
-	public Map<DictionaryAttribute, String> getAttributes(){
+	public final Map<DictionaryAttribute, String> getAttributes(){
 		return Collections.unmodifiableMap(attributes);
 	}
 
-	public String getEncoding(){ return charset.name(); }
+	public final String getEncoding(){ return charset.name(); }
 
-	public byte getSeparator(){ return separator; }
+	public final byte getSeparator(){ return separator; }
 
-	public Locale getLocale(){ return locale; }
+	public final Locale getLocale(){ return locale; }
 
-	public Map<String, String> getInputConversionPairs(){ return inputConversion; }
+	public final Map<String, String> getInputConversionPairs(){ return inputConversion; }
 
-	public Map<String, String> getOutputConversionPairs(){ return outputConversion; }
+	public final Map<String, String> getOutputConversionPairs(){ return outputConversion; }
 
-	public Map<String, List<String>> getReplacementPairs(){ return replacement; }
+	public final Map<String, List<String>> getReplacementPairs(){ return replacement; }
 
-	public Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
+	public final Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
 
-	public boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
+	public final boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
 
-	public boolean isIgnoringPunctuation(){ return boolAttributes.get(DictionaryAttribute.IGNORE_PUNCTUATION); }
+	public final boolean isIgnoringPunctuation(){ return boolAttributes.get(DictionaryAttribute.IGNORE_PUNCTUATION); }
 
-	public boolean isIgnoringNumbers(){ return boolAttributes.get(DictionaryAttribute.IGNORE_NUMBERS); }
+	public final boolean isIgnoringNumbers(){ return boolAttributes.get(DictionaryAttribute.IGNORE_NUMBERS); }
 
-	public boolean isIgnoringCamelCase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_CAMEL_CASE); }
+	public final boolean isIgnoringCamelCase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_CAMEL_CASE); }
 
-	public boolean isIgnoringAllUppercase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_ALL_UPPERCASE); }
+	public final boolean isIgnoringAllUppercase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_ALL_UPPERCASE); }
 
-	public boolean isIgnoringDiacritics(){ return boolAttributes.get(DictionaryAttribute.IGNORE_DIACRITICS); }
+	public final boolean isIgnoringDiacritics(){ return boolAttributes.get(DictionaryAttribute.IGNORE_DIACRITICS); }
 
-	public boolean isConvertingCase(){ return boolAttributes.get(DictionaryAttribute.CONVERT_CASE); }
+	public final boolean isConvertingCase(){ return boolAttributes.get(DictionaryAttribute.CONVERT_CASE); }
 
-	public boolean isSupportingRunOnWords(){ return boolAttributes.get(DictionaryAttribute.RUN_ON_WORDS); }
+	public final boolean isSupportingRunOnWords(){ return boolAttributes.get(DictionaryAttribute.RUN_ON_WORDS); }
 
-	public Charset getCharset(){
+	public final Charset getCharset(){
 		return charset;
 	}
 
-	public EncoderType getSequenceEncoderType(){
+	public final EncoderType getSequenceEncoderType(){
 		return encoderType;
 	}
 
@@ -260,7 +260,7 @@ public class DictionaryMetadata{
 	 * @param writer	The writer to write to.
 	 * @throws IOException	Thrown when an I/O error occurs.
 	 */
-	public void write(final Writer writer) throws IOException{
+	public final void write(final Writer writer) throws IOException{
 		final PropertiesUTF8 properties = new PropertiesUTF8();
 		for(final Map.Entry<DictionaryAttribute, String> e : getAttributes().entrySet())
 			properties.setProperty(e.getKey().propertyName, e.getValue());

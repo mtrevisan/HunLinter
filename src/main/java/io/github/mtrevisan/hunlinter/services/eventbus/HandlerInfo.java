@@ -44,19 +44,19 @@ class HandlerInfo{
 		this.vetoHandler = vetoHandler;
 	}
 
-	public boolean matchesEvent(final Object event){
+	public final boolean matchesEvent(final Object event){
 		return event.getClass().equals(eventClass);
 	}
 
-	public Method getMethod(){
+	public final Method getMethod(){
 		return method;
 	}
 
-	public Object getSubscriber(){
+	public final Object getSubscriber(){
 		return subscriber.get();
 	}
 
-	public boolean isVetoHandler(){
+	public final boolean isVetoHandler(){
 		return vetoHandler;
 	}
 

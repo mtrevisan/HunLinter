@@ -47,17 +47,17 @@ public class Murmur3HashFunction implements HashFunction{
 
 
 	@Override
-	public boolean isSingleValued(){
+	public final boolean isSingleValued(){
 		return false;
 	}
 
 	@Override
-	public long hash(final byte[] bytes){
+	public final long hash(final byte[] bytes){
 		return hash_x86_32(bytes, 0, SEED);
 	}
 
 	@Override
-	public long[] hashMultiple(final byte[] bytes){
+	public final long[] hashMultiple(final byte[] bytes){
 		return hash_x64_128(bytes, 0, SEED);
 	}
 

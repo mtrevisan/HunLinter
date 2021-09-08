@@ -54,7 +54,7 @@ public class WordBreakTableHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))

@@ -40,7 +40,7 @@ public class ConversionTableHandler implements Handler{
 	}
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		final ConversionTable table = new ConversionTable(affixOption);
 		table.parse(context);
 

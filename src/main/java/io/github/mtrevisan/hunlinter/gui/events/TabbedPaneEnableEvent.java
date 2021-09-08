@@ -46,11 +46,11 @@ public class TabbedPaneEnableEvent{
 		this.enable = enable;
 	}
 
-	public JLayeredPane getPane(){
+	public final JLayeredPane getPane(){
 		return pane;
 	}
 
-	public boolean isEnable(){
+	public final boolean isEnable(){
 		return enable;
 	}
 

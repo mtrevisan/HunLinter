@@ -55,13 +55,13 @@ public class CheckUpdateOnStartupAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		preferences.putBoolean(UPDATE_STARTUP_CHECK, ((AbstractButton)event.getSource()).isSelected());
 	}
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException{
+	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}
 

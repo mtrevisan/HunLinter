@@ -34,19 +34,19 @@ import java.util.zip.Checksum;
 public class CRC32HashFunction implements HashFunction{
 
 	@Override
-	public boolean isSingleValued(){
+	public final boolean isSingleValued(){
 		return true;
 	}
 
 	@Override
-	public long hash(final byte[] bytes){
+	public final long hash(final byte[] bytes){
 		final Checksum crc32 = new CRC32();
 		crc32.update(bytes);
 		return crc32.getValue();
 	}
 
 	@Override
-	public long[] hashMultiple(final byte[] bytes){
+	public final long[] hashMultiple(final byte[] bytes){
 		return new long[]{hash(bytes)};
 	}
 

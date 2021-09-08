@@ -62,7 +62,7 @@ import java.nio.ByteBuffer;
 public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		//FIXME
 		//Search for the infix that can be encoded and remove from `source` to get a maximum-length prefix of `target`.
 		//This could be done more efficiently by running a smarter longest-common-subsequence algorithm and some pruning (?).
@@ -134,7 +134,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		int infixIndex = decodeValue(encoded[0]);
 		int infixLength = decodeValue(encoded[1]);
 		int truncateSuffixBytes = decodeValue(encoded[2]);
@@ -155,7 +155,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

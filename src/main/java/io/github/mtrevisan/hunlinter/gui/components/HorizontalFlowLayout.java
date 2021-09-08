@@ -99,7 +99,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	 * @see Container#getPreferredSize
 	 */
 	@Override
-	public Dimension preferredLayoutSize(final Container target){
+	public final Dimension preferredLayoutSize(final Container target){
 		return layoutSize(target, Component::getPreferredSize);
 	}
 
@@ -113,7 +113,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 	 * @see Container#doLayout
 	 */
 	@Override
-	public Dimension minimumLayoutSize(final Container target){
+	public final Dimension minimumLayoutSize(final Container target){
 		final Dimension dimension = layoutSize(target, Component::getMinimumSize);
 		dimension.width -= getHgap() + 1;
 		return dimension;

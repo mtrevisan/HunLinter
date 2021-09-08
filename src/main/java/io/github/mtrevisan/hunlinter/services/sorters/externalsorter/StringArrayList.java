@@ -59,7 +59,7 @@ public class StringArrayList implements RandomAccess{
 	 *
 	 * @return	The number of elements in this list.
 	 */
-	public synchronized int size(){
+	public final synchronized int size(){
 		return size;
 	}
 
@@ -68,7 +68,7 @@ public class StringArrayList implements RandomAccess{
 	 *
 	 * @param element	Element to be appended to this list.
 	 */
-	public synchronized void add(final String element){
+	public final synchronized void add(final String element){
 		if(size == data.length)
 			grow(size + 1);
 
@@ -76,7 +76,7 @@ public class StringArrayList implements RandomAccess{
 		size ++;
 	}
 
-	public synchronized String get(final int index){
+	public final synchronized String get(final int index){
 		return data[index];
 	}
 
@@ -96,21 +96,21 @@ public class StringArrayList implements RandomAccess{
 	 * Removes all the elements from this list.
 	 * The list will be empty after this call returns.
 	 */
-	public synchronized void clear(){
+	public final synchronized void clear(){
 		for(int i = 0; i < size; i ++)
 			data[i] = null;
 	}
 
-	public synchronized void sort(final Comparator<? super String> comparator){
+	public final synchronized void sort(final Comparator<? super String> comparator){
 		Arrays.sort(data, 0, size, comparator);
 	}
 
-	public synchronized void parallelSort(final Comparator<? super String> comparator){
+	public final synchronized void parallelSort(final Comparator<? super String> comparator){
 		Arrays.parallelSort(data, 0, size, comparator);
 	}
 
 	@Override
-	public synchronized boolean equals(final Object obj){
+	public final synchronized boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -122,7 +122,7 @@ public class StringArrayList implements RandomAccess{
 	}
 
 	@Override
-	public synchronized int hashCode(){
+	public final synchronized int hashCode(){
 		return 31 * size + Arrays.deepHashCode(data);
 	}
 

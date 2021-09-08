@@ -74,7 +74,7 @@ public class SelectFontAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Supplier<String> sampleExtractor = () -> {
@@ -100,7 +100,7 @@ public class SelectFontAction extends AbstractAction{
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException{
+	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}
 

@@ -80,7 +80,7 @@ public class WordMuncher{
 		}
 	}
 
-	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
+	public final List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
 		originators.add(0, dicEntry);
 

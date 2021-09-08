@@ -48,19 +48,19 @@ public class Hyphenation{
 		this.breakCharacter = breakCharacter;
 	}
 
-	public String[] getSyllabes(){
+	public final String[] getSyllabes(){
 		return syllabes;
 	}
 
-	public String[] getCompounds(){
+	public final String[] getCompounds(){
 		return compounds;
 	}
 
-	public String[] getRules(){
+	public final String[] getRules(){
 		return rules;
 	}
 
-	public String getBreakCharacter(){
+	public final String getBreakCharacter(){
 		return breakCharacter;
 	}
 
@@ -68,7 +68,7 @@ public class Hyphenation{
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the (relative) index of the syllabe at the given (global) index
 	 */
-	public int getSyllabeIndex(int idx){
+	public final int getSyllabeIndex(int idx){
 		int k = -1;
 		final int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
@@ -86,11 +86,11 @@ public class Hyphenation{
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the syllabe at the given (global) index
 	 */
-	public String getSyllabe(final int idx){
+	public final String getSyllabe(final int idx){
 		return syllabes[getSyllabeIndex(idx)];
 	}
 
-	public int countSyllabes(){
+	public final int countSyllabes(){
 		return syllabes.length;
 	}
 
@@ -98,7 +98,7 @@ public class Hyphenation{
 	 * @param idx	Index of syllabe to extract, if negative then it's relative to the last syllabe
 	 * @return the syllabe at the given (relative) index
 	 */
-	public String getAt(final int idx){
+	public final String getAt(final int idx){
 		return syllabes[restoreRelativeIndex(idx)];
 	}
 
@@ -106,16 +106,16 @@ public class Hyphenation{
 		return (idx + countSyllabes()) % countSyllabes();
 	}
 
-	public boolean isHyphenated(){
+	public final boolean isHyphenated(){
 		return (rules.length > 0);
 	}
 
-	public boolean isCompound(){
+	public final boolean isCompound(){
 		return (compounds.length > 1);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -127,7 +127,7 @@ public class Hyphenation{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Arrays.hashCode(syllabes);
 		result = 31 * result + breakCharacter.hashCode();
 		return result;

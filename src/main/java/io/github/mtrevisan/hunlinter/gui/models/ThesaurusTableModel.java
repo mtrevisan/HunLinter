@@ -51,28 +51,28 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private List<ThesaurusEntry> synonyms;
 
 
-	public ThesaurusEntry getSynonymsAt(final int index){
+	public final ThesaurusEntry getSynonymsAt(final int index){
 		return synonyms.get(index);
 	}
 
-	public void setSynonyms(final List<ThesaurusEntry> synonyms){
+	public final void setSynonyms(final List<ThesaurusEntry> synonyms){
 		this.synonyms = synonyms;
 
 		fireTableDataChanged();
 	}
 
 	@Override
-	public int getRowCount(){
+	public final int getRowCount(){
 		return (synonyms != null? synonyms.size(): 0);
 	}
 
 	@Override
-	public int getColumnCount(){
+	public final int getColumnCount(){
 		return COLUMN_NAMES.length;
 	}
 
 	@Override
-	public Object getValueAt(final int rowIndex, final int columnIndex){
+	public final Object getValueAt(final int rowIndex, final int columnIndex){
 		if(synonyms == null || synonyms.size() <= rowIndex)
 			return null;
 
@@ -85,7 +85,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public String getColumnName(final int column){
+	public final String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 

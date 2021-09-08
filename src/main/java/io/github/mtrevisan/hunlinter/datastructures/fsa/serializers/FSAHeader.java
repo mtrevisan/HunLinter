@@ -52,7 +52,7 @@ public class FSAHeader{
 		this.version = version;
 	}
 
-	public byte getVersion(){
+	public final byte getVersion(){
 		return version;
 	}
 

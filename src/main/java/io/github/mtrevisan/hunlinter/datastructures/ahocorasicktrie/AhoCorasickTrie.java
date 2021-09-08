@@ -79,7 +79,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @return	A list of outputs
 	 */
-	public List<SearchResult<V>> searchInText(final String text){
+	public final List<SearchResult<V>> searchInText(final String text){
 		final ArrayList<SearchResult<V>> collectedHits = new ArrayList<>();
 		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
 			collectedHits.ensureCapacity(collectedHits.size() + hits.length);
@@ -98,7 +98,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text
 	 * @param processor	A processor which handles the output
 	 */
-	public void searchInText(final String text, final HitProcessor<V> processor){
+	public final void searchInText(final String text, final HitProcessor<V> processor){
 		Objects.requireNonNull(processor, "Processor cannot be null");
 
 		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
@@ -119,7 +119,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	Source text to check
 	 * @return	{@code true} if string contains at least one substring
 	 */
-	public boolean containsKey(final String text){
+	public final boolean containsKey(final String text){
 		return searchInText(text, (hits, index) -> Boolean.FALSE);
 	}
 
@@ -159,12 +159,12 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return nextNodeId;
 	}
 
-	public boolean hasKey(final String key){
+	public final boolean hasKey(final String key){
 		final int id = exactMatchSearch(key);
 		return (id >= 0);
 	}
 
-	public V get(final String key){
+	public final V get(final String key){
 		final int id = exactMatchSearch(key);
 		return (outerValue != null && id >= 0? outerValue.get(id): null);
 	}
@@ -176,7 +176,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param value	The value
 	 * @return	successful or not（failure if there is no key）
 	 */
-	public boolean set(final String key, final V value){
+	public final boolean set(final String key, final V value){
 		final int id = exactMatchSearch(key);
 		if(id >= 0){
 			outerValue.set(id, value);
@@ -241,20 +241,20 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return result;
 	}
 
-	public int size(){
+	public final int size(){
 		return (outerValue != null? outerValue.size(): 0);
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return (size() == 0);
 	}
 
-	public boolean isInitialized(){
+	public final boolean isInitialized(){
 		return (output != null);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -270,7 +270,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = outerValue.hashCode();
 		result = 31 * result + Arrays.hashCode(base);
 		result = 31 * result + Arrays.hashCode(next);

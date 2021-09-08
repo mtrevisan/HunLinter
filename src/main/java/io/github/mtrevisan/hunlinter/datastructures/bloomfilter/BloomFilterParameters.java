@@ -68,7 +68,7 @@ public abstract class BloomFilterParameters{
 	 *
 	 * @return	The tightening ratio.
 	 */
-	public double getTighteningRatio(){
+	public final double getTighteningRatio(){
 		return TIGHTENING_RATIO_DEFAULT;
 	}
 
@@ -77,18 +77,18 @@ public abstract class BloomFilterParameters{
 	 *
 	 * @return	The bit array type.
 	 */
-	public BitArrayBuilder.Type getBitArrayType(){
+	public final BitArrayBuilder.Type getBitArrayType(){
 		return BIT_ARRAY_TYPE_DEFAULT;
 	}
 
-	public void validate(){
+	public final void validate(){
 		if(getExpectedNumberOfElements() <= 0)
 			throw new IllegalArgumentException(INVALID_NUMBER_OF_ELEMENTS);
 		if(getFalsePositiveProbability() <= 0. || getFalsePositiveProbability() >= 1.)
 			throw new IllegalArgumentException(INVALID_FALSE_POSITIVE_PROBABILITY);
 		if(getGrowthRateWhenFull() <= 1.)
 			throw new IllegalArgumentException(INVALID_GROW_RATIO);
-		if(getTighteningRatio() <= 0. && getTighteningRatio() >= 1.)
+		if(getTighteningRatio() <= 0. || getTighteningRatio() >= 1.)
 			throw new IllegalArgumentException(INVALID_TIGHTENING_RATIO);
 		if(getBitArrayType() == null)
 			throw new IllegalArgumentException(INVALID_BIT_ARRAY_TYPE);

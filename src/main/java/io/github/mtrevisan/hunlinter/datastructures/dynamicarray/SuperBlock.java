@@ -42,23 +42,23 @@ class SuperBlock{
 		this.numberOfDataBlocks = numberOfDataBlocks;
 	}
 
-	boolean isEven(){
+	final boolean isEven(){
 		return even;
 	}
 
-	boolean isEmpty(){
+	final boolean isEmpty(){
 		return (numberOfDataBlocks == 0);
 	}
 
-	boolean isFull(){
+	final boolean isFull(){
 		return (numberOfDataBlocks == maxNumberOfDataBlocks);
 	}
 
-	void incrementCurrentNumberOfDataBlocks(){
+	final void incrementCurrentNumberOfDataBlocks(){
 		numberOfDataBlocks ++;
 	}
 
-	void decrementCurrentNumberOfDataBlocks(){
+	final void decrementCurrentNumberOfDataBlocks(){
 		numberOfDataBlocks --;
 	}
 

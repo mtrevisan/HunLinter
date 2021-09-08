@@ -36,7 +36,7 @@ public class LoadProjectEvent{
 		this.project = project;
 	}
 
-	public Path getProject(){
+	public final Path getProject(){
 		return project;
 	}
 

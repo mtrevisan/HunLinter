@@ -105,7 +105,7 @@ public class RulesReducer{
 	}
 
 
-	public List<LineEntry> collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
+	public final List<LineEntry> collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
 		if(!inflections.isEmpty())
 			//remove base inflection
 			inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
@@ -173,11 +173,11 @@ public class RulesReducer{
 		}
 	}
 
-	List<LineEntry> reduceRules(final Collection<LineEntry> plainRules){
+	final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules){
 		return reduceRules(plainRules, null);
 	}
 
-	public List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final ProgressCallback progressCallback){
+	public final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final ProgressCallback progressCallback){
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
 		if(progressCallback != null)
@@ -699,7 +699,7 @@ public class RulesReducer{
 			}
 	}
 
-	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final Iterable<LineEntry> compactedRules){
+	public final List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final Iterable<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));
@@ -748,12 +748,11 @@ public class RulesReducer{
 		return list;
 	}
 
-	void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines){
+	final void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines){
 		checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
 
-	public void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines,
-			final ProgressCallback progressCallback){
+	public final void checkReductionCorrectness(final String flag, final List<String> reducedRules, final Collection<String> originalLines, final ProgressCallback progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));

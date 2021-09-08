@@ -43,17 +43,16 @@ public class TableRenderer extends DefaultTableCellRenderer{
 	private final Collection<Integer> errors = new HashSet<>(0);
 
 
-	public void setErrorOnRow(final int line){
+	public final void setErrorOnRow(final int line){
 		errors.add(line);
 	}
 
-	public void clearErrors(){
+	public final void clearErrors(){
 		errors.clear();
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
-			final boolean hasFocus, final int row, final int column){
+	public final Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column){
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 		setText(value != null? String.valueOf(value): null);
@@ -66,7 +65,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 		return this;
 	}
 
-	public void adjustRowHeight(final JTable table, final int rowIndex){
+	public final void adjustRowHeight(final JTable table, final int rowIndex){
 		final int rowHeight = getPreferredSize().height + 4;
 		if(rowHeight > table.getRowHeight(rowIndex))
 			table.setRowHeight(rowIndex, rowHeight);

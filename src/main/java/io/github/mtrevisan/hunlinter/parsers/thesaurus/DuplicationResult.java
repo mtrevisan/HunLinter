@@ -41,16 +41,16 @@ public class DuplicationResult<T>{
 		this.forceInsertion = forceInsertion;
 	}
 
-	public List<T> getDuplicates(){
+	public final List<T> getDuplicates(){
 		return duplicates;
 	}
 
-	public boolean isForceInsertion(){
+	public final boolean isForceInsertion(){
 		return forceInsertion;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -62,7 +62,7 @@ public class DuplicationResult<T>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = duplicates.hashCode();
 		result = 31 * result + Boolean.hashCode(forceInsertion);
 		return result;

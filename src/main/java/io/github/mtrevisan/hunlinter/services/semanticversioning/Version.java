@@ -164,7 +164,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean greaterThan(final Version other){
+	public final boolean greaterThan(final Version other){
 		return (compareTo(other) > 0);
 	}
 
@@ -175,7 +175,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean greaterThanOrEqualTo(final Version other){
+	public final boolean greaterThanOrEqualTo(final Version other){
 		return (compareTo(other) >= 0);
 	}
 
@@ -186,7 +186,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean lessThan(final Version other){
+	public final boolean lessThan(final Version other){
 		return (compareTo(other) < 0);
 	}
 
@@ -197,12 +197,12 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean lessThanOrEqualTo(final Version other){
+	public final boolean lessThanOrEqualTo(final Version other){
 		return (compareTo(other) <= 0);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -217,7 +217,7 @@ public class Version implements Comparable<Version>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Integer.hashCode(major);
 		result = 31 * result + Integer.hashCode(minor);
 		result = 31 * result + patch.hashCode();
@@ -237,7 +237,7 @@ public class Version implements Comparable<Version>{
 	 * @see #compareToWithBuilds(Version other)
 	 */
 	@Override
-	public int compareTo(final Version other){
+	public final int compareTo(final Version other){
 		final int result = compareToCore(other);
 		return (result != 0? result: compareToIdentifiers(preRelease, other.preRelease));
 	}
@@ -254,7 +254,7 @@ public class Version implements Comparable<Version>{
 	 * @param other	The object to be compared.
 	 * @return	A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
 	 */
-	public int compareToWithBuilds(final Version other){
+	public final int compareToWithBuilds(final Version other){
 		int result = compareTo(other);
 		if(result == 0)
 			result = compareToIdentifiers(preRelease, other.preRelease);
@@ -294,7 +294,7 @@ public class Version implements Comparable<Version>{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		final StringBuilder sb = (new StringBuilder())
 			.append(major).append(DOT).append(minor).append(DOT).append(patch);
 		if(preRelease.length > 0)

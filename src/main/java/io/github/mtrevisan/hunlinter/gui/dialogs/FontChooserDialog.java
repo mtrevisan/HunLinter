@@ -68,17 +68,17 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		}
 
 		@Override
-		public void insertUpdate(final DocumentEvent e){
+		public final void insertUpdate(final DocumentEvent e){
 			update(e);
 		}
 
 		@Override
-		public void removeUpdate(final DocumentEvent e){
+		public final void removeUpdate(final DocumentEvent e){
 			update(e);
 		}
 
 		@Override
-		public void changedUpdate(final DocumentEvent e){
+		public final void changedUpdate(final DocumentEvent e){
 			update(e);
 		}
 

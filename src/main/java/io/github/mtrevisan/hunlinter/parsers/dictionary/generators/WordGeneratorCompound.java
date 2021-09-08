@@ -81,8 +81,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 	}
 
-	protected List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
-			final Map<String, List<DictionaryEntry>> inputs){
+	protected final List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations, final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
 		outer:
@@ -120,7 +119,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected List<Inflection> applyCompound(final Iterable<List<List<Inflection>>> entries, final int limit){
+	protected final List<Inflection> applyCompound(final Iterable<List<List<Inflection>>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -344,8 +343,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others. */
-	protected Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
-			final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
+	protected final Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules, final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
 		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
@@ -369,7 +367,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return map;
 	}
 
-	protected void loadDictionaryForInclusionTest(){
+	protected final void loadDictionaryForInclusionTest(){
 		if(dicInclusionTestWorker != null)
 			dicInclusionTestWorker.executeSynchronously();
 	}

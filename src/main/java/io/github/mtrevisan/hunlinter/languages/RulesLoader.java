@@ -158,43 +158,43 @@ public class RulesLoader{
 	}
 
 
-	public boolean isMorphologicalFieldsCheck(){
+	public final boolean isMorphologicalFieldsCheck(){
 		return morphologicalFieldsCheck;
 	}
 
-	public boolean isEnableVerbSyllabationCheck(){
+	public final boolean isEnableVerbSyllabationCheck(){
 		return enableVerbSyllabationCheck;
 	}
 
-	public boolean isWordCanHaveMultipleStresses(){
+	public final boolean isWordCanHaveMultipleStresses(){
 		return wordCanHaveMultipleStresses;
 	}
 
-	public boolean containsDataField(final MorphologicalTag key){
+	public final boolean containsDataField(final MorphologicalTag key){
 		return dataFields.containsKey(key);
 	}
 
-	public Set<String> getDataField(final MorphologicalTag key){
+	public final Set<String> getDataField(final MorphologicalTag key){
 		return dataFields.get(key);
 	}
 
-	public boolean containsUnsyllabableWords(final String word){
+	public final boolean containsUnsyllabableWords(final String word){
 		return unsyllabableWords.contains(word);
 	}
 
-	public boolean containsMultipleStressedWords(final String word){
+	public final boolean containsMultipleStressedWords(final String word){
 		return multipleStressedWords.contains(word);
 	}
 
-	public boolean containsHasToContainStress(final String flag){
+	public final boolean containsHasToContainStress(final String flag){
 		return hasToContainStress.contains(flag);
 	}
 
-	public boolean containsCannotContainStress(final String flag){
+	public final boolean containsCannotContainStress(final String flag){
 		return cannotContainStress.contains(flag);
 	}
 
-	public void letterToFlagIncompatibilityCheck(final Inflection inflection){
+	public final void letterToFlagIncompatibilityCheck(final Inflection inflection){
 		final String word = inflection.getWord();
 		final Set<Character> keys = letterAndRulesNotCombinable.keySet();
 		for(final Character key : keys)
@@ -205,7 +205,7 @@ public class RulesLoader{
 			}
 	}
 
-	public void flagToFlagIncompatibilityCheck(final Inflection inflection){
+	public final void flagToFlagIncompatibilityCheck(final Inflection inflection){
 		final Set<String> rules = ruleAndRulesNotCombinable.keySet();
 		for(final String rule : rules)
 			if(inflection.hasContinuationFlag(rule)){

@@ -60,7 +60,7 @@ public class RelationTable{
 		this.affixOption = affixOption;
 	}
 
-	public void parse(final ParsingContext context){
+	public final void parse(final ParsingContext context){
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
@@ -99,7 +99,7 @@ public class RelationTable{
 			throw new LinterException(BAD_OPTION.get().format(new Object[]{context, affixOption.getCode()}));
 	}
 
-	public String extractAsList(){
+	public final String extractAsList(){
 		final StringJoiner sj = new StringJoiner(", ");
 		for(final String[] list : table){
 			final String base = list[0];
@@ -110,7 +110,7 @@ public class RelationTable{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return "[affixOption=" + affixOption + ',' + "table=" + table + ']';
 	}
 

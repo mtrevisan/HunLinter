@@ -77,7 +77,7 @@ public class OpenFileAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		try{
 			final File file = (fileSupplier != null? fileSupplier.get(): packager.getFile(fileKey));
 			FileHelper.openFileWithChosenEditor(file);
@@ -89,7 +89,7 @@ public class OpenFileAction extends AbstractAction{
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException{
+	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}
 

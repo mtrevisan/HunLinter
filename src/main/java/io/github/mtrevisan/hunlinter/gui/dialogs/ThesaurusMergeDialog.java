@@ -161,11 +161,11 @@ public class ThesaurusMergeDialog extends JDialog{
 		dispose();
    }//GEN-LAST:event_mergeButtonActionPerformed
 
-	public String getMerge(){
+	public final String getMerge(){
 		return mergerTextArea.getText();
 	}
 
-	public boolean isMerged(){
+	public final boolean isMerged(){
 		return merged;
 	}
 

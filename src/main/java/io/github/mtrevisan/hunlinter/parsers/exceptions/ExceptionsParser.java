@@ -84,7 +84,7 @@ public class ExceptionsParser{
 	 * @throws IOException	If an I/O error occurs.
 	 * @throws SAXException	If a parsing error occurs on the `xml` file.
 	 */
-	public void parse(final File wexFile, final String language) throws IOException, SAXException{
+	public final void parse(final File wexFile, final String language) throws IOException, SAXException{
 		comparator = BaseBuilder.getComparator(language);
 
 		clear();
@@ -120,15 +120,15 @@ public class ExceptionsParser{
 		}
 	}
 
-	public List<String> getExceptionsDictionary(){
+	public final List<String> getExceptionsDictionary(){
 		return dictionary;
 	}
 
-	public int getExceptionsCounter(){
+	public final int getExceptionsCounter(){
 		return dictionary.size();
 	}
 
-	public void modify(final TagChangeType changeType, final Collection<String> tags){
+	public final void modify(final TagChangeType changeType, final Collection<String> tags){
 		switch(changeType){
 			case ADD -> {
 				dictionary.addAll(tags);
@@ -142,11 +142,11 @@ public class ExceptionsParser{
 		}
 	}
 
-	public boolean contains(final String exception){
+	public final boolean contains(final String exception){
 		return dictionary.contains(exception);
 	}
 
-	public void save(final File excFile) throws TransformerException{
+	public final void save(final File excFile) throws TransformerException{
 		final Document doc = xmlManager.newXMLDocumentStandalone();
 
 		//root element
@@ -164,7 +164,7 @@ public class ExceptionsParser{
 		xmlManager.createXML(excFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 

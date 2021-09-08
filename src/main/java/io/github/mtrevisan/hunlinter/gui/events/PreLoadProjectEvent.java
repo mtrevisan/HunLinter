@@ -36,7 +36,7 @@ public class PreLoadProjectEvent{
 		this.project = project;
 	}
 
-	public LoadProjectEvent convertToLoadEvent(){
+	public final LoadProjectEvent convertToLoadEvent(){
 		return new LoadProjectEvent(project);
 	}
 

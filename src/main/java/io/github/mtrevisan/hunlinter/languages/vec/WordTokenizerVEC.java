@@ -48,7 +48,7 @@ public class WordTokenizerVEC extends WordTokenizer{
 
 
 	@Override
-	public List<String> tokenize(String text){
+	public final List<String> tokenize(String text){
 		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");
 		return super.tokenize(text);
 	}

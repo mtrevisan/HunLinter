@@ -61,11 +61,11 @@ public class ThesaurusDictionary{
 		dictionary = new TreeMap<>(comparator);
 	}
 
-	public boolean add(final ThesaurusEntry entry){
+	public final boolean add(final ThesaurusEntry entry){
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
-	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
+	public final boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
 		for(int i = 0; i < size; i ++)
@@ -112,20 +112,20 @@ public class ThesaurusDictionary{
 	}
 
 	/** Find if there is a duplicate with the same definition and same Part-of-Speech. */
-	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+	public final boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
 		final ThesaurusEntry def = dictionary.get(definition);
 		return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
 	}
 
 	/** Find if there is a duplicate with the same Part-of-Speech and same synonyms. */
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+	public final boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
 		return (LoopHelper.match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
 	}
 
 	//FIXME? remove only one entry?
-	public void deleteDefinition(final String definition, final String synonyms){
+	public final void deleteDefinition(final String definition, final String synonyms){
 		//recover all words (definition and synonyms) from given definition
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
 		final Set<String> definitions = entryToBeDeleted.getSynonymsSet();
@@ -153,27 +153,27 @@ public class ThesaurusDictionary{
 //			});
 	}
 
-	public List<ThesaurusEntry> getSynonymsDictionary(){
+	public final List<ThesaurusEntry> getSynonymsDictionary(){
 		return new ArrayList<>(dictionary.values());
 	}
 
-	public List<ThesaurusEntry> getSortedSynonyms(){
+	public final List<ThesaurusEntry> getSortedSynonyms(){
 		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
 		//need to sort the definitions in natural order
 		synonyms.sort((entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
 		return synonyms;
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 
-	public int size(){
+	public final int size(){
 		return dictionary.size();
 	}
 
 	/** Find all the entries that have Part-of-Speech and synonyms contained into the given ones. */
-	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
+	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<String> syns = Arrays.asList(synonyms);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());

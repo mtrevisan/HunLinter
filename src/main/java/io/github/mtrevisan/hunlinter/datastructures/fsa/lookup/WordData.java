@@ -51,38 +51,38 @@ public class WordData{
 	/**
 	 * @return	Inflected word form data. Usually the parameter passed to {@link DictionaryLookup#lookup(String)}.
 	 */
-	public byte[] getWord(){
+	public final byte[] getWord(){
 		return word;
 	}
 
 	/**
 	 * @return	Stem data decoded to a character sequence or {@code null} if no associated stem data exists.
 	 */
-	public byte[] getStem(){
+	public final byte[] getStem(){
 		return stem;
 	}
 
 	/**
 	 * @return	Tag data decoded to a character sequence or {@code null} if no associated tag data exists.
 	 */
-	public byte[] getTag(){
+	public final byte[] getTag(){
 		return tag;
 	}
 
-	void setWord(final byte[] word){
+	final void setWord(final byte[] word){
 		this.word = word;
 	}
 
-	void setStem(final byte[] stem){
+	final void setStem(final byte[] stem){
 		this.stem = stem;
 	}
 
-	void setTag(final byte[] tag){
+	final void setTag(final byte[] tag){
 		this.tag = tag;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -95,7 +95,7 @@ public class WordData{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Arrays.hashCode(word);
 		result = 31 * result + Arrays.hashCode(stem);
 		result = 31 * result + Arrays.hashCode(tag);
@@ -103,7 +103,7 @@ public class WordData{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return "WordData[word:" + new String(word, StandardCharsets.UTF_8)
 			+ ", stem:" + (stem != null? new String(stem, StandardCharsets.UTF_8): "null")
 			+ ", tag:" + (tag != null? new String(tag, StandardCharsets.UTF_8): "null")

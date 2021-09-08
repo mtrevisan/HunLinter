@@ -45,7 +45,7 @@ public class ByteSink{
 	 *
 	 * @return	The byte array
 	 */
-	public byte[] getByteArray(){
+	public final byte[] getByteArray(){
 		try{
 			stream.close();
 		}
@@ -63,7 +63,7 @@ public class ByteSink{
 	 * @param b	Byte to be added
 	 * @return	This instance
 	 */
-	public ByteSink putByte(final byte b){
+	public final ByteSink putByte(final byte b){
 		stream.write(b);
 		return this;
 	}
@@ -74,7 +74,7 @@ public class ByteSink{
 	 * @param bytes	The array of bytes to be added
 	 * @return	This instance
 	 */
-	public ByteSink putBytes(final byte[] bytes){
+	public final ByteSink putBytes(final byte[] bytes){
 		try{
 			stream.write(bytes);
 		}
@@ -84,12 +84,12 @@ public class ByteSink{
 		return this;
 	}
 
-	public ByteSink putBytes(final byte[] bytes, final int offset, final int length){
+	public final ByteSink putBytes(final byte[] bytes, final int offset, final int length){
 		stream.write(bytes, offset, length);
 		return this;
 	}
 
-	public ByteSink putChar(final char c){
+	public final ByteSink putChar(final char c){
 		try{
 			dataStream.writeChar(c);
 			return this;
@@ -99,7 +99,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putShort(final short s){
+	public final ByteSink putShort(final short s){
 		try{
 			dataStream.writeShort(s);
 			return this;
@@ -109,7 +109,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putInt(final int i){
+	public final ByteSink putInt(final int i){
 		try{
 			dataStream.writeInt(i);
 			return this;
@@ -119,7 +119,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putLong(final long l){
+	public final ByteSink putLong(final long l){
 		try{
 			dataStream.writeLong(l);
 			return this;
@@ -129,7 +129,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putFloat(final float f){
+	public final ByteSink putFloat(final float f){
 		try{
 			dataStream.writeFloat(f);
 			return this;
@@ -139,7 +139,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putDouble(final double d){
+	public final ByteSink putDouble(final double d){
 		try{
 			dataStream.writeDouble(d);
 			return this;
@@ -149,7 +149,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putBoolean(final boolean b){
+	public final ByteSink putBoolean(final boolean b){
 		try{
 			dataStream.writeBoolean(b);
 			return this;
@@ -159,7 +159,7 @@ public class ByteSink{
 		}
 	}
 
-	public ByteSink putChars(final CharSequence charSequence){
+	public final ByteSink putChars(final CharSequence charSequence){
 		try{
 			dataStream.writeBytes(charSequence.toString());
 			return this;

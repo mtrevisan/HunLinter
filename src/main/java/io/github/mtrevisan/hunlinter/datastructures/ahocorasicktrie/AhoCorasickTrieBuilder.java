@@ -66,7 +66,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param map	A map containing key-value pairs
 	 * @return	The trie
 	 */
-	public AhoCorasickTrie<V> build(final Map<String, V> map){
+	public final AhoCorasickTrie<V> build(final Map<String, V> map){
 		Objects.requireNonNull(map, "Map cannot be null");
 
 		trie = new AhoCorasickTrie<>();

@@ -45,7 +45,7 @@ public class Affixes{
 		this.terminals = terminals;
 	}
 
-	public List<List<String>> extractAllAffixes(final boolean reverseAffixes){
+	public final List<List<String>> extractAllAffixes(final boolean reverseAffixes){
 		final List<List<String>> result = new ArrayList<>(3);
 		result.add(reverseAffixes? suffixes: prefixes);
 		result.add(reverseAffixes? prefixes: suffixes);
@@ -54,7 +54,7 @@ public class Affixes{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -67,7 +67,7 @@ public class Affixes{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = (prefixes == null? 0: prefixes.hashCode());
 		result = 31 * result + (suffixes == null? 0: suffixes.hashCode());
 		result = 31 * result + (terminals == null? 0: terminals.hashCode());

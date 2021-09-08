@@ -187,7 +187,7 @@ public class Packager{
 	private final XMLManager xmlManager = new XMLManager();
 
 
-	public void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
+	public final void reload(final Path projectPath) throws ProjectNotFoundException, IOException, SAXException{
 		Objects.requireNonNull(projectPath, "Project path cannot be null");
 
 		this.projectPath = projectPath;
@@ -228,11 +228,11 @@ public class Packager{
 		return false;
 	}
 
-	public List<String> getAvailableLanguages(){
+	public final List<String> getAvailableLanguages(){
 		return languages;
 	}
 
-	public void extractConfigurationFolders(final String language){
+	public final void extractConfigurationFolders(final String language){
 		if(!languages.contains(language))
 			throw new IllegalArgumentException("Language not present in " + FILENAME_MANIFEST_XML);
 
@@ -324,7 +324,7 @@ public class Packager{
 	}
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")
-	public void createPackage(final Path projectPath, final String language){
+	public final void createPackage(final Path projectPath, final String language){
 		//package entire folder into a ZIP file
 		try{
 			final File autoCorrectOutputFile = packageAutoCorrectFiles(language);
@@ -407,7 +407,7 @@ public class Packager{
 		ZIPPER.zipDirectory(projectFolder, Deflater.BEST_COMPRESSION, outputFile, outputFiles.toArray(new File[0]));
 	}
 
-	public String getLanguage(){
+	public final String getLanguage(){
 		return language;
 	}
 
@@ -418,7 +418,7 @@ public class Packager{
 	 *
 	 * @see AffixData#getSampleText()
 	 */
-	public String getSampleText(){
+	public final String getSampleText(){
 		String sampleText = "The quick brown fox jumps over the lazy dog\n0123456789";
 		final File affFile = getAffixFile();
 		if(affFile != null){
@@ -436,51 +436,51 @@ public class Packager{
 		return sampleText;
 	}
 
-	public Path getProjectPath(){
+	public final Path getProjectPath(){
 		return projectPath;
 	}
 
-	public File getFile(final String key){
+	public final File getFile(final String key){
 		return (File)configurationFiles.get(KEY_FILE_MAPPER.get(key));
 	}
 
-	public File[] getFiles(final String key){
+	public final File[] getFiles(final String key){
 		return (File[])configurationFiles.get(KEY_FILE_MAPPER.get(key));
 	}
 
-	public File getAffixFile(){
+	public final File getAffixFile(){
 		return getFile(KEY_FILE_AFFIX);
 	}
 
-	public File getDictionaryFile(){
+	public final File getDictionaryFile(){
 		return getFile(KEY_FILE_DICTIONARY);
 	}
 
-	public File getHyphenationFile(){
+	public final File getHyphenationFile(){
 		return getFile(KEY_FILE_HYPHENATION);
 	}
 
-	public File getThesaurusDataFile(){
+	public final File getThesaurusDataFile(){
 		return getFile(KEY_FILE_THESAURUS_DATA);
 	}
 
-	public File getThesaurusIndexFile(){
+	public final File getThesaurusIndexFile(){
 		return getFile(KEY_FILE_THESAURUS_INDEX);
 	}
 
-	public File getAutoCorrectFile(){
+	public final File getAutoCorrectFile(){
 		return getFile(KEY_FILE_AUTO_CORRECT);
 	}
 
-	public File getSentenceExceptionsFile(){
+	public final File getSentenceExceptionsFile(){
 		return getFile(KEY_FILE_SENTENCE_EXCEPTIONS);
 	}
 
-	public File getWordExceptionsFile(){
+	public final File getWordExceptionsFile(){
 		return getFile(KEY_FILE_WORD_EXCEPTIONS);
 	}
 
-	public File[] getAutoTextFiles(){
+	public final File[] getAutoTextFiles(){
 		return getFiles(KEY_FILE_AUTO_TEXT);
 	}
 

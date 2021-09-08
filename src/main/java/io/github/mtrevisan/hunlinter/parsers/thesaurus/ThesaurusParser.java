@@ -84,7 +84,7 @@ public class ThesaurusParser{
 		dictionary = new ThesaurusDictionary(language);
 	}
 
-	public ThesaurusDictionary getDictionary(){
+	public final ThesaurusDictionary getDictionary(){
 		return dictionary;
 	}
 
@@ -94,7 +94,7 @@ public class ThesaurusParser{
 	 * @param theFile	The reference to the thesaurus file
 	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(final File theFile) throws IOException{
+	public final void parse(final File theFile) throws IOException{
 		clear();
 
 		final Path thePath = theFile.toPath();
@@ -115,11 +115,11 @@ public class ThesaurusParser{
 		}
 	}
 
-	public int getSynonymsCount(){
+	public final int getSynonymsCount(){
 		return dictionary.size();
 	}
 
-	public List<ThesaurusEntry> getSynonymsDictionary(){
+	public final List<ThesaurusEntry> getSynonymsDictionary(){
 		return dictionary.getSynonymsDictionary();
 	}
 
@@ -129,8 +129,7 @@ public class ThesaurusParser{
 	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
-			final Predicate<String> duplicatesDiscriminator){
+	public final DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms, final Predicate<String> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
@@ -172,16 +171,16 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same definition and same Part-of-Speech (and also a synonym). */
-	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+	public final boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
 		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 
 	/** Find if there is a duplicate with the same Part-of-Speech and same synonyms. */
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+	public final boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
-	public void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
+	public final void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
 		dictionary.deleteDefinition(definition, selectedSynonyms);
 	}
 
@@ -251,11 +250,11 @@ public class ThesaurusParser{
 		return RegexHelper.clear(text, PATTERN_CLEAR_SEARCH);
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 
-	public void save(final File theIndexFile, final File theDataFile) throws IOException{
+	public final void save(final File theIndexFile, final File theDataFile) throws IOException{
 		//save index and data files
 		final Charset charset = StandardCharsets.UTF_8;
 		try(

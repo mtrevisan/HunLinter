@@ -61,15 +61,15 @@ public class HyphenationBreak{
 	}
 
 
-	public boolean isBreakpoint(final int index){
+	public final boolean isBreakpoint(final int index){
 		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getIndex() % 2 != 0);
 	}
 
-	public String getRule(final int index){
+	public final String getRule(final int index){
 		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getData();
 	}
 
-	public String[] getRules(){
+	public final String[] getRules(){
 		int offset = 0;
 		final String[] list = new String[indexesAndRules.size()];
 		for(final IndexDataPair<String> pair : indexesAndRules.values())
@@ -77,7 +77,7 @@ public class HyphenationBreak{
 		return list;
 	}
 
-	public void enforceNoHyphens(final List<String> syllabes, final Iterable<String> noHyphen){
+	public final void enforceNoHyphens(final List<String> syllabes, final Iterable<String> noHyphen){
 		if(syllabes.size() > 1){
 			int wordLength = 0;
 			for(final String syllabe : syllabes)
@@ -178,7 +178,7 @@ public class HyphenationBreak{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -189,7 +189,7 @@ public class HyphenationBreak{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		return indexesAndRules.hashCode();
 	}
 

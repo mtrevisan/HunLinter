@@ -176,7 +176,7 @@ public class FSA extends FSAAbstract{
 	 * @return The start node of this automaton.
 	 */
 	@Override
-	public int getRootNode(){
+	public final int getRootNode(){
 		// Skip dummy node marking terminating state.
 		final int epsilonNode = skipArc(getFirstArc(0));
 
@@ -195,22 +195,22 @@ public class FSA extends FSAAbstract{
 	}
 
 	@Override
-	public int getEndNode(final int arc){
+	public final int getEndNode(final int arc){
 		return getDestinationNodeOffset(arc);
 	}
 
 	@Override
-	public byte getArcLabel(final int arc){
+	public final byte getArcLabel(final int arc){
 		return arcs[arc];
 	}
 
 	@Override
-	public boolean isArcFinal(final int arc){
+	public final boolean isArcFinal(final int arc){
 		return ((arcs[arc + ADDRESS_OFFSET] & BIT_FINAL_ARC) != 0);
 	}
 
 	@Override
-	public boolean isArcTerminal(final int arc){
+	public final boolean isArcTerminal(final int arc){
 		return (getDestinationNodeOffset(arc) == 0);
 	}
 
@@ -219,7 +219,7 @@ public class FSA extends FSAAbstract{
 	 *		of the set of suffixes reachable from {@code node} (called its right language).
 	 */
 	@Override
-	public int getRightLanguageCount(final int node){
+	public final int getRightLanguageCount(final int node){
 		assert flags.contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
 
 		return decodeFromBytes(arcs, node, nodeDataLength);
@@ -234,7 +234,7 @@ public class FSA extends FSAAbstract{
 	 * </p>
 	 */
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return flags;
 	}
 
@@ -245,7 +245,7 @@ public class FSA extends FSAAbstract{
 	 * @return Returns true if the argument is the last arc of a node.
 	 * @see #BIT_LAST_ARC
 	 */
-	public boolean isArcLast(final int arc){
+	public final boolean isArcLast(final int arc){
 		return ((arcs[arc + ADDRESS_OFFSET] & BIT_LAST_ARC) != 0);
 	}
 
@@ -254,7 +254,7 @@ public class FSA extends FSAAbstract{
 	 * @return   {@code true} if {@link #BIT_TARGET_NEXT} is set for this arc.
 	 * @see #BIT_TARGET_NEXT
 	 */
-	public boolean isNextSet(final int arc){
+	public final boolean isNextSet(final int arc){
 		return (arcs[arc + ADDRESS_OFFSET] & BIT_TARGET_NEXT) != 0;
 	}
 

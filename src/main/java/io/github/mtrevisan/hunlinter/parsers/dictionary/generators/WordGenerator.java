@@ -54,35 +54,35 @@ public class WordGenerator{
 		wordGeneratorCompoundBeginMiddleEnd = new WordGeneratorCompoundBeginMiddleEnd(affixData, dicParser, checker);
 	}
 
-	public DictionaryEntry createFromDictionaryLine(final String line){
+	public final DictionaryEntry createFromDictionaryLine(final String line){
 		return dictionaryEntryFactory.createFromDictionaryLine(line);
 	}
 
-	public DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
+	public final DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
 		return dictionaryEntryFactory.createFromDictionaryLineNoStemTag(line);
 	}
 
-	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
+	public final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry);
 	}
 
-	public List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
+	public final List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
 		return wordGeneratorAffixRules.applyAffixRulesWithCompounds(dicEntry);
 	}
 
-	public List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+	public final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 
-	public List<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	public final List<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
-	public List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	public final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 
-	public List<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
+	public final List<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		return wordGeneratorCompoundBeginMiddleEnd.applyCompoundBeginMiddleEnd(inputCompounds, limit);
 	}
 

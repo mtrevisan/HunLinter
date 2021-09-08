@@ -238,7 +238,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		if(event.getSource() == noHyphenationList)
 			removeSelectedRows();
 	}

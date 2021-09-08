@@ -184,7 +184,7 @@ public class CFSA extends FSAAbstract{
 	}
 
 	@Override
-	public int getRootNode(){
+	public final int getRootNode(){
 		//skip dummy node marking terminating state
 		return getDestinationNodeOffset(getFirstArc(EPSILON));
 	}
@@ -200,30 +200,30 @@ public class CFSA extends FSAAbstract{
 	}
 
 	@Override
-	public int getEndNode(final int arc){
+	public final int getEndNode(final int arc){
 		return getDestinationNodeOffset(arc);
 	}
 
 	@Override
-	public byte getArcLabel(final int arc){
+	public final byte getArcLabel(final int arc){
 		final int index = arcs[arc] & LABEL_INDEX_MASK;
 		return (index > 0? labelMapping[index]: arcs[arc + 1]);
 	}
 
 	@Override
-	public int getRightLanguageCount(final int node){
+	public final int getRightLanguageCount(final int node){
 		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
 
 		return readVInt(arcs, node);
 	}
 
 	@Override
-	public boolean isArcFinal(final int arc){
+	public final boolean isArcFinal(final int arc){
 		return ((arcs[arc] & BIT_FINAL_ARC) != 0);
 	}
 
 	@Override
-	public boolean isArcTerminal(final int arc){
+	public final boolean isArcTerminal(final int arc){
 		return (getDestinationNodeOffset(arc) == 0);
 	}
 
@@ -234,7 +234,7 @@ public class CFSA extends FSAAbstract{
 	 * @return Returns true if the argument is the last arc of a node.
 	 * @see #BIT_LAST_ARC
 	 */
-	public boolean isArcLast(final int arc){
+	public final boolean isArcLast(final int arc){
 		return ((arcs[arc] & BIT_LAST_ARC) != 0);
 	}
 
@@ -243,12 +243,12 @@ public class CFSA extends FSAAbstract{
 	 * @return Returns true if {@link #BIT_TARGET_NEXT} is set for this arc.
 	 * @see #BIT_TARGET_NEXT
 	 */
-	public boolean isNextSet(final int arc){
+	public final boolean isNextSet(final int arc){
 		return ((arcs[arc] & BIT_TARGET_NEXT) != 0);
 	}
 
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return flags;
 	}
 

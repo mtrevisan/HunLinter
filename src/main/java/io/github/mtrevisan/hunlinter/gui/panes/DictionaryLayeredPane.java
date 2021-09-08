@@ -316,7 +316,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void initialize(final Integer actionCommand){
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -361,7 +361,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clear(final Integer actionCommand){
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_DICTIONARY)
 			return;
 
@@ -384,7 +384,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearAid(final Integer actionCommand){
+	public final void clearAid(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 

@@ -184,27 +184,27 @@ public class HyphenationParser{
 		this.options = (options != null? options: new HyphenationOptionsParser());
 	}
 
-	public boolean isSecondLevelPresent(){
+	public final boolean isSecondLevelPresent(){
 		return secondLevelPresent;
 	}
 
-	public Pattern getPatternNoHyphen(){
+	public final Pattern getPatternNoHyphen(){
 		return patternNoHyphen;
 	}
 
-	public Map<Level, AhoCorasickTrie<String>> getPatterns(){
+	public final Map<Level, AhoCorasickTrie<String>> getPatterns(){
 		return patterns;
 	}
 
-	public Map<Level, Map<String, String>> getCustomHyphenations(){
+	public final Map<Level, Map<String, String>> getCustomHyphenations(){
 		return customHyphenations;
 	}
 
-	public HyphenationOptionsParser getOptions(){
+	public final HyphenationOptionsParser getOptions(){
 		return options;
 	}
 
-	public void setOptions(final HyphenationOptionsParser options){
+	public final void setOptions(final HyphenationOptionsParser options){
 		this.options = options;
 	}
 
@@ -214,7 +214,7 @@ public class HyphenationParser{
 	 * @param hypFile	The content of the hyphenation file
 	 * @throws LinterException   If something is wrong while parsing the file
 	 */
-	public void parse(final File hypFile){
+	public final void parse(final File hypFile){
 		final Path hypPath = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
 		final Charset charset = FileHelper.determineCharset(hypPath);
@@ -336,7 +336,7 @@ public class HyphenationParser{
 		return duplicatedRule;
 	}
 
-	public void clear(){
+	public final void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
 		for(final Level lev : Level.values())
@@ -356,7 +356,7 @@ public class HyphenationParser{
 	 * @param level   Level to add the rule to
 	 * @return The value of a rule if already in place, {@code null} if the insertion has completed successfully
 	 */
-	public String addRule(final String rule, final Level level){
+	public final String addRule(final String rule, final Level level){
 		validateRule(rule, level);
 
 		final String oldRule;
@@ -385,7 +385,7 @@ public class HyphenationParser{
 	 * @param level	Level to remove the rule from
 	 * @return {@code true} if the removal has completed successfully
 	 */
-	public boolean removeRule(final String rule, final Level level){
+	public final boolean removeRule(final String rule, final Level level){
 		final String oldRule;
 		if(isCustomRule(rule)){
 			final String key = StringHelper.removeAll(rule, EQUALS_SIGN);
@@ -489,7 +489,7 @@ public class HyphenationParser{
 		return RegexHelper.indexOf(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
 	}
 
-	public void save(final File hypFile) throws IOException{
+	public final void save(final File hypFile) throws IOException{
 		final Charset charset = StandardCharsets.UTF_8;
 		final Path hypPath = hypFile.toPath();
 		try(final BufferedWriter writer = Files.newBufferedWriter(hypPath, charset)){
@@ -534,7 +534,7 @@ public class HyphenationParser{
 	 * @param level	The level to check the rule for
 	 * @return	Whether the hyphenator has the given rule
 	 */
-	public boolean hasRule(final String rule, final Level level){
+	public final boolean hasRule(final String rule, final Level level){
 		return (isCustomRule(rule)
 			? customHyphenations.get(level).containsValue(rule)
 			: rules.get(level).containsKey(getKeyFromData(rule)));

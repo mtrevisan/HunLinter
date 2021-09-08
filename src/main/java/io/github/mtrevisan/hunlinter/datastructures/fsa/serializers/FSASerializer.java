@@ -73,21 +73,21 @@ public class FSASerializer implements FSASerializerInterface{
 	 * @return Returns the same object for easier call chaining.
 	 */
 	@Override
-	public FSASerializer serializeWithNumbers(){
+	public final FSASerializer serializeWithNumbers(){
 		serializeWithNumbers = true;
 
 		return this;
 	}
 
 	@Override
-	public FSASerializer withFiller(final byte filler){
+	public final FSASerializer withFiller(final byte filler){
 		this.fillerByte = filler;
 
 		return this;
 	}
 
 	@Override
-	public FSASerializer withAnnotationSeparator(final byte annotationSeparator){
+	public final FSASerializer withAnnotationSeparator(final byte annotationSeparator){
 		this.annotationByte = annotationSeparator;
 
 		return this;
@@ -100,7 +100,7 @@ public class FSASerializer implements FSASerializerInterface{
 	 * @see #serializeWithNumbers()
 	 */
 	@Override
-	public <T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback)
+	public final <T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback)
 			throws IOException{
 		//prepare space for arc offsets and linearize all the states
 		final int[] linearized = linearize(fsa);
@@ -180,7 +180,7 @@ public class FSASerializer implements FSASerializerInterface{
 
 	/** Return supported flags. */
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return flags;
 	}
 

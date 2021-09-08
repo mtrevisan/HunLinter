@@ -113,7 +113,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	public void loadRules(){
+	public final void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 
 		patternNonVanishingEl = RegexHelper.pattern(rulesLoader.readProperty("patternNonVanishingEl"),
@@ -132,7 +132,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	public void checkInflection(final Inflection inflection, final int index){
+	public final void checkInflection(final Inflection inflection, final int index){
 		super.checkInflection(inflection, index);
 
 		stressCheck(inflection);
@@ -209,7 +209,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	@Override
-	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){
+	protected final void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){
 		if(subwordIndex == 0)
 			stressCheck(subword, inflection);
 
@@ -289,17 +289,17 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 
 	@Override
-	public boolean shouldNotCheckProductiveness(final String flag){
+	public final boolean shouldNotCheckProductiveness(final String flag){
 		return dontCheckProductivenessRules.contains(flag);
 	}
 
 	@Override
-	public boolean isConsonant(final char chr){
+	public final boolean isConsonant(final char chr){
 		return WordVEC.isConsonant(chr);
 	}
 
 	@Override
-	public boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
+	public final boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
 		final String word = inflection.getWord();
 		return (word.length() >= MINIMAL_PAIR_MINIMUM_LENGTH
 			&& word.indexOf('ƚ') < 0

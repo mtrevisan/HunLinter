@@ -45,20 +45,20 @@ public class Duplicate{
 		this.lineIndex = lineIndex;
 	}
 
-	public Inflection getInflection(){
+	public final Inflection getInflection(){
 		return inflection;
 	}
 
-	public String getWord(){
+	public final String getWord(){
 		return word;
 	}
 
-	public int getLineIndex(){
+	public final int getLineIndex(){
 		return lineIndex;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -69,7 +69,7 @@ public class Duplicate{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		return Integer.hashCode(lineIndex);
 	}
 

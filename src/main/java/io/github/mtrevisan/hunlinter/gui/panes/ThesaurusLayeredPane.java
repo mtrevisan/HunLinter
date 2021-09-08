@@ -291,7 +291,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void initialize(final Integer actionCommand){
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -326,7 +326,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	@EventHandler
 	@SuppressWarnings("unchecked")
-	public void clear(final Integer actionCommand){
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;
 
@@ -364,7 +364,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			sorter.setRowFilter(null);
 	}
 
-	public void mergeThesaurusRow(final Component invoker){
+	public final void mergeThesaurusRow(final Component invoker){
 		final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
@@ -392,11 +392,11 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		}
 	}
 
-	public void removeSelectedRows(final Component invoker){
+	public final void removeSelectedRows(final Component invoker){
 		removeSelectedRowsFromThesaurus();
 	}
 
-	public void removeSelectedRowsFromThesaurus(){
+	public final void removeSelectedRowsFromThesaurus(){
 		try{
 			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 			final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
@@ -431,7 +431,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	}
 
 
-	public void openDictionaryFSAActionPerformed(final ActionEvent evt){
+	public final void openDictionaryFSAActionPerformed(final ActionEvent evt){
 		dictionaryLookup = null;
 
 		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenDictionaryFSAFileChooser);
@@ -452,7 +452,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		}
 	}
 
-	public DictionaryLookup getDictionaryLookup(){
+	public final DictionaryLookup getDictionaryLookup(){
 		return dictionaryLookup;
 	}
 

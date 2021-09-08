@@ -60,7 +60,7 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		//search for the maximum matching subsequence that can be encoded
 		int maxSubsequenceLength = 0;
 		int maxSubsequenceIndex = 0;
@@ -92,7 +92,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		int truncatePrefixBytes = decodeValue(encoded[0]);
 		int truncateSuffixBytes = decodeValue(encoded[1]);
 		if(truncatePrefixBytes == REMOVE_EVERYTHING || truncateSuffixBytes == REMOVE_EVERYTHING){
@@ -109,7 +109,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

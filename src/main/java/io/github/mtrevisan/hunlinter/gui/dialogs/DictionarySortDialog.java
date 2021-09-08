@@ -143,7 +143,7 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setDictionaryEnabled(final boolean enabled){
+	public final void setDictionaryEnabled(final boolean enabled){
 		entriesList.setEnabled(enabled);
 	}
 
@@ -219,15 +219,15 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.setCellRenderer(renderer);
 	}
 
-	public void addListSelectionListener(final ListSelectionListener listener){
+	public final void addListSelectionListener(final ListSelectionListener listener){
 		entriesList.addListSelectionListener(listener);
 	}
 
-	public int getFirstVisibleIndex(){
+	public final int getFirstVisibleIndex(){
 		return entriesList.getFirstVisibleIndex();
 	}
 
-	public int getSelectedIndex(){
+	public final int getSelectedIndex(){
 		return entriesList.getSelectedIndex();
 	}
 

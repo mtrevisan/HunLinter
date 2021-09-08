@@ -52,7 +52,7 @@ public class Orthography{
 		return correctApostrophes(word);
 	}
 
-	protected String correctApostrophes(final String word){
+	protected final String correctApostrophes(final String word){
 		return StringUtils.replaceChars(word, WRONG_APOSTROPHES, CORRECT_APOSTROPHES);
 	}
 
@@ -60,19 +60,19 @@ public class Orthography{
 		return new boolean[syllabes.length];
 	}
 
-	public boolean hasSyllabationErrors(final String[] syllabes){
+	public final boolean hasSyllabationErrors(final String[] syllabes){
 		final boolean[] errors = getSyllabationErrors(syllabes);
 		return IntStream.range(0, errors.length)
 			.mapToObj(idx -> errors[idx])
 			.anyMatch(error -> error);
 	}
 
-	public StringJoiner formatHyphenation(final String[] syllabes){
+	public final StringJoiner formatHyphenation(final String[] syllabes){
 		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
 		return formatHyphenation(syllabes, sj, Function.identity());
 	}
 
-	public StringJoiner formatHyphenation(final String[] syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
+	public final StringJoiner formatHyphenation(final String[] syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
 		final boolean[] errors = getSyllabationErrors(syllabes);
 		for(int i = 0; i < syllabes.length; i ++){
 			final Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());

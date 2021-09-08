@@ -89,34 +89,34 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 		}
 	}
 
-	public String getDefinition(){
+	public final String getDefinition(){
 		return definition;
 	}
 
-	public String joinSynonyms(final String separator){
+	public final String joinSynonyms(final String separator){
 		return StringUtils.join(synonyms, separator);
 	}
 
-	public void addSynonym(final SynonymsEntry synonymsEntry){
+	public final void addSynonym(final SynonymsEntry synonymsEntry){
 		synonyms.add(synonymsEntry);
 	}
 
-	public List<SynonymsEntry> getSynonyms(){
+	public final List<SynonymsEntry> getSynonyms(){
 		return synonyms;
 	}
 
-	public Set<String> getSynonymsSet(){
+	public final Set<String> getSynonymsSet(){
 		final Set<String> set = new HashSet<>(synonyms.size());
 		for(final SynonymsEntry synonym : synonyms)
 			set.addAll(synonym.getSynonyms());
 		return set;
 	}
 
-	public int getSynonymsEntries(){
+	public final int getSynonymsEntries(){
 		return synonyms.size();
 	}
 
-	public boolean containsPartOfSpeechesAndSynonym(final String[] partOfSpeeches, final String synonym){
+	public final boolean containsPartOfSpeechesAndSynonym(final String[] partOfSpeeches, final String synonym){
 //		return synonyms.stream()
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
@@ -127,25 +127,25 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 //		return false;
 	}
 
-	public boolean contains(final Collection<String> partOfSpeeches, final List<String> synonyms){
+	public final boolean contains(final Collection<String> partOfSpeeches, final List<String> synonyms){
 		final Collection<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
 	}
 
-	public boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
+	public final boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
 		final Collection<String> ss = new ArrayList<>(synonyms);
 		return (ss.remove(definition) && match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
 			|| match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
 	}
 
-	public void saveToIndex(final BufferedWriter writer, final int idx) throws IOException{
+	public final void saveToIndex(final BufferedWriter writer, final int idx) throws IOException{
 		writer.write(definition);
 		writer.write(PIPE);
 		writer.write(Integer.toString(idx));
 		writer.write(NEW_LINE);
 	}
 
-	public int saveToData(final BufferedWriter dataWriter, final Charset charset) throws IOException{
+	public final int saveToData(final BufferedWriter dataWriter, final Charset charset) throws IOException{
 		final int synonymsEntries = getSynonymsEntries();
 		saveToIndex(dataWriter, synonymsEntries);
 		int synonymsLength = 1;
@@ -160,20 +160,20 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		final StringJoiner sj = new StringJoiner("\r\n");
 		for(final SynonymsEntry synonym : synonyms)
 			sj.add(definition + ": " + String.join(", ", synonym.toString()));
 		return sj.toString();
 	}
 
-	public String toLine(final int definitionIndex){
+	public final String toLine(final int definitionIndex){
 		return synonyms.get(definitionIndex)
 			.toLine(definition);
 	}
 
 	@Override
-	public int compareTo(final ThesaurusEntry other){
+	public final int compareTo(final ThesaurusEntry other){
 		return new CompareToBuilder()
 			.append(definition, other.definition)
 			.append(synonyms, other.synonyms)
@@ -181,7 +181,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -193,7 +193,7 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = definition.hashCode();
 		result = 31 * result + synonyms.hashCode();
 		return result;

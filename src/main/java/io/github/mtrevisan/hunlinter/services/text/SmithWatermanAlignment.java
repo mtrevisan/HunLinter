@@ -71,7 +71,7 @@ public class SmithWatermanAlignment{
 		private Deque<Character> operations;
 
 		@Override
-		public boolean equals(final Object obj){
+		public final boolean equals(final Object obj){
 			if(this == obj)
 				return true;
 			if(obj == null || getClass() != obj.getClass())
@@ -85,7 +85,7 @@ public class SmithWatermanAlignment{
 		}
 
 		@Override
-		public int hashCode(){
+		public final int hashCode(){
 			int result = Integer.hashCode(firstIndexA);
 			result = 31 * result + Integer.hashCode(firstIndexB);
 			result = 31 * result + Integer.hashCode(lastIndexA);
@@ -117,7 +117,7 @@ public class SmithWatermanAlignment{
 			scores[0][j] = j * COST_INSERTION;
 	}
 
-	public Set<Trace> align(){
+	public final Set<Trace> align(){
 		//calculate scores:
 		double maxScore = 0.;
 		for(int j = 1; j <= m; j ++)

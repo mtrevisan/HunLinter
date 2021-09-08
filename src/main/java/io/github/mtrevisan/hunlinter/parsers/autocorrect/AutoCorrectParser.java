@@ -80,7 +80,7 @@ public class AutoCorrectParser{
 	 * @throws IOException	If an I/O error occurs.
 	 * @throws SAXException	If a parsing error occurs on the `xml` file.
 	 */
-	public void parse(final File acoFile) throws IOException, SAXException{
+	public final void parse(final File acoFile) throws IOException, SAXException{
 		clear();
 
 		final Document doc = xmlManager.parseXMLDocument(acoFile);
@@ -115,15 +115,15 @@ public class AutoCorrectParser{
 		}
 	}
 
-	public List<CorrectionEntry> getCorrectionsDictionary(){
+	public final List<CorrectionEntry> getCorrectionsDictionary(){
 		return dictionary;
 	}
 
-	public int getCorrectionsCounter(){
+	public final int getCorrectionsCounter(){
 		return dictionary.size();
 	}
 
-	public void setCorrection(final int index, final String incorrect, final String correct){
+	public final void setCorrection(final int index, final String incorrect, final String correct){
 		dictionary.set(index, new CorrectionEntry(incorrect, correct));
 	}
 
@@ -134,8 +134,7 @@ public class AutoCorrectParser{
 	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
-			final Supplier<Boolean> duplicatesDiscriminator){
+	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct, final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE.get().format(new Object[]{"Incorrect", incorrect}));
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
@@ -149,7 +148,7 @@ public class AutoCorrectParser{
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	public void deleteCorrection(final int selectedRowID){
+	public final void deleteCorrection(final int selectedRowID){
 		dictionary.remove(selectedRowID);
 	}
 
@@ -164,7 +163,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public boolean contains(final String incorrect, final String correct){
+	public final boolean contains(final String incorrect, final String correct){
 		return (match(dictionary,
 			elem -> !incorrect.isEmpty() && !correct.isEmpty()
 				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
@@ -188,7 +187,7 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
-	public void save(final File acoFile) throws TransformerException{
+	public final void save(final File acoFile) throws TransformerException{
 		final Document doc = xmlManager.newXMLDocumentStandalone();
 
 		//root element
@@ -207,7 +206,7 @@ public class AutoCorrectParser{
 		xmlManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 

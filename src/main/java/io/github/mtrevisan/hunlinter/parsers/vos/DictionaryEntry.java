@@ -93,15 +93,15 @@ public class DictionaryEntry{
 //		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 //	}
 
-	public String getWord(){
+	public final String getWord(){
 		return word;
 	}
 
-	public boolean isCombinable(){
+	public final boolean isCombinable(){
 		return combinable;
 	}
 
-	public boolean removeContinuationFlag(final String continuationFlagToRemove){
+	public final boolean removeContinuationFlag(final String continuationFlagToRemove){
 		boolean removed = false;
 		if(continuationFlagToRemove != null && continuationFlags != null){
 			final int previousSize = continuationFlags.size();
@@ -119,23 +119,23 @@ public class DictionaryEntry{
 	 * @param isTerminalAffix	The method used to determine if a flag is a terminal
 	 * @return	Whether there are continuation flags that are not terminal affixes
 	 */
-	public boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
+	public final boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
 		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
 	}
 
-	public List<String> getContinuationFlags(){
+	public final List<String> getContinuationFlags(){
 		return continuationFlags;
 	}
 
-	public int getContinuationFlagCount(){
+	public final int getContinuationFlagCount(){
 		return (continuationFlags != null? continuationFlags.size(): 0);
 	}
 
-	public boolean hasContinuationFlag(final String flag){
+	public final boolean hasContinuationFlag(final String flag){
 		return (continuationFlags != null && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public boolean hasContinuationFlags(final String[] flags){
+	public final boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(continuationFlags);
 			return (LoopHelper.match(flags, Predicate.not(list::add)) != null);
@@ -166,7 +166,7 @@ public class DictionaryEntry{
 		return null;
 	}
 
-	public Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
+	public final Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		final int size = (continuationFlags != null? continuationFlags.size(): 0);
 		final Map<String, List<DictionaryEntry>> result = new HashMap<>(size);
 		for(int i = 0; i < size; i ++){
@@ -178,8 +178,7 @@ public class DictionaryEntry{
 		return result;
 	}
 
-	public Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
-			final String compoundMiddleFlag, final String compoundEndFlag){
+	public final Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag, final String compoundMiddleFlag, final String compoundEndFlag){
 		final Map<String, List<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new ArrayList<>(0));
 		distribution.put(compoundMiddleFlag, new ArrayList<>(0));
@@ -191,7 +190,7 @@ public class DictionaryEntry{
 		return distribution;
 	}
 
-	public boolean hasPartOfSpeech(){
+	public final boolean hasPartOfSpeech(){
 		return (LoopHelper.match(morphologicalFields, MorphologicalTag.PART_OF_SPEECH::isSupertypeOf) != null);
 	}
 
@@ -199,7 +198,7 @@ public class DictionaryEntry{
 	 * @param partOfSpeech	Part-of-Speech WITH the MorphologicalTag.PART_OF_SPEECH prefix
 	 * @return	Whether this entry has the given Part-of-Speech
 	 */
-	public boolean hasPartOfSpeech(final String partOfSpeech){
+	public final boolean hasPartOfSpeech(final String partOfSpeech){
 		return hasMorphologicalField(partOfSpeech);
 	}
 
@@ -207,7 +206,7 @@ public class DictionaryEntry{
 		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
 	}
 
-	public String getMorphologicalFieldStem(){
+	public final String getMorphologicalFieldStem(){
 		if(morphologicalFields != null){
 			final String tag = MorphologicalTag.STEM.getCode();
 			for(final String mf : morphologicalFields)
@@ -217,7 +216,7 @@ public class DictionaryEntry{
 		return word;
 	}
 
-	public List<String> getMorphologicalFieldPartOfSpeech(){
+	public final List<String> getMorphologicalFieldPartOfSpeech(){
 		if(morphologicalFields == null)
 			return Collections.emptyList();
 
@@ -235,7 +234,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public List<List<String>> extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public final List<List<String>> extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -304,7 +303,7 @@ public class DictionaryEntry{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -317,7 +316,7 @@ public class DictionaryEntry{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = (word == null? 0: word.hashCode());
 		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
 		result = 31 * result + Arrays.hashCode(morphologicalFields);

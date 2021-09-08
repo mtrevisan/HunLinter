@@ -78,8 +78,7 @@ class WordGeneratorBase{
 	 * @return	The list of inflections for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
-			final RuleEntry overriddenRule){
+	protected final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();
@@ -142,8 +141,7 @@ class WordGeneratorBase{
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
-	protected List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
-			final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	protected final List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}

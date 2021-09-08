@@ -44,14 +44,14 @@ public class RuleMatcherEntry{
 		this.wrongFlags = wrongFlags;
 	}
 
-	public void match(final Inflection inflection){
+	public final void match(final Inflection inflection){
 		for(final String flag : wrongFlags)
 			if(inflection.hasContinuationFlag(flag))
 				throw new LinterException(messagePattern.format(new Object[]{masterFlag, flag}));
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -64,7 +64,7 @@ public class RuleMatcherEntry{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = messagePattern.hashCode();
 		result = 31 * result + masterFlag.hashCode();
 		result = 31 * result + Arrays.hashCode(wrongFlags);

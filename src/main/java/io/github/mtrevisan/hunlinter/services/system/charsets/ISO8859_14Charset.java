@@ -65,7 +65,7 @@ public class ISO8859_14Charset extends Charset{
 		}
 
 		@Override
-		protected CoderResult decodeLoop(final ByteBuffer in, final CharBuffer out){
+		protected final CoderResult decodeLoop(final ByteBuffer in, final CharBuffer out){
 			while(in.hasRemaining() && out.hasRemaining()){
 				final char ch = (char)(in.get() & 0x00FF);
 				out.put(ch >= 0xA0? TABLE[ch - 0x00A0]: ch);
@@ -81,7 +81,7 @@ public class ISO8859_14Charset extends Charset{
 		}
 
 		@Override
-		protected CoderResult encodeLoop(final CharBuffer in, final ByteBuffer out){
+		protected final CoderResult encodeLoop(final CharBuffer in, final ByteBuffer out){
 			while(in.hasRemaining() && out.hasRemaining()){
 				final char ch = in.get();
 				out.putChar(INVERSE_TABLE.getOrDefault(ch, ch));
@@ -96,17 +96,17 @@ public class ISO8859_14Charset extends Charset{
 	}
 
 	@Override
-	public boolean contains(final Charset cs){
+	public final boolean contains(final Charset cs){
 		return false;
 	}
 
 	@Override
-	public CharsetDecoder newDecoder(){
+	public final CharsetDecoder newDecoder(){
 		return new ISO8859_14Decoder();
 	}
 
 	@Override
-	public CharsetEncoder newEncoder(){
+	public final CharsetEncoder newEncoder(){
 		return new ISO8859_14Encoder();
 	}
 

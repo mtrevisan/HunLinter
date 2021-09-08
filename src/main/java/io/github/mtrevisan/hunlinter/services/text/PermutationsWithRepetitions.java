@@ -80,7 +80,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	 * @param limit	Count limit for the results
 	 * @return	Total permutations with repetitions of {@code n} elements taken {@code 2…maxCompounds} at a time
 	 */
-	public List<int[]> permutations(final int limit){
+	public final List<int[]> permutations(final int limit){
 		if(limit < 1)
 			throw new IllegalArgumentException(ONE_OUTPUT_MINIMUM);
 
@@ -101,12 +101,12 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	}
 
 	@Override
-	public boolean hasNext(){
+	public final boolean hasNext(){
 		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < maximumIndex);
 	}
 
 	@Override
-	public int[] next(){
+	public final int[] next(){
 		if(!hasNext())
 			throw new NoSuchElementException("No permutations left");
 

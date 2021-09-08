@@ -46,11 +46,11 @@ public class WorkerDataProject extends WorkerData{
 		this.parserManager = parserManager;
 	}
 
-	Packager getPackager(){
+	final Packager getPackager(){
 		return packager;
 	}
 
-	ParserManager getParserManager(){
+	final ParserManager getParserManager(){
 		return parserManager;
 	}
 

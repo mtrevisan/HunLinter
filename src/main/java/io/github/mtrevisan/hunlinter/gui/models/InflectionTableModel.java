@@ -47,24 +47,24 @@ public class InflectionTableModel extends AbstractTableModel implements HunLinte
 
 
 	@Override
-	public void setInflections(final List<Inflection> inflections){
+	public final void setInflections(final List<Inflection> inflections){
 		this.inflections = inflections;
 
 		fireTableDataChanged();
 	}
 
 	@Override
-	public int getRowCount(){
+	public final int getRowCount(){
 		return (inflections != null? inflections.size(): 0);
 	}
 
 	@Override
-	public int getColumnCount(){
+	public final int getColumnCount(){
 		return COLUMN_NAMES.length;
 	}
 
 	@Override
-	public Object getValueAt(final int rowIndex, final int columnIndex){
+	public final Object getValueAt(final int rowIndex, final int columnIndex){
 		if(inflections == null || rowIndex < 0 || inflections.size() <= rowIndex)
 			return null;
 
@@ -80,7 +80,7 @@ public class InflectionTableModel extends AbstractTableModel implements HunLinte
 	}
 
 	@Override
-	public String getColumnName(final int column){
+	public final String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 

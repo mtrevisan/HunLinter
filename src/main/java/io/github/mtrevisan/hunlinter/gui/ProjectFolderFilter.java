@@ -67,7 +67,7 @@ public class ProjectFolderFilter extends FileFilter{
 	 * @return true if the file is to be accepted, false otherwise
 	 */
 	@Override
-	public boolean accept(final File f){
+	public final boolean accept(final File f){
 		return (f != null && f.isDirectory());
 	}
 
@@ -78,7 +78,7 @@ public class ProjectFolderFilter extends FileFilter{
 	 * @return	The description of this filter
 	 */
 	@Override
-	public String getDescription(){
+	public final String getDescription(){
 		return description;
 	}
 

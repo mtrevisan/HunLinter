@@ -100,7 +100,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** Returns {@code true} if there are still elements in this iterator. */
 	@Override
-	public boolean hasNext(){
+	public final boolean hasNext(){
 		if(nextElement == null)
 			nextElement = advance();
 
@@ -111,7 +111,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 	 * @return Returns a {@link ByteBuffer} with the sequence corresponding to the next final state in the automaton.
 	 */
 	@Override
-	public ByteBuffer next(){
+	public final ByteBuffer next(){
 		final ByteBuffer cache;
 		if(nextElement != null){
 			cache = nextElement;
@@ -175,7 +175,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 
 	/** Not implemented in this iterator. */
 	@Override
-	public void remove(){
+	public final void remove(){
 		throw new UnsupportedOperationException("Read-only iterator.");
 	}
 

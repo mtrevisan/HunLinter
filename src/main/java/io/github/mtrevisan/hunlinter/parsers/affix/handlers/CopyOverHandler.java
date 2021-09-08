@@ -31,7 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 public class CopyOverHandler implements Handler{
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		affixData.addData(context.getRuleType(), context.getAllButFirstParameter());
 
 		return 0;

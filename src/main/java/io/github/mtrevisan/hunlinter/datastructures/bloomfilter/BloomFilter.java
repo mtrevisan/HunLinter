@@ -158,12 +158,12 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public double getFalsePositiveProbability(){
+	public final double getFalsePositiveProbability(){
 		return falsePositiveProbability;
 	}
 
 	@Override
-	public synchronized int getAddedElements(){
+	public final synchronized int getAddedElements(){
 		return addedElements;
 	}
 
@@ -196,7 +196,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter.
 	 * @return {@code true} if any bit was modified when adding the value, {@code false} otherwise.
 	 */
-	public synchronized boolean add(final byte[] bytes){
+	public final synchronized boolean add(final byte[] bytes){
 		final boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
 			addedElements ++;
@@ -233,7 +233,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public synchronized boolean contains(final byte[] bytes){
+	public final synchronized boolean contains(final byte[] bytes){
 		final long hash = getLongHash64(bytes);
 		final int lowHash = (int)hash;
 		final int highHash = (int)(hash >>> 32);
@@ -281,45 +281,45 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	//Overridden helper functions follow
 	@Override
-	public boolean add(final T value){
+	public final boolean add(final T value){
 		return (value != null && add(decomposeValue(value)));
 	}
 
 	@Override
-	public boolean contains(final T value){
+	public final boolean contains(final T value){
 		return (value != null && contains(value.toString().getBytes(charset)));
 	}
 
 	@Override
-	public synchronized boolean isFull(){
+	public final synchronized boolean isFull(){
 		return (addedElements >= expectedElements);
 	}
 
 	@Override
-	public double getExpectedFalsePositiveProbability(){
+	public final double getExpectedFalsePositiveProbability(){
 		return getTrueFalsePositiveProbability(expectedElements);
 	}
 
 	@Override
-	public synchronized double getTrueFalsePositiveProbability(){
+	public final synchronized double getTrueFalsePositiveProbability(){
 		return getTrueFalsePositiveProbability(addedElements);
 	}
 
 	@Override
-	public double getTrueFalsePositiveProbability(final int insertedElements){
+	public final double getTrueFalsePositiveProbability(final int insertedElements){
 		//(1 - e^(-k * n / m)) ^ k
 		return Math.pow((1. - Math.exp(-hashFunctions * (double)insertedElements / bitsRequired)), hashFunctions);
 	}
 
 	/** Sets all bits to false in the Bloom filter. */
 	@Override
-	public synchronized void clear(){
+	public final synchronized void clear(){
 		bitArray.clearAll();
 		addedElements = 0;
 	}
 
 	@Override
-	public synchronized void close(){
+	public final synchronized void close(){
 		try{
 			bitArray.close();
 		}

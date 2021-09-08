@@ -49,7 +49,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	 * @param c	The collection which contains the elements to add
 	 * @throws NullPointerException	If {@code c} is {@code null}
 	 */
-	public void addAll(final Collection<String> c){
+	public final void addAll(final Collection<String> c){
 		if(!c.isEmpty()){
 			final int startIndex = getSize();
 
@@ -60,11 +60,11 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	@Override
-	public String getElementAt(final int index){
+	public final String getElementAt(final int index){
 		return delegate.get(index);
 	}
 
-	public void replaceAll(final Collection<String> c, final int startIndex){
+	public final void replaceAll(final Collection<String> c, final int startIndex){
 		if(!c.isEmpty()){
 			final int size = getSize();
 			if(startIndex >= size)
@@ -80,11 +80,11 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	@Override
-	public int getSize(){
+	public final int getSize(){
 		return delegate.size();
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return delegate.isEmpty();
 	}
 
@@ -92,7 +92,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	 * Removes all the elements from this list.
 	 * The list will be empty after this call returns (unless it throws an exception).
 	 */
-	public void clear(){
+	public final void clear(){
 		final int index = delegate.size() - 1;
 		delegate.clear();
 
@@ -101,7 +101,7 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return delegate.toString();
 	}
 

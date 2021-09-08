@@ -53,7 +53,7 @@ public class ProjectNotFoundException extends Exception{
 		this.projectPath = projectPath;
 	}
 
-	public Path getProjectPath(){
+	public final Path getProjectPath(){
 		return projectPath;
 	}
 

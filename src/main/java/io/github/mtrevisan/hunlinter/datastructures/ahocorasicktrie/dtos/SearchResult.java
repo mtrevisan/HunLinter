@@ -48,29 +48,29 @@ public class SearchResult<V>{
 		this.value = value;
 	}
 
-	public int getIndexBegin(){
+	public final int getIndexBegin(){
 		return begin;
 	}
 
-	public int getIndexEnd(){
+	public final int getIndexEnd(){
 		return end;
 	}
 
-	public int getMatchLength(){
+	public final int getMatchLength(){
 		return end - begin;
 	}
 
-	public V getValue(){
+	public final V getValue(){
 		return value;
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return "[" + begin + ":" + end + "] = " + value;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -83,7 +83,7 @@ public class SearchResult<V>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Integer.hashCode(begin);
 		result = 31 * result + Integer.hashCode(end);
 		result = 31 * result + value.hashCode();

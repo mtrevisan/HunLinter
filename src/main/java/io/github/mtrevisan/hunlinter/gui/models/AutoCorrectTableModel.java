@@ -46,24 +46,24 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 	private List<CorrectionEntry> corrections;
 
 
-	public void setCorrections(final List<CorrectionEntry> corrections){
+	public final void setCorrections(final List<CorrectionEntry> corrections){
 		this.corrections = corrections;
 
 		fireTableDataChanged();
 	}
 
 	@Override
-	public int getRowCount(){
+	public final int getRowCount(){
 		return (corrections != null? corrections.size(): 0);
 	}
 
 	@Override
-	public int getColumnCount(){
+	public final int getColumnCount(){
 		return COLUMN_NAMES.length;
 	}
 
 	@Override
-	public Object getValueAt(final int rowIndex, final int columnIndex){
+	public final Object getValueAt(final int rowIndex, final int columnIndex){
 		if(corrections == null || corrections.size() <= rowIndex)
 			return null;
 
@@ -76,7 +76,7 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public String getColumnName(final int column){
+	public final String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 

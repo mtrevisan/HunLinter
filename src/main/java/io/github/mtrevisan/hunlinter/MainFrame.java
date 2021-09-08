@@ -579,7 +579,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		workerManager.checkForAbortion(this);
 	}
 
@@ -591,7 +591,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
+	public final void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
 		parsingResultTextArea.setText(null);
 
 		if(parserManager != null)
@@ -609,7 +609,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
+	public final void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
 			FontHelper.setCurrentFont(temporaryFont, this);
@@ -624,7 +624,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
+	public final void loadFileInternal(final BusExceptionEvent exceptionEvent){
 		final Throwable cause = exceptionEvent.getCause();
 
 		//FIXME sometimes happens...
@@ -644,7 +644,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void parsingWarnings(final LinterWarning warningEvent){
+	public final void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
 		final IndexDataPair<?> eventData = warningEvent.getData();
 		if(eventData != null){
@@ -743,7 +743,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
+	public final void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
 		final JLayeredPane pane = evt.getPane();
 		final boolean enable = evt.isEnable();
 		if(pane != null){
@@ -782,7 +782,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearAffixParser(final Integer actionCommand){
+	public final void clearAffixParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
@@ -804,7 +804,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearDictionaryParser(final Integer actionCommand){
+	public final void clearDictionaryParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
@@ -815,7 +815,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearAidParser(final Integer actionCommand){
+	public final void clearAidParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
@@ -828,7 +828,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearThesaurusParser(final Integer actionCommand){
+	public final void clearThesaurusParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
@@ -844,7 +844,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearHyphenationParser(final Integer actionCommand){
+	public final void clearHyphenationParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
@@ -860,7 +860,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearAutoCorrectParser(final Integer actionCommand){
+	public final void clearAutoCorrectParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -876,7 +876,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearSentenceExceptionsParser(final Integer actionCommand){
+	public final void clearSentenceExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
@@ -891,7 +891,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearWordExceptionsParser(final Integer actionCommand){
+	public final void clearWordExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 
@@ -906,7 +906,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
+	public final void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case "progress" -> {
 				final int progress = (int)evt.getNewValue();

@@ -60,23 +60,23 @@ public class RecentFilesMenu extends JMenu{
 		addEntriesToMenu();
 	}
 
-	public void addEntry(final String filePath){
+	public final void addEntry(final String filePath){
 		recentItems.push(filePath);
 
 		addEntriesToMenu();
 	}
 
-	public void removeEntry(final String filePath){
+	public final void removeEntry(final String filePath){
 		recentItems.remove(filePath);
 
 		addEntriesToMenu();
 	}
 
-	public boolean hasEntries(){
+	public final boolean hasEntries(){
 		return (recentItems.size() > 0);
 	}
 
-	public void clear(){
+	public final void clear(){
 		//clear the existing items
 		removeAll();
 

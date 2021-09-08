@@ -76,7 +76,7 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 	 * @return	The identifier of an arc leaving {@code node} and labeled with {@code label}.
 	 * 	An identifier equal to 0 means the node has no outgoing arc labeled {@code label}.
 	 */
-	public int getArc(final int node, final byte label){
+	public final int getArc(final int node, final byte label){
 		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
 			if(getArcLabel(arc) == label)
 				return arc;
@@ -148,7 +148,7 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 	 * @param node	Identifier of the starting node from which to return subsequences.
 	 * @return	An iterable over all sequences encoded starting at the given node.
 	 */
-	public Iterable<ByteBuffer> getSequences(final int node){
+	public final Iterable<ByteBuffer> getSequences(final int node){
 		return (node > 0? () -> new ByteSequenceIterator(this, node): Collections.emptyList());
 	}
 
@@ -185,7 +185,7 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 	 *
 	 * @param v   Visitor to receive traversal calls.
 	 */
-	public void visitPostOrder(final StateVisitor v){
+	public final void visitPostOrder(final StateVisitor v){
 		final DynamicIntArray stack = new DynamicIntArray();
 		//push root node to first stack
 		stack.push(getRootNode());

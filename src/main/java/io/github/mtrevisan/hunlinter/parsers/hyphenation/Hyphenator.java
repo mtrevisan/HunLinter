@@ -69,7 +69,7 @@ public class Hyphenator implements HyphenatorInterface{
 	 * @return	The hyphenation object
 	 */
 	@Override
-	public Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level){
+	public final Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level){
 		//FIXME return the rule that matches additionalRule removed by the breakpoints
 		final String oldRule = hypParser.addRule(additionalRule, level);
 
@@ -92,7 +92,7 @@ public class Hyphenator implements HyphenatorInterface{
 	 * @return the hyphenation object
 	 */
 	@Override
-	public Hyphenation hyphenate(final String word){
+	public final Hyphenation hyphenate(final String word){
 		//apply first level hyphenation
 		final Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns = hypParser.getPatterns();
 		HyphenationOptions options = hypParser.getOptions().getNonCompoundOptions();
@@ -212,7 +212,7 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	@Override
-	public List<String> splitIntoCompounds(final String word){
+	public final List<String> splitIntoCompounds(final String word){
 		final List<String> response;
 		if(hypParser.isSecondLevelPresent()){
 			//apply first level hyphenation non-compound

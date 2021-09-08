@@ -80,17 +80,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 		protected DuplicatesDictionaryBaseData(){}
 
 		@Override
-		public int getExpectedNumberOfElements(){
+		public final int getExpectedNumberOfElements(){
 			return 1_000_000;
 		}
 
 		@Override
-		public double getFalsePositiveProbability(){
+		public final double getFalsePositiveProbability(){
 			return 0.000_000_4;
 		}
 
 		@Override
-		public double getGrowthRateWhenFull(){
+		public final double getGrowthRateWhenFull(){
 			return 1.3;
 		}
 

@@ -74,11 +74,11 @@ public class DictionaryEntryFactory{
 		Objects.requireNonNull(strategy, "Strategy cannot be null");
 	}
 
-	public DictionaryEntry createFromDictionaryLine(final String line){
+	public final DictionaryEntry createFromDictionaryLine(final String line){
 		return createFromDictionaryLine(line, true);
 	}
 
-	public DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
+	public final DictionaryEntry createFromDictionaryLineNoStemTag(final String line){
 		return createFromDictionaryLine(line, false);
 	}
 

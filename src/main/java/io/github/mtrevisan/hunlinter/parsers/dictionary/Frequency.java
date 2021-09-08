@@ -60,7 +60,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @param value	the value to add.
 	 */
-	public void addValue(final T value){
+	public final void addValue(final T value){
 		incrementValue(value, 1);
 	}
 
@@ -73,11 +73,11 @@ public class Frequency<T extends Comparable<?>>{
 	 * @param value	the value to add.
 	 * @param increment	the amount by which the value should be incremented
 	 */
-	public void incrementValue(final T value, final long increment){
+	public final void incrementValue(final T value, final long increment){
 		frequencies.put(value, getCount(value) + increment);
 	}
 
-	public void clear(){
+	public final void clear(){
 		frequencies.clear();
 	}
 
@@ -93,7 +93,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @return	entry set Iterator
 	 */
-	public Iterator<Map.Entry<T, Long>> entrySetIterator(){
+	public final Iterator<Map.Entry<T, Long>> entrySetIterator(){
 		return frequencies.entrySet().iterator();
 	}
 
@@ -102,7 +102,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @return	a list containing the value(s) which appear most often.
 	 */
-	public List<T> getMode(){
+	public final List<T> getMode(){
 		final long mostPopular = calculateMostPopularFrequency();
 
 		return getMode(mostPopular);
@@ -124,7 +124,7 @@ public class Frequency<T extends Comparable<?>>{
 			.collect(Collectors.toList());
 	}
 
-	public List<T> getMostCommonValues(final int limit){
+	public final List<T> getMostCommonValues(final int limit){
 		final List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
 		sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
@@ -141,7 +141,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @param value	the value to lookup.
 	 * @return	the frequency of the given value.
 	 */
-	public long getCount(final T value){
+	public final long getCount(final T value){
 		return frequencies.getOrDefault(value, 0l);
 	}
 
@@ -154,7 +154,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @param value	the value to lookup
 	 * @return	the proportion of values equal to the given value
 	 */
-	public double getPercentOf(final T value){
+	public final double getPercentOf(final T value){
 		final long sumFreq = getSumOfFrequencies();
 		return (sumFreq > 0? (double)getCount(value) / sumFreq: Double.NaN);
 	}
@@ -164,7 +164,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @return	the total frequency count.
 	 */
-	public long getSumOfFrequencies(){
+	public final long getSumOfFrequencies(){
 		return sumOfFrequencies.apply(frequencies.hashCode());
 	}
 
@@ -184,7 +184,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @return a string representation.
 	 */
 	@Override
-	public String toString(){
+	public final String toString(){
 		final StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
 		for(final T value : frequencies.keySet())
 			sb.append(value)
@@ -197,7 +197,7 @@ public class Frequency<T extends Comparable<?>>{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -208,7 +208,7 @@ public class Frequency<T extends Comparable<?>>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		return frequencies.hashCode();
 	}
 

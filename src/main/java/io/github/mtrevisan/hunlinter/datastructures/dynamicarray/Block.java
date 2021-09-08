@@ -36,21 +36,21 @@ class Block<T>{
 		data = (T[])new Object[capacity];
 	}
 
-	int size(){
+	final int size(){
 		return limit;
 	}
 
-	boolean isFull(){
+	final boolean isFull(){
 		return (limit == data.length);
 	}
 
 	/** Increase the space allocated for storing elements. */
-	void grow(){
+	final void grow(){
 		limit ++;
 	}
 
 	/** Set the last element to null and decrease the space allocated for storing elements. */
-	void shrink(){
+	final void shrink(){
 		data[-- limit] = null;
 	}
 

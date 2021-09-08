@@ -49,19 +49,19 @@ class BinaryFileBuffer implements Closeable{
 	}
 
 	@Override
-	public void close(){
+	public final void close(){
 		scanner.close();
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return (cache == null);
 	}
 
-	public String peek(){
+	public final String peek(){
 		return cache;
 	}
 
-	public String pop(){
+	public final String pop(){
 		final String answer = peek();
 		readNextLine();
 		return answer;

@@ -64,7 +64,7 @@ public class LinterWarning extends Exception{
 		this.data = data;
 	}
 
-	public IndexDataPair<?> getData(){
+	public final IndexDataPair<?> getData(){
 		return data;
 	}
 

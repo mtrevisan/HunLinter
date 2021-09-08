@@ -103,13 +103,13 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void start(){
+	public final void start(){
 		if(running.compareAndSet(false, true))
 			watcherTask = EXECUTOR.submit(this);
 	}
 
 	@Override
-	public void stop(){
+	public final void stop(){
 		if(running.get()){
 			running.set(false);
 
@@ -126,7 +126,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void register(final FileChangeListener listener, final String... patterns){
+	public final void register(final FileChangeListener listener, final String... patterns){
 		Objects.requireNonNull(listener, "Listener cannot be null");
 
 		for(final String pattern : patterns){
@@ -147,7 +147,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void unregisterAll(){
+	public final void unregisterAll(){
 		stop();
 
 		watchKeyToDirPath.clear();
@@ -185,7 +185,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	@Override
-	public void run(){
+	public final void run(){
 		while(!Thread.interrupted()){
 			try{
 				final WatchKey key = watcher.take();
@@ -284,11 +284,11 @@ public class FileListenerManager implements FileListener, Runnable{
 		return dirPathToListeners.get(dir);
 	}
 
-	public boolean matchesAny(final Path input, final Iterable<PathMatcher> patterns){
+	public final boolean matchesAny(final Path input, final Iterable<PathMatcher> patterns){
 		return (match(patterns, pattern -> matches(input, pattern)) != null);
 	}
 
-	public boolean matches(final Path input, final PathMatcher pattern){
+	public final boolean matches(final Path input, final PathMatcher pattern){
 		return pattern.matches(input);
 	}
 

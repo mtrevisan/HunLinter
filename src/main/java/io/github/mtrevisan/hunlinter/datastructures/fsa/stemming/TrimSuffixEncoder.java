@@ -58,7 +58,7 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		int sharedPrefix = ArrayHelper.longestCommonPrefix(source, target);
 		int truncateBytes = source.length - sharedPrefix;
 		if(truncateBytes >= REMOVE_EVERYTHING){
@@ -73,7 +73,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		final byte suffixTrimCode = encoded[0];
 		int truncateBytes = decodeValue(suffixTrimCode);
 		if(truncateBytes == REMOVE_EVERYTHING)
@@ -89,7 +89,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

@@ -138,7 +138,7 @@ public class BasicEventBus implements EventBusInterface{
 	}
 
 	@Override
-	public void start(){
+	public final void start(){
 		eventQueueThread.start();
 		killQueueThread.start();
 	}
@@ -156,7 +156,7 @@ public class BasicEventBus implements EventBusInterface{
 	 * @param subscriber	The subscriber object which will receive notifications on {@link EventHandler}
 	 * 	annotated methods.
 	 */
-	public void subscribe(final Object subscriber){
+	public final void subscribe(final Object subscriber){
 		//lookup to see if we have any subscriber instances already
 		final boolean subscribedAlready = loadHandlerIntoQueue(subscriber);
 		if(!subscribedAlready)
@@ -210,7 +210,7 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @param subscriber	The object to unsubscribe from future events.
 	 */
-	public void unsubscribe(final Object subscriber){
+	public final void unsubscribe(final Object subscriber){
 		//remove handler from queue
 		final Collection<HandlerInfo> killList = new ArrayList<>(handlers.size());
 		for(final HandlerInfo info : handlers){
@@ -228,7 +228,7 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @param event	The event to publish on the event bus.
 	 */
-	public void publish(final Object event){
+	public final void publish(final Object event){
 		try{
 			queue.put(event);
 		}
@@ -246,7 +246,7 @@ public class BasicEventBus implements EventBusInterface{
 	 * @param event	The event to query for.
 	 * @return	If the event bus has pending events of given type to publish.
 	 */
-	public boolean hasPendingEvents(final Object event){
+	public final boolean hasPendingEvents(final Object event){
 		return queue.contains(event);
 	}
 
@@ -255,7 +255,7 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @return	Returns true if the event bus has pending events to publish.
 	 */
-	public boolean hasPendingEvents(){
+	public final boolean hasPendingEvents(){
 		return !queue.isEmpty();
 	}
 
@@ -264,7 +264,7 @@ public class BasicEventBus implements EventBusInterface{
 	private class EventQueueRunner implements Runnable{
 		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
-		public void run(){
+		public final void run(){
 			try{
 				while(true)
 					notifySubscribers(queue.take());
@@ -359,7 +359,7 @@ public class BasicEventBus implements EventBusInterface{
 	private class KillQueueRunner implements Runnable{
 		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
-		public void run(){
+		public final void run(){
 			try{
 				while(true){
 					final HandlerInfo info = killQueue.take();

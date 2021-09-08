@@ -87,7 +87,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected Void prepareProcessing(final String message){
+	protected final Void prepareProcessing(final String message){
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
@@ -96,26 +96,26 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected Void resetProcessing(final String message, final Object... params){
+	protected final Void resetProcessing(final String message, final Object... params){
 		setProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
 	}
 
-	protected void finalizeProcessing(final String message){
+	protected final void finalizeProcessing(final String message){
 		watch.stop();
 
 		setProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
-	public void executeSynchronously(){
+	public final void executeSynchronously(){
 		doInBackground();
 	}
 
 
-	protected void manageException(final LinterException e){
+	protected final void manageException(final LinterException e){
 		if(JavaHelper.isInterruptedException(e))
 			cancel(e);
 		else if(e.getData() != null){
@@ -132,7 +132,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 
-	protected void setProgress(final long index, final long total){
+	protected final void setProgress(final long index, final long total){
 		final int progress = calculateProgress(index, total);
 		setProgress(Math.min(progress, 100));
 	}
@@ -142,7 +142,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@Override
-	protected void done(){
+	protected final void done(){
 		if(!isCancelled())
 			workerData.callCompletedCallback();
 	}
@@ -174,7 +174,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 * NOTE: this should be called inside `SwingWorker.doInBackground()` to allow process abortion
 	 */
 	@SuppressWarnings("AwaitNotInLoop")
-	protected void sleepOnPause(){
+	protected final void sleepOnPause(){
 		if(paused.get()){
 			PAUSE_LOCK.lock();
 			try{
@@ -194,7 +194,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 *
 	 * @param exception	Exception that causes the cancellation
 	 */
-	protected void cancel(final Exception exception){
+	protected final void cancel(final Exception exception){
 		if(!JavaHelper.isInterruptedException(exception)){
 			if(exception != null){
 				final String errorMessage = ExceptionHelper.getMessage(exception);
@@ -216,7 +216,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	/** User cancelled worker. */
-	public void cancel(){
+	public final void cancel(){
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
 		workerData.callCancelledCallback(null);
@@ -225,7 +225,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -236,7 +236,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		return workerData.hashCode();
 	}
 

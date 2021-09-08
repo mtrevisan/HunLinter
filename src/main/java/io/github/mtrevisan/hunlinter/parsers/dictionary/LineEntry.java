@@ -112,7 +112,7 @@ public class LineEntry implements Serializable{
 		from = (words != null? new HashSet<>(words): new HashSet<>(0));
 	}
 
-	public List<String> extractFromEndingWith(final String suffix){
+	public final List<String> extractFromEndingWith(final String suffix){
 		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
 		final ArrayList<String> list = new ArrayList<>(from.size());
 		for(final String word : from)
@@ -122,15 +122,15 @@ public class LineEntry implements Serializable{
 		return list;
 	}
 
-	public boolean isProductive(){
+	public final boolean isProductive(){
 		return !from.isEmpty();
 	}
 
-	public String anAddition(){
+	public final String anAddition(){
 		return addition.iterator().next();
 	}
 
-	public LineEntry createReverse(){
+	public final LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
 		final Set<String> reversedAddition = new HashSet<>(addition.size());
 		for(final String add : addition){
@@ -143,7 +143,7 @@ public class LineEntry implements Serializable{
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
-	public boolean isContainedInto(final LineEntry rule){
+	public final boolean isContainedInto(final LineEntry rule){
 		final Set<String> parentBones = extractRuleSpine(this);
 		final Set<String> childBones = extractRuleSpine(rule);
 		return childBones.containsAll(parentBones);
@@ -159,7 +159,7 @@ public class LineEntry implements Serializable{
 		return parentBones;
 	}
 
-	public Set<Character> extractGroup(final int indexFromLast){
+	public final Set<Character> extractGroup(final int indexFromLast){
 		return extractGroup(indexFromLast, from);
 	}
 
@@ -176,7 +176,7 @@ public class LineEntry implements Serializable{
 		return group;
 	}
 
-	public void expandConditionToMaxLength(final Comparator<String> comparator){
+	public final void expandConditionToMaxLength(final Comparator<String> comparator){
 		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[0]));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
@@ -195,7 +195,7 @@ public class LineEntry implements Serializable{
 			.toString();
 	}
 
-	public String toHunspellRule(final AffixType type, final String flag){
+	public final String toHunspellRule(final AffixType type, final String flag){
 		String anAddition = anAddition();
 		String morphologicalRules = StringUtils.EMPTY;
 		final int idx = anAddition.indexOf(TAB);
@@ -209,7 +209,7 @@ public class LineEntry implements Serializable{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("rem", removal)
 			.append("add", addition)
@@ -219,7 +219,7 @@ public class LineEntry implements Serializable{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -232,7 +232,7 @@ public class LineEntry implements Serializable{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = (removal == null? 0: removal.hashCode());
 		result = 31 * result + addition.hashCode();
 		result = 31 * result + condition.hashCode();

@@ -60,7 +60,7 @@ public class HyphenationLinterAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		workerManager.createHyphenationLinterWorker(
@@ -76,7 +76,7 @@ public class HyphenationLinterAction extends AbstractAction{
 
 
 	@Override
-	protected Object clone() throws CloneNotSupportedException{
+	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}
 

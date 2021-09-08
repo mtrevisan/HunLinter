@@ -94,7 +94,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean get(final int index){
+	public final boolean get(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
@@ -105,7 +105,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean set(final int index){
+	public final boolean set(final int index){
 		if(!get(index)){
 			final int pos = index >> 3;
 			final int bit = 1 << (index & 0x07);
@@ -116,7 +116,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public void clear(final int index){
+	public final void clear(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
@@ -126,19 +126,19 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public void clearAll(){
+	public final void clearAll(){
 		if(buffer != null)
 			for(int index = 0; index < numberOfBytes; index ++)
 				buffer.put(index, (byte)0);
 	}
 
 	@Override
-	public int size(){
+	public final int size(){
 		return numberOfBytes * Byte.SIZE;
 	}
 
 	@Override
-	public void close() throws IOException{
+	public final void close() throws IOException{
 		try(backingFile){
 			closeDirectBuffer();
 		}

@@ -227,7 +227,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		task.execute();
    }//GEN-LAST:event_downloadButtonActionPerformed
 
-	public void interrupt(){
+	public final void interrupt(){
 		if(task != null && !task.isCancelled())
 			task.cancelTask();
 
@@ -235,17 +235,17 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	}
 
 	@Override
-	public void startCheckUpdates(){
+	public final void startCheckUpdates(){
 		statusLabel.setText("Check for updates…");
 	}
 
 	@Override
-	public void startDownloads(final GITFileData fileData){
+	public final void startDownloads(final GITFileData fileData){
 		statusLabel.setText("Begin downloading version " + fileData.version + "…");
 	}
 
 	@Override
-	public void validatingFile(final GITFileData fileData, final String localPath){
+	public final void validatingFile(final GITFileData fileData, final String localPath){
 		statusLabel.setText("Validating download…");
 
 		try{
@@ -258,14 +258,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	}
 
 	@Override
-	public void stopped(){
+	public final void stopped(){
 		statusLabel.setText("Update stopped");
 
 		downloadButton.setEnabled(true);
 	}
 
 	@Override
-	public void succeeded(){
+	public final void succeeded(){
 		statusLabel.setText("File has been downloaded and verified successfully!");
 
 		try{
@@ -295,14 +295,14 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	}
 
 	@Override
-	public void failed(final Exception e){
+	public final void failed(final Exception e){
 		statusLabel.setText("Error downloading file: " + e.getMessage());
 
 		downloadButton.setEnabled(true);
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
+	public final void propertyChange(final PropertyChangeEvent evt){
 		if("progress".equals(evt.getPropertyName()))
 			fileProgressBar.setValue((Integer)evt.getNewValue());
 	}

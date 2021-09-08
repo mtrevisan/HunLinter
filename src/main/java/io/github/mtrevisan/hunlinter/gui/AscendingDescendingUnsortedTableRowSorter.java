@@ -37,7 +37,7 @@ class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends Ta
 	}
 
 	@Override
-	public void toggleSortOrder(final int column){
+	public final void toggleSortOrder(final int column){
 		final List<? extends SortKey> sortKeys = getSortKeys();
 		if(!sortKeys.isEmpty() && sortKeys.get(0).getSortOrder() == SortOrder.DESCENDING)
 			setSortKeys(null);
@@ -51,7 +51,7 @@ class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends Ta
 	 * Overridden to cope with the annoying IOOBE
 	 */
 	@Override
-	public int convertRowIndexToModel(final int index){
+	public final int convertRowIndexToModel(final int index){
 		try{
 			return super.convertRowIndexToModel(index);
 		}

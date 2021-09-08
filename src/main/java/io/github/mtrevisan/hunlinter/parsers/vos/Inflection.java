@@ -106,15 +106,15 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry[] getAppliedRules(){
+	public final AffixEntry[] getAppliedRules(){
 		return appliedRules;
 	}
 
-	public AffixEntry getAppliedRule(final int index){
+	public final AffixEntry getAppliedRule(final int index){
 		return (appliedRules != null && index < appliedRules.length? appliedRules[index]: null);
 	}
 
-	public boolean hasAppliedRule(final String flag){
+	public final boolean hasAppliedRule(final String flag){
 		if(appliedRules != null)
 			for(final AffixEntry appliedRule : appliedRules)
 				if(appliedRule.getFlag().equals(flag))
@@ -123,7 +123,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(final AffixType type){
+	public final AffixEntry getLastAppliedRule(final AffixType type){
 		AffixEntry result = null;
 		if(appliedRules != null)
 			for(final AffixEntry rule : appliedRules)
@@ -132,27 +132,27 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(){
+	public final AffixEntry getLastAppliedRule(){
 		return (appliedRules != null? appliedRules[appliedRules.length - 1]: null);
 	}
 
-	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
+	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
 		if(compoundEntries != null && compoundEntries.length > 0
 				&& compoundEntries[compoundEntries.length - 1].hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
 	}
 
-	public boolean hasMorphologicalFields(){
+	public final boolean hasMorphologicalFields(){
 		return (morphologicalFields != null && morphologicalFields.length > 0);
 	}
 
-	public void prependAppliedRules(final AffixEntry[] appliedRules){
+	public final void prependAppliedRules(final AffixEntry[] appliedRules){
 		if(appliedRules != null)
 			this.appliedRules = ArrayUtils.insert(0, (this.appliedRules != null? this.appliedRules: new AffixEntry[1]),
 				appliedRules);
 	}
 
-	public boolean hasInflectionRules(){
+	public final boolean hasInflectionRules(){
 		return (appliedRules != null && appliedRules.length > 0);
 	}
 
@@ -164,7 +164,7 @@ public class Inflection extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
-	public boolean isTwofolded(final String circumfixFlag){
+	public final boolean isTwofolded(final String circumfixFlag){
 		if(appliedRules != null){
 			//find last applied rule with circumfix flag
 			int startIndex = appliedRules.length - 1;
@@ -180,7 +180,7 @@ public class Inflection extends DictionaryEntry{
 		return false;
 	}
 
-	public String getRulesSequence(){
+	public final String getRulesSequence(){
 		final StringJoiner sj = new StringJoiner(LEADS_TO);
 		if(appliedRules != null)
 			for(final AffixEntry rule : appliedRules)
@@ -188,20 +188,20 @@ public class Inflection extends DictionaryEntry{
 		return sj.toString();
 	}
 
-	public String getMorphologicalFields(){
+	public final String getMorphologicalFields(){
 		return (morphologicalFields != null? StringUtils.join(morphologicalFields, StringUtils.SPACE): StringUtils.EMPTY);
 	}
 
-	public String[] getMorphologicalFieldsAsArray(){
+	public final String[] getMorphologicalFieldsAsArray(){
 		return morphologicalFields;
 	}
 
 	@Override
-	public boolean isCompound(){
+	public final boolean isCompound(){
 		return (compoundEntries != null && compoundEntries.length > 0);
 	}
 
-	public String toStringWithPartOfSpeechAndStem(){
+	public final String toStringWithPartOfSpeechAndStem(){
 		final List<String> pos = getMorphologicalFieldPartOfSpeech();
 		final String stem = getMorphologicalFieldStem();
 		if(!pos.isEmpty()){
@@ -212,17 +212,17 @@ public class Inflection extends DictionaryEntry{
 		return word;
 	}
 
-	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){
+	public final void applyOutputConversionTable(final Function<String, String> outputConversionTable){
 		word = outputConversionTable.apply(word);
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return toString(null);
 	}
 
 	@Override
-	public String toString(final FlagParsingStrategy strategy){
+	public final String toString(final FlagParsingStrategy strategy){
 		final StringJoiner sj = new StringJoiner(TAB);
 		sj.add(super.toString(strategy));
 		if(hasInflectionRules()){

@@ -47,14 +47,14 @@ public class LetterMatcherEntry{
 		this.correctRule = correctRule;
 	}
 
-	public void match(final Inflection inflection){
+	public final void match(final Inflection inflection){
 		for(final String flag : wrongFlags)
 			if(inflection.hasContinuationFlag(flag))
 				throw new LinterException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -68,7 +68,7 @@ public class LetterMatcherEntry{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = (messagePattern == null? 0: messagePattern.hashCode());
 		result = 31 * result + Integer.hashCode(masterLetter);
 		result = 31 * result + Arrays.hashCode(wrongFlags);

@@ -55,12 +55,12 @@ class DictionaryIterator implements Iterator<WordData>{
 	}
 
 	@Override
-	public boolean hasNext(){
+	public final boolean hasNext(){
 		return entriesItr.hasNext();
 	}
 
 	@Override
-	public WordData next(){
+	public final WordData next(){
 		final ByteBuffer entryBuffer = entriesItr.next();
 		final byte[] array = entryBuffer.array();
 		final int limit = entryBuffer.remaining();

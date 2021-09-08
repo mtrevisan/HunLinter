@@ -39,15 +39,15 @@ public class HyphenationOptions{
 		clear();
 	}
 
-	public int getLeftMin(){
+	public final int getLeftMin(){
 		return leftMin;
 	}
 
-	public int getRightMin(){
+	public final int getRightMin(){
 		return rightMin;
 	}
 
-	public int getMinDefault(){
+	public final int getMinDefault(){
 		return minDefault;
 	}
 
@@ -56,15 +56,15 @@ public class HyphenationOptions{
 		rightMin = minDefault;
 	}
 
-	public void setLeftMin(final int value){
+	public final void setLeftMin(final int value){
 		leftMin = Math.max(value, 0);
 	}
 
-	public void setRightMin(final int value){
+	public final void setRightMin(final int value){
 		rightMin = Math.max(value, 0);
 	}
 
-	public int getMinimumLength(){
+	public final int getMinimumLength(){
 		return leftMin + rightMin;
 	}
 

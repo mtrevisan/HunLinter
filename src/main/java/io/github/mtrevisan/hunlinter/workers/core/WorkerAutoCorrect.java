@@ -41,7 +41,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		super(workerData);
 	}
 
-	protected void processLines(final Consumer<CorrectionEntry> dataProcessor){
+	protected final void processLines(final Consumer<CorrectionEntry> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load autocorrect

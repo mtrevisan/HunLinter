@@ -79,7 +79,7 @@ public class RadixTrieNode{
 		this.depth = depth;
 	}
 
-	public int getDepth(){
+	public final int getDepth(){
 		return depth;
 	}
 
@@ -88,14 +88,14 @@ public class RadixTrieNode{
 	 *
 	 * @param key	Key of this node
 	 */
-	public void addChildrenId(final int key){
+	public final void addChildrenId(final int key){
 		if(childrenIds == null)
 			childrenIds = new HashSet<>(1);
 
 		childrenIds.add(key);
 	}
 
-	public Integer getLargestChildrenId(){
+	public final Integer getLargestChildrenId(){
 		return (childrenIds != null && !childrenIds.isEmpty()? childrenIds.iterator().next(): null);
 	}
 
@@ -104,7 +104,7 @@ public class RadixTrieNode{
 	 *
 	 * @param childrenIds	Identifier of the children to add.
 	 */
-	public void addChildrenIds(final Iterable<Integer> childrenIds){
+	public final void addChildrenIds(final Iterable<Integer> childrenIds){
 		if(childrenIds != null)
 			for(final Integer childrenId : childrenIds)
 				addChildrenId(childrenId);
@@ -115,7 +115,7 @@ public class RadixTrieNode{
 	 *
 	 * @return	The children ids
 	 */
-	public Collection<Integer> getChildrenIds(){
+	public final Collection<Integer> getChildrenIds(){
 		return (childrenIds == null? Collections.emptyList(): childrenIds);
 	}
 
@@ -124,7 +124,7 @@ public class RadixTrieNode{
 	 *
 	 * @return	Whether this is a leaf node
 	 */
-	public boolean isAcceptable(){
+	public final boolean isAcceptable(){
 		return (depth > 0 && childrenIds != null);
 	}
 
@@ -133,11 +133,11 @@ public class RadixTrieNode{
 	 *
 	 * @return	The fail node
 	 */
-	public RadixTrieNode failure(){
+	public final RadixTrieNode failure(){
 		return failure;
 	}
 
-	public void setFailure(final RadixTrieNode failure, final int[] fail){
+	public final void setFailure(final RadixTrieNode failure, final int[] fail){
 		this.failure = failure;
 		fail[id] = failure.id;
 	}
@@ -162,11 +162,11 @@ public class RadixTrieNode{
 	 * @param character	Character to get the next node from
 	 * @return	The next node
 	 */
-	public RadixTrieNode nextNode(final Character character){
+	public final RadixTrieNode nextNode(final Character character){
 		return nextNode(character, false);
 	}
 
-	public RadixTrieNode getFailureNode(final Character transition){
+	public final RadixTrieNode getFailureNode(final Character transition){
 		RadixTrieNode traceFailureNode = failure;
 		while(traceFailureNode.nextNode(transition) == null)
 			traceFailureNode = traceFailureNode.failure;
@@ -179,11 +179,11 @@ public class RadixTrieNode{
 	 * @param character	Character to get the next node from
 	 * @return	The next node (ignoring root node)
 	 */
-	public RadixTrieNode nextNodeIgnoreRoot(final Character character){
+	public final RadixTrieNode nextNodeIgnoreRoot(final Character character){
 		return nextNode(character, true);
 	}
 
-	public RadixTrieNode addNode(final Character character){
+	public final RadixTrieNode addNode(final Character character){
 		RadixTrieNode nextNode = nextNodeIgnoreRoot(character);
 		if(nextNode == null){
 			nextNode = new RadixTrieNode(depth + 1);
@@ -192,29 +192,29 @@ public class RadixTrieNode{
 		return nextNode;
 	}
 
-	public Collection<RadixTrieNode> getNodes(){
+	public final Collection<RadixTrieNode> getNodes(){
 		return success.values();
 	}
 
-	public Collection<Character> getTransitions(){
+	public final Collection<Character> getTransitions(){
 		return success.keySet();
 	}
 
-	public Map<Character, RadixTrieNode> getSuccess(){
+	public final Map<Character, RadixTrieNode> getSuccess(){
 		return success;
 	}
 
-	public int getId(){
+	public final int getId(){
 		return id;
 	}
 
-	public void setId(final int id){
+	public final void setId(final int id){
 		this.id = id;
 	}
 
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("depth", depth)
 			.append("id", id)
@@ -226,7 +226,7 @@ public class RadixTrieNode{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -241,7 +241,7 @@ public class RadixTrieNode{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = Integer.hashCode(depth);
 		result = 31 * result + failure.hashCode();
 		result = 31 * result + childrenIds.hashCode();

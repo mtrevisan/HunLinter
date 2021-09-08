@@ -70,12 +70,12 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 					.add(component);
 	}
 
-	public void setEncoder(final Encoder<ILoggingEvent> encoder){
+	public final void setEncoder(final Encoder<ILoggingEvent> encoder){
 		this.encoder = encoder;
 	}
 
 	@Override
-	protected void append(final ILoggingEvent eventObject){
+	protected final void append(final ILoggingEvent eventObject){
 		if((!TEXT_AREAS.isEmpty() || !LABELS.isEmpty()) && encoder != null){
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);

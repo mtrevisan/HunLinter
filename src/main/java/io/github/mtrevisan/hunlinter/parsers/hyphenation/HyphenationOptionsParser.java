@@ -56,25 +56,25 @@ public class HyphenationOptionsParser{
 	private final Set<String> noHyphen = new HashSet<>(0);
 
 
-	public HyphenationOptions getNonCompoundOptions(){
+	public final HyphenationOptions getNonCompoundOptions(){
 		return nonCompoundOptions;
 	}
 
-	public HyphenationOptions getCompoundOptions(){
+	public final HyphenationOptions getCompoundOptions(){
 		return compoundOptions;
 	}
 
-	public Set<String> getNoHyphen(){
+	public final Set<String> getNoHyphen(){
 		return noHyphen;
 	}
 
-	public void clear(){
+	public final void clear(){
 		nonCompoundOptions.clear();
 		compoundOptions.clear();
 		noHyphen.clear();
 	}
 
-	public boolean parseLine(final String line){
+	public final boolean parseLine(final String line){
 		boolean managed = true;
 		if(line.startsWith(MIN_LEFT_HYPHENATION))
 			nonCompoundOptions.setLeftMin(Integer.parseInt(extractValue(line)));
@@ -96,7 +96,7 @@ public class HyphenationOptionsParser{
 		return components[1].trim();
 	}
 
-	public void write(final BufferedWriter writer) throws IOException{
+	public final void write(final BufferedWriter writer) throws IOException{
 		if(nonCompoundOptions.getLeftMin() != nonCompoundOptions.getMinDefault())
 			writeValue(writer, MIN_LEFT_HYPHENATION, nonCompoundOptions.getLeftMin());
 		if(nonCompoundOptions.getRightMin() != nonCompoundOptions.getMinDefault())

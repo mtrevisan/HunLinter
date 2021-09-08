@@ -39,7 +39,7 @@ public class CopyOverAsNumberHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
 

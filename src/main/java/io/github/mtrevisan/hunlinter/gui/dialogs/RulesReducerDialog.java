@@ -245,7 +245,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			rulesReducerWorker.cancel();
 	}
 
-   public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+   public final void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
 		if(flag != null){
 			mainProgressBar.setValue(0);
@@ -281,7 +281,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
    }//GEN-LAST:event_optimizeClosedGroupCheckBoxActionPerformed
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
 			final Runnable cancelTask = () -> {
 				ruleComboBox.setEnabled(true);
@@ -296,7 +296,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
+	public final void propertyChange(final PropertyChangeEvent evt){
 		final String propertyName = evt.getPropertyName();
 		if("progress".equals(propertyName)){
 			final int progress = (int)evt.getNewValue();

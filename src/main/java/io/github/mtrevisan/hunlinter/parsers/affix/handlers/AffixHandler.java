@@ -56,7 +56,7 @@ public class AffixHandler implements Handler{
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();

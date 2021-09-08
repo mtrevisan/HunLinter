@@ -104,7 +104,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	 * @return Returns the same object for easier call chaining.
 	 */
 	@Override
-	public CFSASerializer serializeWithNumbers(){
+	public final CFSASerializer serializeWithNumbers(){
 		serializeWithNumbers = true;
 
 		return this;
@@ -117,7 +117,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	 * @see #serializeWithNumbers()
 	 */
 	@Override
-	public <T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback)
+	public final <T extends OutputStream> T serialize(final FSAAbstract fsa, final T os, final ProgressCallback progressCallback)
 			throws IOException{
 		//calculate the most frequent labels and build indexed labels dictionary
 		computeLabelsIndex(fsa);
@@ -210,7 +210,7 @@ public class CFSASerializer implements FSASerializerInterface{
 
 	/** Return supported flags. */
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return SUPPORTED_FLAGS;
 	}
 
@@ -446,12 +446,12 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	@Override
-	public CFSASerializer withFiller(final byte filler){
+	public final CFSASerializer withFiller(final byte filler){
 		throw new UnsupportedOperationException("CFSA2 does not support filler. Use .info file.");
 	}
 
 	@Override
-	public CFSASerializer withAnnotationSeparator(final byte annotationSeparator){
+	public final CFSASerializer withAnnotationSeparator(final byte annotationSeparator){
 		throw new UnsupportedOperationException("CFSA2 does not support separator. Use .info file.");
 	}
 

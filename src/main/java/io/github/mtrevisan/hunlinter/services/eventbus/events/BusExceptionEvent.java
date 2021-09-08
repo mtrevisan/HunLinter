@@ -52,11 +52,11 @@ public class BusExceptionEvent extends EventObject{
 		this.cause = cause;
 	}
 
-	public Object getSubscriber(){
+	public final Object getSubscriber(){
 		return getSource();
 	}
 
-	public Throwable getCause(){
+	public final Throwable getCause(){
 		return cause;
 	}
 

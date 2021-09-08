@@ -42,7 +42,7 @@ public class WorkerDataParser<P> extends WorkerData{
 		this.parser = parser;
 	}
 
-	public P getParser(){
+	public final P getParser(){
 		return parser;
 	}
 

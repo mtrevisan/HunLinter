@@ -115,7 +115,7 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2));
 	}
 
-	public boolean isInDictionary(final String word){
+	public final boolean isInDictionary(final String word){
 		return dictionary.contains(word);
 	}
 

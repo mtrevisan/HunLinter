@@ -113,13 +113,13 @@ public class FSABuilder{
 	 * @param input	Input sequences to build automaton from.
 	 * @return	The automaton encoding of all input sequences.
 	 */
-	public FSAAbstract build(final Iterable<byte[]> input){
+	public final FSAAbstract build(final Iterable<byte[]> input){
 		for(final byte[] chs : input)
 			add(chs);
 		return complete();
 	}
 
-	public FSAAbstract build(final byte[][] input){
+	public final FSAAbstract build(final byte[][] input){
 		for(final byte[] chs : input)
 			add(chs);
 		return complete();

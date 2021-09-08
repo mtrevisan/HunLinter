@@ -49,7 +49,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	}
 
 	@Override
-	protected Void doInBackground(){
+	protected final Void doInBackground(){
 		try{
 			listener.startCheckUpdates();
 
@@ -88,19 +88,19 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		return contentLength;
 	}
 
-	public void cancelTask(){
+	public final void cancelTask(){
 		listener.stopped();
 
 		cancel(true);
 	}
 
 	@Override
-	public void rbcProgressCallback(final RBCWrapper rbc, final double progress){
+	public final void rbcProgressCallback(final RBCWrapper rbc, final double progress){
 		setProgress(Math.min((int)Math.round(progress), 100));
 	}
 
 	@Override
-	protected void done(){
+	protected final void done(){
 		if(!isCancelled()){
 			try{
 				listener.validatingFile(remoteObject, localPath);

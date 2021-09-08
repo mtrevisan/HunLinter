@@ -182,7 +182,7 @@ public class AffixParser{
 	 * @throws IOException	If an I/O error occurs.
 	 * @throws LinterException   If something is wrong while parsing the file (e.g. a missing rule).
 	 */
-	public void parse(final File affFile, final String configurationLanguage) throws IOException{
+	public final void parse(final File affFile, final String configurationLanguage) throws IOException{
 		clear();
 
 		int index = 0;
@@ -303,15 +303,15 @@ public class AffixParser{
 		return PARSING_HANDLERS.get(ruleType);
 	}
 
-	public AffixData getAffixData(){
+	public final AffixData getAffixData(){
 		return data;
 	}
 
-	public String getLanguage(){
+	public final String getLanguage(){
 		return data.getLanguage();
 	}
 
-	public void clear(){
+	public final void clear(){
 		data.clear();
 	}
 

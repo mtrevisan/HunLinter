@@ -274,7 +274,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		workerManager.checkForAbortion(parentFrame);
 	}
 
@@ -347,7 +347,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void initialize(final Integer actionCommand){
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -390,7 +390,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clear(final Integer actionCommand){
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
@@ -407,7 +407,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public void clearAid(final Integer actionCommand){
+	public final void clearAid(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 

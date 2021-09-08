@@ -94,7 +94,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
-	public SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){
+	public final SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 
 		//remove intersection
@@ -106,45 +106,45 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return newEntry;
 	}
 
-	public String[] getPartOfSpeeches(){
+	public final String[] getPartOfSpeeches(){
 		return partOfSpeeches;
 	}
 
-	public boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
+	public final boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
 		return SetHelper.setOf(this.partOfSpeeches).equals(SetHelper.setOf(partOfSpeeches));
 	}
 
-	public List<String> getSynonyms(){
+	public final List<String> getSynonyms(){
 		return synonyms;
 	}
 
-	public boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
+	public final boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
 		return !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches);
 	}
 
-	public boolean containsSynonym(final String synonym){
+	public final boolean containsSynonym(final String synonym){
 		return (LoopHelper.match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
 	}
 
-	public boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
+	public final boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
 		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches))
 			&& this.synonyms.containsAll(synonyms));
 	}
 
-	public boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
+	public final boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
 		return ((partOfSpeeches == null || !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches))
 			&& !Collections.disjoint(this.synonyms, synonyms));
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return (new StringJoiner(COLUMN))
 			.add(String.join(COMMA, partOfSpeeches))
 			.add(StringUtils.join(synonyms, COMMA))
 			.toString();
 	}
 
-	public String toLine(final CharSequence definition){
+	public final String toLine(final CharSequence definition){
 		final StringJoiner sj = new StringJoiner(", ", "(", ")");
 		for(final String partOfSpeech : partOfSpeeches)
 			sj.add(partOfSpeech);
@@ -156,7 +156,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	@Override
-	public int compareTo(final SynonymsEntry other){
+	public final int compareTo(final SynonymsEntry other){
 		return new CompareToBuilder()
 			.append(partOfSpeeches, other.partOfSpeeches)
 			.append(synonyms, other.synonyms)
@@ -164,7 +164,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -176,7 +176,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = synonyms.hashCode();
 		result = 31 * result + Arrays.hashCode(partOfSpeeches);
 		return result;

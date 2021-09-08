@@ -47,7 +47,7 @@ public class Debouncer<T>{
 		this.interval = interval;
 	}
 
-	public void call(final T key){
+	public final void call(final T key){
 		final TimerTask task = new TimerTask(key);
 
 		TimerTask prev;
@@ -59,7 +59,7 @@ public class Debouncer<T>{
 		}while(prev != null && !prev.extend());
 	}
 
-	public void terminate(){
+	public final void terminate(){
 		executorService.shutdownNow();
 	}
 

@@ -81,19 +81,19 @@ public class LinterException extends RuntimeException{
 		this.fixActionType = fixActionType;
 	}
 
-	public IndexDataPair<?> getData(){
+	public final IndexDataPair<?> getData(){
 		return data;
 	}
 
-	public boolean canFix(){
+	public final boolean canFix(){
 		return (fixAction != null);
 	}
 
-	public Runnable getFixAction(){
+	public final Runnable getFixAction(){
 		return fixAction;
 	}
 
-	public FixActionType getFixActionType(){
+	public final FixActionType getFixActionType(){
 		return fixActionType;
 	}
 

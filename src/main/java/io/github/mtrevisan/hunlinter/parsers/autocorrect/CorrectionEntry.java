@@ -43,21 +43,21 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 		this.correctForm = correctForm;
 	}
 
-	public String getIncorrectForm(){
+	public final String getIncorrectForm(){
 		return incorrectForm;
 	}
 
-	public String getCorrectForm(){
+	public final String getCorrectForm(){
 		return correctForm;
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return ("\"" + incorrectForm + " -> " + correctForm + "\"");
 	}
 
 	@Override
-	public int compareTo(final CorrectionEntry other){
+	public final int compareTo(final CorrectionEntry other){
 		return new CompareToBuilder()
 			.append(incorrectForm, other.incorrectForm)
 			.append(correctForm, other.correctForm)
@@ -65,7 +65,7 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -77,7 +77,7 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = incorrectForm.hashCode();
 		result = 31 * result + correctForm.hashCode();
 		return result;

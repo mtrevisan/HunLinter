@@ -55,7 +55,7 @@ public abstract class FlagParsingStrategy{
 	 */
 	public abstract String[] parseFlags(final String rawFlags);
 
-	protected void checkForDuplicates(final String[] flags){
+	protected final void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);
@@ -65,7 +65,7 @@ public abstract class FlagParsingStrategy{
 	}
 
 
-	public String joinFlags(final List<String> flags){
+	public final String joinFlags(final List<String> flags){
 		if(flags == null || flags.isEmpty())
 			return StringUtils.EMPTY;
 
@@ -81,7 +81,7 @@ public abstract class FlagParsingStrategy{
 	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	public String joinFlags(final String[] flags){
+	public final String joinFlags(final String[] flags){
 		return joinFlags(flags, (flags != null? flags.length: 0));
 	}
 
@@ -89,7 +89,7 @@ public abstract class FlagParsingStrategy{
 		return joinFlags(flags, size, StringUtils.EMPTY);
 	}
 
-	protected String joinFlags(final String[] flags, final int size, final String flagSeparator){
+	protected final String joinFlags(final String[] flags, final int size, final String flagSeparator){
 		if(flags == null || size == 0)
 			return StringUtils.EMPTY;
 

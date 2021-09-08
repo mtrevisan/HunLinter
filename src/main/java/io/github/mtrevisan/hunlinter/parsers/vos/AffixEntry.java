@@ -124,7 +124,7 @@ public class AffixEntry{
 		checkValidity(parentType, type, parentFlag, flag, removal, line, index);
 	}
 
-	public void setParent(final RuleEntry parent){
+	public final void setParent(final RuleEntry parent){
 		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		this.parent = parent;
@@ -156,7 +156,7 @@ public class AffixEntry{
 		}
 	}
 
-	public String getAppending(){
+	public final String getAppending(){
 		return appending;
 	}
 
@@ -164,15 +164,15 @@ public class AffixEntry{
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
-	public boolean hasContinuationFlags(){
+	public final boolean hasContinuationFlags(){
 		return (continuationFlags != null && !continuationFlags.isEmpty());
 	}
 
-	public boolean hasContinuationFlag(final String flag){
+	public final boolean hasContinuationFlag(final String flag){
 		return (hasContinuationFlags() && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){
+	public final List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){
 		final Set<String> flags = new HashSet<>();
 		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);
@@ -194,7 +194,7 @@ public class AffixEntry{
 	 * @param dicEntry	The dictionary entry to combine from
 	 * @return	The list of new morphological fields
 	 */
-	public String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
+	public final String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
 		String[] baseMorphFields = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
 		final String[] ruleMorphFields = (morphologicalFields != null? morphologicalFields: new String[0]);
 
@@ -241,17 +241,17 @@ public class AffixEntry{
 		return mf;
 	}
 
-	public void validate(){
+	public final void validate(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
 		if(!filteredFields.isEmpty())
 			throw new LinterException(POS_PRESENT.get().format(new Object[]{String.join(", ", filteredFields)}));
 	}
 
-	public AffixType getType(){
+	public final AffixType getType(){
 		return parent.getType();
 	}
 
-	public String getFlag(){
+	public final String getFlag(){
 		return parent.getFlag();
 	}
 
@@ -267,7 +267,7 @@ public class AffixEntry{
 		return collector;
 	}
 
-	public boolean canApplyTo(final String word){
+	public final boolean canApplyTo(final String word){
 		if(condition.length() == 1 && condition.charAt(0) == '.')
 			return true;
 
@@ -333,11 +333,11 @@ public class AffixEntry{
 		return (j < 0);
 	}
 
-	public boolean canInverseApplyTo(final String word){
+	public final boolean canInverseApplyTo(final String word){
 		return (parent.getType() == AffixType.SUFFIX? word.endsWith(appending): word.startsWith(appending));
 	}
 
-	public String applyRule(final String word, final boolean isFullstrip){
+	public final String applyRule(final String word, final boolean isFullstrip){
 		if(!isFullstrip && word.length() == removing.length())
 			throw new LinterException(CANNOT_FULL_STRIP.get().format(new Object[]{word}));
 
@@ -347,13 +347,13 @@ public class AffixEntry{
 	}
 
 	//NOTE: {#canInverseApplyTo} should be called to verify applicability
-	public String undoRule(final String word){
+	public final String undoRule(final String word){
 		return (parent.getType() == AffixType.SUFFIX
 			? word.substring(0, word.length() - appending.length()) + removing
 			: removing + word.substring(appending.length()));
 	}
 
-	public String toString(final FlagParsingStrategy strategy){
+	public final String toString(final FlagParsingStrategy strategy){
 		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final StringBuilder sb = new StringBuilder();
@@ -367,7 +367,7 @@ public class AffixEntry{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		sj.add(parent.getType().getOption().getCode())
 			.add(parent.getFlag())
@@ -383,7 +383,7 @@ public class AffixEntry{
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -399,7 +399,7 @@ public class AffixEntry{
 	}
 
 	@Override
-	public int hashCode(){
+	public final int hashCode(){
 		int result = (parent == null? 0: parent.hashCode());
 		result = 31 * result + (removing == null? 0: removing.hashCode());
 		result = 31 * result + (appending == null? 0: appending.hashCode());
