@@ -46,6 +46,7 @@ public class AutoCorrectLinterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public AutoCorrectLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("autocorrect.linter",
 			new ImageIcon(AutoCorrectLinterAction.class.getResource("/dictionary_correctness.png")));
@@ -72,6 +73,11 @@ public class AutoCorrectLinterAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

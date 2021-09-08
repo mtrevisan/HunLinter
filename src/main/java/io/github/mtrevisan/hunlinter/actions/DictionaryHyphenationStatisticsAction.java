@@ -50,6 +50,7 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionaryHyphenationStatisticsAction(final boolean performHyphenationStatistics, final WorkerManager workerManager,
 			final Frame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.statistics",
@@ -82,6 +83,11 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

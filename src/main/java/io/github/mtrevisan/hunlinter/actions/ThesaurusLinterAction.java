@@ -46,6 +46,7 @@ public class ThesaurusLinterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public ThesaurusLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("thesaurus.linter",
 			new ImageIcon(ThesaurusLinterAction.class.getResource("/dictionary_correctness.png")));
@@ -72,6 +73,11 @@ public class ThesaurusLinterAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

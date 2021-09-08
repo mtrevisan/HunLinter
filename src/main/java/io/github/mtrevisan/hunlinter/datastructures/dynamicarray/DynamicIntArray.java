@@ -162,7 +162,7 @@ public class DynamicIntArray implements RandomAccess{
 		set(size - 1, x);
 	}
 
-	public synchronized void addAll(final DynamicIntArray array){
+	public void addAll(final DynamicIntArray array){
 		for(int i = 0; i < array.size; i ++)
 			add(array.get(i));
 	}
@@ -178,7 +178,7 @@ public class DynamicIntArray implements RandomAccess{
 		return elem;
 	}
 
-	public synchronized void shrink(final int newSize){
+	public void shrink(final int newSize){
 		while(size > newSize)
 			remove();
 	}

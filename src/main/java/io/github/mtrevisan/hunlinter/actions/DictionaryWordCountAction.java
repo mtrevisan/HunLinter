@@ -47,6 +47,7 @@ public class DictionaryWordCountAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionaryWordCountAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.wordCount",
 			new ImageIcon(DictionaryWordCountAction.class.getResource("/dictionary_count.png")));
@@ -73,6 +74,11 @@ public class DictionaryWordCountAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

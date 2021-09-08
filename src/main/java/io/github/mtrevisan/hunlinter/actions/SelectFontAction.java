@@ -60,6 +60,7 @@ public class SelectFontAction extends AbstractAction{
 	private final Preferences preferences;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public SelectFontAction(final Packager packager, final ParserManager parserManager, final Preferences preferences){
 		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
@@ -97,6 +98,11 @@ public class SelectFontAction extends AbstractAction{
 		dialog.setVisible(true);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

@@ -88,6 +88,11 @@ public class OpenFileAction extends AbstractAction{
 	}
 
 
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
 	@SuppressWarnings("unused")
 	@Serial
 	private void writeObject(final ObjectOutputStream os) throws IOException{

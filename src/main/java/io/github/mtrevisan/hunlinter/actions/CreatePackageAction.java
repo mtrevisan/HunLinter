@@ -45,6 +45,7 @@ public class CreatePackageAction extends AbstractAction{
 	private final ParserManager parserManager;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public CreatePackageAction(final ParserManager parserManager){
 		super("system.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
 
@@ -60,6 +61,11 @@ public class CreatePackageAction extends AbstractAction{
 		parserManager.createPackage();
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

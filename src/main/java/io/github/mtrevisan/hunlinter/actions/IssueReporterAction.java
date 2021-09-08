@@ -43,6 +43,7 @@ public class IssueReporterAction extends AbstractAction{
 	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";
 
 
+	@SuppressWarnings("ConstantConditions")
 	public IssueReporterAction(){
 		super("system.issue", new ImageIcon(IssueReporterAction.class.getResource("/help_issue.png")));
 	}
@@ -52,6 +53,11 @@ public class IssueReporterAction extends AbstractAction{
 		FileHelper.browseURL(URL_REPORT_ISSUE);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

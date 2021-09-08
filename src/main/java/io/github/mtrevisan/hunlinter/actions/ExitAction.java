@@ -42,6 +42,7 @@ public class ExitAction extends AbstractAction{
 	private static final long serialVersionUID = -3856496810694201902L;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public ExitAction(){
 		super("system.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
 	}
@@ -54,6 +55,11 @@ public class ExitAction extends AbstractAction{
 		System.exit(0);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

@@ -47,6 +47,7 @@ public class DictionaryLinterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionaryLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.linter",
 			new ImageIcon(DictionaryLinterAction.class.getResource("/dictionary_correctness.png")));
@@ -73,6 +74,11 @@ public class DictionaryLinterAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

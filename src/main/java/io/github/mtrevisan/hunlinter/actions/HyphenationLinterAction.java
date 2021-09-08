@@ -47,6 +47,7 @@ public class HyphenationLinterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public HyphenationLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("hyphenation.linter",
 			new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
@@ -73,6 +74,11 @@ public class HyphenationLinterAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

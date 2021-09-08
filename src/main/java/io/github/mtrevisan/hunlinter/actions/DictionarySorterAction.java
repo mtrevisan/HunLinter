@@ -53,6 +53,7 @@ public class DictionarySorterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionarySorterAction(final ParserManager parserManager, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.sorter", new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_sort.png")));
@@ -102,6 +103,11 @@ public class DictionarySorterAction extends AbstractAction{
 		dialog.setVisible(true);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

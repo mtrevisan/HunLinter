@@ -56,6 +56,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionaryExtractWordlistAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager,
 			final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractWordlist",
@@ -99,6 +100,11 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

@@ -43,6 +43,7 @@ public class AboutAction extends AbstractAction{
 	private static final long serialVersionUID = 4363575204925273954L;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public AboutAction(){
 		super("system.about", new ImageIcon(AboutAction.class.getResource("/help_about.png")));
 	}
@@ -58,6 +59,11 @@ public class AboutAction extends AbstractAction{
 		dialog.setVisible(true);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

@@ -43,6 +43,7 @@ public class OnlineHelpAction extends AbstractAction{
 	private static final String URL_ONLINE_HELP = "https://github.com/mtrevisan/HunLinter/blob/master/README.md";
 
 
+	@SuppressWarnings("ConstantConditions")
 	public OnlineHelpAction(){
 		super("system.help", new ImageIcon(OnlineHelpAction.class.getResource("/help_help.png")));
 	}
@@ -52,6 +53,11 @@ public class OnlineHelpAction extends AbstractAction{
 		FileHelper.browseURL(URL_ONLINE_HELP);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

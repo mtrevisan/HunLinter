@@ -254,6 +254,11 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 
+	@Override
+	public Object clone(){
+		return super.clone();
+	}
+
 	@SuppressWarnings("unused")
 	@Serial
 	private void writeObject(final ObjectOutputStream os) throws IOException{

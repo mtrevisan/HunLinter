@@ -49,6 +49,7 @@ public class ThesaurusLinterFSAAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public ThesaurusLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
 			final PropertyChangeListener propertyChangeListener){
 		super("thesaurus.linter.fsa",
@@ -83,6 +84,11 @@ public class ThesaurusLinterFSAAction extends AbstractAction{
 			);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

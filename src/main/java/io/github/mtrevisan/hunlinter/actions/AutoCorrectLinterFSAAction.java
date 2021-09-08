@@ -49,6 +49,7 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public AutoCorrectLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
 			final PropertyChangeListener propertyChangeListener){
 		super("autocorrect.linter.fsa",
@@ -83,6 +84,11 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 			);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial

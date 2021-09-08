@@ -54,6 +54,7 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractDuplicates",
 			new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
@@ -93,6 +94,11 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 		);
 	}
 
+
+	@Override
+	protected Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
 
 	@SuppressWarnings("unused")
 	@Serial
