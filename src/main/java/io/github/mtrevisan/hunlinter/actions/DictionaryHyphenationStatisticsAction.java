@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -45,19 +46,22 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
 	private final boolean performHyphenationStatistics;
 	private final WorkerManager workerManager;
+	private final Frame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 
 	public DictionaryHyphenationStatisticsAction(final boolean performHyphenationStatistics, final WorkerManager workerManager,
-			final PropertyChangeListener propertyChangeListener){
+			final Frame parentFrame, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.statistics",
 			new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_statistics.png")));
 
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.performHyphenationStatistics = performHyphenationStatistics;
 		this.workerManager = workerManager;
+		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
@@ -73,7 +77,8 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(true)
+			worker -> setEnabled(true),
+			parentFrame
 		);
 	}
 

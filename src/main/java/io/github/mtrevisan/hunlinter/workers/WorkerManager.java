@@ -72,20 +72,17 @@ public class WorkerManager{
 
 	private final Packager packager;
 	private final ParserManager parserManager;
-	private final Frame parentFrame;
 
 
-	public WorkerManager(final Packager packager, final ParserManager parserManager, final Frame parentFrame){
+	public WorkerManager(final Packager packager, final ParserManager parserManager){
 		Objects.requireNonNull(packager, "Packager cannot be null");
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
-		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
-		this.parentFrame = parentFrame;
 	}
 
-	public void checkForAbortion(){
+	public void checkForAbortion(final Frame parentFrame){
 		for(final Map.Entry<String, WorkerAbstract<?>> workerNameWorker : WORKERS.entrySet()){
 			final WorkerAbstract<?> worker = workerNameWorker.getValue();
 			if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
@@ -163,7 +160,7 @@ public class WorkerManager{
 	}
 
 	public void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart,
-			final Consumer<WorkerAbstract<?>> onEnd){
+			final Consumer<WorkerAbstract<?>> onEnd, final Frame parentFrame){
 		final Supplier<WorkerAbstract<?>> creator = () -> {
 			final Boolean performHyphenationStatistics = preStart.get();
 			return new StatisticsWorker(parserManager, performHyphenationStatistics, parentFrame);

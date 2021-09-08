@@ -82,21 +82,24 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	private final Packager packager;
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
+	private final Frame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 	private String formerCompoundInputText;
 
 
 	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager,
-			final PropertyChangeListener propertyChangeListener){
+			final Frame parentFrame, final PropertyChangeListener propertyChangeListener){
 		Objects.requireNonNull(packager, "Packager cannot be null");
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
+		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 
 
@@ -272,7 +275,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion();
+		workerManager.checkForAbortion(parentFrame);
 	}
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed

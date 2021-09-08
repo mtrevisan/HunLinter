@@ -182,8 +182,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public MainFrame(){
 		packager = new Packager();
 		parserManager = new ParserManager(packager);
-		//FIXME move `this` from the constructor
-		workerManager = new WorkerManager(packager, parserManager, this);
+		workerManager = new WorkerManager(packager, parserManager);
 
 
 		initComponents();
@@ -236,7 +235,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
 		EventBusService.subscribe(dicLayeredPane);
-      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
+      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this, this);
 		EventBusService.subscribe(cmpLayeredPane);
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
 		EventBusService.subscribe(theLayeredPane);
@@ -397,7 +396,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicWordCountMenuItem.setText("Word count");
       dicMenu.add(dicWordCountMenuItem);
 
-      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this));
+      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this, this));
       dicStatisticsMenuItem.setMnemonic('S');
       dicStatisticsMenuItem.setText("Statistics");
       dicMenu.add(dicStatisticsMenuItem);
@@ -457,7 +456,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
-      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this));
+      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this, this));
       hypStatisticsMenuItem.setMnemonic('S');
       hypStatisticsMenuItem.setText("Statistics");
       hypMenu.add(hypStatisticsMenuItem);
@@ -581,7 +580,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion();
+		workerManager.checkForAbortion(this);
 	}
 
 	private void loadFile(final Path basePath){
