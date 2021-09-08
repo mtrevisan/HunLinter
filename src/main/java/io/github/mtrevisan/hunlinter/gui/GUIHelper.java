@@ -71,6 +71,15 @@ public final class GUIHelper{
 
 	private GUIHelper(){}
 
+
+	//FIXME icon size
+	public static int getIconSize(){
+//		final int iconSize = hypRulesValueLabel.getHeight();
+//		final int iconSize = dicTotalInflectionsValueLabel.getHeight();
+final int iconSize = 17;
+		return iconSize;
+	}
+
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.
 	 *

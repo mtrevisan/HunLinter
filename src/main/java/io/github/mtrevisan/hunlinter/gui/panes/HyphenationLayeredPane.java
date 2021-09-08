@@ -103,10 +103,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(wordTextField, addRuleTextField);
 
 		try{
-			//FIXME
-//			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
+			final int iconSize = GUIHelper.getIconSize();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);

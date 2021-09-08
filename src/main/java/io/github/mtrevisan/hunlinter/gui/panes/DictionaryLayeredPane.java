@@ -116,10 +116,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(inputTextField);
 
 		try{
-			//FIXME
-//			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
+			final int iconSize = GUIHelper.getIconSize();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
 			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
 			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
