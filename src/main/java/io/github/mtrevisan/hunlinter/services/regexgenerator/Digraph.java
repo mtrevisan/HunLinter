@@ -99,7 +99,8 @@ public final class Digraph<T>{
 	public void addEdge(final int v, final int w, final T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
-		adjacency.get(v).add(0, IndexDataPair.of(w, value));
+		adjacency.get(v)
+			.add(0, IndexDataPair.of(w, value));
 	}
 
 	/**

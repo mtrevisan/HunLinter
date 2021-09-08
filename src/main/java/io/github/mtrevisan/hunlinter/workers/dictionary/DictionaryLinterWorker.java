@@ -129,8 +129,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlags();
 			unusedFlags.removeAll(flags);
 			if(!unusedFlags.isEmpty())
-				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "),
-					IndexDataPair.NULL_INDEX_DATA_PAIR));
+				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "))
+					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 
 			return null;
 		};

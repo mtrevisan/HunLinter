@@ -181,7 +181,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void incompatibilityCheck(final Inflection inflection, final int index){
 		final List<String> pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
-			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT, IndexDataPair.of(index, null)));
+			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT)
+				.withIndexDataPair(IndexDataPair.of(index, null)));
 	}
 
 	private void orthographyCheck(final Inflection inflection){
