@@ -173,7 +173,7 @@ public class SmithWatermanAlignment{
 
 	private Deque<IndexDataPair<Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>(0);
+		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
@@ -185,7 +185,7 @@ public class SmithWatermanAlignment{
 		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
-		trace.operations = new ArrayDeque<>(0);
+		trace.operations = new ArrayDeque<>();
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){

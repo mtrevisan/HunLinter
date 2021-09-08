@@ -46,7 +46,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 
-	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>(0);
+	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>();
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
