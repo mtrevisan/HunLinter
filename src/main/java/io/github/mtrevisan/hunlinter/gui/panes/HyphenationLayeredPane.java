@@ -379,6 +379,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_optionsButtonActionPerformed
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
@@ -387,6 +388,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION)
 			return;

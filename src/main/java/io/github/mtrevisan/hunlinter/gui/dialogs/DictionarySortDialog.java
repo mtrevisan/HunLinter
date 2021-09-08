@@ -148,6 +148,7 @@ public class DictionarySortDialog extends JDialog{
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public final void reloadDictionaryParser(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY)
 			return;

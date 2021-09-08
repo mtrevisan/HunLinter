@@ -290,6 +290,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;

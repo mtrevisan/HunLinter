@@ -590,6 +590,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
 		parsingResultTextArea.setText(null);
 
@@ -607,6 +608,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
@@ -621,6 +623,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
 		final Throwable cause = exceptionEvent.getCause();
 
@@ -640,6 +643,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
 		final IndexDataPair<?> eventData = warningEvent.getData();
@@ -738,6 +742,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
 		final JLayeredPane pane = evt.getPane();
 		final boolean enable = evt.isEnable();
@@ -776,6 +781,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearAffixParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
@@ -797,6 +803,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearDictionaryParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
@@ -807,6 +814,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearAidParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
@@ -819,6 +827,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearThesaurusParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
@@ -834,6 +843,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearHyphenationParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
@@ -849,6 +859,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearAutoCorrectParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
@@ -864,6 +875,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearSentenceExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
@@ -878,6 +890,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearWordExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;

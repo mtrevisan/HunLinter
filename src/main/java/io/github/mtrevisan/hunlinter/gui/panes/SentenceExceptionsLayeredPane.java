@@ -223,6 +223,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
@@ -237,6 +238,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_SENTENCE_EXCEPTIONS)
 			return;

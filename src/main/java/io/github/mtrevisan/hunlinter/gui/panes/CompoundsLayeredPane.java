@@ -346,6 +346,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
@@ -388,6 +389,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
@@ -404,6 +406,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
+	@SuppressWarnings("unused")
 	public void clearAid(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
