@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -123,12 +124,10 @@ public class Packager{
 	public static final String FILENAME_SENTENCE_EXCEPTIONS = "SentenceExceptList.xml";
 	public static final String FILENAME_WORD_EXCEPTIONS = "WordExceptList.xml";
 	private static final String CONFIGURATION_NODE_NAME_AUTO_TEXT = "AutoText";
-	private static final String FILENAME_AUTO_TEXT = "BlockList.xml";
 	private static final String CONFIGURATION_NODE_NAME_INTERNAL_PATHS = "InternalPaths";
 	private static final String FOLDER_ORIGIN = "%origin%";
 	private static final Pattern FOLDER_SPLITTER = RegexHelper.pattern("[/\\\\]");
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
-	private static final String FILENAME_STANDARD_AUTO_TEXT = "standard";
 
 	private static final Map<String, String> KEY_FILE_MAPPER = new HashMap<>(9);
 	static{
@@ -183,7 +182,7 @@ public class Packager{
 	private List<String> languages;
 
 	private String language;
-	private final Map<String, File> configurationFiles = new HashMap<>(0);
+	private final Map<String, Object> configurationFiles = new HashMap<>(0);
 
 	private final XMLManager xmlManager = new XMLManager();
 
@@ -256,7 +255,10 @@ public class Packager{
 				try(final Stream<Path> stream = Files.list(autoTextPath)){
 					stream.filter(file -> !Files.isDirectory(file))
 						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_BAU))
-						.forEach(path -> ZIPPER.unzipFile(path.toFile(), autoTextPath));
+						.forEach(path -> {
+							final Path outputPath = Path.of(autoTextPath.toString(), FilenameUtils.getBaseName(path.toFile().getName()));
+							ZIPPER.unzipFile(path.toFile(), outputPath);
+						});
 				}
 			}
 		}
@@ -268,7 +270,7 @@ public class Packager{
 	}
 
 	private List<String> extractLanguages(final Iterable<File> configurationFiles) throws IOException, SAXException{
-		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
+		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, configurationFiles);
 		final Node parentNode = pair.getRight();
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
@@ -293,25 +295,25 @@ public class Packager{
 	}
 
 	private void processDictionariesConfigurationFile() throws IOException, SAXException{
-		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
-		final File file = pair.getLeft();
+		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
+		final Path path = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node == null)
 			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
 				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
 		else
-			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), path.getParent()));
 	}
 
 	private void processPathsConfigurationFile() throws IOException, SAXException{
-		final Pair<File, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
-		final File file = pair.getLeft();
+		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
+		final Path path = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), file.toPath().getParent()));
+			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), path.getParent()));
 			final Collection<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
-			final Collection<File> collection = configurationFiles.values();
-			for(final File f : collection)
+			final Collection<Object> collection = configurationFiles.values();
+			for(final Object f : collection)
 				uniqueFolders.add(f.toString());
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
@@ -321,19 +323,20 @@ public class Packager{
 		}
 	}
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public void createPackage(final Path projectPath, final String language){
 		//package entire folder into a ZIP file
 		try{
-			final Path autoCorrectOutputPath = packageAutoCorrectFiles(language);
-			final Path autoTextOutputPath = packageAutoTextFiles(language);
+			final File autoCorrectOutputFile = packageAutoCorrectFiles(language);
+			final List<File> autoTextOutputFiles = packageAutoTextFiles();
 
-			packageExtension(projectPath.toFile(), autoCorrectOutputPath, autoTextOutputPath);
+			packageExtension(projectPath.toFile(), autoCorrectOutputFile, autoTextOutputFiles);
 
 			//remove created sub-packages
-			if(autoCorrectOutputPath != null)
-				Files.delete(autoCorrectOutputPath);
-			if(autoTextOutputPath != null)
-				Files.delete(autoTextOutputPath);
+			if(autoCorrectOutputFile != null)
+				autoCorrectOutputFile.delete();
+			for(final File file : autoTextOutputFiles)
+				file.delete();
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Package created");
 
@@ -346,41 +349,62 @@ public class Packager{
 		}
 	}
 
-	private Path packageAutoCorrectFiles(final String language) throws IOException{
-		File autoCorrectFile = configurationFiles.get(FILENAME_AUTO_CORRECT);
+	private File packageAutoCorrectFiles(final String language){
+		File autoCorrectFile = (File)configurationFiles.get(FILENAME_AUTO_CORRECT);
 		if(autoCorrectFile == null)
-			autoCorrectFile = configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
+			autoCorrectFile = (File)configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
 		if(autoCorrectFile == null)
-			autoCorrectFile = configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-		return packageFiles(FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT, autoCorrectFile);
-	}
-
-	private Path packageAutoTextFiles(final String language) throws IOException{
-		final File autoTextFile = configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		//FIXME package with the same name of the folder it was unzipped into
-		return packageFiles(FILENAME_STANDARD_AUTO_TEXT + EXTENSION_BAU, autoTextFile);
-	}
-
-	private Path packageFiles(final String packageFilename, final File file) throws IOException{
-		Path outputPath = null;
-		if(file != null){
-			outputPath = Path.of(file.getParent(), packageFilename);
-			final File folder = file.getParentFile();
-			ZIPPER.zipDirectory(folder, Deflater.BEST_COMPRESSION, outputPath.toFile());
+			autoCorrectFile = (File)configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
+		if(autoCorrectFile != null){
+			try{
+				final File inputFolder = autoCorrectFile.getParentFile();
+				final String packageFilename = FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
+				final File outputFile = Path.of(inputFolder.getAbsolutePath(), packageFilename)
+					.toFile();
+				packageFiles(inputFolder, outputFile);
+				return outputFile;
+			}
+			catch(final IOException ioe){
+				LOGGER.error("Cannot package autocorr file `{}`", autoCorrectFile.getName(), ioe);
+			}
 		}
-		return outputPath;
+		return null;
 	}
 
-	private void packageExtension(final File projectFile, final Path autoCorrectOutputPath, final Path autoTextOutputPath) throws IOException{
-		final Path projectPath = projectFile.toPath();
-		final File outputFile = Path.of(projectPath.toString(), projectPath.getName(projectPath.getNameCount() - 1)
-			+ EXTENSION_ZIP)
+	private List<File> packageAutoTextFiles(){
+		final List<File> files = new ArrayList<>(0);
+		final File[] autoTextFiles = (File[])configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		for(final File file : autoTextFiles){
+			try{
+				final File inputFolder = new File(FilenameUtils.removeExtension(file.getAbsolutePath()));
+				final File outputFile = Path.of(inputFolder.getParentFile().getAbsolutePath(), file.getName() + EXTENSION_BAU)
+					.toFile();
+				packageFiles(inputFolder, outputFile);
+				files.add(outputFile);
+			}
+			catch(final IOException ioe){
+				LOGGER.error("Cannot package autotext file `{}`", file.getName(), ioe);
+			}
+		}
+		return files;
+	}
+
+	private void packageFiles(final File inputFolder, final File outputFile) throws IOException{
+		if(inputFolder != null)
+			ZIPPER.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
+	}
+
+	private void packageExtension(final File projectFolder, final File autoCorrectOutputFile, final List<File> autoTextOutputFiles)
+			throws IOException{
+		final File outputFile = Path.of(projectFolder.toString(), FilenameUtils.getBaseName(projectFolder.toString()) + EXTENSION_ZIP)
 			.toFile();
 		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
 		//that are not autoCorrectOutputFilename or autoTextOutputFilename
-		final File autoCorrectOutputFile = (autoCorrectOutputPath != null? autoCorrectOutputPath.toFile(): null);
-		final File autoTextOutputFile = (autoTextOutputPath != null? autoTextOutputPath.toFile(): null);
-		ZIPPER.zipDirectory(projectFile, Deflater.BEST_COMPRESSION, outputFile, autoCorrectOutputFile, autoTextOutputFile);
+		final List<File> outputFiles = new ArrayList<>(autoTextOutputFiles.size() + (autoCorrectOutputFile != null? 1: 0));
+		if(autoCorrectOutputFile != null)
+			outputFiles.add(autoCorrectOutputFile);
+		outputFiles.addAll(autoTextOutputFiles);
+		ZIPPER.zipDirectory(projectFolder, Deflater.BEST_COMPRESSION, outputFile, outputFiles.toArray(new File[0]));
 	}
 
 	public String getLanguage(){
@@ -417,7 +441,11 @@ public class Packager{
 	}
 
 	public File getFile(final String key){
-		return configurationFiles.get(KEY_FILE_MAPPER.get(key));
+		return (File)configurationFiles.get(KEY_FILE_MAPPER.get(key));
+	}
+
+	public File[] getFiles(final String key){
+		return (File[])configurationFiles.get(KEY_FILE_MAPPER.get(key));
 	}
 
 	public File getAffixFile(){
@@ -452,8 +480,8 @@ public class Packager{
 		return getFile(KEY_FILE_WORD_EXCEPTIONS);
 	}
 
-	public File getAutoTextFile(){
-		return getFile(KEY_FILE_AUTO_TEXT);
+	public File[] getAutoTextFiles(){
+		return getFiles(KEY_FILE_AUTO_TEXT);
 	}
 
 	/** Go up directories until description.xml or manifest.json is found. */
@@ -497,7 +525,7 @@ public class Packager{
 		return configurationPaths;
 	}
 
-	private Pair<File, Node> findConfiguration(final String configurationName, final Iterable<File> configurationFiles)
+	private Pair<Path, Node> findConfiguration(final String configurationName, final Iterable<File> configurationFiles)
 			throws IOException, SAXException{
 		for(final File configurationFile : configurationFiles){
 			final Document doc = xmlManager.parseXMLDocument(configurationFile);
@@ -509,13 +537,13 @@ public class Packager{
 
 			final Node foundNode = onNodeNameApply(rootElement, configurationName, Function.identity());
 			if(foundNode != null)
-				return Pair.of(configurationFile, foundNode);
+				return Pair.of(configurationFile.toPath(), foundNode);
 		}
 		return Pair.of(null, null);
 	}
 
-	private Map<String, File> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
-		final Map<String, File> folders = new HashMap<>(0);
+	private Map<String, Object> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
+		final Map<String, Object> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
 			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
@@ -533,7 +561,7 @@ public class Packager{
 	}
 
 	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
-			final Map<String, File> folders) throws IOException{
+			final Map<String, Object> folders) throws IOException{
 		//restrict to given language
 		final List<Node> children = extractChildren(entry);
 		children.removeIf(node -> !ArrayUtils.contains(extractLocale(node), language));
@@ -557,13 +585,13 @@ public class Packager{
 		}
 	}
 
-	private Map<String, File> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
+	private Map<String, Object> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
 			final Path originPath) throws IOException{
 		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
 		Objects.requireNonNull(folder, "Folder cannot be null");
 
 		final File file = absolutizeFolder(folder, basePath, originPath);
-		final Map<String, File> children = new HashMap<>(3);
+		final Map<String, Object> children = new HashMap<>(3);
 		if(CONFIGURATION_NODE_NAME_AUTO_CORRECT.equals(nodeValue)){
 			autoCorrectPath = file.toPath();
 
@@ -574,7 +602,15 @@ public class Packager{
 		else if(CONFIGURATION_NODE_NAME_AUTO_TEXT.equals(nodeValue)){
 			autoTextPath = file.toPath();
 
-			children.put(nodeValue, Path.of(file.toString(), FILENAME_AUTO_TEXT).toFile());
+			final Set<File> autotextFiles = new HashSet<>(0);
+			final File[] autotextFolders = file.listFiles((dir, name) -> new File(dir, name).isDirectory());
+			if(autotextFolders != null)
+				autotextFiles.addAll(Arrays.asList(autotextFolders));
+			final File[] ff = file.listFiles((dir, name) -> name.endsWith(EXTENSION_BAU));
+			if(ff != null)
+				for(final File f : ff)
+					autotextFiles.add(new File(FilenameUtils.removeExtension(f.getAbsolutePath())));
+			children.put(CONFIGURATION_NODE_NAME_AUTO_TEXT, autotextFiles.toArray(new File[0]));
 		}
 		else
 			LOGGER.info("Unknown configuration name: {}", nodeValue);
