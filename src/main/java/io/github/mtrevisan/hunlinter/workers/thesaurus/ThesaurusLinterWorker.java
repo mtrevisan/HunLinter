@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +65,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 	public static final String WORKER_NAME = "Thesaurus linter";
 
-	private static final ThreadLocal<MessageFormat> MISSING_ENTRY = JavaHelper.createMessageFormat("Thesaurus doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
-	private static final ThreadLocal<MessageFormat> ENTRY_NOT_IN_DICTIONARY = JavaHelper.createMessageFormat("Dictionary doesn''t contain definition {0} (from entry {1})");
+	private static final String MISSING_ENTRY = "Thesaurus doesn't contain definition {} with part-of-speech {} (from entry {})";
+	private static final String ENTRY_NOT_IN_DICTIONARY = "Dictionary doesn't contain definition {} (from entry {})";
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -95,8 +94,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
 			for(final String word : words)
 				if(!bloomFilter.contains(word))
-					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.get().format(
-						new Object[]{word, originalDefinition}));
+					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, originalDefinition));
 
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
@@ -107,8 +105,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.get().format(
-							new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
+						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
+							Arrays.toString(partOfSpeeches), originalDefinition));
 				}
 			}
 		};

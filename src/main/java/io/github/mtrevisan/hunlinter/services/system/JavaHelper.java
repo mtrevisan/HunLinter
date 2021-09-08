@@ -26,12 +26,12 @@ package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.helpers.MessageFormatter;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
-import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,12 +47,10 @@ public final class JavaHelper{
 
 	private JavaHelper(){}
 
-	public static ThreadLocal<MessageFormat> createMessageFormat(final String text){
-		return ThreadLocal.withInitial(() -> new MessageFormat(text));
-	}
 
-	public static String createMessage(final ThreadLocal<MessageFormat> messageFormat, final Object... data){
-		return messageFormat.get().format(data);
+	public static String textFormat(final String message, final Object... parameters){
+		return MessageFormatter.arrayFormat(message, parameters)
+			.getMessage();
 	}
 
 

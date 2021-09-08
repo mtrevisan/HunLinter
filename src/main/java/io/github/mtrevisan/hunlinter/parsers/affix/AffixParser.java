@@ -39,7 +39,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +48,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -77,8 +75,8 @@ import java.util.regex.Pattern;
  */
 public class AffixParser{
 
-	private static final ThreadLocal<MessageFormat> BAD_FIRST_LINE = JavaHelper.createMessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: `{0}`");
-	private static final ThreadLocal<MessageFormat> GLOBAL_ERROR_MESSAGE = JavaHelper.createMessageFormat("{0}, line {1,number,#}");
+	private static final String BAD_FIRST_LINE = "The first non-comment line in the affix file must be a 'SET charset', was: `{}`";
+	private static final String GLOBAL_ERROR_MESSAGE = "{}, line {}";
 
 	private static final String NO_LANGUAGE = "xxx";
 

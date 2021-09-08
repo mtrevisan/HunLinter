@@ -43,7 +43,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -61,7 +60,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
-	private static final ThreadLocal<MessageFormat> WORD_IS_NOT_SYLLABABLE = JavaHelper.createMessageFormat("{0} ({1}) is not syllabable");
+	private static final String WORD_IS_NOT_SYLLABABLE = "{} ({}) is not syllabable";
 
 
 	public HyphenationLinterWorker(final ParserManager parserManager){
@@ -93,9 +92,9 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
 					final String[] syllabes = hyphenation.getSyllabes();
 					if(orthography.hasSyllabationErrors(syllabes)){
-						final String message = WORD_IS_NOT_SYLLABABLE.get().format(new Object[]{word,
+						final String message = JavaHelper.textFormat(WORD_IS_NOT_SYLLABABLE, word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK),
-							indexData.getData()});
+							indexData.getData());
 						final StringBuilder sb = new StringBuilder(message);
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");

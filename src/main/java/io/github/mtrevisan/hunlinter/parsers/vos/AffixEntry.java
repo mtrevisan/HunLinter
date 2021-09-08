@@ -55,16 +55,16 @@ import java.util.regex.Pattern;
 
 public class AffixEntry{
 
-	private static final ThreadLocal<MessageFormat> AFFIX_EXPECTED = JavaHelper.createMessageFormat("Expected an affix entry, found something else{0} in parent flag `{1}`");
-	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Cannot parse affix line `{0}`");
-	private static final ThreadLocal<MessageFormat> WRONG_REMOVING_APPENDING_FORMAT = JavaHelper.createMessageFormat("Same removal and addition parts: `{0}`");
-	private static final ThreadLocal<MessageFormat> WRONG_TYPE = JavaHelper.createMessageFormat("Wrong rule type, expected `{0}`, got `{1}`: {2}");
-	private static final ThreadLocal<MessageFormat> WRONG_FLAG = JavaHelper.createMessageFormat("Wrong rule flag, expected `{0}`, got `{1}`: {2}");
-	private static final ThreadLocal<MessageFormat> WRONG_CONDITION_END = JavaHelper.createMessageFormat("Condition part doesn''t ends with removal part: `{0}`");
-	private static final ThreadLocal<MessageFormat> WRONG_CONDITION_START = JavaHelper.createMessageFormat("Condition part doesn''t starts with removal part: `{0}`");
-	private static final ThreadLocal<MessageFormat> POS_PRESENT = JavaHelper.createMessageFormat("Part-of-Speech detected: `{0}`");
-	private static final ThreadLocal<MessageFormat> CHARACTERS_IN_COMMON = JavaHelper.createMessageFormat("Characters in common between removed and added part: `{0}`");
-	private static final ThreadLocal<MessageFormat> CANNOT_FULL_STRIP = JavaHelper.createMessageFormat("Cannot strip full word `{0}` without the FULLSTRIP option");
+	private static final String AFFIX_EXPECTED = "Expected an affix entry, found something else{} in parent flag `{}`";
+	private static final String WRONG_FORMAT = "Cannot parse affix line `{}`";
+	private static final String WRONG_REMOVING_APPENDING_FORMAT = "Same removal and addition parts: `{}`";
+	private static final String WRONG_TYPE = "Wrong rule type, expected `{}`, got `{}`: {}";
+	private static final String WRONG_FLAG = "Wrong rule flag, expected `{}`, got `{}`: {}";
+	private static final String WRONG_CONDITION_END = "Condition part doesn't ends with removal part: `{}`";
+	private static final String WRONG_CONDITION_START = "Condition part doesn't starts with removal part: `{}`";
+	private static final String POS_PRESENT = "Part-of-Speech detected: `{}`";
+	private static final String CHARACTERS_IN_COMMON = "Characters in common between removed and added part: `{}`";
+	private static final String CANNOT_FULL_STRIP = "Cannot strip full word `{}` without the FULLSTRIP option";
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
@@ -142,15 +142,15 @@ public class AffixEntry{
 				if(!condition.endsWith(removal))
 					throw new LinterException(WRONG_CONDITION_END, line);
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.get().format(new Object[]{line}),
-						IndexDataPair.of(index, null)));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON, line)
+						.withIndexDataPair(IndexDataPair.of(index, null)));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START, line);
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.get().format(new Object[]{line}),
-						IndexDataPair.of(index, null)));
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON, line)
+						.withIndexDataPair(IndexDataPair.of(index, null)));
 			}
 		}
 	}

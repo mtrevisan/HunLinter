@@ -27,12 +27,10 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -40,10 +38,10 @@ import java.util.Scanner;
 
 public class AliasesHandler implements Handler{
 
-	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <flag/morphological field>'");
-	private static final ThreadLocal<MessageFormat> BAD_OPTION = JavaHelper.createMessageFormat("Error reading line `{0}`: bad option, it must be {1}");
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String WRONG_FORMAT = "Error reading line `{}`: bad number of entries, it must be '<option> <flag/morphological field>'";
+	private static final String BAD_OPTION = "Error reading line `{}`: bad option, it must be {}";
 
 
 	@Override

@@ -27,18 +27,17 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 
 public class RuleMatcherEntry{
 
-	private final MessageFormat messagePattern;
+	private final String messagePattern;
 	private final String masterFlag;
 	private final String[] wrongFlags;
 
 
-	public RuleMatcherEntry(final MessageFormat messagePattern, final String masterFlag, final String[] wrongFlags){
+	public RuleMatcherEntry(final String messagePattern, final String masterFlag, final String[] wrongFlags){
 		this.messagePattern = messagePattern;
 		this.masterFlag = masterFlag;
 		this.wrongFlags = wrongFlags;
@@ -47,7 +46,7 @@ public class RuleMatcherEntry{
 	public final void match(final Inflection inflection){
 		for(final String flag : wrongFlags)
 			if(inflection.hasContinuationFlag(flag))
-				throw new LinterException(messagePattern.format(new Object[]{masterFlag, flag}));
+				throw new LinterException(messagePattern, masterFlag, flag);
 	}
 
 	@Override

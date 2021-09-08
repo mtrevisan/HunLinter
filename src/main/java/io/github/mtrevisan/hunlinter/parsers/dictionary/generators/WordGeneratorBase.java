@@ -33,13 +33,11 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,8 +50,8 @@ class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
-	private static final ThreadLocal<MessageFormat> TWOFOLD_RULE_VIOLATED = JavaHelper.createMessageFormat("Twofold rule violated for `{0} from {1}` ({2} still has rules {3})");
-	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`{1}");
+	private static final String TWOFOLD_RULE_VIOLATED = "Twofold rule violated for `{} from {}` ({} still has rules {})";
+	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`{}";
 
 
 	protected final AffixData affixData;

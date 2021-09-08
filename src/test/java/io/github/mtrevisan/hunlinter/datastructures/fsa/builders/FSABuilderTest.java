@@ -80,7 +80,7 @@ class FSABuilderTest{
 	@Test
 	void lexicographicOrder(){
 		List<byte[]> input = Arrays.asList(new byte[]{0}, new byte[]{1}, new byte[]{(byte)0xFF});
-		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
+		input.sort(LexicographicalComparator.lexicographicalComparator());
 
 		//check if lexical ordering is consistent with absolute byte value
 		Assertions.assertEquals(0, input.get(0)[0]);
@@ -128,7 +128,7 @@ class FSABuilderTest{
 		final Random rnd = new Random(System.currentTimeMillis());
 		for(int i = 0; i < count; i ++)
 			input.add(randomByteSequence(rnd, lengthMin, lengthMax, alphabetMin, alphabetMax));
-		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
+		input.sort(LexicographicalComparator.lexicographicalComparator());
 		return input;
 	}
 

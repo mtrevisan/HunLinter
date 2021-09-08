@@ -28,13 +28,11 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +48,7 @@ import java.util.function.Predicate;
 
 public class DictionaryEntry{
 
-	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`{1}");
+	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`{}";
 
 	private static final String SLASH = "/";
 	private static final String TAB = "\t";
@@ -181,7 +179,8 @@ public class DictionaryEntry{
 		return result;
 	}
 
-	public final Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag, final String compoundMiddleFlag, final String compoundEndFlag){
+	public final Map<String, List<DictionaryEntry>> distributeByCompoundBeginMiddleEnd(final String compoundBeginFlag,
+			final String compoundMiddleFlag, final String compoundEndFlag){
 		final Map<String, List<DictionaryEntry>> distribution = new HashMap<>(3);
 		distribution.put(compoundBeginFlag, new ArrayList<>(0));
 		distribution.put(compoundMiddleFlag, new ArrayList<>(0));

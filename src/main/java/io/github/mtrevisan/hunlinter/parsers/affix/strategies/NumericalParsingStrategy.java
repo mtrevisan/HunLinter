@@ -25,12 +25,10 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
 
@@ -40,9 +38,9 @@ import java.util.regex.Pattern;
  */
 final class NumericalParsingStrategy extends FlagParsingStrategy{
 
-	private static final ThreadLocal<MessageFormat> FLAG_MUST_BE_IN_RANGE = JavaHelper.createMessageFormat("Flag must be in the range [1, {0}]: `{1}`");
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Flag must be an integer number: `{0}`");
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT_COMPOUND_RULE = JavaHelper.createMessageFormat("Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{0}`");
+	private static final String FLAG_MUST_BE_IN_RANGE = "Flag must be in the range [1, {}]: `{}`";
+	private static final String BAD_FORMAT = "Flag must be an integer number: `{}`";
+	private static final String BAD_FORMAT_COMPOUND_RULE = "Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{}`";
 
 
 	private static final int MAX_NUMERICAL_FLAG = 65_535;

@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -38,7 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -46,12 +44,12 @@ import java.util.Set;
 
 public class CompoundRuleHandler implements Handler{
 
-	private static final ThreadLocal<MessageFormat> MISMATCHED_COMPOUND_RULE_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: mismatched compound rule type (expected {1})");
-	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Error reading line `{0}`: duplicated line");
-	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final ThreadLocal<MessageFormat> EMPTY_COMPOUND_RULE_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: compound rule type cannot be empty");
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Error reading line `{0}`: compound rule is bad formatted");
+	private static final String MISMATCHED_COMPOUND_RULE_TYPE = "Error reading line `{}`: mismatched compound rule type (expected {})";
+	private static final String DUPLICATED_LINE = "Error reading line `{}`: duplicated line";
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String EMPTY_COMPOUND_RULE_TYPE = "Error reading line `{}`: compound rule type cannot be empty";
+	private static final String BAD_FORMAT = "Error reading line `{}`: compound rule is bad formatted";
 
 
 	@Override
@@ -80,8 +78,8 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.get().format(new Object[]{line}),
-						IndexDataPair.of(context.getIndex() + i, null)));
+					EventBusService.publish(new LinterWarning(DUPLICATED_LINE, line)
+						.withIndexDataPair(IndexDataPair.of(context.getIndex() + i, null)));
 			}
 
 			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);

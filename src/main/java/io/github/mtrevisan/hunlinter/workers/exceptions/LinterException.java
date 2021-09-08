@@ -32,7 +32,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.text.MessageFormat;
 
 
 public class LinterException extends RuntimeException{
@@ -43,48 +42,37 @@ public class LinterException extends RuntimeException{
 	public enum FixActionType{ADD, REPLACE, REMOVE}
 
 
-	private final IndexDataPair<?> data;
+	private IndexDataPair<?> data;
 	//FIXME useful?
-	private final Runnable fixAction;
-	private final FixActionType fixActionType;
+	private Runnable fixAction;
+	private FixActionType fixActionType;
 
 
-	public LinterException(final Throwable cause, final Object data){
-		this(null, cause, IndexDataPair.of(-1, data), null, null);
+	public LinterException(final Throwable cause){
+		super(cause);
 	}
 
-	public LinterException(final Throwable cause, final IndexDataPair<?> data){
-		this(null, cause, data, null, null);
+	public LinterException(final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public LinterException(final String message){
-		this(message, null, null, null);
-	}
-
-	public LinterException(final ThreadLocal<MessageFormat> message, final Object... data){
-		this(JavaHelper.createMessage(message, data), null, null, null);
-	}
-
-	public LinterException(final String message, final IndexDataPair<?> data){
-		this(message, null, data, null, null);
-	}
-
-	public LinterException(final String message, final Throwable cause, final IndexDataPair<?> data){
-		this(message, cause, data, null, null);
-	}
-
-	public LinterException(final String message, final IndexDataPair<?> data, final Runnable fixAction,
-			final FixActionType fixActionType){
-		this(message, null, data, fixAction, fixActionType);
-	}
-
-	public LinterException(final String message,  final Throwable cause, final IndexDataPair<?> data, final Runnable fixAction,
-			final FixActionType fixActionType){
-		super(message, cause);
-
+	public LinterException withIndexDataPair(final IndexDataPair<?> data){
 		this.data = data;
+
+		return this;
+	}
+
+	public LinterException withData(final Object data){
+		this.data = IndexDataPair.of(-1, data);
+
+		return this;
+	}
+
+	public LinterException withFixAction(final Runnable fixAction, final FixActionType fixActionType){
 		this.fixAction = fixAction;
 		this.fixActionType = fixActionType;
+
+		return this;
 	}
 
 	public final IndexDataPair<?> getData(){

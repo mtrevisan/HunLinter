@@ -38,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -52,7 +51,7 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter against dictionary FSA";
 
-	private static final ThreadLocal<MessageFormat> ENTRY_NOT_IN_DICTIONARY = JavaHelper.createMessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
+	private static final String ENTRY_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
 	public AutoCorrectLinterFSAWorker(final AutoCorrectParser acoParser, final DictionaryParser dicParser, final WordGenerator wordGenerator,
@@ -86,8 +85,7 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(final String word : words)
 					if(dictionaryLookup.lookup(word).isEmpty())
-						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.get().format(
-							new Object[]{word, correctForm}));
+						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, correctForm));
 			}
 		};
 

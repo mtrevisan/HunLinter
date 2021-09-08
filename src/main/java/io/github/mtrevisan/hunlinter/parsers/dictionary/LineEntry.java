@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +40,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,7 +56,7 @@ public class LineEntry implements Serializable{
 	@Serial
 	private static final long serialVersionUID = 8374397415767767436L;
 
-	private static final ThreadLocal<MessageFormat> CANNOT_EXTRACT_GROUP = JavaHelper.createMessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word `{2}` that is too short");
+	private static final String CANNOT_EXTRACT_GROUP = "Cannot extract group from [{}] at index {} from last because of the presence of the word `{}` that is too short";
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 

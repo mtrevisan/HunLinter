@@ -38,7 +38,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -46,7 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -66,8 +64,8 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
-	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`, cannot reduce");
-	private static final ThreadLocal<MessageFormat> VERY_BAD_ERROR = JavaHelper.createMessageFormat("Something very bad occurs while producing from `{0}`, expected {1}, obtained {1}");
+	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
+	private static final String VERY_BAD_ERROR = "Something very bad occurs while producing from `{}`, expected {}, obtained {}";
 
 	private static final String PIPE = "|";
 

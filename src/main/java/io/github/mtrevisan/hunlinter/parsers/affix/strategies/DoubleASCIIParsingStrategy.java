@@ -25,13 +25,11 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
 
@@ -41,10 +39,10 @@ import java.util.regex.Pattern;
  */
 final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Each flag should be in {0} encoding: `{1}`");
-	private static final ThreadLocal<MessageFormat> FLAG_MUST_BE_EVEN_IN_LENGTH = JavaHelper.createMessageFormat("Flag must be even number of characters: `{0}`");
-	private static final ThreadLocal<MessageFormat> FLAG_MUST_BE_OF_LENGTH_TWO = JavaHelper.createMessageFormat("Flag must be of length two: `{0}`");
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT_COMPOUND_RULE = JavaHelper.createMessageFormat("Compound rule must be composed by double-characters flags in {0} encoding, or the optional operators '*' or '?': `{1}`");
+	private static final String BAD_FORMAT = "Each flag should be in {} encoding: `{}`";
+	private static final String FLAG_MUST_BE_EVEN_IN_LENGTH = "Flag must be even number of characters: `{}`";
+	private static final String FLAG_MUST_BE_OF_LENGTH_TWO = "Flag must be of length two: `{}`";
+	private static final String BAD_FORMAT_COMPOUND_RULE = "Compound rule must be composed by double-characters flags in {} encoding, or the optional operators '*' or '?': `{}`";
 
 	private static final Pattern PATTERN = RegexHelper.pattern("(?<=\\G.{2})");
 

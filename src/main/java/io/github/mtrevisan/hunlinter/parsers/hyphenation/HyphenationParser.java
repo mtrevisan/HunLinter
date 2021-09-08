@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +41,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -70,16 +68,16 @@ import java.util.regex.Pattern;
 public class HyphenationParser{
 
 	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
-	private static final ThreadLocal<MessageFormat> DUPLICATED_CUSTOM_HYPHENATION = JavaHelper.createMessageFormat("Custom hyphenation `{0}` is already present");
-	private static final ThreadLocal<MessageFormat> DUPLICATED_HYPHENATION = JavaHelper.createMessageFormat("Duplicate found: `{0}`");
-	private static final ThreadLocal<MessageFormat> INVALID_RULE = JavaHelper.createMessageFormat("Rule `{0}` has an invalid format");
-	private static final ThreadLocal<MessageFormat> INVALID_HYPHENATION_POINT = JavaHelper.createMessageFormat("Rule `{0}` has no hyphenation point(s)");
-	private static final ThreadLocal<MessageFormat> INVALID_HYPHENATION_POINT_NEAR_DOT = JavaHelper.createMessageFormat("Rule `{0}` is invalid, the hyphenation point should not be adjacent to a dot");
-	private static final ThreadLocal<MessageFormat> MORE_HYPHENATION_DOTS = JavaHelper.createMessageFormat("Augmented rule `{0}` has not exactly one hyphenation point");
-	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_INDEX_NOT_LESS_THAN = JavaHelper.createMessageFormat("Augmented rule `{0}` has the index number not less than the hyphenation point");
-	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = JavaHelper.createMessageFormat("Augmented rule `{0}` has the length number not less than the hyphenation point");
-	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_LENGTH_EXCEEDS = JavaHelper.createMessageFormat("Augmented rule `{0}` has the length number that exceeds the length of the rule");
-	private static final ThreadLocal<MessageFormat> DUPLICATED_RULE = JavaHelper.createMessageFormat("Pattern `{0}` already present as `{1}`");
+	private static final String DUPLICATED_CUSTOM_HYPHENATION = "Custom hyphenation `{}` is already present";
+	private static final String DUPLICATED_HYPHENATION = "Duplicate found: `{}`";
+	private static final String INVALID_RULE = "Rule `{}` has an invalid format";
+	private static final String INVALID_HYPHENATION_POINT = "Rule `{}` has no hyphenation point(s)";
+	private static final String INVALID_HYPHENATION_POINT_NEAR_DOT = "Rule `{}` is invalid, the hyphenation point should not be adjacent to a dot";
+	private static final String MORE_HYPHENATION_DOTS = "Augmented rule `{}` has not exactly one hyphenation point";
+	private static final String AUGMENTED_RULE_INDEX_NOT_LESS_THAN = "Augmented rule `{}` has the index number not less than the hyphenation point";
+	private static final String AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = "Augmented rule `{}` has the length number not less than the hyphenation point";
+	private static final String AUGMENTED_RULE_LENGTH_EXCEEDS = "Augmented rule `{}` has the length number that exceeds the length of the rule";
+	private static final String DUPLICATED_RULE = "Pattern `{}` already present as `{}`";
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 

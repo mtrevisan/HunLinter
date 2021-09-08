@@ -197,7 +197,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				throw e;
 			}
 			catch(final Exception e){
-				throw new LinterException(e, data);
+				throw new LinterException(e)
+					.withIndexDataPair(data);
 			}
 		};
 	}

@@ -26,16 +26,13 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.math.NumberUtils;
-
-import java.text.MessageFormat;
 
 
 public class CopyOverAsNumberHandler implements Handler{
 
-	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: The first parameter is not a number");
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: The first parameter is not a number";
 
 
 	@Override

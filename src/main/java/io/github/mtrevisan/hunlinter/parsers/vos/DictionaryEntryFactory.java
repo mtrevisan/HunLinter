@@ -29,14 +29,12 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +44,7 @@ import java.util.regex.Pattern;
 
 public class DictionaryEntryFactory{
 
-	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Cannot parse dictionary line `{0}`");
+	private static final String WRONG_FORMAT = "Cannot parse dictionary line `{}`";
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;

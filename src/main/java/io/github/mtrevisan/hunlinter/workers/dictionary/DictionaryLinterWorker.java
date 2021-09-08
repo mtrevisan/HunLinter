@@ -32,7 +32,6 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -41,7 +40,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -56,7 +54,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Dictionary linter";
 
-	private static final ThreadLocal<MessageFormat> UNUSED_FLAGS = JavaHelper.createMessageFormat("Unused flags: {0}");
+	private static final String UNUSED_FLAGS = "Unused flags: {}";
 
 
 	public DictionaryLinterWorker(final ParserManager parserManager){
@@ -131,7 +129,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlags();
 			unusedFlags.removeAll(flags);
 			if(!unusedFlags.isEmpty())
-				manageException(new LinterException(UNUSED_FLAGS.get().format(new Object[]{StringUtils.join(unusedFlags, ", ")}),
+				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "),
 					IndexDataPair.NULL_INDEX_DATA_PAIR));
 
 			return null;

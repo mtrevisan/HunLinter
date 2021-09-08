@@ -33,14 +33,12 @@ import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -48,11 +46,11 @@ import java.util.Scanner;
 
 public class AffixHandler implements Handler{
 
-	private static final ThreadLocal<MessageFormat> BAD_THIRD_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the third parameter is not a number");
-	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Duplicated line: {0}");
-	private static final ThreadLocal<MessageFormat> MISMATCHED_RULE_TYPE = JavaHelper.createMessageFormat("Mismatched rule type (expected `{0}`)");
-	private static final ThreadLocal<MessageFormat> MISMATCHED_RULE_FLAG = JavaHelper.createMessageFormat("Mismatched rule flag (expected `{0}`)");
+	private static final String BAD_THIRD_PARAMETER = "Error reading line `{}`: the third parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String DUPLICATED_LINE = "Duplicated line: {}";
+	private static final String MISMATCHED_RULE_TYPE = "Mismatched rule type (expected `{}`)";
+	private static final String MISMATCHED_RULE_FLAG = "Mismatched rule flag (expected `{}`)";
 
 
 	@Override
@@ -108,8 +106,8 @@ public class AffixHandler implements Handler{
 
 
 			if(entries.contains(entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.get().format(new Object[]{entry.toString()}),
-					IndexDataPair.of(context.getIndex() + i, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, entry.toString())
+					.withIndexDataPair(IndexDataPair.of(context.getIndex() + i, null)));
 			else
 				entries.add(entry);
 

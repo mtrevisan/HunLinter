@@ -25,11 +25,9 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -42,7 +40,7 @@ public abstract class FlagParsingStrategy{
 	/** Represents a '*' character in a compound rule. */
 	public static final String FLAG_ANY = "*";
 
-	private static final ThreadLocal<MessageFormat> DUPLICATED_FLAG = JavaHelper.createMessageFormat("Flags must not be duplicated: {0}");
+	private static final String DUPLICATED_FLAG = "Flags must not be duplicated: {}";
 
 
 	public abstract void validate(final String flag);

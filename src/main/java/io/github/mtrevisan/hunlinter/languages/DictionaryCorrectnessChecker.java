@@ -36,19 +36,18 @@ import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 
-import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.Set;
 
 
 public class DictionaryCorrectnessChecker{
 
-	private static final ThreadLocal<MessageFormat> INVALID_CIRCUMFIX_FLAG = JavaHelper.createMessageFormat("{0} cannot have a circumfix flag ({1})");
-	private static final ThreadLocal<MessageFormat> NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = JavaHelper.createMessageFormat("Non-affix entry contains {0}");
-	private static final ThreadLocal<MessageFormat> NO_MORPHOLOGICAL_FIELD = JavaHelper.createMessageFormat("{0} doesn''t have any morphological fields");
-	private static final ThreadLocal<MessageFormat> INVALID_MORPHOLOGICAL_FIELD_PREFIX = JavaHelper.createMessageFormat("{0} has an invalid morphological field prefix: {1}");
-	private static final ThreadLocal<MessageFormat> UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = JavaHelper.createMessageFormat("{0} has an unknown morphological field prefix: {1}");
-	private static final ThreadLocal<MessageFormat> UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = JavaHelper.createMessageFormat("{0} has an unknown morphological field value: {1}");
+	private static final String INVALID_CIRCUMFIX_FLAG = "{} cannot have a circumfix flag ({})";
+	private static final String NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = "Non-affix entry contains {}";
+	private static final String NO_MORPHOLOGICAL_FIELD = "{} doesn't have any morphological fields";
+	private static final String INVALID_MORPHOLOGICAL_FIELD_PREFIX = "{} has an invalid morphological field prefix: {}";
+	private static final String UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = "{} has an unknown morphological field prefix: {}";
+	private static final String UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = "{} has an unknown morphological field value: {}";
 
 
 	protected final AffixData affixData;
@@ -90,25 +89,25 @@ public class DictionaryCorrectnessChecker{
 
 	private void morphologicalFieldCheck(final Inflection inflection, final int index){
 		if(!inflection.hasMorphologicalFields())
-			EventBusService.publish(new LinterWarning(JavaHelper.createMessage(NO_MORPHOLOGICAL_FIELD, inflection.getWord()),
-				IndexDataPair.of(index, null)));
+			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD, inflection.getWord())
+				.withIndexDataPair(IndexDataPair.of(index, null)));
 
 		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
 		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
 		for(int i = 0; i < size; i ++){
 			final String morphologicalField = morphologicalFields[i];
 			if(morphologicalField.length() < 4)
-				EventBusService.publish(new LinterWarning(JavaHelper.createMessage(INVALID_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(),
-					morphologicalField), IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
+					.withIndexDataPair(IndexDataPair.of(index, null)));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
-				EventBusService.publish(new LinterWarning(JavaHelper.createMessage(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(),
-					morphologicalField), IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
+					.withIndexDataPair(IndexDataPair.of(index, null)));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
-				EventBusService.publish(new LinterWarning(JavaHelper.createMessage(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE, inflection.getWord(),
-					morphologicalField), IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE, inflection.getWord(), morphologicalField)
+					.withIndexDataPair(IndexDataPair.of(index, null)));
 		}
 	}
 

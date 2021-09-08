@@ -28,12 +28,10 @@ import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,9 +47,9 @@ import java.util.Set;
 
 public class RulesLoader{
 
-	private static final ThreadLocal<MessageFormat> WORD_WITH_RULE_CANNOT_HAVE = JavaHelper.createMessageFormat("Word with rule {0} cannot have rule {1}");
-	private static final ThreadLocal<MessageFormat> WORD_WITH_LETTER_CANNOT_HAVE = JavaHelper.createMessageFormat("Word with letter `{0}` cannot have rule {1}");
-	private static final ThreadLocal<MessageFormat> WORD_WITH_LETTER_CANNOT_HAVE_USE = JavaHelper.createMessageFormat("Word with letter `{0}` cannot have rule {1}, use {2}");
+	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {} cannot have rule {}";
+	private static final String WORD_WITH_LETTER_CANNOT_HAVE = "Word with letter `{}` cannot have rule {}";
+	private static final String WORD_WITH_LETTER_CANNOT_HAVE_USE = "Word with letter `{}` cannot have rule {}, use {}";
 
 
 	private final PropertiesUTF8 rulesProperties;
@@ -105,7 +103,7 @@ public class RulesLoader{
 				final String masterFlag = rules.get(i ++);
 				final String[] wrongFlags = strategy.parseFlags(rules.get(i));
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new ArrayList<>(1))
-					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE.get(), masterFlag, wrongFlags));
+					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
 
 			Character letter = null;
@@ -121,7 +119,7 @@ public class RulesLoader{
 					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new ArrayList<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
 								? WORD_WITH_LETTER_CANNOT_HAVE_USE
-								: WORD_WITH_LETTER_CANNOT_HAVE).get(),
+								: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
 				}
 			}

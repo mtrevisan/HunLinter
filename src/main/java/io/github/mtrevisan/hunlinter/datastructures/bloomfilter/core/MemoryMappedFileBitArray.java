@@ -46,7 +46,7 @@ import java.util.Arrays;
 public class MemoryMappedFileBitArray implements BitArray{
 
 	private static final String EMPTY_BACKUP_FILE = "Backup file cannot be empty/null";
-	private static final String INVALID_BACKUP_FILE = "Backup file doesn''t represent a valid file";
+	private static final String INVALID_BACKUP_FILE = "Backup file doesn't represent a valid file";
 	private static final String INVALID_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 

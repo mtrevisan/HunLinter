@@ -22,70 +22,25 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.gui.models;
+package io.github.mtrevisan.hunlinter.workers.exceptions;
 
-import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
-import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.List;
 
 
-public class ThesaurusTableModel extends AbstractTableModel{
+public class LinterIllegalArgumentException extends RuntimeException{
 
 	@Serial
-	private static final long serialVersionUID = -2584004821296780108L;
-
-	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
-
-	public static final String TAG_NEW_LINE = "<br>";
-	private static final String TAG = "<html><body style=\"'white-space:nowrap'\">{}</body></html>";
+	private static final long serialVersionUID = -3541599634727937775L;
 
 
-	private List<ThesaurusEntry> synonyms;
-
-
-	public final ThesaurusEntry getSynonymsAt(final int index){
-		return synonyms.get(index);
-	}
-
-	public final void setSynonyms(final List<ThesaurusEntry> synonyms){
-		this.synonyms = synonyms;
-
-		fireTableDataChanged();
-	}
-
-	@Override
-	public final int getRowCount(){
-		return (synonyms != null? synonyms.size(): 0);
-	}
-
-	@Override
-	public final int getColumnCount(){
-		return COLUMN_NAMES.length;
-	}
-
-	@Override
-	public final Object getValueAt(final int rowIndex, final int columnIndex){
-		if(synonyms == null || synonyms.size() <= rowIndex)
-			return null;
-
-		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
-		return switch(columnIndex){
-			case 0 -> thesaurus.getDefinition();
-			case 1 -> JavaHelper.textFormat(TAG, thesaurus.joinSynonyms(TAG_NEW_LINE));
-			default -> null;
-		};
-	}
-
-	@Override
-	public final String getColumnName(final int column){
-		return COLUMN_NAMES[column];
+	public LinterIllegalArgumentException(final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters));
 	}
 
 

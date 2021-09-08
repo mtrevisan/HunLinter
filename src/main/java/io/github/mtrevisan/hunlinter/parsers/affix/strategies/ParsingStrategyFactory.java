@@ -24,17 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public final class ParsingStrategyFactory{
 
-	private static final ThreadLocal<MessageFormat> UNKNOWN_TYPE = JavaHelper.createMessageFormat("Unknown strategy type: {0}");
+	private static final String UNKNOWN_TYPE = "Unknown strategy type: {}";
 
 
 	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>(4);

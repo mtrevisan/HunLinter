@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.exceptions;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -39,7 +38,6 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -54,8 +52,8 @@ import java.util.List;
  */
 public class ExceptionsParser{
 
-	private static final ThreadLocal<MessageFormat> DUPLICATED_ENTRY = JavaHelper.createMessageFormat("Duplicated entry in file {0}: `{1}`");
-	private static final ThreadLocal<MessageFormat> INVALID_ROOT = JavaHelper.createMessageFormat("Invalid root element in file {0}, expected `{1}`, was `{2}`");
+	private static final String DUPLICATED_ENTRY = "Duplicated entry in file {}: `{}`";
+	private static final String INVALID_ROOT = "Invalid root element in file {}, expected `{}`, was `{}`";
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -112,8 +110,8 @@ public class ExceptionsParser{
 		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final String s : dictionary){
 			if(!map.add(s))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.get().format(new Object[]{configurationFilename, s}),
-					IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, configurationFilename, s)
+					.withIndexDataPair(IndexDataPair.of(index, null)));
 
 			index ++;
 		}

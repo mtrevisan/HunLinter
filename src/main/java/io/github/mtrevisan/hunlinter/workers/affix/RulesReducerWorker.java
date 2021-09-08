@@ -35,7 +35,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -45,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +56,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
-	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`, cannot reduce");
+	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
 
 	private static final String WORKER_NAME = "Rules reducer";
 

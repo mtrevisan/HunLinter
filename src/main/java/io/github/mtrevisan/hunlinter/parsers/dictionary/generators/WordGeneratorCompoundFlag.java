@@ -29,11 +29,9 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.PermutationsWithRepetitions;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,8 +44,8 @@ import java.util.function.Function;
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	private static final ThreadLocal<MessageFormat> NON_POSITIVE_LIMIT = JavaHelper.createMessageFormat("Limit cannot be non-positive: {0}");
-	private static final ThreadLocal<MessageFormat> NON_POSITIVE_MAX_COMPOUNDS = JavaHelper.createMessageFormat("Max compounds cannot be non-positive: {0}");
+	private static final String NON_POSITIVE_LIMIT = "Limit cannot be non-positive: {}";
+	private static final String NON_POSITIVE_MAX_COMPOUNDS = "Max compounds cannot be non-positive: {}";
 
 
 	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){

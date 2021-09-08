@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +38,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -58,8 +56,8 @@ import java.util.regex.Pattern;
  */
 public class ThesaurusParser{
 
-	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{0}`");
-	private static final ThreadLocal<MessageFormat> NOT_ENOUGH_SYNONYMS = JavaHelper.createMessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
+	private static final String WRONG_FORMAT = "Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{}`";
+	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
 	private static final String PIPE = "|";
 

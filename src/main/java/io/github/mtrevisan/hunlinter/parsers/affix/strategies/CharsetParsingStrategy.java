@@ -24,21 +24,19 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 
 
 final class CharsetParsingStrategy extends FlagParsingStrategy{
 
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Each flag should be in {0} encoding: `{1}`");
-	private static final ThreadLocal<MessageFormat> BAD_FORMAT_COMPOUND_RULE = JavaHelper.createMessageFormat("Compound rule should be in {0} encoding: `{1}`");
-	private static final ThreadLocal<MessageFormat> FLAG_MUST_BE_OF_LENGTH_ONE = JavaHelper.createMessageFormat("Flag should be of length one and in {0} encoding: `{1}`");
+	private static final String BAD_FORMAT = "Each flag should be in {} encoding: `{}`";
+	private static final String BAD_FORMAT_COMPOUND_RULE = "Compound rule should be in {} encoding: `{}`";
+	private static final String FLAG_MUST_BE_OF_LENGTH_ONE = "Flag should be of length one and in {} encoding: `{}`";
 
 
 	private final Charset charset;

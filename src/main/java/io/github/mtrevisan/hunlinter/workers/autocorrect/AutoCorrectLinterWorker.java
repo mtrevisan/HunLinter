@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -63,7 +62,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter";
 
-	private static final ThreadLocal<MessageFormat> ENTRY_NOT_IN_DICTIONARY = JavaHelper.createMessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
+	private static final String ENTRY_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -103,8 +102,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(final String word : words)
 					if(!bloomFilter.contains(word))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.get().format(
-							new Object[]{word, correctForm}));
+						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, correctForm));
 			}
 		};
 

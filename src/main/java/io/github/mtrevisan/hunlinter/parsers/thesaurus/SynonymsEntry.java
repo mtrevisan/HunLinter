@@ -26,12 +26,10 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,9 +46,9 @@ public class SynonymsEntry{
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
 
-	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Wrong format for thesaurus entry: `{0}`");
-	private static final ThreadLocal<MessageFormat> POS_NOT_IN_PARENTHESIS = JavaHelper.createMessageFormat("Part-of-speech is not in parenthesis: `{0}`");
-	private static final ThreadLocal<MessageFormat> NOT_ENOUGH_SYNONYMS = JavaHelper.createMessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
+	private static final String WRONG_FORMAT = "Wrong format for thesaurus entry: `{}`";
+	private static final String POS_NOT_IN_PARENTHESIS = "Part-of-speech is not in parenthesis: `{}`";
+	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
 
 	private final String[] partOfSpeeches;

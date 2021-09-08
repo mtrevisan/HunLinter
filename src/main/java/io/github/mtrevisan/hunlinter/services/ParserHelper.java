@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.services;
 
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -35,7 +34,6 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
@@ -43,7 +41,7 @@ import java.util.function.BiConsumer;
 
 public final class ParserHelper{
 
-	private static final ThreadLocal<MessageFormat> WRONG_FILE_FORMAT = JavaHelper.createMessageFormat("Malformed file, the first line is not a number, was `{0}`");
+	private static final String WRONG_FILE_FORMAT = "Malformed file, the first line is not a number, was `{}`";
 
 	//FIXME https://zverok.github.io/blog/2021-03-16-spellchecking-dictionaries.html #4
 	public static final char COMMENT_MARK_SHARP = '#';

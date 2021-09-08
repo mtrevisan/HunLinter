@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.services.system;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_10Charset;
 import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_14Charset;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -52,7 +53,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +71,7 @@ public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final ThreadLocal<MessageFormat> WRONG_FILE_FORMAT_CHARSET = JavaHelper.createMessageFormat("The file is not in an allowable charset ({0})");
+	private static final String WRONG_FILE_FORMAT_CHARSET = "The file is not in an allowable charset ({})";
 
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
@@ -163,7 +163,7 @@ public final class FileHelper{
 		for(final Charset charset : HUNSPELL_CHARSETS)
 			sj.add(charset.name());
 		final String charsets = sj.toString();
-		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.get().format(new Object[]{charsets}));
+		throw new LinterIllegalArgumentException(WRONG_FILE_FORMAT_CHARSET, charsets);
 	}
 
 

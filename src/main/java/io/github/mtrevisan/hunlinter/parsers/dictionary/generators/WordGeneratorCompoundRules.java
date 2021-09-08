@@ -31,11 +31,9 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +42,8 @@ import java.util.Objects;
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	private static final ThreadLocal<MessageFormat> NON_POSITIVE_LIMIT = JavaHelper.createMessageFormat("Limit cannot be non-positive: {0}");
-	private static final ThreadLocal<MessageFormat> MISSING_WORD = JavaHelper.createMessageFormat("Missing word(s) for rule {0} in compound rule {1}");
+	private static final String NON_POSITIVE_LIMIT = "Limit cannot be non-positive: {}";
+	private static final String MISSING_WORD = "Missing word(s) for rule {} in compound rule {}";
 
 
 	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){

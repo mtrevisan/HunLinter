@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -42,7 +41,6 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -57,9 +55,9 @@ public class AutoCorrectParser{
 
 	private static final String QUOTATION_MARK = "\"";
 
-	private static final ThreadLocal<MessageFormat> BAD_QUOTE = JavaHelper.createMessageFormat("{0} form cannot contain apostrophes or double quotes: `{1}`");
-	private static final ThreadLocal<MessageFormat> DUPLICATED_ENTRY = JavaHelper.createMessageFormat("Duplicated entry in auto-correct file: `{0}` -> `{1}`");
-	private static final ThreadLocal<MessageFormat> INVALID_ROOT = JavaHelper.createMessageFormat("Invalid root element, expected `{0}`, was `{1}`");
+	private static final String BAD_QUOTE = "{} form cannot contain apostrophes or double quotes: `{}`";
+	private static final String DUPLICATED_ENTRY = "Duplicated entry in auto-correct file: `{}` -> `{}`";
+	private static final String INVALID_ROOT = "Invalid root element, expected `{}`, was `{}`";
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
@@ -108,8 +106,8 @@ public class AutoCorrectParser{
 		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.get().format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),
-					IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, s.getIncorrectForm(), s.getCorrectForm())
+					.withIndexDataPair(IndexDataPair.of(index, null)));
 
 			index ++;
 		}

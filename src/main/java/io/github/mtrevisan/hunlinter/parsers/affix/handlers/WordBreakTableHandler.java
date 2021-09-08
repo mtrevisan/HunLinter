@@ -29,14 +29,12 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -44,11 +42,11 @@ import java.util.Set;
 
 public class WordBreakTableHandler implements Handler{
 
-	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final ThreadLocal<MessageFormat> MISMATCHED_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: mismatched type (expected {1})");
-	private static final ThreadLocal<MessageFormat> EMPTY_BREAK_CHARACTER = JavaHelper.createMessageFormat("Error reading line `{0}`: break character cannot be empty");
-	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Error reading line `{0}`: duplicated line");
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String MISMATCHED_TYPE = "Error reading line `{}`: mismatched type (expected {})";
+	private static final String EMPTY_BREAK_CHARACTER = "Error reading line `{}`: break character cannot be empty";
+	private static final String DUPLICATED_LINE = "Error reading line `{}`: duplicated line";
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
