@@ -99,11 +99,11 @@ class WordTokenizerTest{
 	}
 
 	//FIXME
-//	@Test
-//	void url(){
-//		List<String> tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
-//
-//		Assertions.assertEquals(Arrays.asList("Here", " ", "http://www.bla.com", " ", "is", " ", "another", " ", "url", "."), tokens);
-//	}
+	@Test
+	void url(){
+		List<String> tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
+
+		Assertions.assertEquals(Arrays.asList("Here", " ", "http://www.bla.com", " ", "is", " ", "another", " ", "url", "."), tokens);
+	}
 
 }

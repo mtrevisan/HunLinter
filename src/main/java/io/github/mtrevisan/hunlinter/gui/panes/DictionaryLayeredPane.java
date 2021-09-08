@@ -116,10 +116,9 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(inputTextField);
 
 		try{
-			final int iconSize = GUIHelper.getIconSize();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
-			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
 
 			//reset columns visibility
@@ -456,7 +455,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		dm.clear();
 	}
 
-	private static class MyJCopyableTable extends JCopyableTable{
+	private static final class MyJCopyableTable extends JCopyableTable{
 		@Override
 		public String getValueAtRow(final int row){
 			final TableModel model = getModel();

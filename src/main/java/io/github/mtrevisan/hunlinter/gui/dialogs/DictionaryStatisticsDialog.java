@@ -100,7 +100,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIHelper.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			popupMenu.add(GUIHelper.createPopupCopyMenu(popupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
 				longestWordCharactersValueLabel, longestWordSyllabesValueLabel, mostCommonSyllabesValueLabel,
 				syllabeLengthsModeValueLabel, totalWordsValueLabel, uniqueWordsValueLabel);
@@ -641,7 +641,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	private static class MyChartPanel extends ChartPanel{
+	private static final class MyChartPanel extends ChartPanel{
 		private MyChartPanel(final JFreeChart chart){
 			super(chart);
 		}

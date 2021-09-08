@@ -119,20 +119,19 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(synonymsTextField);
 
 		try{
-			final int iconSize = GUIHelper.getIconSize();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
 
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
-			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
+			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
 			popupMergeMenuItem.setEnabled(false);
 			mergeCopyRemovePopupMenu.add(popupMergeMenuItem);
-			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIHelper::copyCallback));
-			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(mergeCopyRemovePopupMenu, GUIHelper::copyCallback));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(mergeCopyRemovePopupMenu, this::removeSelectedRows));
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
-			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIHelper::copyCallback));
-			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
+			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(copyRemovePopupMenu, GUIHelper::copyCallback));
+			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(copyRemovePopupMenu, this::removeSelectedRows));
 			GUIHelper.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
@@ -456,7 +455,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		return dictionaryLookup;
 	}
 
-	private static class MyJCopyableTable extends JCopyableTable{
+	private static final class MyJCopyableTable extends JCopyableTable{
 		@Override
 		public String getValueAtRow(final int row){
 			final TableModel model = getModel();

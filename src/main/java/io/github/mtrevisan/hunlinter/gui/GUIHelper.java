@@ -72,14 +72,6 @@ public final class GUIHelper{
 	private GUIHelper(){}
 
 
-	//FIXME icon size
-	public static int getIconSize(){
-//		final int iconSize = hypRulesValueLabel.getHeight();
-//		final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
-		return iconSize;
-	}
-
 	/**
 	 * Force the escape key to call the same action as pressing the Cancel button.
 	 *
@@ -123,16 +115,38 @@ final int iconSize = 17;
 	}
 
 
-	public static JMenuItem createPopupMenuItem(final String text, final char mnemonic, final String iconURL, final int iconSize,
-			final JPopupMenu popupMenu, final Consumer<Component> fnCallback) throws IOException{
-		final JMenuItem menuItem = new JMenuItem(text, mnemonic);
+	public static JMenuItem createPopupMenuItem(final String text, final char mnemonic, final String iconURL, final JPopupMenu popupMenu,
+			final Consumer<Component> fnCallback) throws IOException{
+		final MyMenuItem menuItem = new MyMenuItem(text, mnemonic);
 		if(iconURL != null){
+			@SuppressWarnings("ConstantConditions")
 			final BufferedImage img = ImageIO.read(GUIHelper.class.getResourceAsStream(iconURL));
-			final Icon icon = new ImageIcon(img.getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
-			menuItem.setIcon(icon);
+			menuItem.setIcon(img);
 		}
 		menuItem.addActionListener(e -> fnCallback.accept(popupMenu.getInvoker()));
 		return menuItem;
+	}
+
+	private static final class MyMenuItem extends JMenuItem{
+		private BufferedImage icon;
+
+		public MyMenuItem(final String text, final int mnemonic){
+			super(text, mnemonic);
+		}
+
+		public void setIcon(final BufferedImage icon){
+			this.icon = icon;
+		}
+
+		@Override
+		public void paintComponent(final Graphics g){
+			super.paintComponent(g);
+
+			final int height = getHeight();
+			final int iconSize = height * 17 / 26;
+			final int offset = (height - iconSize) >> 1;
+			g.drawImage(icon, offset, offset, iconSize, iconSize,this);
+		}
 	}
 
 	public static JMenuItem createPopupMenuItem(final String text, final boolean selected, final JPopupMenu popupMenu,
@@ -142,24 +156,24 @@ final int iconSize = 17;
 		return menuItem;
 	}
 
-	public static JMenuItem createPopupMergeMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnMerge)
+	public static JMenuItem createPopupMergeMenu(final JPopupMenu popupMenu, final Consumer<Component> fnMerge)
 			throws IOException{
-		return createPopupMenuItem("Merge", 'M', "/popup_add.png", iconSize, popupMenu, fnMerge);
+		return createPopupMenuItem("Merge", 'M', "/popup_add.png", popupMenu, fnMerge);
 	}
 
-	public static JMenuItem createPopupCopyMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnCopy)
+	public static JMenuItem createPopupCopyMenu(final JPopupMenu popupMenu, final Consumer<Component> fnCopy)
 			throws IOException{
-		return createPopupMenuItem("Copy", 'C', "/popup_copy.png", iconSize, popupMenu, fnCopy);
+		return createPopupMenuItem("Copy", 'C', "/popup_copy.png", popupMenu, fnCopy);
 	}
 
-	public static JMenuItem createPopupExportTableMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnExport)
+	public static JMenuItem createPopupExportTableMenu(final JPopupMenu popupMenu, final Consumer<Component> fnExport)
 			throws IOException{
-		return createPopupMenuItem("Export", 'E', "/popup_export.png", iconSize, popupMenu, fnExport);
+		return createPopupMenuItem("Export", 'E', "/popup_export.png", popupMenu, fnExport);
 	}
 
-	public static JMenuItem createPopupRemoveMenu(final int iconSize, final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
+	public static JMenuItem createPopupRemoveMenu(final JPopupMenu popupMenu, final Consumer<Component> fnDelete)
 			throws IOException{
-		return createPopupMenuItem("Remove", 'R', "/popup_delete.png", iconSize, popupMenu, fnDelete);
+		return createPopupMenuItem("Remove", 'R', "/popup_delete.png", popupMenu, fnDelete);
 	}
 
 	public static JMenuItem createCheckBoxMenu(final String text, final boolean selected, final JPopupMenu popupMenu,

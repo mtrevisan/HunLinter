@@ -114,7 +114,7 @@ public class BasicEventBus implements EventBusInterface{
 		this(Executors.newCachedThreadPool(new MyThreadFactory()), waitForHandlers);
 	}
 
-	private static class MyThreadFactory implements ThreadFactory{
+	private static final class MyThreadFactory implements ThreadFactory{
 		private final ThreadFactory delegate = Executors.defaultThreadFactory();
 
 		@Override

@@ -103,9 +103,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(wordTextField, addRuleTextField);
 
 		try{
-			final int iconSize = GUIHelper.getIconSize();
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 		}
 		catch(final IOException ignored){}

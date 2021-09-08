@@ -421,7 +421,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
 	}
 
-	private static class MyJCopyableTable extends JCopyableTable{
+	private static final class MyJCopyableTable extends JCopyableTable{
 		@Override
 		public String getValueAtRow(final int row){
 			final TableModel model = getModel();
