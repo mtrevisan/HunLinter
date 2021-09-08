@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 
-public class SynonymsEntry implements Comparable<SynonymsEntry>{
+public class SynonymsEntry{
 
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
@@ -153,14 +152,6 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			.add(StringUtils.join(synonyms, ThesaurusEntry.PIPE))
 			.add(definition)
 			.toString();
-	}
-
-	@Override
-	public final int compareTo(final SynonymsEntry other){
-		return new CompareToBuilder()
-			.append(partOfSpeeches, other.partOfSpeeches)
-			.append(synonyms, other.synonyms)
-			.toComparison();
 	}
 
 	@Override

@@ -333,7 +333,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
@@ -352,7 +352,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	@SuppressWarnings({"unused", "unchecked"})
+	@SuppressWarnings({"unused", "NumberEquality", "unchecked"})
 	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT)
 			return;

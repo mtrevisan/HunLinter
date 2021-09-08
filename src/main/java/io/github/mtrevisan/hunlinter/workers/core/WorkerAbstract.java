@@ -75,6 +75,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@Override
+	@SuppressWarnings("DesignForExtension")
 	protected Void doInBackground(){
 		try{
 			processor.apply(null);

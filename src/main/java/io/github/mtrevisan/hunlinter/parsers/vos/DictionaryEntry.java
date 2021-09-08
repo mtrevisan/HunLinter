@@ -143,6 +143,7 @@ public class DictionaryEntry{
 		return false;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public AffixEntry[] getAppliedRules(){
 		return new AffixEntry[0];
 	}
@@ -153,6 +154,7 @@ public class DictionaryEntry{
 	 * @param type    The type used to filter the last applied rule
 	 * @return    The last applied rule of the specified type
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public AffixEntry getLastAppliedRule(final AffixType type){
 		return null;
 	}
@@ -162,6 +164,7 @@ public class DictionaryEntry{
 	 *
 	 * @return    The last applied rule of the specified type
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public AffixEntry getLastAppliedRule(){
 		return null;
 	}
@@ -282,15 +285,18 @@ public class DictionaryEntry{
 		return new Affixes(prefixes, suffixes, terminals);
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public boolean isCompound(){
 		return false;
 	}
 
 	@Override
+	@SuppressWarnings("DesignForExtension")
 	public String toString(){
 		return toString(null);
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String toString(final FlagParsingStrategy strategy){
 		final StringBuilder sb = new StringBuilder(word);
 		if(continuationFlags != null && !continuationFlags.isEmpty()){

@@ -226,7 +226,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
@@ -240,7 +240,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;

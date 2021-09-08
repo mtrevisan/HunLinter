@@ -278,6 +278,7 @@ public final class FileHelper{
 
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
+	@SuppressWarnings("UseOfProcessBuilder")
 	public static boolean browse(File file) throws IOException, InterruptedException{
 		if(file.isFile())
 			file = file.getParentFile();
@@ -307,6 +308,7 @@ public final class FileHelper{
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
+	@SuppressWarnings("UseOfProcessBuilder")
 	public static boolean openFileWithChosenEditor(final File file) throws IOException, InterruptedException{
 		//system-specific
 		ProcessBuilder builder = null;
@@ -330,6 +332,7 @@ public final class FileHelper{
 		return executeDesktopCommand(Desktop.Action.BROWSE, url);
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	private static boolean executeDesktopCommand(final Desktop.Action action, final Object parameter){
 		boolean done = false;
 		final Desktop desktop = getDesktopFor(action);
@@ -364,6 +367,7 @@ public final class FileHelper{
 		return (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(action)? Desktop.getDesktop(): null);
 	}
 
+	@SuppressWarnings("UseOfProcessBuilder")
 	private static boolean runOSCommand(final ProcessBuilder builder) throws IOException, InterruptedException{
 		boolean accomplished = false;
 		if(builder != null){

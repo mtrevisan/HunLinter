@@ -79,9 +79,8 @@ public final class DownloaderHelper{
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
 	private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
-	public static final Map<String, Object> APPLICATION_PROPERTIES;
+	public static final Map<String, Object> APPLICATION_PROPERTIES = new HashMap<>(3);
 	static{
-		APPLICATION_PROPERTIES = new HashMap<>(3);
 		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
 			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);

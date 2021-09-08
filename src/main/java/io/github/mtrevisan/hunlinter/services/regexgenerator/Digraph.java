@@ -53,7 +53,7 @@ import java.util.StringJoiner;
  */
 public final class Digraph<T>{
 
-	private static final String NEWLINE = System.getProperty("line.separator");
+	private static final String NEWLINE = "\r\n";
 
 	//adjacency list for given vertex
 	private final List<List<IndexDataPair<T>>> adjacency = new ArrayList<>(0);

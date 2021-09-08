@@ -115,9 +115,9 @@ public class Dictionary{
 	 * Attempts to load a dictionary from opened streams of FSA dictionary data
 	 * and associated metadata. Input streams are not closed automatically.
 	 *
-	 * @param fsaStream	The stream with FSA data
-	 * @param metadataStream	The stream with metadata
-	 * @return	An instantiated {@link Dictionary}.
+	 * @param fsaStream	The stream with FSA data.
+	 * @param metadataStream	The stream with metadata.
+	 * @return	An instance.
 	 * @throws IOException	If an I/O error occurs.
 	 */
 	public static Dictionary read(final InputStream fsaStream, final InputStream metadataStream) throws IOException{

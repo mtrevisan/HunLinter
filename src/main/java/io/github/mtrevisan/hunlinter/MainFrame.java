@@ -204,6 +204,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			//disable the "All files" option
 			openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
 			try{
+				@SuppressWarnings("ConstantConditions")
 				final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
 				final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
 				openProjectPathFileChooser.setFileView(new MyFileView(projectFolderIcon));
@@ -227,7 +228,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents() {
+   @SuppressWarnings("ConstantConditions")
+	private void initComponents() {
 
       parsingResultScrollPane = new javax.swing.JScrollPane();
       parsingResultTextArea = new javax.swing.JTextArea();
@@ -327,7 +329,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.setMnemonic('F');
       filMenu.setText("File");
 
-      filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
+		filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open project…");
       filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -781,7 +783,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearAffixParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
@@ -803,7 +805,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearDictionaryParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
@@ -814,7 +816,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearAidParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
@@ -827,7 +829,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearThesaurusParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
@@ -843,7 +845,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearHyphenationParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
@@ -859,7 +861,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearAutoCorrectParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
@@ -875,7 +877,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearSentenceExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
@@ -890,7 +892,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	@SuppressWarnings("unused")
+	@SuppressWarnings({"unused", "NumberEquality"})
 	public final void clearWordExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;

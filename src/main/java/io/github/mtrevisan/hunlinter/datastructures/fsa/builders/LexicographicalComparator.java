@@ -88,6 +88,7 @@ public final class LexicographicalComparator{
 		 * them while (final or not) local variables are runtime values.
 		 */
 
+		@SuppressWarnings("UseOfSunClasses")
 		static final Unsafe theUnsafe = getUnsafe();
 
 		/** The offset to the first element in a byte array. */

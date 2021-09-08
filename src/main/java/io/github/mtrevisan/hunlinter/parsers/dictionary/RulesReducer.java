@@ -736,7 +736,7 @@ public class RulesReducer{
 			for(final LineEntry entry : entries)
 				entry.expandConditionToMaxLength(comparator);
 
-		final List<LineEntry> list = new ArrayList<>(entries);
+		final List<LineEntry> list = (entries != null? new ArrayList<>(entries): new ArrayList<>(0));
 		list.sort(lineEntryComparator);
 		return list;
 	}

@@ -98,6 +98,7 @@ public class WordTokenizer{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public List<String> tokenize(String text){
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 

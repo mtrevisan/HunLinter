@@ -134,9 +134,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 				sleepOnPause();
 			});
 
-			if(reducedRules != null)
-				for(final String rule : reducedRules)
-					LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule);
+			for(final String rule : reducedRules)
+				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Successfully processed");

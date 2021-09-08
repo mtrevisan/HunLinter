@@ -58,7 +58,7 @@ public class DynamicIntArray implements RandomAccess{
 		blocks[0] = new IntBlock(1);
 
 		//SB0 has only one Block, and that Block can only have one element
-		lastSuperBlock = new SuperBlock(true, 1, 1, 0);
+		lastSuperBlock = SuperBlock.createEven(1, 1, 0);
 		//SB0 contains a Block, incrementCurrentNumberOfDataBlocks
 		lastSuperBlock.incrementCurrentNumberOfDataBlocks();
 
@@ -119,13 +119,15 @@ public class DynamicIntArray implements RandomAccess{
 					// The new SuperBlock will have the same MaxNumberOfDataBlocks as the old one,
 					// but twice the MaxNumberOfElementsPerBlock.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock * 2, 0);
+					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks,
+						lastSuperBlock.maxNumberOfElementsPerBlock * 2, 0);
 				else
 					// If the number of the current full lastSuperBlock is not even,
 					// The new SuperBlock will have the same MaxNumberOfElementsPerBlock as the old one,
 					// but twice the MaxNumberOfDataBlocks.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks * 2, lastSuperBlock.maxNumberOfElementsPerBlock, 0);
+					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks * 2,
+						lastSuperBlock.maxNumberOfElementsPerBlock, 0);
 			}
 
 			// Create a new Block, use lastSuperBlock to figure out how many elements the Block can store.
@@ -227,13 +229,15 @@ public class DynamicIntArray implements RandomAccess{
 					// but the same MaxNumberOfElementsPerBlock.
 					// This previous superBlock currently is full of Blocks.
 					// --numberOfSuperBlocks - 1 gives us the number of this previous superBlock.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks / 2, lastSuperBlock.maxNumberOfElementsPerBlock, lastSuperBlock.maxNumberOfDataBlocks / 2);
+					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks / 2,
+						lastSuperBlock.maxNumberOfElementsPerBlock, lastSuperBlock.maxNumberOfDataBlocks / 2);
 				else
 					// If the number of the current empty lastSuperBlock is not even,
 					// The previous SuperBlock will have one half of MaxNumberOfElementsPerBlock as the old one,
 					// but the same MaxNumberOfDataBlocks.
 					// This previous superBlock currently is full of Blocks.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock / 2, lastSuperBlock.maxNumberOfDataBlocks);
+					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks,
+						lastSuperBlock.maxNumberOfElementsPerBlock / 2, lastSuperBlock.maxNumberOfDataBlocks);
 			}
 		}
 	}

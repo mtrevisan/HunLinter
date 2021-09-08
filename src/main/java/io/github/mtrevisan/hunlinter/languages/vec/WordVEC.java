@@ -74,7 +74,7 @@ public final class WordVEC{
 			final Locale fallbackLocale = Locale.ITALIAN;
 			LOGGER.error("Bad error while creating the collator, use {} as default", fallbackLocale.getLanguage(), e);
 
-			COLLATOR = RuleBasedCollator.getInstance(fallbackLocale);
+			COLLATOR = Collator.getInstance(fallbackLocale);
 		}
 	}
 

@@ -57,6 +57,7 @@ public class HelpDialog extends JDialog{
 
 
 		try{
+			@SuppressWarnings("ConstantConditions")
 			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
 			final Icon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
 			logo.setIcon(icon);

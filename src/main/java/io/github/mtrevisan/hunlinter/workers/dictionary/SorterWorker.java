@@ -66,6 +66,7 @@ public class SorterWorker extends WorkerDictionary{
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 		//here `boundary` cannot be null
+		@SuppressWarnings("ConstantConditions")
 		final int sectionStart = boundary.getKey();
 		final int sectionEnd = boundary.getValue() + 1;
 

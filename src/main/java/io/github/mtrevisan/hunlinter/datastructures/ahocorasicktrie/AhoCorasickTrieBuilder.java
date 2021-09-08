@@ -281,7 +281,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
 				if(fetch(sibling.getValue(), newSiblings) == 0){
-					trie.base[begin + sibling.getKey()] = (-sibling.getValue().getLargestChildrenId() - 1);
+					trie.base[begin + sibling.getKey()] = -sibling.getValue().getLargestChildrenId() - 1;
 					memoryGrowthRate++;
 				}
 				else{

@@ -164,6 +164,7 @@ public class Inflection extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
+	@SuppressWarnings("ConstantConditions")
 	public final boolean isTwofolded(final String circumfixFlag){
 		if(appliedRules != null){
 			//find last applied rule with circumfix flag

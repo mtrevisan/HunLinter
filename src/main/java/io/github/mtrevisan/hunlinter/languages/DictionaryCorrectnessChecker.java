@@ -64,6 +64,7 @@ public class DictionaryCorrectnessChecker{
 		this.hyphenator = hyphenator;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
@@ -75,6 +76,7 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	/** Used by the correctness check worker after calling {@link #loadRules()}. */
+	@SuppressWarnings("DesignForExtension")
 	public void checkInflection(final Inflection inflection, final int index){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))
@@ -120,16 +122,19 @@ public class DictionaryCorrectnessChecker{
 	//used by the correctness check worker:
 	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
+	@SuppressWarnings("DesignForExtension")
 	public boolean shouldNotCheckProductiveness(final String flag){
 		return false;
 	}
 
 	//used by the minimal pairs' worker:
+	@SuppressWarnings("DesignForExtension")
 	public boolean isConsonant(final char chr){
 		return true;
 	}
 
 	//used by the minimal pairs' worker:
+	@SuppressWarnings("DesignForExtension")
 	public boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
 		return true;
 	}

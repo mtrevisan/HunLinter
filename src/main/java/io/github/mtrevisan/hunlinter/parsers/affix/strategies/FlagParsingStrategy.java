@@ -85,6 +85,7 @@ public abstract class FlagParsingStrategy{
 		return joinFlags(flags, (flags != null? flags.length: 0));
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String joinFlags(final String[] flags, final int size){
 		return joinFlags(flags, size, StringUtils.EMPTY);
 	}

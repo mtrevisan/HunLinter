@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * Serializes in-memory {@link FSA} graphs to a binary format compatible with
- * Jan Daciuk's <code>fsa</code>'s package <code>FSA5</code> format.
+ * Jan Daciuk's {@code fsa}'s package <code>FSA5</code> format.
  *
  * <p>
  * It is possible to serialize the automaton with numbers required for perfect
@@ -51,7 +51,7 @@ public class FSASerializer implements FSASerializerInterface{
 	public byte annotationByte = FSA.DEFAULT_ANNOTATION;
 
 	/**
-	 * <code>true</code> if we should serialize with numbers.
+	 * {@code true} if we should serialize with numbers.
 	 *
 	 * @see #serializeWithNumbers()
 	 */
@@ -94,9 +94,9 @@ public class FSASerializer implements FSASerializerInterface{
 	}
 
 	/**
-	 * Serialize root state <code>s</code> to an output stream in <code>FSA</code> format.
+	 * Serialize root state {@code s} to an output stream in <code>FSA</code> format.
 	 *
-	 * @return	<code>os</code> for chaining.
+	 * @return	{@code os} for chaining.
 	 * @see #serializeWithNumbers()
 	 */
 	@Override

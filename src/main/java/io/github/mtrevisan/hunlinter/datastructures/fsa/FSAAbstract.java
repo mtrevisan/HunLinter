@@ -123,6 +123,7 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 	 * @throws UnsupportedOperationException	If the automaton was not compiled with {@link FSAFlags#NUMBERS}.
 	 *		The value can then be computed by manual count of {@link #getSequences}.
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public int getRightLanguageCount(final int node){
 		throw new UnsupportedOperationException("Automaton not compiled with " + FSAFlags.NUMBERS);
 	}
@@ -253,8 +254,8 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 	 * A factory for reading a specific FSA subclass, including proper casting.
 	 *
 	 * @param stream The input stream to read automaton data from. The stream is not closed.
-	 * @param clazz  A subclass of {@link FSAAbstract} to cast the read automaton to.
-	 * @param <T>    A subclass of {@link FSAAbstract} to cast the read automaton to.
+	 * @param clazz  A subclass of this class to cast the read automaton to.
+	 * @param <T>    A subclass of this class to cast the read automaton to.
 	 * @return Returns an instantiated automaton. Never null.
 	 * @throws IOException If the input stream does not represent an automaton, is otherwise
 	 *                     invalid or the class of the automaton read from the input stream

@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -44,7 +43,7 @@ import java.util.StringJoiner;
 import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
-public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
+public class ThesaurusEntry{
 
 	public static final String PIPE = "|";
 	public static final String PART_OF_SPEECH_SEPARATOR = PIPE + ":";
@@ -170,14 +169,6 @@ public class ThesaurusEntry implements Comparable<ThesaurusEntry>{
 	public final String toLine(final int definitionIndex){
 		return synonyms.get(definitionIndex)
 			.toLine(definition);
-	}
-
-	@Override
-	public final int compareTo(final ThesaurusEntry other){
-		return new CompareToBuilder()
-			.append(definition, other.definition)
-			.append(synonyms, other.synonyms)
-			.toComparison();
 	}
 
 	@Override

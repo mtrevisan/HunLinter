@@ -106,22 +106,19 @@ public class WordMuncher{
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
-					if(originatingWord != null){
-						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
+					final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-						final List<Inflection> inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
-						//remove base inflection
-						inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
+					final List<Inflection> inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+					//remove base inflection
+					inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
 
-						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
-						if(inflections.size() != 1)
-							continue;
+					//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
+					if(inflections.size() != 1)
+						continue;
 
-						final List<String> baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
-						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty()
-								|| baseInflectionPartOfSpeech.equals(partOfSpeech)))
-							originators.add(originatorEntry);
-					}
+					final List<String> baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
+					if(baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty() || baseInflectionPartOfSpeech.equals(partOfSpeech))
+						originators.add(originatorEntry);
 				}
 
 		return originators;
@@ -136,11 +133,9 @@ public class WordMuncher{
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
-					if(originatingWord != null){
-						final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
-						if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
-							originatingRulesFromEntry.add(originatingRule);
-					}
+					final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
+					if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
+						originatingRulesFromEntry.add(originatingRule);
 				}
 			if(!originatingRulesFromEntry.isEmpty()){
 				//originatingRulesFromEntry should not have inflections from identical word

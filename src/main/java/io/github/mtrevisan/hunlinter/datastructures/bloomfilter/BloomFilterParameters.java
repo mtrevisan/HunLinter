@@ -59,6 +59,7 @@ public abstract class BloomFilterParameters{
 	 *
 	 * @return	The growth rate when the filter is full.
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public double getGrowthRateWhenFull(){
 		return GROWTH_RATE_WHEN_FULL_DEFAULT;
 	}

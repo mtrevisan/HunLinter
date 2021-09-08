@@ -48,6 +48,7 @@ public class Orthography{
 		return SingletonHelper.INSTANCE;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String correctOrthography(final String word){
 		return correctApostrophes(word);
 	}
@@ -56,6 +57,7 @@ public class Orthography{
 		return StringUtils.replaceChars(word, WRONG_APOSTROPHES, CORRECT_APOSTROPHES);
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public boolean[] getSyllabationErrors(final String[] syllabes){
 		return new boolean[syllabes.length];
 	}
@@ -85,18 +87,22 @@ public class Orthography{
 	 * @param syllabes	The list of syllabes
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
 		return -1;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public int countGraphemes(final String word){
 		return word.length();
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String markDefaultStress(final String word){
 		return word;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public boolean hasStressedGrapheme(final String word){
 		return false;
 	}

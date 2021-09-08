@@ -73,9 +73,9 @@ public class RulesLoader{
 
 		rulesProperties = BaseBuilder.getRulesProperties(language);
 
-		morphologicalFieldsCheck = Boolean.parseBoolean((String)rulesProperties.get("morphologicalFieldsCheck"));
-		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.get("verbSyllabationCheck"));
-		wordCanHaveMultipleStresses = Boolean.parseBoolean((String)rulesProperties.get("wordCanHaveMultipleStresses"));
+		morphologicalFieldsCheck = Boolean.parseBoolean((String)rulesProperties.getProperty("morphologicalFieldsCheck"));
+		enableVerbSyllabationCheck = Boolean.parseBoolean((String)rulesProperties.getProperty("verbSyllabationCheck"));
+		wordCanHaveMultipleStresses = Boolean.parseBoolean((String)rulesProperties.getProperty("wordCanHaveMultipleStresses"));
 
 		dataFields.put(MorphologicalTag.STEM, null);
 		dataFields.put(MorphologicalTag.ALLOMORPH, null);

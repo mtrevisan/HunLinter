@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.autocorrect;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 import java.util.Objects;
 
 
@@ -58,10 +56,8 @@ public class CorrectionEntry implements Comparable<CorrectionEntry>{
 
 	@Override
 	public final int compareTo(final CorrectionEntry other){
-		return new CompareToBuilder()
-			.append(incorrectForm, other.incorrectForm)
-			.append(correctForm, other.correctForm)
-			.toComparison();
+		final int comparison = incorrectForm.compareTo(other.incorrectForm);
+		return (comparison == 0? correctForm.compareTo(other.correctForm): comparison);
 	}
 
 	@Override

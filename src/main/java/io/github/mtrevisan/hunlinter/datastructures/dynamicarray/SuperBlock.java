@@ -34,7 +34,17 @@ class SuperBlock{
 	private int numberOfDataBlocks;
 
 
-	SuperBlock(final boolean even, final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+	public static SuperBlock createEven(final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+			final int numberOfDataBlocks){
+		return new SuperBlock(true, maxNumberOfDataBlocks, maxNumberOfElementsPerBlock, numberOfDataBlocks);
+	}
+
+	public static SuperBlock createOdd(final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+			final int numberOfDataBlocks){
+		return new SuperBlock(false, maxNumberOfDataBlocks, maxNumberOfElementsPerBlock, numberOfDataBlocks);
+	}
+
+	private SuperBlock(final boolean even, final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
 			final int numberOfDataBlocks){
 		this.even = even;
 		this.maxNumberOfDataBlocks = maxNumberOfDataBlocks;
