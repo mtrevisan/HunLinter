@@ -152,7 +152,7 @@ public class ExternalSorter{
 			final boolean removeDuplicates = options.isRemoveDuplicates();
 			String lastLine = null;
 			for(int i = 0; i < sortedLines.size(); i ++){
-				final String line = sortedLines.data[i];
+				final String line = sortedLines.get(i);
 				//skip duplicated lines
 				if(!removeDuplicates || !line.equals(lastLine)){
 					writer.write(line);

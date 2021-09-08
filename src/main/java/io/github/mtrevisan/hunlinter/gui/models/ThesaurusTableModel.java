@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.gui.models;
 
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
@@ -44,7 +45,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
 
 	public static final String TAG_NEW_LINE = "<br>";
-	private static final MessageFormat TAG = new MessageFormat("<html><body style=\"'white-space:nowrap'\">{0}</body></html>");
+	private static final ThreadLocal<MessageFormat> TAG = JavaHelper.createMessageFormat("<html><body style=\"'white-space:nowrap'\">{0}</body></html>");
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -78,7 +79,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		return switch(columnIndex){
 			case 0 -> thesaurus.getDefinition();
-			case 1 -> TAG.format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
+			case 1 -> TAG.get().format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
 			default -> null;
 		};
 	}

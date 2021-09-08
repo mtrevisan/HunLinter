@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.parsers.exceptions;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -53,8 +54,8 @@ import java.util.List;
  */
 public class ExceptionsParser{
 
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in file {0}: `{1}`");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element in file {0}, expected `{1}`, was `{2}`");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_ENTRY = JavaHelper.createMessageFormat("Duplicated entry in file {0}: `{1}`");
+	private static final ThreadLocal<MessageFormat> INVALID_ROOT = JavaHelper.createMessageFormat("Invalid root element in file {0}, expected `{1}`, was `{2}`");
 
 	public enum TagChangeType{SET, ADD, REMOVE, CLEAR}
 
@@ -92,7 +93,8 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException(INVALID_ROOT.format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName()}));
+			throw new LinterException(INVALID_ROOT.get().format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT,
+				rootElement.getNodeName()}));
 
 		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
@@ -111,7 +113,8 @@ public class ExceptionsParser{
 		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final String s : dictionary){
 			if(!map.add(s))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{configurationFilename, s}), IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.get().format(new Object[]{configurationFilename, s}),
+					IndexDataPair.of(index, null)));
 
 			index ++;
 		}

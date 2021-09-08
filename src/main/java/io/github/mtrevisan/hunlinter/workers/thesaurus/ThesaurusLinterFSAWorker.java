@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusDictionary;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerThesaurus;
@@ -54,8 +55,8 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 
 	public static final String WORKER_NAME = "Thesaurus linter against dictionary FSA";
 
-	private static final MessageFormat MISSING_ENTRY = new MessageFormat("Thesaurus doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
-	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain definition {0} (from entry {1})");
+	private static final ThreadLocal<MessageFormat> MISSING_ENTRY = JavaHelper.createMessageFormat("Thesaurus doesn''t contain definition {0} with part-of-speech {1} (from entry {2})");
+	private static final ThreadLocal<MessageFormat> ENTRY_NOT_IN_DICTIONARY = JavaHelper.createMessageFormat("Dictionary doesn''t contain definition {0} (from entry {1})");
 
 
 	public ThesaurusLinterFSAWorker(final ThesaurusParser theParser, final DictionaryParser dicParser, final WordGenerator wordGenerator,
@@ -78,7 +79,7 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 			final String[] words = StringUtils.split(originalDefinition, " –");
 			for(final String word : words)
 				if(dictionaryLookup.lookup(word).isEmpty())
-					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+					LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.get().format(
 						new Object[]{word, originalDefinition}));
 
 			//check if each part of `entry`, with appropriate PoS, exists
@@ -90,7 +91,7 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 					definition = ThesaurusDictionary.removeSynonymUse(definition);
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.format(
+						LOGGER.info(ParserManager.MARKER_APPLICATION, MISSING_ENTRY.get().format(
 							new Object[]{definition, Arrays.toString(partOfSpeeches), originalDefinition}));
 				}
 			}

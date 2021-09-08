@@ -35,7 +35,7 @@ public class ByteArrayList implements RandomAccess{
 	 * The array buffer into which the elements of the list are stored.
 	 * The capacity of the ArrayList is the length of this array buffer.
 	 */
-	byte[][] data;
+	private byte[][] data;
 	/** The size of the ArrayList (the number of elements it contains). */
 	private int size;
 	private final float growthRate;
@@ -71,6 +71,10 @@ public class ByteArrayList implements RandomAccess{
 
 		data[size] = element;
 		size ++;
+	}
+
+	public synchronized byte[] get(final int index){
+		return data[index];
 	}
 
 	/**

@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.PermutationsWithRepetitions;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
@@ -45,8 +46,8 @@ import java.util.function.Function;
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: {0}");
-	private static final MessageFormat NON_POSITIVE_MAX_COMPOUNDS = new MessageFormat("Max compounds cannot be non-positive: {0}");
+	private static final ThreadLocal<MessageFormat> NON_POSITIVE_LIMIT = JavaHelper.createMessageFormat("Limit cannot be non-positive: {0}");
+	private static final ThreadLocal<MessageFormat> NON_POSITIVE_MAX_COMPOUNDS = JavaHelper.createMessageFormat("Max compounds cannot be non-positive: {0}");
 
 
 	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
@@ -65,9 +66,9 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT.get().format(new Object[]{limit}));
 		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
-			throw new LinterException(NON_POSITIVE_MAX_COMPOUNDS.format(new Object[]{maxCompounds}));
+			throw new LinterException(NON_POSITIVE_MAX_COMPOUNDS.get().format(new Object[]{maxCompounds}));
 
 		final boolean forbidDuplicates = affixData.isForbidDuplicatesInCompound();
 

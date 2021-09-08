@@ -39,6 +39,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,8 +77,8 @@ import java.util.regex.Pattern;
  */
 public class AffixParser{
 
-	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: `{0}`");
-	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1,number,#}");
+	private static final ThreadLocal<MessageFormat> BAD_FIRST_LINE = JavaHelper.createMessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: `{0}`");
+	private static final ThreadLocal<MessageFormat> GLOBAL_ERROR_MESSAGE = JavaHelper.createMessageFormat("{0}, line {1,number,#}");
 
 	private static final String NO_LANGUAGE = "xxx";
 
@@ -198,7 +199,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(prefix))
-					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
+					throw new LinterException(BAD_FIRST_LINE.get().format(new Object[]{line}));
 				encodingRead = true;
 
 				context.update(line, index, scanner);
@@ -209,7 +210,7 @@ public class AffixParser{
 						index += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
-						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), index}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE.get().format(new Object[]{e.getMessage(), index}));
 					}
 				}
 			}

@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -47,11 +48,11 @@ import java.util.Scanner;
 
 public class AffixHandler implements Handler{
 
-	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line `{0}`: the third parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line: {0}");
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected `{0}`)");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected `{0}`)");
+	private static final ThreadLocal<MessageFormat> BAD_THIRD_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the third parameter is not a number");
+	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
+	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Duplicated line: {0}");
+	private static final ThreadLocal<MessageFormat> MISMATCHED_RULE_TYPE = JavaHelper.createMessageFormat("Mismatched rule type (expected `{0}`)");
+	private static final ThreadLocal<MessageFormat> MISMATCHED_RULE_FLAG = JavaHelper.createMessageFormat("Mismatched rule flag (expected `{0}`)");
 
 
 	@Override
@@ -61,7 +62,7 @@ public class AffixHandler implements Handler{
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_THIRD_PARAMETER.get().format(new Object[]{context}));
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
 			final List<AffixEntry> entries = readEntries(context, parent, affixData);
@@ -82,7 +83,7 @@ public class AffixHandler implements Handler{
 
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getThirdParameter()}));
 
 		final Scanner scanner = context.getScanner();
 		final AffixType parentType = AffixType.createFromCode(context.getRuleType());
@@ -107,7 +108,7 @@ public class AffixHandler implements Handler{
 
 
 			if(entries.contains(entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}),
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.get().format(new Object[]{entry.toString()}),
 					IndexDataPair.of(context.getIndex() + i, null)));
 			else
 				entries.add(entry);
@@ -129,9 +130,9 @@ public class AffixHandler implements Handler{
 	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
 		final String ruleTypeCode = ruleType.getOption().getCode();
 		if(!context.getRuleType().equals(ruleTypeCode))
-			throw new LinterException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
+			throw new LinterException(MISMATCHED_RULE_TYPE.get().format(new Object[]{ruleType}));
 		if(!context.getFirstParameter().equals(ruleFlag))
-			throw new LinterException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
+			throw new LinterException(MISMATCHED_RULE_FLAG.get().format(new Object[]{ruleFlag}));
 
 		entry.validate();
 	}

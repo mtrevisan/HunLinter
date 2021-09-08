@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -43,11 +44,11 @@ import java.util.Set;
 
 public class WordBreakTableHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final MessageFormat MISMATCHED_TYPE = new MessageFormat("Error reading line `{0}`: mismatched type (expected {1})");
-	private static final MessageFormat EMPTY_BREAK_CHARACTER = new MessageFormat("Error reading line `{0}`: break character cannot be empty");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line `{0}`: duplicated line");
+	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
+	private static final ThreadLocal<MessageFormat> MISMATCHED_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: mismatched type (expected {1})");
+	private static final ThreadLocal<MessageFormat> EMPTY_BREAK_CHARACTER = JavaHelper.createMessageFormat("Error reading line `{0}`: break character cannot be empty");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Error reading line `{0}`: duplicated line");
 
 	private static final String DOUBLE_MINUS_SIGN = HyphenationParser.MINUS_SIGN + HyphenationParser.MINUS_SIGN;
 
@@ -57,10 +58,10 @@ public class WordBreakTableHandler implements Handler{
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
 
 			final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
 
@@ -83,15 +84,15 @@ public class WordBreakTableHandler implements Handler{
 
 			final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 			if(option != AffixOption.WORD_BREAK_CHARACTERS)
-				throw new LinterException(MISMATCHED_TYPE.format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
+				throw new LinterException(MISMATCHED_TYPE.get().format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
 
 			final String breakCharacter = (DOUBLE_MINUS_SIGN.equals(lineParts[1])? HyphenationParser.EN_DASH: lineParts[1]);
 			if(StringUtils.isBlank(breakCharacter))
-				throw new LinterException(EMPTY_BREAK_CHARACTER.format(new Object[]{line}));
+				throw new LinterException(EMPTY_BREAK_CHARACTER.get().format(new Object[]{line}));
 
 			final boolean inserted = wordBreakCharacters.add(breakCharacter);
 			if(!inserted && !HyphenationParser.EN_DASH.equals(breakCharacter))
-				throw new LinterException(DUPLICATED_LINE.format(new Object[]{line}));
+				throw new LinterException(DUPLICATED_LINE.get().format(new Object[]{line}));
 		}
 		return wordBreakCharacters;
 	}

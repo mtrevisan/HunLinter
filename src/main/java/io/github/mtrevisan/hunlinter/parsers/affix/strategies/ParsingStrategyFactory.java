@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
@@ -33,7 +34,7 @@ import java.util.Map;
 
 public final class ParsingStrategyFactory{
 
-	private static final MessageFormat UNKNOWN_TYPE = new MessageFormat("Unknown strategy type: {0}");
+	private static final ThreadLocal<MessageFormat> UNKNOWN_TYPE = JavaHelper.createMessageFormat("Unknown strategy type: {0}");
 
 
 	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>(4);
@@ -50,7 +51,7 @@ public final class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new LinterException(UNKNOWN_TYPE.format(new Object[]{flag}));
+			throw new LinterException(UNKNOWN_TYPE.get().format(new Object[]{flag}));
 
 		return strategy;
 	}

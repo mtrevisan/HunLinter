@@ -37,6 +37,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAutoCorrect;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -62,7 +63,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter";
 
-	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
+	private static final ThreadLocal<MessageFormat> ENTRY_NOT_IN_DICTIONARY = JavaHelper.createMessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -102,7 +103,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(final String word : words)
 					if(!bloomFilter.contains(word))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
+						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.get().format(
 							new Object[]{word, correctForm}));
 			}
 		};

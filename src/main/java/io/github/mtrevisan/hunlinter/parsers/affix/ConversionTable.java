@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,10 +47,10 @@ import java.util.StringJoiner;
 
 public class ConversionTable{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line `{0}`: bad option, it must be {1}");
+	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
+	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <pattern-from> <pattern-to>'");
+	private static final ThreadLocal<MessageFormat> BAD_OPTION = JavaHelper.createMessageFormat("Error reading line `{0}`: bad option, it must be {1}");
 
 
 	private static final String KEY_INSIDE = reduceKey(" ");
@@ -71,10 +72,10 @@ public class ConversionTable{
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
@@ -101,9 +102,9 @@ public class ConversionTable{
 
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
+			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{context}));
 		if(!affixOption.is(parts[0]))
-			throw new LinterException(BAD_OPTION.format(new Object[]{context, affixOption.getCode()}));
+			throw new LinterException(BAD_OPTION.get().format(new Object[]{context, affixOption.getCode()}));
 	}
 
 	/**

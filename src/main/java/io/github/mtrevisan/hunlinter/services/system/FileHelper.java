@@ -71,7 +71,7 @@ public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT_CHARSET = new MessageFormat("The file is not in an allowable charset ({0})");
+	private static final ThreadLocal<MessageFormat> WRONG_FILE_FORMAT_CHARSET = JavaHelper.createMessageFormat("The file is not in an allowable charset ({0})");
 
 
 	private static final List<Charset> HUNSPELL_CHARSETS;
@@ -146,7 +146,7 @@ public final class FileHelper{
 			return cs;
 		}
 		catch(final Exception e){
-			throw new LinterException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsetName}));
+			throw new LinterException(WRONG_FILE_FORMAT_CHARSET.get().format(new Object[]{charsetName}));
 		}
 	}
 
@@ -163,7 +163,7 @@ public final class FileHelper{
 		for(final Charset charset : HUNSPELL_CHARSETS)
 			sj.add(charset.name());
 		final String charsets = sj.toString();
-		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
+		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.get().format(new Object[]{charsets}));
 	}
 
 

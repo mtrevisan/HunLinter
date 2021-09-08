@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +58,7 @@ public class LineEntry implements Serializable{
 	@Serial
 	private static final long serialVersionUID = 8374397415767767436L;
 
-	private static final MessageFormat CANNOT_EXTRACT_GROUP = new MessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word `{2}` that is too short");
+	private static final ThreadLocal<MessageFormat> CANNOT_EXTRACT_GROUP = JavaHelper.createMessageFormat("Cannot extract group from [{0}] at index {1} from last because of the presence of the word `{2}` that is too short");
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
@@ -167,7 +168,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new LinterException(CANNOT_EXTRACT_GROUP.format(new Object[]{StringUtils.join(words, ","),
+				throw new LinterException(CANNOT_EXTRACT_GROUP.get().format(new Object[]{StringUtils.join(words, ","),
 					indexFromLast, word}));
 
 			group.add(word.charAt(index));

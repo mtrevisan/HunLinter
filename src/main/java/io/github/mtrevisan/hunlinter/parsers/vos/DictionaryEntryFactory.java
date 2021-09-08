@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,7 +46,7 @@ import java.util.regex.Pattern;
 
 public class DictionaryEntryFactory{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse dictionary line `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Cannot parse dictionary line `{0}`");
 
 	private static final int PARAM_WORD = 1;
 	private static final int PARAM_FLAGS = 2;
@@ -86,7 +87,7 @@ public class DictionaryEntryFactory{
 
 		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 		if(!m.find())
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{line}));
 
 		final String word = extractWord(m.group(PARAM_WORD));
 		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));

@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.text;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.text.MessageFormat;
@@ -38,7 +39,7 @@ import java.util.stream.IntStream;
  */
 public final class HammingDistance{
 
-	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings `{0}` and `{1}` must have the same length");
+	private static final ThreadLocal<MessageFormat> DIFFERENT_LENGTHS = JavaHelper.createMessageFormat("Strings `{0}` and `{1}` must have the same length");
 
 
 	private HammingDistance(){}
@@ -69,7 +70,7 @@ public final class HammingDistance{
 		Objects.requireNonNull(left, "Left cannot be null");
 		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
-			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
+			throw new IllegalArgumentException(DIFFERENT_LENGTHS.get().format(new Object[]{left, right}));
 
 		return (int)IntStream.range(0, left.length())
 			.filter(idx -> left.charAt(idx) != right.charAt(idx))
@@ -84,7 +85,7 @@ public final class HammingDistance{
 		Objects.requireNonNull(left, "Left cannot be null");
 		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
-			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
+			throw new IllegalArgumentException(DIFFERENT_LENGTHS.get().format(new Object[]{left, right}));
 
 		boolean found = false;
 		char chrLeft = 0;

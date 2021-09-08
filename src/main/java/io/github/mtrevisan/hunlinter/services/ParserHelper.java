@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.services;
 
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -42,7 +43,7 @@ import java.util.function.BiConsumer;
 
 public final class ParserHelper{
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_FILE_FORMAT = JavaHelper.createMessageFormat("Malformed file, the first line is not a number, was `{0}`");
 
 	//FIXME https://zverok.github.io/blog/2021-03-16-spellchecking-dictionaries.html #4
 	public static final char COMMENT_MARK_SHARP = '#';
@@ -109,13 +110,13 @@ public final class ParserHelper{
 			throw new EOFException("Unexpected EOF while reading file");
 		final String line = lines.get(0);
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT.get().format(new Object[]{line}));
 	}
 
 	public static String assertLinesCount(final Scanner scanner){
 		final String line = scanner.nextLine();
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT.get().format(new Object[]{line}));
 
 		return line;
 	}

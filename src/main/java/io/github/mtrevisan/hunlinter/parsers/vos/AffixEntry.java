@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -54,16 +55,16 @@ import java.util.regex.Pattern;
 
 public class AffixEntry{
 
-	private static final MessageFormat AFFIX_EXPECTED = new MessageFormat("Expected an affix entry, found something else{0} in parent flag `{1}`");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Cannot parse affix line `{0}`");
-	private static final MessageFormat WRONG_REMOVING_APPENDING_FORMAT = new MessageFormat("Same removal and addition parts: `{0}`");
-	private static final MessageFormat WRONG_TYPE = new MessageFormat("Wrong rule type, expected `{0}`, got `{1}`: {2}");
-	private static final MessageFormat WRONG_FLAG = new MessageFormat("Wrong rule flag, expected `{0}`, got `{1}`: {2}");
-	private static final MessageFormat WRONG_CONDITION_END = new MessageFormat("Condition part doesn''t ends with removal part: `{0}`");
-	private static final MessageFormat WRONG_CONDITION_START = new MessageFormat("Condition part doesn''t starts with removal part: `{0}`");
-	private static final MessageFormat POS_PRESENT = new MessageFormat("Part-of-Speech detected: `{0}`");
-	private static final MessageFormat CHARACTERS_IN_COMMON = new MessageFormat("Characters in common between removed and added part: `{0}`");
-	private static final MessageFormat CANNOT_FULL_STRIP = new MessageFormat("Cannot strip full word `{0}` without the FULLSTRIP option");
+	private static final ThreadLocal<MessageFormat> AFFIX_EXPECTED = JavaHelper.createMessageFormat("Expected an affix entry, found something else{0} in parent flag `{1}`");
+	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Cannot parse affix line `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_REMOVING_APPENDING_FORMAT = JavaHelper.createMessageFormat("Same removal and addition parts: `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_TYPE = JavaHelper.createMessageFormat("Wrong rule type, expected `{0}`, got `{1}`: {2}");
+	private static final ThreadLocal<MessageFormat> WRONG_FLAG = JavaHelper.createMessageFormat("Wrong rule flag, expected `{0}`, got `{1}`: {2}");
+	private static final ThreadLocal<MessageFormat> WRONG_CONDITION_END = JavaHelper.createMessageFormat("Condition part doesn''t ends with removal part: `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_CONDITION_START = JavaHelper.createMessageFormat("Condition part doesn''t starts with removal part: `{0}`");
+	private static final ThreadLocal<MessageFormat> POS_PRESENT = JavaHelper.createMessageFormat("Part-of-Speech detected: `{0}`");
+	private static final ThreadLocal<MessageFormat> CHARACTERS_IN_COMMON = JavaHelper.createMessageFormat("Characters in common between removed and added part: `{0}`");
+	private static final ThreadLocal<MessageFormat> CANNOT_FULL_STRIP = JavaHelper.createMessageFormat("Cannot strip full word `{0}` without the FULLSTRIP option");
 
 	private static final int PARAM_CONDITION = 1;
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
@@ -100,7 +101,7 @@ public class AffixEntry{
 
 		final String[] lineParts = StringUtils.split(cleanedLine, null, 6);
 		if(lineParts.length < 4 || lineParts.length > 6)
-			throw new LinterException(AFFIX_EXPECTED.format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY),
+			throw new LinterException(AFFIX_EXPECTED.get().format(new Object[]{(lineParts.length > 0? ": `" + line + "`": StringUtils.EMPTY),
 				parentFlag}));
 
 		final AffixType type = AffixType.createFromCode(lineParts[0]);
@@ -108,7 +109,7 @@ public class AffixEntry{
 		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		final Matcher m = RegexHelper.matcher(lineParts[3], PATTERN_LINE);
 		if(!m.find())
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{line}));
 
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
@@ -132,24 +133,24 @@ public class AffixEntry{
 	private void checkValidity(final AffixType parentType, final AffixType type, final String parentFlag, final String flag,
 			final String removal, final String line, final int index){
 		if(parentType != type)
-			throw new LinterException(WRONG_TYPE.format(new Object[]{parentType, type, line}));
+			throw new LinterException(WRONG_TYPE.get().format(new Object[]{parentType, type, line}));
 		if(!parentFlag.equals(flag))
-			throw new LinterException(WRONG_FLAG.format(new Object[]{parentFlag, flag, line}));
+			throw new LinterException(WRONG_FLAG.get().format(new Object[]{parentFlag, flag, line}));
 		if(removing.equals(appending))
-			throw new LinterException(WRONG_REMOVING_APPENDING_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_REMOVING_APPENDING_FORMAT.get().format(new Object[]{line}));
 		if(!removing.isEmpty()){
 			if(parentType == AffixType.SUFFIX){
 				if(!condition.endsWith(removal))
-					throw new LinterException(WRONG_CONDITION_END.format(new Object[]{line}));
+					throw new LinterException(WRONG_CONDITION_END.get().format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}),
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.get().format(new Object[]{line}),
 						IndexDataPair.of(index, null)));
 			}
 			else{
 				if(!condition.startsWith(removal))
-					throw new LinterException(WRONG_CONDITION_START.format(new Object[]{line}));
+					throw new LinterException(WRONG_CONDITION_START.get().format(new Object[]{line}));
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
-					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.format(new Object[]{line}),
+					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON.get().format(new Object[]{line}),
 						IndexDataPair.of(index, null)));
 			}
 		}
@@ -243,7 +244,7 @@ public class AffixEntry{
 	public void validate(){
 		final List<String> filteredFields = getMorphologicalFields(MorphologicalTag.PART_OF_SPEECH);
 		if(!filteredFields.isEmpty())
-			throw new LinterException(POS_PRESENT.format(new Object[]{String.join(", ", filteredFields)}));
+			throw new LinterException(POS_PRESENT.get().format(new Object[]{String.join(", ", filteredFields)}));
 	}
 
 	public AffixType getType(){
@@ -338,7 +339,7 @@ public class AffixEntry{
 
 	public String applyRule(final String word, final boolean isFullstrip){
 		if(!isFullstrip && word.length() == removing.length())
-			throw new LinterException(CANNOT_FULL_STRIP.format(new Object[]{word}));
+			throw new LinterException(CANNOT_FULL_STRIP.get().format(new Object[]{word}));
 
 		return (parent.getType() == AffixType.SUFFIX
 			? word.substring(0, word.length() - removing.length()) + appending

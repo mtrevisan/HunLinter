@@ -130,7 +130,7 @@ public final class GUIHelper{
 	private static final class MyMenuItem extends JMenuItem{
 		private BufferedImage icon;
 
-		public MyMenuItem(final String text, final int mnemonic){
+		private MyMenuItem(final String text, final int mnemonic){
 			super(text, mnemonic);
 		}
 

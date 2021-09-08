@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -60,7 +61,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
-	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("{0} ({1}) is not syllabable");
+	private static final ThreadLocal<MessageFormat> WORD_IS_NOT_SYLLABABLE = JavaHelper.createMessageFormat("{0} ({1}) is not syllabable");
 
 
 	public HyphenationLinterWorker(final ParserManager parserManager){
@@ -92,7 +93,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
 					final String[] syllabes = hyphenation.getSyllabes();
 					if(orthography.hasSyllabationErrors(syllabes)){
-						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
+						final String message = WORD_IS_NOT_SYLLABABLE.get().format(new Object[]{word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
 						final StringBuilder sb = new StringBuilder(message);
 						if(inflection.hasInflectionRules())

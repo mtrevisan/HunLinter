@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.Memoizer;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -57,7 +58,7 @@ public class AffixData{
 
 	private static final String REPEATED_FLAG = "Same flags present in multiple options";
 	private static final String CONTAINER_CLOSED = "Cannot add data, container is closed";
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flag already present: `{0}`");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_FLAG = JavaHelper.createMessageFormat("Flag already present: `{0}`");
 
 
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
@@ -163,7 +164,7 @@ public class AffixData{
 		if(closed)
 			throw new LinterException(CONTAINER_CLOSED);
 		if(data.containsKey(key))
-			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{key}));
+			throw new LinterException(DUPLICATED_FLAG.get().format(new Object[]{key}));
 
 		if(value != null)
 			data.put(key, value);

@@ -151,7 +151,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			int progressIndex = 0;
 			final int progressStep = (int)Math.ceil(list.size() / 100.f);
 			for(int index = 0; index < list.size(); index ++){
-				final byte[] encoding = list.data[index];
+				final byte[] encoding = list.get(index);
 				builder.add(encoding);
 
 				if(++ progress % progressStep == 0)

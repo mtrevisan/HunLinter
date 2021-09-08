@@ -38,6 +38,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -65,8 +66,8 @@ public class RulesReducer{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`, cannot reduce");
-	private static final MessageFormat VERY_BAD_ERROR = new MessageFormat("Something very bad occurs while producing from `{0}`, expected {1}, obtained {1}");
+	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`, cannot reduce");
+	private static final ThreadLocal<MessageFormat> VERY_BAD_ERROR = JavaHelper.createMessageFormat("Something very bad occurs while producing from `{0}`, expected {1}, obtained {1}");
 
 	private static final String PIPE = "|";
 
@@ -701,7 +702,7 @@ public class RulesReducer{
 	public List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final Iterable<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
@@ -755,7 +756,7 @@ public class RulesReducer{
 			final ProgressCallback progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 
@@ -779,7 +780,7 @@ public class RulesReducer{
 			final List<LineEntry> filteredOriginalRules = collectInflectionsByFlag(originalInflections, flag, type);
 			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);
 			if(!filteredOriginalRules.equals(filteredRules))
-				throw new LinterException(VERY_BAD_ERROR.format(new Object[]{line, filteredOriginalRules, filteredRules}));
+				throw new LinterException(VERY_BAD_ERROR.get().format(new Object[]{line, filteredOriginalRules, filteredRules}));
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);

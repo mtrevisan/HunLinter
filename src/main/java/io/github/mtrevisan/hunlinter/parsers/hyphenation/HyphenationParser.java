@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -69,16 +70,16 @@ import java.util.regex.Pattern;
 public class HyphenationParser{
 
 	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
-	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation `{0}` is already present");
-	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: `{0}`");
-	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule `{0}` has an invalid format");
-	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule `{0}` has no hyphenation point(s)");
-	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule `{0}` is invalid, the hyphenation point should not be adjacent to a dot");
-	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule `{0}` has not exactly one hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the index number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the length number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule `{0}` has the length number that exceeds the length of the rule");
-	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern `{0}` already present as `{1}`");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_CUSTOM_HYPHENATION = JavaHelper.createMessageFormat("Custom hyphenation `{0}` is already present");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_HYPHENATION = JavaHelper.createMessageFormat("Duplicate found: `{0}`");
+	private static final ThreadLocal<MessageFormat> INVALID_RULE = JavaHelper.createMessageFormat("Rule `{0}` has an invalid format");
+	private static final ThreadLocal<MessageFormat> INVALID_HYPHENATION_POINT = JavaHelper.createMessageFormat("Rule `{0}` has no hyphenation point(s)");
+	private static final ThreadLocal<MessageFormat> INVALID_HYPHENATION_POINT_NEAR_DOT = JavaHelper.createMessageFormat("Rule `{0}` is invalid, the hyphenation point should not be adjacent to a dot");
+	private static final ThreadLocal<MessageFormat> MORE_HYPHENATION_DOTS = JavaHelper.createMessageFormat("Augmented rule `{0}` has not exactly one hyphenation point");
+	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_INDEX_NOT_LESS_THAN = JavaHelper.createMessageFormat("Augmented rule `{0}` has the index number not less than the hyphenation point");
+	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = JavaHelper.createMessageFormat("Augmented rule `{0}` has the length number not less than the hyphenation point");
+	private static final ThreadLocal<MessageFormat> AUGMENTED_RULE_LENGTH_EXCEEDS = JavaHelper.createMessageFormat("Augmented rule `{0}` has the length number that exceeds the length of the rule");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_RULE = JavaHelper.createMessageFormat("Pattern `{0}` already present as `{1}`");
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -278,7 +279,7 @@ public class HyphenationParser{
 	private void parseCustomRule(final String line, final Level level){
 		final String key = StringHelper.removeAll(line, EQUALS_SIGN);
 		if(customHyphenations.get(level).containsKey(key))
-			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
+			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.get().format(new Object[]{line}));
 
 		customHyphenations.get(level)
 			.put(key, line);
@@ -289,7 +290,7 @@ public class HyphenationParser{
 		final String key = getKeyFromData(line);
 		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 		if(duplicatedRule)
-			throw new LinterException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
+			throw new LinterException(DUPLICATED_HYPHENATION.get().format(new Object[]{line}));
 
 		//insert current pattern into the radix tree
 		rules.get(level)
@@ -432,19 +433,19 @@ public class HyphenationParser{
 
 	private static void validateBasicRules(final CharSequence rule){
 		if(!RegexHelper.find(rule, PATTERN_VALID_RULE))
-			throw new LinterException(INVALID_RULE.format(new Object[]{rule}));
+			throw new LinterException(INVALID_RULE.get().format(new Object[]{rule}));
 		if(!StringUtils.contains(rule, EQUALS_SIGN)){
 			if(!RegexHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-				throw new LinterException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
+				throw new LinterException(INVALID_HYPHENATION_POINT.get().format(new Object[]{rule}));
 			if(RegexHelper.find(rule, PATTERN_INVALID_RULE_START) || RegexHelper.find(rule, PATTERN_INVALID_RULE_END))
-				throw new LinterException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
+				throw new LinterException(INVALID_HYPHENATION_POINT_NEAR_DOT.get().format(new Object[]{rule}));
 		}
 	}
 
 	private static void validateAugmentedRule(final CharSequence cleanedRule, final String rule){
 		final int count = RegexHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
-			throw new LinterException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
+			throw new LinterException(MORE_HYPHENATION_DOTS.get().format(new Object[]{rule}));
 
 		final String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
@@ -452,12 +453,12 @@ public class HyphenationParser{
 
 			final int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
-				throw new LinterException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.get().format(new Object[]{rule}));
 			final int length = extractLength(parts);
 			if(length < 0 || startIndex + length < index)
-				throw new LinterException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.get().format(new Object[]{rule}));
 			if(startIndex + length >= parts[0].length())
-				throw new LinterException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_LENGTH_EXCEEDS.get().format(new Object[]{rule}));
 		}
 	}
 
@@ -481,7 +482,7 @@ public class HyphenationParser{
 				break;
 			}
 		if(alreadyPresentRule != null)
-			throw new LinterException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
+			throw new LinterException(DUPLICATED_RULE.get().format(new Object[]{rule, alreadyPresentRule}));
 	}
 
 	public static int getIndexOfBreakpoint(final CharSequence rule){

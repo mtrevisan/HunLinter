@@ -31,6 +31,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
+import java.text.MessageFormat;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,6 +46,11 @@ public final class JavaHelper{
 
 
 	private JavaHelper(){}
+
+	public static ThreadLocal<MessageFormat> createMessageFormat(final String text){
+		return ThreadLocal.withInitial(() -> new MessageFormat(text));
+	}
+
 
 	public static <T> FutureTask<T> createFuture(final Callable<T> callable){
 		final FutureTask<T> futureTask = new FutureTask<>(callable);
@@ -93,6 +99,7 @@ public final class JavaHelper{
 			SwingUtilities.invokeLater(runnable);
 	}
 
+	@SuppressWarnings("BusyWait")
 	public static void delayedRun(final Runnable runnable, final long delayMillis){
 		final long requestedStartTime = System.currentTimeMillis() + delayMillis;
 		new Thread(() -> {

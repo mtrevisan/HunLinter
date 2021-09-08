@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -48,9 +49,9 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format for thesaurus entry: `{0}`");
-	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part-of-speech is not in parenthesis: `{0}`");
-	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Wrong format for thesaurus entry: `{0}`");
+	private static final ThreadLocal<MessageFormat> POS_NOT_IN_PARENTHESIS = JavaHelper.createMessageFormat("Part-of-speech is not in parenthesis: `{0}`");
+	private static final ThreadLocal<MessageFormat> NOT_ENOUGH_SYNONYMS = JavaHelper.createMessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
 
 
 	private final String[] partOfSpeeches;
@@ -70,7 +71,7 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 			final char firstChar = partOfSpeech.charAt(0);
 			final char lastChart = partOfSpeech.charAt(partOfSpeech.length() - 1);
 			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
-				throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
+				throw new LinterException(POS_NOT_IN_PARENTHESIS.get().format(new Object[]{partOfSpeechAndSynonyms}));
 
 			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
 			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
@@ -87,10 +88,10 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 					synonyms.add(trim);
 			}
 			if(synonyms.isEmpty())
-				throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+				throw new LinterException(NOT_ENOUGH_SYNONYMS.get().format(new Object[]{partOfSpeechAndSynonyms}));
 		}
 		else
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
 	}
 
 	public SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){

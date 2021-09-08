@@ -191,15 +191,15 @@ public class FSABuilder{
 		return fsa;
 	}
 
-	private boolean isArcLast(final int arc){
+	private synchronized boolean isArcLast(final int arc){
 		return ((serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_LAST) != 0);
 	}
 
-	private boolean isArcFinal(final int arc){
+	private synchronized boolean isArcFinal(final int arc){
 		return ((serialized[arc + ConstantArcSizeFSA.FLAGS_OFFSET] & ConstantArcSizeFSA.BIT_ARC_FINAL) != 0);
 	}
 
-	private byte getArcLabel(final int arc){
+	private synchronized byte getArcLabel(final int arc){
 		return serialized[arc + ConstantArcSizeFSA.LABEL_OFFSET];
 	}
 
@@ -213,7 +213,7 @@ public class FSABuilder{
 	}
 
 	/** Returns the address of an arc. */
-	private int getArcTarget(int arc){
+	private synchronized int getArcTarget(int arc){
 		arc += ConstantArcSizeFSA.ADDRESS_OFFSET;
 		return (serialized[arc]) << 24
 			| (serialized[arc + 1] & 0xFF) << 16
@@ -330,7 +330,7 @@ public class FSABuilder{
 	}
 
 	/** Append a new mutable state to the active path. */
-	private void expandActivePath(final int size){
+	private synchronized void expandActivePath(final int size){
 		if(activePath.length < size){
 			final int p = activePath.length;
 			activePath = Arrays.copyOf(activePath, size);
@@ -347,7 +347,7 @@ public class FSABuilder{
 	 *
 	 * @return state offset
 	 */
-	private int allocateState(final int labels){
+	private synchronized int allocateState(final int labels){
 		expandBuffers();
 
 		final int state = size;

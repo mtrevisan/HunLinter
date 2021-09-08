@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -51,8 +52,8 @@ class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
-	private static final MessageFormat TWOFOLD_RULE_VIOLATED = new MessageFormat("Twofold rule violated for `{0} from {1}` ({2} still has rules {3})");
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
+	private static final ThreadLocal<MessageFormat> TWOFOLD_RULE_VIOLATED = JavaHelper.createMessageFormat("Twofold rule violated for `{0} from {1}` ({2} still has rules {3})");
+	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`{1}");
 
 
 	protected final AffixData affixData;
@@ -171,7 +172,7 @@ class WordGeneratorBase{
 			final List<String> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
 			if(!aff.isEmpty()){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new LinterException(TWOFOLD_RULE_VIOLATED.format(new Object[]{prod, prod.getRulesSequence(),
+				throw new LinterException(TWOFOLD_RULE_VIOLATED.get().format(new Object[]{prod, prod.getRulesSequence(),
 					prod.getRulesSequence(), overabundantAffixes}));
 			}
 		}
@@ -299,7 +300,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
-			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
+			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{affix,
 				(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 		}
 

@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -57,7 +58,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerWorker.class);
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`, cannot reduce");
+	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`, cannot reduce");
 
 	private static final String WORKER_NAME = "Rules reducer";
 
@@ -82,7 +83,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));
 
 		final AffixType type = ruleToBeReduced.getType();
 

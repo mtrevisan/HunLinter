@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -39,9 +40,9 @@ import java.util.regex.Pattern;
  */
 final class NumericalParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: `{1}`");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: `{0}`");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{0}`");
+	private static final ThreadLocal<MessageFormat> FLAG_MUST_BE_IN_RANGE = JavaHelper.createMessageFormat("Flag must be in the range [1, {0}]: `{1}`");
+	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Flag must be an integer number: `{0}`");
+	private static final ThreadLocal<MessageFormat> BAD_FORMAT_COMPOUND_RULE = JavaHelper.createMessageFormat("Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{0}`");
 
 
 	private static final int MAX_NUMERICAL_FLAG = 65_535;
@@ -86,10 +87,10 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new LinterException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new LinterException(FLAG_MUST_BE_IN_RANGE.get().format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
 		}
 		catch(final NumberFormatException e){
-			throw new LinterException(BAD_FORMAT.format(new Object[]{flag}));
+			throw new LinterException(BAD_FORMAT.get().format(new Object[]{flag}));
 		}
 	}
 
@@ -112,7 +113,7 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 			final boolean isNumber = (part.length() != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.get().format(new Object[]{compoundRule}));
 		}
 	}
 

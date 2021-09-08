@@ -158,7 +158,7 @@ In order to help other folks out with their questions:
 * Once the discussion wraps up and things are clarified, either close the issue, or ask the original issue filer (or a maintainer) to close it for you.
 
 Some notes on picking up support issues:
-* Avoid responding to issues you don't know you can answer accurately.
+* Avoid responding to issue you don't know you can answer accurately.
 * As much as possible, try to refer to past issues with accepted answers. Link to them from your replies with the `#123` format.
 * Be kind and patient with users -- often, folks who have run into confusing things might be upset or impatient. This is ok. Try to understand where they're coming from, and if you're too uncomfortable with the tone, feel free to stay away or withdraw from the issue.<br>
   (note: if the user is outright hostile or is violating the CoC, [refer to the Code of Conduct](CODE_OF_CONDUCT.md) to resolve the conflict).

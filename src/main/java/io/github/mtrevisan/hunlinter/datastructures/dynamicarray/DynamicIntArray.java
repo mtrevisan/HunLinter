@@ -39,7 +39,7 @@ public class DynamicIntArray implements RandomAccess{
 	//number of Blocks in `blocks`
 	private int sizeOfBlocks;
 	//number of elements in DynamicArray
-	private volatile int size;
+	private int size;
 	private int numberOfEmptyDataBlocks;
 	private int indexOfLastNonEmptyDataBlock;
 	private int indexOfLastDataBlock;
@@ -52,7 +52,7 @@ public class DynamicIntArray implements RandomAccess{
 		clear();
 	}
 
-	public final void clear(){
+	public synchronized final void clear(){
 		blocks = new IntBlock[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new IntBlock(1);
@@ -73,7 +73,7 @@ public class DynamicIntArray implements RandomAccess{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public int get(final int i){
+	public synchronized int get(final int i){
 		// We need to find which Block contains the requested element, also in what position of that Block.
 		// locate() gives us a Location object.
 		// The object will contain the index of Block that we want,
@@ -89,7 +89,7 @@ public class DynamicIntArray implements RandomAccess{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public void set(final int index, final int x){
+	public synchronized void set(final int index, final int x){
 		final Location location = new Location(index);
 		final IntBlock block = blocks[location.block];
 		//use the elementIndex in the Location object to set the element within the Block to x
@@ -155,14 +155,14 @@ public class DynamicIntArray implements RandomAccess{
 	// Grows the DynamicArray by one space, increases the size of the
 	// DynamicArray, and sets the last element to x.
 	// Target complexity: O(1)
-	public void add(final int x){
+	public synchronized void add(final int x){
 		grow();
 
 		size ++;
 		set(size - 1, x);
 	}
 
-	public void addAll(final DynamicIntArray array){
+	public synchronized void addAll(final DynamicIntArray array){
 		for(int i = 0; i < array.size; i ++)
 			add(array.get(i));
 	}
@@ -172,13 +172,13 @@ public class DynamicIntArray implements RandomAccess{
 			add(value);
 	}
 
-	public int pop(){
+	public synchronized int pop(){
 		final int elem = get(size - 1);
 		remove();
 		return elem;
 	}
 
-	public void shrink(final int newSize){
+	public synchronized void shrink(final int newSize){
 		while(size > newSize)
 			remove();
 	}
@@ -191,7 +191,7 @@ public class DynamicIntArray implements RandomAccess{
 	 *
 	 * @throws IllegalStateException	If the DynamicArray is empty when remove is called
 	 */
-	public void remove(){
+	public synchronized void remove(){
 		final IntBlock lastNonEmptyDataBlock = blocks[indexOfLastNonEmptyDataBlock];
 		lastNonEmptyDataBlock.shrink();
 		size --;
@@ -262,11 +262,11 @@ public class DynamicIntArray implements RandomAccess{
 
 	// Returns the size of the DynamicArray which is the number of elements that
 	// have been added to it with the add(x) method but not removed.
-	public int size(){
+	public synchronized int size(){
 		return size;
 	}
 
-	public boolean isEmpty(){
+	public synchronized boolean isEmpty(){
 		return (size == 0);
 	}
 

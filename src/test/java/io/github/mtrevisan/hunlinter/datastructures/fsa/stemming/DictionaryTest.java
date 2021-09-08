@@ -37,8 +37,7 @@ class DictionaryTest{
 	void readFromFile() throws IOException{
 		try(
 				InputStream dictInput = getClass().getResource("/services/fsa/lookup/infix.dict").openStream();
-				InputStream infoInput = getClass().getResource("/services/fsa/lookup/infix.info").openStream();
-			){
+				InputStream infoInput = getClass().getResource("/services/fsa/lookup/infix.info").openStream()){
 			Assertions.assertNotNull(Dictionary.read(dictInput, infoInput));
 		}
 	}

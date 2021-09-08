@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.text.MessageFormat;
@@ -42,8 +43,8 @@ import java.util.Objects;
 
 class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: {0}");
-	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule `{0}` in compound begin-middle-end");
+	private static final ThreadLocal<MessageFormat> NON_POSITIVE_LIMIT = JavaHelper.createMessageFormat("Limit cannot be non-positive: {0}");
+	private static final ThreadLocal<MessageFormat> MISSING_WORD = JavaHelper.createMessageFormat("Missing word(s) for rule `{0}` in compound begin-middle-end");
 
 
 	WordGeneratorCompoundBeginMiddleEnd(final AffixData affixData, final DictionaryParser dicParser,
@@ -63,7 +64,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	List<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT.get().format(new Object[]{limit}));
 
 		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
 		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
@@ -113,7 +114,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, List<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, List<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
-				throw new LinterException(MISSING_WORD.format(new Object[]{entry.getKey()}));
+				throw new LinterException(MISSING_WORD.get().format(new Object[]{entry.getKey()}));
 	}
 
 }

@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -45,12 +46,12 @@ import java.util.Set;
 
 public class CompoundRuleHandler implements Handler{
 
-	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: mismatched compound rule type (expected {1})");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line `{0}`: duplicated line");
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
-	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: compound rule type cannot be empty");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line `{0}`: compound rule is bad formatted");
+	private static final ThreadLocal<MessageFormat> MISMATCHED_COMPOUND_RULE_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: mismatched compound rule type (expected {1})");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_LINE = JavaHelper.createMessageFormat("Error reading line `{0}`: duplicated line");
+	private static final ThreadLocal<MessageFormat> BAD_FIRST_PARAMETER = JavaHelper.createMessageFormat("Error reading line `{0}`: the first parameter is not a number");
+	private static final ThreadLocal<MessageFormat> BAD_NUMBER_OF_ENTRIES = JavaHelper.createMessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer less or equal than " + Short.MAX_VALUE);
+	private static final ThreadLocal<MessageFormat> EMPTY_COMPOUND_RULE_TYPE = JavaHelper.createMessageFormat("Error reading line `{0}`: compound rule type cannot be empty");
+	private static final ThreadLocal<MessageFormat> BAD_FORMAT = JavaHelper.createMessageFormat("Error reading line `{0}`: compound rule is bad formatted");
 
 
 	@Override
@@ -71,7 +72,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
+					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.get().format(new Object[]{line, AffixOption.COMPOUND_RULE}));
 
 				final String rule = lineParts[1];
 
@@ -79,7 +80,8 @@ public class CompoundRuleHandler implements Handler{
 
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line}), IndexDataPair.of(context.getIndex() + i, null)));
+					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.get().format(new Object[]{line}),
+						IndexDataPair.of(context.getIndex() + i, null)));
 			}
 
 			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
@@ -93,20 +95,20 @@ public class CompoundRuleHandler implements Handler{
 
 	private int checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+			throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
 
 		return numEntries;
 	}
 
 	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
-			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
+			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.get().format(new Object[]{line}));
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new LinterException(BAD_FORMAT.format(new Object[]{line}));
+			throw new LinterException(BAD_FORMAT.get().format(new Object[]{line}));
 	}
 
 }

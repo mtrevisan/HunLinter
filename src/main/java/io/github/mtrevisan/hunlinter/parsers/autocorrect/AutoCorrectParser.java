@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -56,9 +57,9 @@ public class AutoCorrectParser{
 
 	private static final String QUOTATION_MARK = "\"";
 
-	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: `{1}`");
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in auto-correct file: `{0}` -> `{1}`");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element, expected `{0}`, was `{1}`");
+	private static final ThreadLocal<MessageFormat> BAD_QUOTE = JavaHelper.createMessageFormat("{0} form cannot contain apostrophes or double quotes: `{1}`");
+	private static final ThreadLocal<MessageFormat> DUPLICATED_ENTRY = JavaHelper.createMessageFormat("Duplicated entry in auto-correct file: `{0}` -> `{1}`");
+	private static final ThreadLocal<MessageFormat> INVALID_ROOT = JavaHelper.createMessageFormat("Invalid root element, expected `{0}`, was `{1}`");
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
@@ -86,7 +87,7 @@ public class AutoCorrectParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException(INVALID_ROOT.format(new Object[]{AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName()}));
+			throw new LinterException(INVALID_ROOT.get().format(new Object[]{AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName()}));
 
 		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
@@ -107,7 +108,7 @@ public class AutoCorrectParser{
 		final Collection<String> map = new HashSet<>(dictionary.size());
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.get().format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),
 					IndexDataPair.of(index, null)));
 
 			index ++;
@@ -136,9 +137,9 @@ public class AutoCorrectParser{
 	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
 			final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.format(new Object[]{"Incorrect", incorrect}));
+			throw new LinterException(BAD_QUOTE.get().format(new Object[]{"Incorrect", incorrect}));
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.format(new Object[]{"Correct", correct}));
+			throw new LinterException(BAD_QUOTE.get().format(new Object[]{"Correct", correct}));
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
 		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.get());

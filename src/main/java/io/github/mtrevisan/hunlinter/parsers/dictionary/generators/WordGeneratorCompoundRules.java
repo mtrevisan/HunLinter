@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,8 +44,8 @@ import java.util.Objects;
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: {0}");
-	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule {0} in compound rule {1}");
+	private static final ThreadLocal<MessageFormat> NON_POSITIVE_LIMIT = JavaHelper.createMessageFormat("Limit cannot be non-positive: {0}");
+	private static final ThreadLocal<MessageFormat> MISSING_WORD = JavaHelper.createMessageFormat("Missing word(s) for rule {0} in compound rule {1}");
 
 
 	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
@@ -64,7 +65,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		Objects.requireNonNull(compoundRule, "Compound rule cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT.get().format(new Object[]{limit}));
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
@@ -105,7 +106,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new LinterException(MISSING_WORD.format(new Object[]{component,
+				throw new LinterException(MISSING_WORD.get().format(new Object[]{component,
 					StringUtils.join(compoundRuleComponents, StringUtils.EMPTY)}));
 	}
 

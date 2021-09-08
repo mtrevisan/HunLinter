@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -57,8 +58,8 @@ import java.util.regex.Pattern;
  */
 public class ThesaurusParser{
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{0}`");
-	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
+	private static final ThreadLocal<MessageFormat> WRONG_FORMAT = JavaHelper.createMessageFormat("Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{0}`");
+	private static final ThreadLocal<MessageFormat> NOT_ENOUGH_SYNONYMS = JavaHelper.createMessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
 
 	private static final String PIPE = "|";
 
@@ -132,7 +133,7 @@ public class ThesaurusParser{
 			final Predicate<String> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (StringUtils.startsWithAny(partOfSpeech, PART_OF_SPEECH_START)? 1: 0);
@@ -147,7 +148,7 @@ public class ThesaurusParser{
 				list.add(trim);
 		}
 		if(list.size() < 2)
-			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(NOT_ENOUGH_SYNONYMS.get().format(new Object[]{partOfSpeechAndSynonyms}));
 
 		final String[] synonyms = list.toArray(new String[0]);
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
@@ -259,8 +260,7 @@ public class ThesaurusParser{
 		final Charset charset = StandardCharsets.UTF_8;
 		try(
 				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset);
-				){
+				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset)){
 			//save charset
 			indexWriter.write(charset.name());
 			indexWriter.write(NEW_LINE);

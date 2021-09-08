@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -42,12 +43,12 @@ import java.util.Set;
 
 public class DictionaryCorrectnessChecker{
 
-	private static final MessageFormat INVALID_CIRCUMFIX_FLAG = new MessageFormat("{0} cannot have a circumfix flag ({1})");
-	private static final MessageFormat NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = new MessageFormat("Non-affix entry contains {0}");
-	private static final MessageFormat NO_MORPHOLOGICAL_FIELD = new MessageFormat("{0} doesn''t have any morphological fields");
-	private static final MessageFormat INVALID_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an invalid morphological field prefix: {1}");
-	private static final MessageFormat UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = new MessageFormat("{0} has an unknown morphological field prefix: {1}");
-	private static final MessageFormat UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = new MessageFormat("{0} has an unknown morphological field value: {1}");
+	private static final ThreadLocal<MessageFormat> INVALID_CIRCUMFIX_FLAG = JavaHelper.createMessageFormat("{0} cannot have a circumfix flag ({1})");
+	private static final ThreadLocal<MessageFormat> NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG = JavaHelper.createMessageFormat("Non-affix entry contains {0}");
+	private static final ThreadLocal<MessageFormat> NO_MORPHOLOGICAL_FIELD = JavaHelper.createMessageFormat("{0} doesn''t have any morphological fields");
+	private static final ThreadLocal<MessageFormat> INVALID_MORPHOLOGICAL_FIELD_PREFIX = JavaHelper.createMessageFormat("{0} has an invalid morphological field prefix: {1}");
+	private static final ThreadLocal<MessageFormat> UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX = JavaHelper.createMessageFormat("{0} has an unknown morphological field prefix: {1}");
+	private static final ThreadLocal<MessageFormat> UNKNOWN_MORPHOLOGICAL_FIELD_VALUE = JavaHelper.createMessageFormat("{0} has an unknown morphological field value: {1}");
 
 
 	protected final AffixData affixData;
@@ -70,14 +71,14 @@ public class DictionaryCorrectnessChecker{
 	public void checkCircumfix(final DictionaryEntry dicEntry){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null && dicEntry.hasContinuationFlag(circumfixFlag))
-			throw new LinterException(INVALID_CIRCUMFIX_FLAG.format(new Object[]{dicEntry.getWord(), circumfixFlag}));
+			throw new LinterException(INVALID_CIRCUMFIX_FLAG.get().format(new Object[]{dicEntry.getWord(), circumfixFlag}));
 	}
 
 	/** Used by the correctness check worker after calling {@link #loadRules()}. */
 	public void checkInflection(final Inflection inflection, final int index){
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))
-			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.format(new Object[]{
+			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG.get().format(new Object[]{
 				AffixOption.FORBID_COMPOUND_FLAG.getCode()}));
 
 		if(rulesLoader.isMorphologicalFieldsCheck())
@@ -88,24 +89,25 @@ public class DictionaryCorrectnessChecker{
 
 	private void morphologicalFieldCheck(final Inflection inflection, final int index){
 		if(!inflection.hasMorphologicalFields())
-			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.format(new Object[]{inflection.getWord()}), IndexDataPair.of(index, null)));
+			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD.get().format(new Object[]{inflection.getWord()}),
+				IndexDataPair.of(index, null)));
 
 		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
 		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
 		for(int i = 0; i < size; i ++){
 			final String morphologicalField = morphologicalFields[i];
 			if(morphologicalField.length() < 4)
-				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
-					IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX.get().format(new Object[]{inflection.getWord(),
+					morphologicalField}), IndexDataPair.of(index, null)));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
-				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.format(new Object[]{inflection.getWord(), morphologicalField}),
-					IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX.get().format(new Object[]{inflection.getWord(),
+					morphologicalField}), IndexDataPair.of(index, null)));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
-				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.format(new Object[]{inflection.getWord(), morphologicalField}),
-					IndexDataPair.of(index, null)));
+				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE.get().format(new Object[]{inflection.getWord(),
+					morphologicalField}), IndexDataPair.of(index, null)));
 		}
 	}
 

@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -49,7 +50,7 @@ import java.util.function.Predicate;
 
 public class DictionaryEntry{
 
-	private static final MessageFormat NON_EXISTENT_RULE = new MessageFormat("Non-existent rule `{0}`{1}");
+	private static final ThreadLocal<MessageFormat> NON_EXISTENT_RULE = JavaHelper.createMessageFormat("Non-existent rule `{0}`{1}");
 
 	private static final String SLASH = "/";
 	private static final String TAB = "\t";
@@ -264,7 +265,7 @@ public class DictionaryEntry{
 
 					final AffixEntry[] appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
-					throw new LinterException(NON_EXISTENT_RULE.format(new Object[]{affix,
+					throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{affix,
 						(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
 				}
 
