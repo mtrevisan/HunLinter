@@ -64,7 +64,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	final List<Inflection> applyCompoundBeginMiddleEnd(final String[] inputCompounds, final int limit){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.get().format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT, limit);
 
 		final String compoundBeginFlag = affixData.getCompoundBeginFlag();
 		final String compoundMiddleFlag = affixData.getCompoundMiddleFlag();
@@ -114,7 +114,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, List<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, List<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
-				throw new LinterException(MISSING_WORD.get().format(new Object[]{entry.getKey()}));
+				throw new LinterException(MISSING_WORD, entry.getKey());
 	}
 
 }

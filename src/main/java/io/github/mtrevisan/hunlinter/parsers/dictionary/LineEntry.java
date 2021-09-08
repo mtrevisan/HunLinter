@@ -168,8 +168,7 @@ public class LineEntry implements Serializable{
 		for(final String word : words){
 			final int index = word.length() - indexFromLast - 1;
 			if(index < 0)
-				throw new LinterException(CANNOT_EXTRACT_GROUP.get().format(new Object[]{StringUtils.join(words, ","),
-					indexFromLast, word}));
+				throw new LinterException(CANNOT_EXTRACT_GROUP, StringUtils.join(words, ","), indexFromLast, word);
 
 			group.add(word.charAt(index));
 		}

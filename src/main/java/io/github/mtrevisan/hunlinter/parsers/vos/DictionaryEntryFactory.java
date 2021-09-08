@@ -87,7 +87,7 @@ public class DictionaryEntryFactory{
 
 		final Matcher m = RegexHelper.matcher(line, PATTERN_ENTRY);
 		if(!m.find())
-			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{line}));
+			throw new LinterException(WRONG_FORMAT, line);
 
 		final String word = extractWord(m.group(PARAM_WORD));
 		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));

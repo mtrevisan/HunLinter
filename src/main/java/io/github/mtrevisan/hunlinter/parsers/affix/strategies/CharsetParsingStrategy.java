@@ -71,7 +71,7 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(!canEncode(rawFlags))
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{charset.displayName(), rawFlags}));
+			throw new LinterException(BAD_FORMAT, charset.displayName(), rawFlags);
 
 		final String[] flags = extractFlags(rawFlags);
 
@@ -91,9 +91,9 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 	@Override
 	public void validate(final String flag){
 		if(flag == null || flag.length() != 1)
-			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_ONE.get().format(new Object[]{charset.displayName(), flag}));
+			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_ONE, charset.displayName(), flag);
 		if(!canEncode(flag))
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{charset.displayName(), flag}));
+			throw new LinterException(BAD_FORMAT, charset.displayName(), flag);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 
 	private void checkCompoundValidity(final CharSequence compoundRule){
 		if(!canEncode(compoundRule))
-			throw new LinterException(BAD_FORMAT_COMPOUND_RULE.get().format(new Object[]{charset.displayName(), compoundRule}));
+			throw new LinterException(BAD_FORMAT_COMPOUND_RULE, charset.displayName(), compoundRule);
 	}
 
 	private boolean canEncode(final CharSequence cs){

@@ -60,7 +60,7 @@ public abstract class FlagParsingStrategy{
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);
 			if(!duplicates.isEmpty())
-				throw new LinterException(DUPLICATED_FLAG.get().format(new Object[]{String.join(", ", duplicates)}));
+				throw new LinterException(DUPLICATED_FLAG, String.join(", ", duplicates));
 		}
 	}
 

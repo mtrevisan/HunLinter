@@ -79,7 +79,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		return switch(columnIndex){
 			case 0 -> thesaurus.getDefinition();
-			case 1 -> TAG.get().format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
+			case 1 -> JavaHelper.createMessage(TAG, thesaurus.joinSynonyms(TAG_NEW_LINE));
 			default -> null;
 		};
 	}

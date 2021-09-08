@@ -267,8 +267,7 @@ public class DictionaryEntry{
 
 					final AffixEntry[] appliedRules = getAppliedRules();
 					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
-					throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{affix,
-						(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+					throw new LinterException(NON_EXISTENT_RULE, affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
 				if(rule instanceof RuleEntry){

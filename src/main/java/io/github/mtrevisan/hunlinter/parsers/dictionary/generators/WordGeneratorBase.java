@@ -170,8 +170,7 @@ class WordGeneratorBase{
 			final List<String> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
 			if(!aff.isEmpty()){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
-				throw new LinterException(TWOFOLD_RULE_VIOLATED.get().format(new Object[]{prod, prod.getRulesSequence(),
-					prod.getRulesSequence(), overabundantAffixes}));
+				throw new LinterException(TWOFOLD_RULE_VIOLATED, prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes);
 			}
 		}
 	}
@@ -298,8 +297,7 @@ class WordGeneratorBase{
 				return Collections.emptyList();
 
 			final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
-			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{affix,
-				(parentFlag != null? " via " + parentFlag: StringUtils.EMPTY)}));
+			throw new LinterException(NON_EXISTENT_RULE, affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 		}
 
 		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();

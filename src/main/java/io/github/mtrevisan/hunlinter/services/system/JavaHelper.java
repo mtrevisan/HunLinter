@@ -51,6 +51,10 @@ public final class JavaHelper{
 		return ThreadLocal.withInitial(() -> new MessageFormat(text));
 	}
 
+	public static String createMessage(final ThreadLocal<MessageFormat> messageFormat, final Object... data){
+		return messageFormat.get().format(data);
+	}
+
 
 	public static <T> FutureTask<T> createFuture(final Callable<T> callable){
 		final FutureTask<T> futureTask = new FutureTask<>(callable);

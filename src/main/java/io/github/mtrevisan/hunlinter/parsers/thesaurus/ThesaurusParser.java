@@ -132,7 +132,7 @@ public class ThesaurusParser{
 	public final DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms, final Predicate<String> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
-			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 
 		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (StringUtils.startsWithAny(partOfSpeech, PART_OF_SPEECH_START)? 1: 0);
@@ -147,7 +147,7 @@ public class ThesaurusParser{
 				list.add(trim);
 		}
 		if(list.size() < 2)
-			throw new LinterException(NOT_ENOUGH_SYNONYMS.get().format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
 
 		final String[] synonyms = list.toArray(new String[0]);
 		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);

@@ -51,7 +51,7 @@ public final class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new LinterException(UNKNOWN_TYPE.get().format(new Object[]{flag}));
+			throw new LinterException(UNKNOWN_TYPE, flag);
 
 		return strategy;
 	}

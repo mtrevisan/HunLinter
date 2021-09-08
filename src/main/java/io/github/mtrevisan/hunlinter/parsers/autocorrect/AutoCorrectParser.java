@@ -87,7 +87,7 @@ public class AutoCorrectParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException(INVALID_ROOT.get().format(new Object[]{AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName()}));
+			throw new LinterException(INVALID_ROOT, AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName());
 
 		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
@@ -136,9 +136,9 @@ public class AutoCorrectParser{
 	 */
 	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct, final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.get().format(new Object[]{"Incorrect", incorrect}));
+			throw new LinterException(BAD_QUOTE, "Incorrect", incorrect);
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.get().format(new Object[]{"Correct", correct}));
+			throw new LinterException(BAD_QUOTE, "Correct", correct);
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
 		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.get());

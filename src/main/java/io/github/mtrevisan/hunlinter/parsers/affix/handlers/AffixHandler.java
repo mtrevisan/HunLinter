@@ -62,7 +62,7 @@ public class AffixHandler implements Handler{
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new LinterException(BAD_THIRD_PARAMETER.get().format(new Object[]{context}));
+				throw new LinterException(BAD_THIRD_PARAMETER, context);
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
 			final List<AffixEntry> entries = readEntries(context, parent, affixData);
@@ -83,7 +83,7 @@ public class AffixHandler implements Handler{
 
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
 		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getThirdParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getThirdParameter());
 
 		final Scanner scanner = context.getScanner();
 		final AffixType parentType = AffixType.createFromCode(context.getRuleType());
@@ -130,9 +130,9 @@ public class AffixHandler implements Handler{
 	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
 		final String ruleTypeCode = ruleType.getOption().getCode();
 		if(!context.getRuleType().equals(ruleTypeCode))
-			throw new LinterException(MISMATCHED_RULE_TYPE.get().format(new Object[]{ruleType}));
+			throw new LinterException(MISMATCHED_RULE_TYPE, ruleType);
 		if(!context.getFirstParameter().equals(ruleFlag))
-			throw new LinterException(MISMATCHED_RULE_FLAG.get().format(new Object[]{ruleFlag}));
+			throw new LinterException(MISMATCHED_RULE_FLAG, ruleFlag);
 
 		entry.validate();
 	}

@@ -83,7 +83,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
-			throw new LinterException(NON_EXISTENT_RULE.get().format(new Object[]{flag}));
+			throw new LinterException(NON_EXISTENT_RULE, flag);
 
 		final AffixType type = ruleToBeReduced.getType();
 

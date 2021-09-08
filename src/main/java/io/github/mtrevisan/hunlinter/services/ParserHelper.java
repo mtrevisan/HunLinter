@@ -110,13 +110,13 @@ public final class ParserHelper{
 			throw new EOFException("Unexpected EOF while reading file");
 		final String line = lines.get(0);
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.get().format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT, line);
 	}
 
 	public static String assertLinesCount(final Scanner scanner){
 		final String line = scanner.nextLine();
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.get().format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT, line);
 
 		return line;
 	}

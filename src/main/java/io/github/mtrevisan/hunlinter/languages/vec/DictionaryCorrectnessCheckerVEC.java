@@ -152,7 +152,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 			final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(subword);
 			if(!subword.equals(unmarkedDefaultStressWord))
-				throw new LinterException(UNNECESSARY_STRESS.get().format(new Object[]{inflection.getWord()}));
+				throw new LinterException(UNNECESSARY_STRESS, inflection.getWord());
 		}
 	}
 
@@ -164,12 +164,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 			if(RegexHelper.find(derivedWord, patternNonVanishingEl))
-				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL.get().format(new Object[]{derivedWord}));
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL, derivedWord);
 			if(inflection.hasContinuationFlag(northernPluralRule))
-				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE.get().format(new Object[]{northernPluralRule,
-					northernPluralStressedRule, derivedWord}));
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE, northernPluralRule, northernPluralStressedRule, derivedWord);
 			if(RegexHelper.find(derivedWord, patternVanishingElNextToConsonant))
-				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT.get().format(new Object[]{derivedWord}));
+				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT, derivedWord);
 
 			variants.add(LanguageVariant.VENETIAN);
 		}
@@ -178,7 +177,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			variants.add(LanguageVariant.NORTHERN);
 
 		if(variants.size() > 1)
-			throw new LinterException(WORD_WITH_MIXED_VARIANTS.get().format(new Object[]{derivedWord}));
+			throw new LinterException(WORD_WITH_MIXED_VARIANTS, derivedWord);
 	}
 
 	private void incompatibilityCheck(final Inflection inflection, final int index){
@@ -205,7 +204,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private void orthographyCheck(final String word){
 		final String correctedDerivedWord = orthography.correctOrthography(word);
 		if(!correctedDerivedWord.equals(word))
-			throw new LinterException(MISSPELLED.get().format(new Object[]{word, correctedDerivedWord}));
+			throw new LinterException(MISSPELLED, word, correctedDerivedWord);
 	}
 
 	@Override
@@ -220,18 +219,16 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		if(!rulesLoader.containsMultipleStressedWords(subword)){
 			final int stresses = WordVEC.countStresses(subword);
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
-				throw new LinterException(MULTIPLE_STRESSES.get().format(new Object[]{inflection.getWord()}));
+				throw new LinterException(MULTIPLE_STRESSES, inflection.getWord());
 
 			final AffixEntry appliedRule = getLastAppliedRule(inflection);
 			if(appliedRule != null){
 				final String appliedRuleFlag = appliedRule.getFlag();
 				//retrieve last applied rule
 				if(stresses == 0 && rulesLoader.containsHasToContainStress(appliedRuleFlag))
-					throw new LinterException(MISSING_STRESS.get().format(new Object[]{inflection.getWord(),
-						appliedRuleFlag}));
+					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
 				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
-					throw new LinterException(ALREADY_PRESENT_STRESS.get().format(new Object[]{inflection.getWord(),
-						appliedRuleFlag}));
+					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
 			}
 		}
 	}
@@ -248,13 +245,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		if(!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN)){
 			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
 			if(RegexHelper.find(phonemizedSubword, patternPhonemeCijjhnhiv))
-				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV.get().format(new Object[]{inflection.getWord()}));
+				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV, inflection.getWord());
 		}
 
 		if(RegexHelper.find(subword, PATTERN_V_IU_V))
-			throw new LinterException(WORD_CANNOT_HAVE_V_IU_V.get().format(new Object[]{inflection.getWord()}));
+			throw new LinterException(WORD_CANNOT_HAVE_V_IU_V, inflection.getWord());
 		if(RegexHelper.find(subword, PATTERN_NOT_V_IU_DIERESIS_V))
-			throw new LinterException(WORD_CANNOT_HAVE_NOT_V_IU_DIERESIS_V.get().format(new Object[]{inflection.getWord()}));
+			throw new LinterException(WORD_CANNOT_HAVE_NOT_V_IU_DIERESIS_V, inflection.getWord());
 	}
 
 //	private void variantIncompatibilityCheck(final RuleInflectionEntry inflection, final Set<MatcherEntry> checks){

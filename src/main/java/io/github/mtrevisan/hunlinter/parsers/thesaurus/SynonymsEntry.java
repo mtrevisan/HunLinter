@@ -70,7 +70,7 @@ public class SynonymsEntry{
 			final char firstChar = partOfSpeech.charAt(0);
 			final char lastChart = partOfSpeech.charAt(partOfSpeech.length() - 1);
 			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
-				throw new LinterException(POS_NOT_IN_PARENTHESIS.get().format(new Object[]{partOfSpeechAndSynonyms}));
+				throw new LinterException(POS_NOT_IN_PARENTHESIS, partOfSpeechAndSynonyms);
 
 			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
 			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
@@ -87,10 +87,10 @@ public class SynonymsEntry{
 					synonyms.add(trim);
 			}
 			if(synonyms.isEmpty())
-				throw new LinterException(NOT_ENOUGH_SYNONYMS.get().format(new Object[]{partOfSpeechAndSynonyms}));
+				throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
 		}
 		else
-			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{partOfSpeechAndSynonyms}));
+			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 	}
 
 	public final SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){

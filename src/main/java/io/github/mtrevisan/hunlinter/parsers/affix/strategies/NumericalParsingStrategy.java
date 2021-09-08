@@ -87,10 +87,10 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new LinterException(FLAG_MUST_BE_IN_RANGE.get().format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new LinterException(FLAG_MUST_BE_IN_RANGE, MAX_NUMERICAL_FLAG, flag);
 		}
 		catch(final NumberFormatException e){
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{flag}));
+			throw new LinterException(BAD_FORMAT, flag);
 		}
 	}
 
@@ -113,7 +113,7 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 			final boolean isNumber = (part.length() != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.get().format(new Object[]{compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE, compoundRule);
 		}
 	}
 

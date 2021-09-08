@@ -67,10 +67,10 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 			return null;
 
 		if(rawFlags.length() % 2 != 0)
-			throw new LinterException(FLAG_MUST_BE_EVEN_IN_LENGTH.get().format(new Object[]{rawFlags}));
+			throw new LinterException(FLAG_MUST_BE_EVEN_IN_LENGTH, rawFlags);
 
 		if(!canEncode(rawFlags))
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{StandardCharsets.US_ASCII.displayName(), rawFlags}));
+			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), rawFlags);
 
 		final String[] flags = extractFlags(rawFlags);
 
@@ -86,9 +86,9 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	@Override
 	public void validate(final String flag){
 		if(flag == null || flag.length() != 2)
-			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_TWO.get().format(new Object[]{flag}));
+			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_TWO, flag);
 		if(!canEncode(flag))
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{StandardCharsets.US_ASCII.displayName(), flag}));
+			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), flag);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 			final boolean isFlag = (size != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(size != 2 && isFlag || !canEncode(compoundRule))
-				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.get().format(new Object[]{StandardCharsets.US_ASCII.displayName(), compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE, StandardCharsets.US_ASCII.displayName(), compoundRule);
 		}
 	}
 

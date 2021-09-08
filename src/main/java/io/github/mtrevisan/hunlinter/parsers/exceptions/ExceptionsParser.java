@@ -93,8 +93,7 @@ public class ExceptionsParser{
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException(INVALID_ROOT.get().format(new Object[]{configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT,
-				rootElement.getNodeName()}));
+			throw new LinterException(INVALID_ROOT, configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName());
 
 		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){

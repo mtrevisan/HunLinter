@@ -58,10 +58,10 @@ public class WordBreakTableHandler implements Handler{
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
 			final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
 
@@ -84,15 +84,15 @@ public class WordBreakTableHandler implements Handler{
 
 			final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 			if(option != AffixOption.WORD_BREAK_CHARACTERS)
-				throw new LinterException(MISMATCHED_TYPE.get().format(new Object[]{line, AffixOption.WORD_BREAK_CHARACTERS}));
+				throw new LinterException(MISMATCHED_TYPE, line, AffixOption.WORD_BREAK_CHARACTERS);
 
 			final String breakCharacter = (DOUBLE_MINUS_SIGN.equals(lineParts[1])? HyphenationParser.EN_DASH: lineParts[1]);
 			if(StringUtils.isBlank(breakCharacter))
-				throw new LinterException(EMPTY_BREAK_CHARACTER.get().format(new Object[]{line}));
+				throw new LinterException(EMPTY_BREAK_CHARACTER, line);
 
 			final boolean inserted = wordBreakCharacters.add(breakCharacter);
 			if(!inserted && !HyphenationParser.EN_DASH.equals(breakCharacter))
-				throw new LinterException(DUPLICATED_LINE.get().format(new Object[]{line}));
+				throw new LinterException(DUPLICATED_LINE, line);
 		}
 		return wordBreakCharacters;
 	}

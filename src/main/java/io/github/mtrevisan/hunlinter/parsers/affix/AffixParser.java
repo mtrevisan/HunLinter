@@ -199,7 +199,7 @@ public class AffixParser{
 					continue;
 
 				if(!encodingRead && !line.startsWith(prefix))
-					throw new LinterException(BAD_FIRST_LINE.get().format(new Object[]{line}));
+					throw new LinterException(BAD_FIRST_LINE, line);
 				encodingRead = true;
 
 				context.update(line, index, scanner);
@@ -210,7 +210,7 @@ public class AffixParser{
 						index += handler.parse(context, data);
 					}
 					catch(final RuntimeException e){
-						throw new LinterException(GLOBAL_ERROR_MESSAGE.get().format(new Object[]{e.getMessage(), index}));
+						throw new LinterException(GLOBAL_ERROR_MESSAGE, e.getMessage(), index);
 					}
 				}
 			}

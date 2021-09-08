@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.text.MessageFormat;
 
 
 public class LinterException extends RuntimeException{
@@ -57,6 +59,10 @@ public class LinterException extends RuntimeException{
 
 	public LinterException(final String message){
 		this(message, null, null, null);
+	}
+
+	public LinterException(final ThreadLocal<MessageFormat> message, final Object... data){
+		this(JavaHelper.createMessage(message, data), null, null, null);
 	}
 
 	public LinterException(final String message, final IndexDataPair<?> data){

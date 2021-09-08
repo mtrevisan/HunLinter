@@ -146,7 +146,7 @@ public final class FileHelper{
 			return cs;
 		}
 		catch(final Exception e){
-			throw new LinterException(WRONG_FILE_FORMAT_CHARSET.get().format(new Object[]{charsetName}));
+			throw new LinterException(WRONG_FILE_FORMAT_CHARSET, charsetName);
 		}
 	}
 

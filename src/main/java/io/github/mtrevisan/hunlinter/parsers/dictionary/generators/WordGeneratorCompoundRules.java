@@ -65,7 +65,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		Objects.requireNonNull(compoundRule, "Compound rule cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.get().format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT, limit);
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
@@ -106,8 +106,7 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new LinterException(MISSING_WORD.get().format(new Object[]{component,
-					StringUtils.join(compoundRuleComponents, StringUtils.EMPTY)}));
+				throw new LinterException(MISSING_WORD, component, StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
 	}
 
 	private boolean raiseError(final Map<String, List<DictionaryEntry>> inputs, final String component){

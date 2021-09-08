@@ -72,7 +72,7 @@ public class CompoundRuleHandler implements Handler{
 
 				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
 				if(option != AffixOption.COMPOUND_RULE)
-					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.get().format(new Object[]{line, AffixOption.COMPOUND_RULE}));
+					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE, line, AffixOption.COMPOUND_RULE);
 
 				final String rule = lineParts[1];
 
@@ -95,20 +95,20 @@ public class CompoundRuleHandler implements Handler{
 
 	private int checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
 		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
 		return numEntries;
 	}
 
 	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
-			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.get().format(new Object[]{line}));
+			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE, line);
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new LinterException(BAD_FORMAT.get().format(new Object[]{line}));
+			throw new LinterException(BAD_FORMAT, line);
 	}
 
 }

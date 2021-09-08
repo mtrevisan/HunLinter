@@ -72,10 +72,10 @@ public class ConversionTable{
 		try{
 			final Scanner scanner = context.getScanner();
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER.get().format(new Object[]{context}));
+				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
 			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES.get().format(new Object[]{context, context.getFirstParameter()}));
+				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
 			table = new HashMap<>(4);
 			for(int i = 0; i < numEntries; i ++){
@@ -102,9 +102,9 @@ public class ConversionTable{
 
 	private void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 3)
-			throw new LinterException(WRONG_FORMAT.get().format(new Object[]{context}));
+			throw new LinterException(WRONG_FORMAT, context);
 		if(!affixOption.is(parts[0]))
-			throw new LinterException(BAD_OPTION.get().format(new Object[]{context, affixOption.getCode()}));
+			throw new LinterException(BAD_OPTION, context, affixOption.getCode());
 	}
 
 	/**

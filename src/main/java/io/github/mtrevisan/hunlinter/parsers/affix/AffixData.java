@@ -164,7 +164,7 @@ public class AffixData{
 		if(closed)
 			throw new LinterException(CONTAINER_CLOSED);
 		if(data.containsKey(key))
-			throw new LinterException(DUPLICATED_FLAG.get().format(new Object[]{key}));
+			throw new LinterException(DUPLICATED_FLAG, key);
 
 		if(value != null)
 			data.put(key, value);
