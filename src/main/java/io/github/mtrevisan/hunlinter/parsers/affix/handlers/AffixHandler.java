@@ -75,7 +75,7 @@ public class AffixHandler implements Handler{
 		}
 	}
 
-	private List<AffixEntry> readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
+	private static List<AffixEntry> readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
 			throws IOException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 

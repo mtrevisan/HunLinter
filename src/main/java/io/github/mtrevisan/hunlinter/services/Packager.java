@@ -485,7 +485,7 @@ public class Packager{
 	}
 
 	/** Go up directories until description.xml or manifest.json is found. */
-	private Path getPackageBaseDirectory(final File affFile){
+	private static Path getPackageBaseDirectory(final File affFile){
 		Path parentPath = affFile.toPath()
 			.getParent();
 		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML)

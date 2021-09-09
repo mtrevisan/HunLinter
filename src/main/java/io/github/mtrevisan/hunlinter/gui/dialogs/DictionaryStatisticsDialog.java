@@ -508,17 +508,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
+	private static JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
 		return new MyChartPanel(chart);
 	}
 
-	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
+	private static JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
 		final XYPlot plot = createChartPlot(xAxisTitle, yAxisTitle);
 		return new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
 	}
 
-	private XYPlot createChartPlot(final String xAxisTitle, final String yAxisTitle){
+	private static XYPlot createChartPlot(final String xAxisTitle, final String yAxisTitle){
 		final XYBarRenderer renderer = createChartRenderer();
 		final NumberAxis xAxis = createChartXAxis(xAxisTitle);
 		final NumberAxis yAxis = createChartYAxis(yAxisTitle);
@@ -534,7 +534,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return plot;
 	}
 
-	private XYBarRenderer createChartRenderer(){
+	private static XYBarRenderer createChartRenderer(){
 		final XYBarRenderer renderer = new XYBarRenderer();
 		renderer.setSeriesStroke(0, new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 			1.f, new float[]{10.f, 6.f}, 0.f));

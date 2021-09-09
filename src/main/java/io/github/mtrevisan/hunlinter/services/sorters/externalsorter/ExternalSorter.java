@@ -172,7 +172,7 @@ public class ExternalSorter{
 	 * @param outputFile The output {@link File} to merge the results to
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
+	private static void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
 		final Comparator<String> comparator = options.getComparator();
 		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),
