@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -40,20 +39,25 @@ public class LinterWarning extends Exception{
 	private static final long serialVersionUID = 3853411643385148097L;
 
 
-	private IndexDataPair<?> data;
+	private int index;
+	private Object data;
 
 
 	public LinterWarning(final String message, final Object... parameters){
 		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public final LinterWarning withIndexDataPair(final IndexDataPair<?> data){
-		this.data = data;
+	public final LinterWarning withIndex(final int index){
+		this.index = index;
 
 		return this;
 	}
 
-	public final IndexDataPair<?> getData(){
+	public final int getIndex(){
+		return index;
+	}
+
+	public final Object getData(){
 		return data;
 	}
 

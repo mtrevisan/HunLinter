@@ -254,7 +254,7 @@ public final class GUIHelper{
 					processMouseEvent(e);
 				}
 
-				private static void processMouseEvent(final MouseEvent e){
+				private void processMouseEvent(final MouseEvent e){
 					if(e.isPopupTrigger()){
 						//select row
 						if(field instanceof JCopyableTable){

@@ -90,7 +90,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 				if(word.length() > 1 && !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
-					final String[] syllabes = hyphenation.getSyllabes();
+					final List<String> syllabes = hyphenation.getSyllabes();
 					if(orthography.hasSyllabationErrors(syllabes)){
 						final String message = JavaHelper.textFormat(WORD_IS_NOT_SYLLABABLE, word,
 							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK),

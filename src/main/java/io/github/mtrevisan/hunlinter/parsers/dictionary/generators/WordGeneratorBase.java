@@ -275,10 +275,12 @@ class WordGeneratorBase{
 				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
 					rule = overriddenRule;
 
-				final List<String> currentPostponedAffixes = new ArrayList<>(postponedAffixes);
+				List<String> currentPostponedAffixes = postponedAffixes;
 				if(dicEntry.getLastAppliedRule() != null
-						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX)
+						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX){
+					currentPostponedAffixes = new ArrayList<>(postponedAffixes);
 					currentPostponedAffixes.remove(circumfixFlag);
+				}
 				final List<Inflection> prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
 				inflections.addAll(prods);
 			}

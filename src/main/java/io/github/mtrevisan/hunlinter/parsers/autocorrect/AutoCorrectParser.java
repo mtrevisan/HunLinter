@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.tuple.Pair;
@@ -107,7 +106,7 @@ public class AutoCorrectParser{
 		for(final CorrectionEntry s : dictionary){
 			if(!map.add(s.getIncorrectForm()))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, s.getIncorrectForm(), s.getCorrectForm())
-					.withIndexDataPair(IndexDataPair.of(index, null)));
+					.withIndex(index));
 
 			index ++;
 		}

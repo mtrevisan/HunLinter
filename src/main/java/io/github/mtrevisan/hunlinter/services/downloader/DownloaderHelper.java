@@ -173,7 +173,8 @@ public final class DownloaderHelper{
 		for(final Object elem : array){
 			final String repositoryFilename = (String)((JSONObject)elem).get(PROPERTY_KEY_FILENAME);
 			//either a jar or an exe
-			if(repositoryFilename.endsWith(filename + DEFAULT_PACKAGING_EXTENSION) || repositoryFilename.endsWith(filename + DEFAULT_EXECUTABLE_EXTENSION))
+			if(repositoryFilename.endsWith(filename + DEFAULT_PACKAGING_EXTENSION)
+					|| repositoryFilename.endsWith(filename + DEFAULT_EXECUTABLE_EXTENSION))
 				return new GITFileData((JSONObject)elem);
 		}
 		return null;

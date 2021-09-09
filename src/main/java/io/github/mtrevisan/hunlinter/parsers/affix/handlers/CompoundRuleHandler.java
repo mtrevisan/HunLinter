@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +78,7 @@ public class CompoundRuleHandler implements Handler{
 				final boolean inserted = compoundRules.add(rule);
 				if(!inserted)
 					EventBusService.publish(new LinterWarning(DUPLICATED_LINE, line)
-						.withIndexDataPair(IndexDataPair.of(context.getIndex() + i, null)));
+						.withIndex(context.getIndex() + i));
 			}
 
 			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);

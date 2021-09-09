@@ -82,7 +82,7 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 		final int size = rawFlags.length();
 		final String[] flags = new String[size];
 		for(int i = 0; i < size; i ++)
-			flags[i] = Character.toString(rawFlags.charAt(i));
+			flags[i] = String.valueOf(rawFlags.charAt(i));
 		return flags;
 	}
 

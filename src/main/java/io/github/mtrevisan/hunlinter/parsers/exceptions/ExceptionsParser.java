@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.exceptions;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.w3c.dom.Document;
@@ -111,7 +110,7 @@ public class ExceptionsParser{
 		for(final String s : dictionary){
 			if(!map.add(s))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, configurationFilename, s)
-					.withIndexDataPair(IndexDataPair.of(index, null)));
+					.withIndex(index));
 
 			index ++;
 		}

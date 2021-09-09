@@ -249,9 +249,10 @@ public class DuplicatesWorker extends WorkerDictionary{
 			int writtenSoFar = 0;
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
+				final StringBuilder origin = new StringBuilder();
 				for(final List<Duplicate> entries : mergedDuplicates){
 					final Inflection prod = entries.get(0).getInflection();
-					final StringBuilder origin = new StringBuilder();
+					origin.setLength(0);
 					origin.append(prod.getWord());
 					if(!prod.getMorphologicalFieldPartOfSpeech().isEmpty())
 						origin.append("(")

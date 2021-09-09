@@ -238,8 +238,6 @@ public class FSASerializer implements FSASerializerInterface{
 
 			if(os == null)
 				offsets.put(s, offset);
-			else
-				assert offsets.get(s) == offset: s + " " + offsets.get(s) + " " + offset;
 
 			offset += emitNodeData(bb, os, nodeDataLength, serializeWithNumbers? numbers.get(s): 0);
 

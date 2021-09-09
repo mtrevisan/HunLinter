@@ -33,7 +33,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -107,7 +106,7 @@ public class AffixHandler implements Handler{
 
 			if(entries.contains(entry))
 				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, entry.toString())
-					.withIndexDataPair(IndexDataPair.of(context.getIndex() + i, null)));
+					.withIndex(context.getIndex() + i));
 			else
 				entries.add(entry);
 

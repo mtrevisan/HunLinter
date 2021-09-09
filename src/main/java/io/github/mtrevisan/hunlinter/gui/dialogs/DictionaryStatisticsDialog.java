@@ -635,8 +635,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 				final XYDataItem xy = (XYDataItem)xItr.next();
 				final double y = xy.getY().doubleValue();
 				final int decimals = Frequency.getDecimals(y);
-				final String line = String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%",
-					xy.getX().intValue(), y * 100.);
+				final String line = String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%", xy.getX().intValue(), y * 100.);
 				writer.write(line);
 				writer.newLine();
 			}

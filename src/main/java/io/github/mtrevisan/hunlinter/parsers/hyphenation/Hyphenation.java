@@ -24,19 +24,19 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 
 public class Hyphenation{
 
-	private final String[] syllabes;
-	private final String[] compounds;
-	private final String[] rules;
+	private final List<String> syllabes;
+	private final List<String> compounds;
+	private final List<String> rules;
 	private final String breakCharacter;
 
 
-	public Hyphenation(final String[] syllabes, final String[] compounds, final String[] rules, final String breakCharacter){
+	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules, final String breakCharacter){
 		Objects.requireNonNull(syllabes, "Syllabes cannot be null");
 		Objects.requireNonNull(compounds, "Compounds cannot be null");
 		Objects.requireNonNull(rules, "Rules cannot be null");
@@ -48,15 +48,15 @@ public class Hyphenation{
 		this.breakCharacter = breakCharacter;
 	}
 
-	public final String[] getSyllabes(){
+	public final List<String> getSyllabes(){
 		return syllabes;
 	}
 
-	public final String[] getCompounds(){
+	public final List<String> getCompounds(){
 		return compounds;
 	}
 
-	public final String[] getRules(){
+	public final List<String> getRules(){
 		return rules;
 	}
 
@@ -72,7 +72,7 @@ public class Hyphenation{
 		int k = -1;
 		final int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
-			final String syllabe = syllabes[i];
+			final String syllabe = syllabes.get(i);
 			idx -= syllabe.length();
 			if(idx < 0){
 				k = i;
@@ -87,11 +87,11 @@ public class Hyphenation{
 	 * @return the syllabe at the given (global) index
 	 */
 	public final String getSyllabe(final int idx){
-		return syllabes[getSyllabeIndex(idx)];
+		return syllabes.get(getSyllabeIndex(idx));
 	}
 
 	public final int countSyllabes(){
-		return syllabes.length;
+		return syllabes.size();
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class Hyphenation{
 	 * @return the syllabe at the given (relative) index
 	 */
 	public final String getAt(final int idx){
-		return syllabes[restoreRelativeIndex(idx)];
+		return syllabes.get(restoreRelativeIndex(idx));
 	}
 
 	private int restoreRelativeIndex(final int idx){
@@ -107,11 +107,11 @@ public class Hyphenation{
 	}
 
 	public final boolean isHyphenated(){
-		return (rules.length > 0);
+		return (rules.size() > 0);
 	}
 
 	public final boolean isCompound(){
-		return (compounds.length > 1);
+		return (compounds.size() > 1);
 	}
 
 	@Override
@@ -122,13 +122,13 @@ public class Hyphenation{
 			return false;
 
 		final Hyphenation rhs = (Hyphenation)obj;
-		return (Arrays.equals(syllabes, rhs.syllabes)
+		return (syllabes.equals(rhs.syllabes)
 			&& breakCharacter.equals(rhs.breakCharacter));
 	}
 
 	@Override
 	public final int hashCode(){
-		int result = Arrays.hashCode(syllabes);
+		int result = syllabes.hashCode();
 		result = 31 * result + breakCharacter.hashCode();
 		return result;
 	}

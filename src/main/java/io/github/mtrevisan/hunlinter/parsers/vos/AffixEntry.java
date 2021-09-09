@@ -31,7 +31,6 @@ import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.ArrayUtils;
@@ -141,14 +140,14 @@ public class AffixEntry{
 					throw new LinterException(WRONG_CONDITION_END, line);
 				if(appending.length() > 1 && removal.charAt(0) == appending.charAt(0))
 					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON, line)
-						.withIndexDataPair(IndexDataPair.of(index, null)));
+						.withIndex(index));
 			}
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START, line);
 				if(appending.length() > 1 && removal.charAt(removal.length() - 1) == appending.charAt(appending.length() - 1))
 					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON, line)
-						.withIndexDataPair(IndexDataPair.of(index, null)));
+						.withIndex(index));
 			}
 		}
 	}
@@ -222,7 +221,7 @@ public class AffixEntry{
 		return (LoopHelper.match(tags, tag -> LoopHelper.match(amf, tag::isSupertypeOf) != null) != null);
 	}
 
-	public static String[] extractMorphologicalFields(final DictionaryEntry[] compoundEntries){
+	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		int size = 0;
 		for(final DictionaryEntry compoundEntry : compoundEntries)
 			size += compoundEntry.morphologicalFields.length + 1;

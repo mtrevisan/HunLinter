@@ -80,11 +80,12 @@ public class PropertiesUTF8 extends Properties{
 	public final synchronized void load(final InputStream inStream) throws IOException{
 		try(final BufferedReader in = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8))){
 			String line;
+			final StringBuilder property = new StringBuilder();
 			while((line = in.readLine()) != null){
 				line = removeWhiteSpaces(line);
 				if(!line.isEmpty() && COMMENT.indexOf(line.charAt(0)) < 0){
 					//removes the beginning separators
-					final StringBuilder property = new StringBuilder();
+					property.setLength(0);
 					property.append(line);
 					//reads the whole property if it is on multiple lines
 					while(continueLine(line)){

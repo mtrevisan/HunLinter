@@ -127,12 +127,12 @@ public class DictionaryStatistics implements Closeable{
 
 	public final void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
-			final String[] syllabes = hyphenation.getSyllabes();
+			final List<String> syllabes = hyphenation.getSyllabes();
 
 			final int stressIndex = orthography.getStressedSyllabeIndexFromLast(syllabes);
 			if(stressIndex >= 0)
 				stressFromLastFrequencies.addValue(stressIndex);
-			syllabeLengthsFrequencies.addValue(syllabes.length);
+			syllabeLengthsFrequencies.addValue(syllabes.size());
 			final StringBuilder sb = new StringBuilder();
 			for(final String syllabe : syllabes){
 				sb.append(syllabe);
@@ -172,8 +172,8 @@ public class DictionaryStatistics implements Closeable{
 	}
 
 	private void storeHyphenation(final Hyphenation hyphenation){
-		final String[] syllabes = hyphenation.getSyllabes();
-		final int syllabeCount = syllabes.length;
+		final List<String> syllabes = hyphenation.getSyllabes();
+		final int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
 			longestWordsBySyllabes.add(hyphenation);
@@ -188,7 +188,8 @@ public class DictionaryStatistics implements Closeable{
 		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
 		final List<String> list = new ArrayList<>(values.size());
 		for(final String value : values)
-			list.add(value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.));
+			list.add(value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value))
+				+ "f%%)", syllabesFrequencies.getPercentOf(value) * 100.));
 		return list;
 	}
 

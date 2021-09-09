@@ -49,11 +49,11 @@ public class Inflection extends DictionaryEntry{
 
 	private AffixEntry[] appliedRules;
 
-	private final DictionaryEntry[] compoundEntries;
+	private final List<DictionaryEntry> compoundEntries;
 
 
 	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
-			final DictionaryEntry[] compoundEntries){
+			final List<DictionaryEntry> compoundEntries){
 		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
 	}
@@ -68,7 +68,7 @@ public class Inflection extends DictionaryEntry{
 		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
-		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
+		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
 		return new Inflection(word, continuationFlags, morphologicalFields, combinable, appliedRules, compoundEntries);
 	}
 
@@ -83,7 +83,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	private Inflection(final String word, final List<String> continuationFlags, final String[] morphologicalFields,
-			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
+			final boolean combinable, final AffixEntry[] appliedRules, final List<DictionaryEntry> compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
@@ -92,7 +92,7 @@ public class Inflection extends DictionaryEntry{
 
 	/* NOTE: used for testing purposes. */
 	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
-			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
+			final List<DictionaryEntry> compoundEntries, final FlagParsingStrategy strategy){
 		super(word, (strategy != null && StringUtils.isNotBlank(continuationFlags)
 				? Arrays.asList(strategy.parseFlags(continuationFlags))
 				: null),
@@ -101,7 +101,7 @@ public class Inflection extends DictionaryEntry{
 		this.compoundEntries = compoundEntries;
 	}
 
-	private static DictionaryEntry[] extractCompoundEntries(final DictionaryEntry dicEntry){
+	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){
 		return (dicEntry instanceof Inflection? ((Inflection)dicEntry).compoundEntries: null);
 	}
 
@@ -137,8 +137,8 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
-		if(compoundEntries != null && compoundEntries.length > 0
-				&& compoundEntries[compoundEntries.length - 1].hasContinuationFlag(forceCompoundUppercaseFlag))
+		if(compoundEntries != null && !compoundEntries.isEmpty()
+				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
 	}
 
@@ -199,7 +199,7 @@ public class Inflection extends DictionaryEntry{
 
 	@Override
 	public final boolean isCompound(){
-		return (compoundEntries != null && compoundEntries.length > 0);
+		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
 	public final String toStringWithPartOfSpeechAndStem(){

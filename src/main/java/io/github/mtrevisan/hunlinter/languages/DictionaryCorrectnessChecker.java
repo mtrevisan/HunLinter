@@ -31,8 +31,6 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 
@@ -90,7 +88,7 @@ public class DictionaryCorrectnessChecker{
 	private void morphologicalFieldCheck(final Inflection inflection, final int index){
 		if(!inflection.hasMorphologicalFields())
 			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD, inflection.getWord())
-				.withIndexDataPair(IndexDataPair.of(index, null)));
+				.withIndex(index));
 
 		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
 		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
@@ -98,16 +96,16 @@ public class DictionaryCorrectnessChecker{
 			final String morphologicalField = morphologicalFields[i];
 			if(morphologicalField.length() < 4)
 				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
-					.withIndexDataPair(IndexDataPair.of(index, null)));
+					.withIndex(index));
 
 			final MorphologicalTag key = MorphologicalTag.createFromCode(morphologicalField);
 			if(!rulesLoader.containsDataField(key))
 				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
-					.withIndexDataPair(IndexDataPair.of(index, null)));
+					.withIndex(index));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
 				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE, inflection.getWord(), morphologicalField)
-					.withIndexDataPair(IndexDataPair.of(index, null)));
+					.withIndex(index));
 		}
 	}
 

@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchR
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
@@ -100,24 +99,23 @@ public class Hyphenator implements HyphenatorInterface{
 
 		final List<String> compounds = createHyphenatedWord(word, hyphBreak);
 		final List<String> syllabes = new ArrayList<>(compounds);
-		String[] rules = hyphBreak.getRules();
+		List<String> rules = hyphBreak.getRules();
 
 		//if there is a second level
 		if(hypParser.isSecondLevelPresent()){
 			syllabes.clear();
-			String[] rules2ndLevel = new String[0];
+			final List<String> rules2ndLevel = new ArrayList<>();
 
 			//apply second level hyphenation for the word parts
 			int i = 0;
-			final int parentRulesSize = rules.length;
 			for(final String compound : compounds){
 				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);
 
 				syllabes.addAll(createHyphenatedWord(compound, subHyph));
-				rules2ndLevel = ArrayUtils.addAll(rules2ndLevel, subHyph.getRules());
-				if(i < parentRulesSize)
-					rules2ndLevel = ArrayUtils.add(rules2ndLevel, rules[i ++]);
+				rules2ndLevel.addAll(subHyph.getRules());
+				if(i < rules.size())
+					rules2ndLevel.add(rules.get(i ++));
 			}
 
 			rules = rules2ndLevel;
@@ -126,7 +124,7 @@ public class Hyphenator implements HyphenatorInterface{
 		//enforce no-hyphens
 		hyphBreak.enforceNoHyphens(syllabes, hypParser.getOptions().getNoHyphen());
 
-		return new Hyphenation(syllabes.toArray(new String[0]), compounds.toArray(new String[0]), rules, breakCharacter);
+		return new Hyphenation(syllabes, compounds, rules, breakCharacter);
 	}
 
 	/**

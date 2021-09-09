@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -57,11 +58,11 @@ public class Orthography{
 	}
 
 	@SuppressWarnings("DesignForExtension")
-	public boolean[] getSyllabationErrors(final String[] syllabes){
-		return new boolean[syllabes.length];
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
+		return new boolean[syllabes.size()];
 	}
 
-	public final boolean hasSyllabationErrors(final String[] syllabes){
+	public final boolean hasSyllabationErrors(final List<String> syllabes){
 		final boolean[] errors = getSyllabationErrors(syllabes);
 		for(int idx = 0; idx < errors.length; idx ++)
 			if(errors[idx])
@@ -69,16 +70,17 @@ public class Orthography{
 		return false;
 	}
 
-	public final StringJoiner formatHyphenation(final String[] syllabes){
+	public final StringJoiner formatHyphenation(final List<String> syllabes){
 		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
 		return formatHyphenation(syllabes, sj, Function.identity());
 	}
 
-	public final StringJoiner formatHyphenation(final String[] syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
+	public final StringJoiner formatHyphenation(final List<String> syllabes, final StringJoiner sj,
+			final Function<String, String> errorFormatter){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-		for(int i = 0; i < syllabes.length; i ++){
+		for(int i = 0; i < syllabes.size(); i ++){
 			final Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
-			sj.add(fun.apply(syllabes[i]));
+			sj.add(fun.apply(syllabes.get(i)));
 		}
 		return sj;
 	}
@@ -88,7 +90,7 @@ public class Orthography{
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
 	@SuppressWarnings("DesignForExtension")
-	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
+	public int getStressedSyllabeIndexFromLast(final List<String> syllabes){
 		return -1;
 	}
 

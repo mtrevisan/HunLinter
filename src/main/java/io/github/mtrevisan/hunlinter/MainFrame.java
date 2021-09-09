@@ -85,7 +85,6 @@ import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
@@ -648,13 +647,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@SuppressWarnings("unused")
 	public static void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
-		final IndexDataPair<?> eventData = warningEvent.getData();
+		final Object eventData = warningEvent.getData();
 		if(eventData != null){
-			final int index = eventData.getIndex();
-			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
-			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData.getData());
-			if(eventData.getData() != null)
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData.getData());
+			final int eventIndex = warningEvent.getIndex();
+			final String lineText = (eventIndex >= 0? ", line " + eventIndex: StringUtils.EMPTY);
+			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData);
+			if(eventData != null)
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData);
 			else
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}", warningEvent.getMessage(), lineText);
 		}

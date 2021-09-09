@@ -50,6 +50,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -417,7 +418,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		formerHyphenationText = text;
 
 		String count = null;
-		String[] rules = new String[0];
+		java.util.List<String> rules = new ArrayList<>(0);
 		if(StringUtils.isNotBlank(text)){
 			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 

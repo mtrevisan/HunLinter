@@ -34,7 +34,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +84,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
+		final ArrayList<List<Inflection>> expandedPermutationEntries = new ArrayList<>(0);
 		outer:
 		for(final List<String> permutation : permutations){
 			//expand permutation
-			final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.size());
+			expandedPermutationEntries.clear();
+			expandedPermutationEntries.ensureCapacity(permutation.size());
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					final List<Inflection> dicEntriesPerFlag = new ArrayList<>(0);
@@ -105,9 +106,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					dicEntries.put(flag, dicEntriesPerFlag);
 				}
 
-				final List<Inflection> dicEntriesPerFlag = dicEntries.get(flag);
-				if(!dicEntriesPerFlag.isEmpty())
-					expandedPermutationEntries.add(dicEntriesPerFlag);
+				final List<Inflection> dicEntryByFlag = dicEntries.get(flag);
+				if(!dicEntryByFlag.isEmpty())
+					expandedPermutationEntries.add(dicEntryByFlag);
 				else{
 					//it is not possible to compound some words, return empty list
 					entries.clear();
@@ -136,7 +137,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			boolean completed = false;
 			final int[] indexes = new int[entry.size()];
 			while(!completed){
-				final DictionaryEntry[] compoundEntries = composeCompound(indexes, entry, sb);
+				final List<DictionaryEntry> compoundEntries = composeCompound(indexes, entry, sb);
 
 				if(!sb.isEmpty() && (!checkCompoundReplacement || !existsCompoundAsReplacement(sb.toString()))){
 					final List<List<String>> continuationFlags = extractCompoundFlagsByComponent(compoundEntries, compoundFlag);
@@ -183,7 +184,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return new ArrayList<>(inflections).subList(0, Math.min(inflections.size(), limit));
 	}
 
-	private List<Inflection> generateInflections(final String compoundWord, final DictionaryEntry[] compoundEntries,
+	private List<Inflection> generateInflections(final String compoundWord, final List<DictionaryEntry> compoundEntries,
 			final Collection<List<String>> continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
@@ -207,13 +208,13 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return inflections;
 	}
 
-	private DictionaryEntry[] composeCompound(final int[] indexes, final List<List<Inflection>> entry, final StringBuffer sb){
+	private List<DictionaryEntry> composeCompound(final int[] indexes, final List<List<Inflection>> entry, final StringBuffer sb){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final boolean forbidDifferentCasesInCompound = affixData.isForbidDifferentCasesInCompound();
 		final boolean forbidTriples = affixData.isForbidTriplesInCompound();
 		final boolean simplifyTriples = affixData.isSimplifyTriplesInCompound();
 
-		DictionaryEntry[] compoundEntries = new DictionaryEntry[0];
+		final List<DictionaryEntry> compoundEntries = new ArrayList<>(indexes.length);
 
 		sb.setLength(0);
 		StringHelper.Casing lastWordCasing = null;
@@ -226,7 +227,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 				break;
 			}
 
-			compoundEntries = ArrayUtils.add(compoundEntries, next);
+			compoundEntries.add(next);
 
 			String nextCompound = next.getWord();
 			final boolean containsTriple = containsTriple(sb, nextCompound);
@@ -286,11 +287,11 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both. */
-	private List<List<String>> extractCompoundFlagsByComponent(final DictionaryEntry[] compoundEntries,
+	private List<List<String>> extractCompoundFlagsByComponent(final List<DictionaryEntry> compoundEntries,
 			final String compoundFlag){
-		final List<List<String>> prefixes = compoundEntries[0]
+		final List<List<String>> prefixes = compoundEntries.get(0)
 			.extractAllAffixes(affixData, false);
-		final List<List<String>> suffixes = compoundEntries[compoundEntries.length - 1]
+		final List<List<String>> suffixes = compoundEntries.get(compoundEntries.size() - 1)
 			.extractAllAffixes(affixData, false);
 		final Set<String> terminals = new TreeSet<>();
 		terminals.addAll(prefixes.get(Affixes.INDEX_TERMINALS));

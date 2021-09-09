@@ -248,13 +248,8 @@ public enum DictionaryAttribute{
 			for(final String stringPair : replacements){
 				final String[] twoStrings = StringUtils.split(stringPair.trim(), StringUtils.SPACE, 2);
 				final String replacement = StringUtils.replace(twoStrings[1], " ", "_");
-				if(!replacementPairs.containsKey(twoStrings[0])){
-					final List<String> strList = new ArrayList<>(1);
-					strList.add(replacement);
-					replacementPairs.put(twoStrings[0], strList);
-				}
-				else
-					replacementPairs.get(twoStrings[0]).add(replacement);
+				replacementPairs.computeIfAbsent(twoStrings[0], k -> new ArrayList<>(1))
+					.add(replacement);
 			}
 			return replacementPairs;
 		}

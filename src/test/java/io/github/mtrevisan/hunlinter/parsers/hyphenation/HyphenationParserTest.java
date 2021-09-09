@@ -299,7 +299,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate("abcd", "a=bcd", HyphenationParser.Level.NON_COMPOUND);
 
-		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes().toArray(new String[0]));
 	}
 
 	@Test
@@ -720,7 +720,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
-		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes().toArray(new String[0]));
 	}
 
 }

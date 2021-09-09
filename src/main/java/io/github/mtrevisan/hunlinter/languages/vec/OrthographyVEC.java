@@ -166,10 +166,10 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public boolean[] getSyllabationErrors(final String[] syllabes){
-		final boolean[] errors = new boolean[syllabes.length];
-		for(int i = 0; i < syllabes.length; i ++){
-			final String syllabe = syllabes[i];
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
+		final boolean[] errors = new boolean[syllabes.size()];
+		for(int i = 0; i < syllabes.size(); i ++){
+			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
 				&& !StringUtils.contains(syllabe, HyphenationParser.MODIFIER_LETTER_APOSTROPHE)
 				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
@@ -178,9 +178,9 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
-		for(int i = syllabes.length - 1; i >= 0; i --)
-			if(hasStressedGrapheme(syllabes[i]))
+	public int getStressedSyllabeIndexFromLast(final List<String> syllabes){
+		for(int i = syllabes.size() - 1; i >= 0; i --)
+			if(hasStressedGrapheme(syllabes.get(i)))
 				return i;
 		return -1;
 	}

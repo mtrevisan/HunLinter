@@ -26,6 +26,8 @@ package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +71,11 @@ public class HyphenationBreak{
 		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getData();
 	}
 
-	public final String[] getRules(){
-		int offset = 0;
-		final String[] list = new String[indexesAndRules.size()];
-		for(final IndexDataPair<String> pair : indexesAndRules.values())
-			list[offset ++] = pair.getData();
+	public final List<String> getRules(){
+		final Collection<IndexDataPair<String>> pairs = indexesAndRules.values();
+		final List<String> list = new ArrayList<>(pairs.size());
+		for(final IndexDataPair<String> pair : pairs)
+			list.add(pair.getData());
 		return list;
 	}
 

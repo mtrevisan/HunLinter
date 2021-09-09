@@ -35,7 +35,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
@@ -182,7 +181,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final List<String> pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
 			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT)
-				.withIndexDataPair(IndexDataPair.of(index, null)));
+				.withIndex(index));
 	}
 
 	private void orthographyCheck(final Inflection inflection){
