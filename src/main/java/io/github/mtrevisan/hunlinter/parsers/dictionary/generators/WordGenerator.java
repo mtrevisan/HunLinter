@@ -78,7 +78,7 @@ public class WordGenerator{
 		return wordGeneratorCompoundRules.applyCompoundRules(inputCompounds, compoundRule, limit);
 	}
 
-	public final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	public final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final Integer maxCompounds){
 		return wordGeneratorCompoundFlag.applyCompoundFlag(inputCompounds, limit, maxCompounds);
 	}
 

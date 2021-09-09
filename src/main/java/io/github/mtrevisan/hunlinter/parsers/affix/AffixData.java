@@ -346,7 +346,7 @@ public class AffixData{
 		return getData(AffixOption.FORBID_COMPOUND_FLAG);
 	}
 
-	public final int getCompoundMaxWordCount(){
+	public final Integer getCompoundMaxWordCount(){
 		return getData(AffixOption.COMPOUND_MAX_WORD_COUNT);
 	}
 
@@ -358,7 +358,7 @@ public class AffixData{
 		return containsData(AffixOption.CHECK_COMPOUND_REPLACEMENT);
 	}
 
-	public final int getCompoundMinimumLength(){
+	public final Integer getCompoundMinimumLength(){
 		return getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
 	}
 

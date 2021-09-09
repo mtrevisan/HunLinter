@@ -81,7 +81,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 		currentVersionLabel.setText((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION));
 		newVersionLabel.setText(remoteObject.version.toString());
-		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(remoteObject.size));
+		downloadSizeLabel.setText(remoteObject.size != null? StringHelper.byteCountToHumanReadable(remoteObject.size): "--");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

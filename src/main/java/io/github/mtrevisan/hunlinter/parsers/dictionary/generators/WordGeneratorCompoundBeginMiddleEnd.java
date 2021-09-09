@@ -91,7 +91,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 
 	private Map<String, List<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
-		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
+		final Integer compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds

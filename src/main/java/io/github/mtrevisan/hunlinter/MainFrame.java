@@ -911,7 +911,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public final void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case "progress" -> {
-				final int progress = (int)evt.getNewValue();
+				final int progress = (Integer)evt.getNewValue();
 				mainProgressBar.setValue(progress);
 			}
 			case "state" -> {

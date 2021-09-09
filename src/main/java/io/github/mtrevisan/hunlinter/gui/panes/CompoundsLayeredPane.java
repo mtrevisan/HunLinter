@@ -291,7 +291,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             final AffixData affixData = parserManager.getAffixData();
 				final String[] input = StringUtils.split(inputCompounds, '\n');
             if(inputText.equals(affixData.getCompoundFlag())){
-               final int maxCompounds = affixData.getCompoundMaxWordCount();
+               final Integer maxCompounds = affixData.getCompoundMaxWordCount();
                words = wordGenerator.applyCompoundFlag(input, limit, maxCompounds);
             }
             else

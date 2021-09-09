@@ -85,7 +85,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			final int position = index + 1;
 			for(final int hit : hits)
 				collectedHits.add(new SearchResult<>(position - keyLength[hit], position, outerValue.get(hit)));
-			return Boolean.TRUE;
+			return true;
 		};
 		searchInText(text, consumer);
 		return collectedHits;
@@ -105,9 +105,9 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 			for(final int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
 				if(!proceed)
-					return Boolean.FALSE;
+					return false;
 			}
-			return Boolean.TRUE;
+			return true;
 		};
 		searchInText(text, consumer);
 	}
@@ -119,7 +119,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @return	{@code true} if string contains at least one substring.
 	 */
 	public final boolean containsKey(final String text){
-		return searchInText(text, (hits, index) -> Boolean.FALSE);
+		return searchInText(text, (hits, index) -> false);
 	}
 
 	/**

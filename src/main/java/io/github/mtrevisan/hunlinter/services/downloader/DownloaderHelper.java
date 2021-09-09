@@ -158,7 +158,7 @@ public final class DownloaderHelper{
 	}
 
 	public static void validate(final byte[] content, final GITFileData object) throws Exception{
-		if(content.length != object.size)
+		if(object.size != null && content.length != object.size)
 			throw new Exception("Size mismatch while downloading " + object.name + ", expected " + object.size + " B, had " + content.length + " B");
 
 		final String downloadedSha = calculateGitSha1(content);

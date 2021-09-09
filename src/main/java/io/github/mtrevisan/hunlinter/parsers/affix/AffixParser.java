@@ -291,8 +291,8 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
-			final int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
-			if(compoundMin < 1)
+			final Integer compoundMin = data.getCompoundMinimumLength();
+			if(compoundMin != null && compoundMin < 1)
 				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
 		}
 	}

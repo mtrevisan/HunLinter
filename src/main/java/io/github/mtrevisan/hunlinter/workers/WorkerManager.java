@@ -101,7 +101,8 @@ public class WorkerManager{
 	}
 
 
-	public final void createProjectLoaderWorker(final Consumer<WorkerAbstract<?>> onStart, final Runnable completed, final Consumer<Exception> cancelled){
+	public final void createProjectLoaderWorker(final Consumer<WorkerAbstract<?>> onStart, final Runnable completed,
+			final Consumer<Exception> cancelled){
 		final Supplier<WorkerAbstract<?>> creator = () -> new ProjectLoaderWorker(packager, parserManager, completed, cancelled);
 		createWorker(ProjectLoaderWorker.WORKER_NAME, creator, onStart, null);
 	}
@@ -116,12 +117,14 @@ public class WorkerManager{
 		createWorker(WordCountWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createDuplicatesWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createDuplicatesWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<File, WorkerAbstract<?>> creator = outputFile -> new DuplicatesWorker(parserManager, outputFile);
 		createWorker(DuplicatesWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
-	public final void createSorterWorker(final Supplier<Integer> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createSorterWorker(final Supplier<Integer> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<Integer, WorkerAbstract<?>> creator = selectedRow ->
 			new SorterWorker(packager.getDictionaryFile(), parserManager, selectedRow);
 		createWorker(SorterWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
@@ -133,48 +136,55 @@ public class WorkerManager{
 		createWorker(ThesaurusLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createThesaurusLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd, final DictionaryLookup dictionaryLookup){
+	public final void createThesaurusLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd,
+			final DictionaryLookup dictionaryLookup){
 		final Supplier<WorkerAbstract<?>> creator = () -> new ThesaurusLinterFSAWorker(parserManager.getTheParser(),
 			parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
 		createWorker(ThesaurusLinterFSAWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
 	public final void createAutoCorrectLinterWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
-		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getAcoParser(), parserManager.getLanguage(),
-			parserManager.getDicParser(), parserManager.getWordGenerator());
+		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterWorker(parserManager.getAcoParser(),
+			parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator());
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createAutoCorrectLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd, final DictionaryLookup dictionaryLookup){
+	public final void createAutoCorrectLinterFSAWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd,
+			final DictionaryLookup dictionaryLookup){
 		final Supplier<WorkerAbstract<?>> creator = () -> new AutoCorrectLinterFSAWorker(parserManager.getAcoParser(),
 			parserManager.getDicParser(), parserManager.getWordGenerator(), dictionaryLookup);
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd, final Frame parentFrame){
+	public final void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd, final Frame parentFrame){
 		final Supplier<WorkerAbstract<?>> creator = () -> {
-			final Boolean performHyphenationStatistics = preStart.get();
+			final boolean performHyphenationStatistics = preStart.get();
 			return new StatisticsWorker(parserManager, performHyphenationStatistics, parentFrame);
 		};
 		createWorker(StatisticsWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,
+			final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<File, WorkerAbstract<?>> creator = outputFile -> new WordlistWorker(parserManager, type, outputFile);
 		createWorker(WordlistWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
-	public final void createWordlistFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createWordlistFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<File, WorkerAbstract<?>> creator = outputFile -> new WordlistFSAWorker(parserManager, outputFile);
 		createWorker(WordlistFSAWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
-	public final void createPoSFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createPoSFSAWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<File, WorkerAbstract<?>> creator = outputFile -> new PoSFSAWorker(parserManager, outputFile);
 		createWorker(PoSFSAWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
 
-	public final void createMinimalPairsWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createMinimalPairsWorker(final Supplier<File> preStart, final Consumer<WorkerAbstract<?>> onStart,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Function<File, WorkerAbstract<?>> creator = outputFile -> new MinimalPairsWorker(parserManager, outputFile);
 		createWorker(MinimalPairsWorker.WORKER_NAME, creator, preStart, onStart, onEnd);
 	}
@@ -184,7 +194,8 @@ public class WorkerManager{
 		createWorker(HyphenationLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createCompoundRulesWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<List<Inflection>> onComplete, final Consumer<WorkerAbstract<?>> onEnd){
+	public final void createCompoundRulesWorker(final Consumer<WorkerAbstract<?>> onStart, final Consumer<List<Inflection>> onComplete,
+			final Consumer<WorkerAbstract<?>> onEnd){
 		final Supplier<WorkerAbstract<?>> creator = () -> {
 			final AffixParser affParser = parserManager.getAffParser();
 			final AffixData affixData = affParser.getAffixData();

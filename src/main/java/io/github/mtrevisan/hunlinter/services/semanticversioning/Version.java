@@ -115,11 +115,11 @@ public class Version implements Comparable<Version>{
 		if(hasLeadingZeros(tokens[0]) || hasLeadingZeros(tokens[1]) || hasLeadingZeros(patchOnly))
 			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
-		major = Integer.parseInt(tokens[0]);
-		minor = Integer.parseInt(tokens[1]);
+		major = Integer.valueOf(tokens[0]);
+		minor = Integer.valueOf(tokens[1]);
 		final String patchAndOthers = tokens[2];
 		final StringTokenizer tokenizer = new StringTokenizer(patchAndOthers, PRE_RELEASE_PREFIX + BUILD_PREFIX, true);
-		patch = Integer.parseInt(tokenizer.nextToken());
+		patch = Integer.valueOf(tokenizer.nextToken());
 		String nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
 		if(PRE_RELEASE_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
 			preRelease = StringUtils.split(tokenizer.nextToken(), DOT);
@@ -218,9 +218,11 @@ public class Version implements Comparable<Version>{
 
 	@Override
 	public final int hashCode(){
-		int result = Integer.hashCode(major);
-		result = 31 * result + Integer.hashCode(minor);
-		result = 31 * result + patch.hashCode();
+		int result = (major != null? Integer.hashCode(major): 0);
+		if(minor != null)
+			result = 31 * result + Integer.hashCode(minor);
+		if(patch != null)
+			result = 31 * result + patch.hashCode();
 		result = 31 * result + Arrays.hashCode(preRelease);
 		result = 31 * result + Arrays.hashCode(build);
 		return result;
@@ -262,9 +264,27 @@ public class Version implements Comparable<Version>{
 	}
 
 	private int compareToCore(final Version other){
-		return (!major.equals(other.major)? major - other.major:
-			(!minor.equals(other.minor)? minor - other.minor:
-			patch - other.patch));
+		int comparison = compareToCore(major, other.major);
+		if(comparison != 0)
+			return comparison;
+
+		comparison = compareToCore(minor, other.minor);
+		if(comparison != 0)
+			return comparison;
+
+		return compareToCore(patch, other.patch);
+	}
+
+	private int compareToCore(final Integer value1, final Integer value2){
+		int comparison = 0;
+		if(value1 != null || value2 != null){
+			if(value1 != null && value2 == null)
+				return 1;
+			if(value1 == null)
+				return -1;
+			comparison = Integer.compare(value1, value2);
+		}
+		return comparison;
 	}
 
 	private int compareToIdentifiers(final String[] preRelease, final String[] otherPreRelease){

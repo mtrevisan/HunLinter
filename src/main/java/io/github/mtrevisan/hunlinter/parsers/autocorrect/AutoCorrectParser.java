@@ -132,7 +132,8 @@ public class AutoCorrectParser{
 	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
-	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct, final Supplier<Boolean> duplicatesDiscriminator){
+	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
+			final Supplier<Boolean> duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE, "Incorrect", incorrect);
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))

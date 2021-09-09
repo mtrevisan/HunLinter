@@ -343,7 +343,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others. */
-	protected final Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules, final Map<String, List<DictionaryEntry>> distribution, final int compoundMinimumLength, final String forbiddenWordFlag){
+	protected final Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
+			final Map<String, List<DictionaryEntry>> distribution, final Integer compoundMinimumLength, final String forbiddenWordFlag){
 		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
@@ -354,7 +355,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final int size = (entries != null? entries.size(): 0);
 			for(int i = 0; i < size; i ++){
 				final DictionaryEntry entry = entries.get(i);
-				if(entry.getWord().length() >= compoundMinimumLength && !entry.hasContinuationFlag(forbiddenWordFlag))
+				if(compoundMinimumLength != null && entry.getWord().length() >= compoundMinimumLength
+						&& !entry.hasContinuationFlag(forbiddenWordFlag))
 					value.add(entry);
 			}
 			final String key = m.getKey();

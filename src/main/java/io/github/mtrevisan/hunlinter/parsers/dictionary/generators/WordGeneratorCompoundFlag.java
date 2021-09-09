@@ -53,19 +53,19 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	}
 
 	/**
-	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_FLAG
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with {@code AffixOption.COMPOUND_FLAG}.
 	 *
-	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule
-	 * @param limit	Limit result count
-	 * @param maxCompounds	Maximum compound count
-	 * @return	The list of inflections
-	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
+	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule.
+	 * @param limit	Limit result count.
+	 * @param maxCompounds	Maximum compound count.
+	 * @return	The list of inflections.
+	 * @throws NoApplicableRuleException	If there are no rules that apply to the word.
 	 */
-	final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final Integer maxCompounds){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
 			throw new LinterException(NON_POSITIVE_LIMIT, limit);
-		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
+		if(maxCompounds == null || maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
 			throw new LinterException(NON_POSITIVE_MAX_COMPOUNDS, maxCompounds);
 
 		final boolean forbidDuplicates = affixData.isForbidDuplicatesInCompound();
@@ -88,7 +88,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	}
 
 	private List<DictionaryEntry> extractCompoundFlags(final String[] inputCompounds){
-		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
+		final Integer compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		final List<DictionaryEntry> result = new ArrayList<>(inputCompounds.length);
@@ -96,7 +96,8 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
 
 			//filter input set by minimum length and forbidden flag
-			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
+			if(compoundMinimumLength != null && dicEntry.getWord().length() >= compoundMinimumLength
+					&& !dicEntry.hasContinuationFlag(forbiddenWordFlag))
 				result.add(dicEntry);
 		}
 		return result;
