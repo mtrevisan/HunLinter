@@ -71,8 +71,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		catch(final LinterException e){
 			throw e;
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 
@@ -169,8 +169,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 				sleepOnPause();
 			}
-			catch(final Exception e){
-				final LinterException le = new LinterException(e.getMessage(), e.getCause(), data);
+			catch(final RuntimeException re){
+				final LinterException le = new LinterException(re.getMessage(), re.getCause(), data);
 				manageException(le);
 
 				if(workerData.isCancelOnException())
@@ -196,8 +196,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e)
+			catch(final RuntimeException re){
+				throw new LinterException(re)
 					.withIndexDataPair(data);
 			}
 		};
@@ -209,8 +209,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			writer.write(line);
 			writer.write(lineSeparator);
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 

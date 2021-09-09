@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -89,8 +90,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			if(!metadataPath.toFile().exists())
 				MetadataBuilder.createWordlistInfo(affixData, "none", metadataPath, charset);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 
 
@@ -169,8 +170,8 @@ public class WordlistFSAWorker extends WorkerDictionary{
 
 				return outputFile;
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new RuntimeException(ioe.getMessage());
 			}
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);

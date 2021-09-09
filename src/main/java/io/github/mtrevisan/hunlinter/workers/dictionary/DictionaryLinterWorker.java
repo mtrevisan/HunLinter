@@ -104,8 +104,8 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());
 				}
-				catch(final Exception e){
-					final LinterException wrappedException = wrapException(e, inflection, indexData);
+				catch(final RuntimeException re){
+					final LinterException wrappedException = wrapException(re, inflection, indexData);
 					manageException(wrappedException);
 
 					//remove all inflections derived from this one

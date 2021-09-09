@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -77,8 +78,8 @@ public class SorterWorker extends WorkerDictionary{
 			try{
 				lines = FileHelper.readAllLines(dicParser.getDicFile().toPath(), dicParser.getCharset());
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new RuntimeException(ioe.getMessage());
 			}
 
 			setProgress(33);
@@ -106,8 +107,8 @@ public class SorterWorker extends WorkerDictionary{
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new RuntimeException(ioe.getMessage());
 			}
 
 			return null;

@@ -51,6 +51,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -181,7 +182,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                      //… and save the files
                      parserManager.storeAutoCorrectFile();
                   }
-                  catch(final Exception ex){
+                  catch(final TransformerException ex){
                      LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
                   }
                };
@@ -323,7 +324,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
-      catch(final Exception e){
+      catch(final TransformerException e){
          LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
@@ -377,7 +378,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			//… and save the files
 			parserManager.storeAutoCorrectFile();
 		}
-		catch(final Exception e){
+		catch(final TransformerException e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}

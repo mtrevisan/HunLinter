@@ -58,10 +58,10 @@ public final class BitArrayBuilder{
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}
-				catch(final IOException e){
+				catch(final IOException ioe){
 					ba = new JavaBitArray(bits);
 
-					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);
+					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", ioe);
 				}
 		}
 		return ba;

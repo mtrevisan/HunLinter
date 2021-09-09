@@ -209,7 +209,7 @@ public final class LexicographicalComparator{
 			return comparator;
 		}
 		//ensure we really catch *everything*
-		catch(final Throwable t){
+		catch(final ClassNotFoundException ignored){
 			return lexicographicalComparatorJavaImpl();
 		}
 	}

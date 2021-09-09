@@ -49,6 +49,7 @@ import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -218,8 +219,8 @@ public final class FileHelper{
 			reader.skip(Integer.MAX_VALUE);
 			lines = reader.getLineNumber() + 1;
 		}
-		catch(final IOException e){
-			e.printStackTrace();
+		catch(final IOException ioe){
+			ioe.printStackTrace();
 		}
 		return lines;
 	}
@@ -232,7 +233,7 @@ public final class FileHelper{
 				final int n = raf.readInt();
 				size = Integer.toUnsignedLong(Integer.reverseBytes(n));
 			}
-			catch(final Exception ignored){}
+			catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
 		}
 		else
 			size = file.length();
@@ -244,7 +245,7 @@ public final class FileHelper{
 		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
 			magic = (raf.read() & 0xFF | ((raf.read() << 8) & 0xFF00));
 		}
-		catch(final Throwable ignored){}
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
 		return (magic == GZIPInputStream.GZIP_MAGIC);
 	}
 
@@ -357,7 +358,7 @@ public final class FileHelper{
 					}
 			}
 		}
-		catch(final Exception e){
+		catch(final IOException | URISyntaxException e){
 			LOGGER.error("Cannot execute {} command", action, e);
 		}
 		return done;
@@ -389,10 +390,10 @@ public final class FileHelper{
 			try{
 				Files.move(source, target);
 			}
-			catch(final IOException e){
+			catch(final IOException ioe){
 				Files.move(temp, target);
 
-				throw e;
+				throw ioe;
 			}
 			finally{
 				Files.deleteIfExists(temp);

@@ -62,8 +62,8 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 				dataProcessor.accept(data);
 			}
 		}
-		catch(final Exception e){
-			manageException(new LinterException(e)
+		catch(final RuntimeException re){
+			manageException(new LinterException(re)
 				.withData(data));
 		}
 	}
@@ -99,8 +99,8 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e)
+			catch(final RuntimeException re){
+				throw new LinterException(re)
 					.withData(data);
 			}
 		};

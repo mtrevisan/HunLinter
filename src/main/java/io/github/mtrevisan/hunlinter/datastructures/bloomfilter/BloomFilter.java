@@ -323,8 +323,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		try{
 			bitArray.close();
 		}
-		catch(final IOException e){
-			LOGGER.error("Error closing the Bloom filter", e);
+		catch(final IOException ioe){
+			LOGGER.error("Error closing the Bloom filter", ioe);
 		}
 	}
 

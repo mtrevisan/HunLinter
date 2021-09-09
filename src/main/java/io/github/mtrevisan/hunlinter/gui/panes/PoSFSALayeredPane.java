@@ -199,7 +199,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 			if(StringUtils.isNotBlank(textField.getText()))
 				processSentence();
 		}
-		catch(final Exception e){
+		catch(final IllegalArgumentException | IOException e){
 			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA\n\n"
 				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
 		}

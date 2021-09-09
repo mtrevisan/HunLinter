@@ -136,7 +136,7 @@ public class ZipManager{
 			}
 			zis.closeEntry();
 		}
-		catch(final IOException ioe){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
 			LOGGER.warn("Cannot extract file", ioe);
 		}
 	}

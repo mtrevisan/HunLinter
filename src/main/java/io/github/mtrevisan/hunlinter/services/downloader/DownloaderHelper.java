@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -102,7 +103,7 @@ public final class DownloaderHelper{
 			final int responseCode = httpConnection.getResponseCode();
 			return (responseCode == HttpURLConnection.HTTP_OK);
 		}
-		catch(final Exception e){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){
 			return false;
 		}
 	}

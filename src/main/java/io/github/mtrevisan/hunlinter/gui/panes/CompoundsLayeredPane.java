@@ -285,8 +285,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             final HunLinterTableModelInterface<Inflection> dm = (CompoundTableModel)table.getModel();
             dm.setInflections(words);
          }
-         catch(final Exception e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+         catch(final RuntimeException re){
+            LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), inputText);
          }
       }
       else

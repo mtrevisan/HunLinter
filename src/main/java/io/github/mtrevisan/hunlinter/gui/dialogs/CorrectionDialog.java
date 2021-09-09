@@ -174,8 +174,9 @@ public class CorrectionDialog extends JDialog{
 			final String correct = correctTextField.getText();
          okButtonAction.accept(incorrect, correct);
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction, e.getMessage());
+      catch(final RuntimeException re){
+         LOGGER.info(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction,
+				re.getMessage());
       }
 
       dispose();

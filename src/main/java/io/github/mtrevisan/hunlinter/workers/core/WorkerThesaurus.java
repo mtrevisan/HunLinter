@@ -62,8 +62,8 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 				dataProcessor.accept(data);
 			}
 		}
-		catch(final Exception e){
-			manageException(new LinterException(e)
+		catch(final RuntimeException re){
+			manageException(new LinterException(re)
 				.withData(data));
 		}
 	}
@@ -99,8 +99,8 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e)
+			catch(final RuntimeException re){
+				throw new LinterException(re)
 					.withData(data);
 			}
 		};

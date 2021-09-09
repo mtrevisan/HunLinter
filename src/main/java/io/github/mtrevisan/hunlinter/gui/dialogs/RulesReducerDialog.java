@@ -311,12 +311,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				rulesReducerWorker.addPropertyChangeListener(this);
 				rulesReducerWorker.execute();
 			}
-			catch(final Exception e){
+			catch(final RuntimeException re){
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
 
-				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());
+				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, re.getMessage());
 			}
 		}
 	}

@@ -84,7 +84,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 			cancel(new ProjectNotFoundException(packager.getProjectPath(), e));
 		}
-		catch(final Exception e){
+		catch(final IOException | SAXException e){
 			logExceptionError(e);
 
 			cancel(e);

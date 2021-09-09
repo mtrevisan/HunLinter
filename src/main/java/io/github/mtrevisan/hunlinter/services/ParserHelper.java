@@ -98,8 +98,8 @@ public final class ParserHelper{
 			if(progressCallback != null)
 				progressCallback.accept(100);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 

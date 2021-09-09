@@ -207,8 +207,8 @@ public class AffixParser{
 					try{
 						index += handler.parse(context, data);
 					}
-					catch(final RuntimeException e){
-						throw new LinterException(GLOBAL_ERROR_MESSAGE, e.getMessage(), index);
+					catch(final RuntimeException re){
+						throw new LinterException(GLOBAL_ERROR_MESSAGE, re.getMessage(), index);
 					}
 				}
 			}

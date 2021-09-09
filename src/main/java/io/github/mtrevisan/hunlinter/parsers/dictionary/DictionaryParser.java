@@ -147,8 +147,8 @@ public class DictionaryParser{
 			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
 				boundaries.put(startSection, lineIndex - 1);
 		}
-		catch(final IOException e){
-			LOGGER.error(null, e);
+		catch(final IOException ioe){
+			LOGGER.error(null, ioe);
 		}
 
 		boundariesCalculated = true;

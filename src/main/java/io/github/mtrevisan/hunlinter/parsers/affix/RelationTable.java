@@ -85,8 +85,8 @@ public class RelationTable{
 				table.add(substitutions);
 			}
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e.getMessage());
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
+			throw new RuntimeException(ioe.getMessage());
 		}
 	}
 

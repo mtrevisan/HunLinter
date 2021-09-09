@@ -349,10 +349,10 @@ public class DictionaryLayeredPane extends JLayeredPane{
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
-			LOGGER.error("A bad error occurred", e);
+			LOGGER.error("A bad error occurred", re);
 		}
 	}
 
@@ -427,14 +427,14 @@ public class DictionaryLayeredPane extends JLayeredPane{
 					try{
 						checker.checkInflection(inflection, index);
 					}
-					catch(final Exception e){
+					catch(final RuntimeException re){
 						dicCellRenderer.setErrorOnRow(index);
 
 						sb.setLength(0);
-						sb.append(e.getMessage());
+						sb.append(re.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
-						final String errorMessage = ExceptionHelper.getMessage(e);
+						final String errorMessage = ExceptionHelper.getMessage(re);
 						LOGGER.trace("{}, line {}", errorMessage, index);
 						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
 					}
@@ -442,8 +442,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
 					index ++;
 				}
 			}
-			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), text);
+			catch(final RuntimeException re){
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), text);
 			}
 		}
 		else

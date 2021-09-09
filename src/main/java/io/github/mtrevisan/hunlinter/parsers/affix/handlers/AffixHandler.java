@@ -69,8 +69,8 @@ public class AffixHandler implements Handler{
 
 			return Integer.parseInt(context.getThirdParameter());
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e.getMessage());
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe.getMessage());
 		}
 	}
 

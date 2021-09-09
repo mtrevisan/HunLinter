@@ -80,9 +80,9 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		try{
 			processor.apply(null);
 		}
-		catch(final Exception e){
+		catch(final RuntimeException re){
 			if(workerData.isCancelOnException())
-				cancel(e);
+				cancel(re);
 		}
 		return null;
 	}
@@ -179,11 +179,9 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		if(paused.get()){
 			PAUSE_LOCK.lock();
 			try{
-				try{
 					UNPAUSE.await();
-				}
-				catch(final InterruptedException ignored){}
 			}
+			catch(final InterruptedException ignored){}
 			finally{
 				PAUSE_LOCK.unlock();
 			}

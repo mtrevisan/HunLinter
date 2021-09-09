@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -70,7 +71,7 @@ public class AliasesHandler implements Handler{
 
 			return numEntries;
 		}
-		catch(final Exception e){
+		catch(final LinterException | NumberFormatException | EOFException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}

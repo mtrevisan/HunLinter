@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -70,7 +71,7 @@ public final class JavaHelper{
 					return futureTask.get();
 				}
 			}
-			catch(final Exception ignored){}
+			catch(final InterruptedException | ExecutionException ignored){}
 		}
 	}
 
@@ -153,8 +154,8 @@ public final class JavaHelper{
 					Runtime.getRuntime()
 						.exec(cmd.toString());
 				}
-				catch(final IOException e){
-					e.printStackTrace();
+				catch(final IOException ioe){
+					ioe.printStackTrace();
 				}
 			}));
 

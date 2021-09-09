@@ -338,8 +338,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
             addRuleSyllabationValueLabel.setText(null);
             addRuleSyllabesCountValueLabel.setText(null);
          }
-         catch(final IOException e){
-            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
+         catch(final IOException ioe){
+            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", ioe);
          }
       }
       else{
@@ -356,8 +356,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
             parserManager.storeHyphenationFile();
          }
-         catch(final Exception e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
+         catch(final IOException ioe){
+            LOGGER.info(ParserManager.MARKER_APPLICATION, ioe.getMessage());
          }
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),

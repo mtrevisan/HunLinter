@@ -175,7 +175,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 				unmapper.bindTo(theUnsafe)
 					.invokeExact(buffer);
 			}
-			catch(final Throwable ignored){ }
+			catch(@SuppressWarnings("OverlyBroadCatchBlock") final Throwable ignored){ }
 
 			buffer = null;
 		}

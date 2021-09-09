@@ -152,8 +152,8 @@ public class DictionarySortDialog extends JDialog{
 			final int lastVisibleIndex = getFirstVisibleIndex();
 			loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 

@@ -365,7 +365,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 				FileHelper.browse(outputFile);
 			}
-			catch(final Exception e){
+			catch(final IOException | InterruptedException e){
 				LOGGER.error("Cannot export statistics", e);
 			}
 

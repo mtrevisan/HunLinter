@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.services.downloader.DownloadException;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadListenerInterface;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadTask;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
@@ -49,7 +50,9 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -210,7 +213,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(final Exception ignored){}
+		catch(final VersionException | IOException | ParseException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
@@ -246,7 +249,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final byte[] content = DownloaderHelper.readFileContent(localPath);
 			DownloaderHelper.validate(content, remoteObject);
 		}
-		catch(final Exception e){
+		catch(final IOException | DownloadException | NoSuchAlgorithmException e){
 			statusLabel.setText(e.getMessage());
 		}
 	}
@@ -283,7 +286,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 				System.exit(0);
 			}
 		}
-		catch(final Exception e){
+		catch(final URISyntaxException | IllegalArgumentException | IOException | InterruptedException e){
 			e.printStackTrace();
 		}
 	}

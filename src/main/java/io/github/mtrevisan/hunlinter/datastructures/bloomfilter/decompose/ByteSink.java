@@ -78,8 +78,8 @@ public class ByteSink{
 		try{
 			stream.write(bytes);
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store bytes inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store bytes inside the sink", ioe);
 		}
 		return this;
 	}
@@ -94,8 +94,8 @@ public class ByteSink{
 			dataStream.writeChar(c);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store char inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store char inside the sink", ioe);
 		}
 	}
 
@@ -104,8 +104,8 @@ public class ByteSink{
 			dataStream.writeShort(s);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store short inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store short inside the sink", ioe);
 		}
 	}
 
@@ -114,8 +114,8 @@ public class ByteSink{
 			dataStream.writeInt(i);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store int inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store int inside the sink", ioe);
 		}
 	}
 
@@ -124,8 +124,8 @@ public class ByteSink{
 			dataStream.writeLong(l);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store long inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store long inside the sink", ioe);
 		}
 	}
 
@@ -134,8 +134,8 @@ public class ByteSink{
 			dataStream.writeFloat(f);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store float inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store float inside the sink", ioe);
 		}
 	}
 
@@ -144,8 +144,8 @@ public class ByteSink{
 			dataStream.writeDouble(d);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store double inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store double inside the sink", ioe);
 		}
 	}
 
@@ -154,8 +154,8 @@ public class ByteSink{
 			dataStream.writeBoolean(b);
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store boolean inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store boolean inside the sink", ioe);
 		}
 	}
 
@@ -164,8 +164,8 @@ public class ByteSink{
 			dataStream.writeBytes(charSequence.toString());
 			return this;
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Unable to store charSequence inside the sink", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Unable to store charSequence inside the sink", ioe);
 		}
 	}
 

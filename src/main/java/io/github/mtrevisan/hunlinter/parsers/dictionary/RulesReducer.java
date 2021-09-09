@@ -330,7 +330,7 @@ public class RulesReducer{
 					overallLastGroups.put(index, overallLastGroup);
 				}
 			}
-			catch(final Exception ignored){}
+			catch(final RuntimeException ignored){}
 		}
 		return overallLastGroups;
 	}

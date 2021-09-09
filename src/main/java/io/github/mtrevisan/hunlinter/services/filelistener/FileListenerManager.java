@@ -95,8 +95,8 @@ public class FileListenerManager implements FileListener, Runnable{
 		try{
 			return FILE_SYSTEM_DEFAULT.newWatchService();
 		}
-		catch(final IOException e){
-			throw new RuntimeException("Exception while creating watch service", e);
+		catch(final IOException ioe){
+			throw new RuntimeException("Exception while creating watch service", ioe);
 		}
 	}
 
@@ -159,8 +159,8 @@ public class FileListenerManager implements FileListener, Runnable{
 
 			watchKeyToDirPath.put(key, dir);
 		}
-		catch(final IOException e){
-			LOGGER.error("Exception while watching {}", dir, e);
+		catch(final IOException ioe){
+			LOGGER.error("Exception while watching {}", dir, ioe);
 		}
 	}
 

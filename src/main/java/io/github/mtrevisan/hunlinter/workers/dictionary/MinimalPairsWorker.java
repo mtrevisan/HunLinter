@@ -46,7 +46,9 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -169,8 +171,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			for(final String line : list)
 				writeLine(writer, line, NEW_LINE);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 
@@ -214,7 +216,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 						}
 					}
 				}
-				catch(final Exception ignored){
+				catch(final IOException ignored){
 					//FIXME
 					//length varied, consider another line for minimal pair search
 				}
@@ -226,8 +228,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 		return minimalPairs;
 	}
@@ -250,8 +252,8 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				sleepOnPause();
 			}
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 

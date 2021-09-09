@@ -32,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.IOException;
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -93,7 +93,7 @@ public class ConversionTable{
 			for(final List<Pair<String, String>> list : table.values())
 				list.sort(Comparator.comparingInt((Pair<String, String> e) -> e.getKey().length()).reversed());
 		}
-		catch(final IOException e){
+		catch(final EOFException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}

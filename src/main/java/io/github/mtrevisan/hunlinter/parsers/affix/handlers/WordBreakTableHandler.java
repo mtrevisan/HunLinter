@@ -67,8 +67,8 @@ public class WordBreakTableHandler implements Handler{
 
 			return numEntries;
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e.getMessage());
+		catch(final EOFException ioe){
+			throw new RuntimeException(ioe.getMessage());
 		}
 	}
 

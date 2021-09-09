@@ -78,6 +78,7 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.RecentItems;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.eventbus.events.BusExceptionEvent;
@@ -90,6 +91,7 @@ import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,7 +224,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
-				catch(final Exception ignored){}
+				catch(final IOException | ParseException | VersionException ignored){}
 			});
 	}
 
@@ -719,7 +721,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			//load font for this language
 			loadLanguageDependentFont();
 		}
-		catch(final Exception e){
+		catch(final RuntimeException e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);

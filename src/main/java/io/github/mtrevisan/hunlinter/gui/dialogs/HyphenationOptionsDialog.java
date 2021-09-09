@@ -240,8 +240,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			final int[] selectedRows = noHyphenationList.getSelectedIndices();
 			deleteRows(selectedRows);
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", re.getMessage());
 		}
 	}
 

@@ -46,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -273,8 +274,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 					sleepOnPause();
 				}
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
+			catch(final IOException ioe){
+				throw new RuntimeException(ioe);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());

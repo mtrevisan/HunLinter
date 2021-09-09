@@ -29,12 +29,14 @@ import io.github.mtrevisan.hunlinter.services.eventbus.events.VetoEvent;
 import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -313,7 +315,7 @@ public class BasicEventBus implements EventBusInterface{
 					if(f.get())
 						vetoCalled = true;
 			}
-			catch(final Exception e){
+			catch(final InterruptedException | ExecutionException e){
 				//this only happens if the executorService is interrupted, and by default, that shouldn't
 				//really ever happen; or, if the callable sneaks out an exception, which again shouldn't happen
 				vetoCalled = true;
@@ -338,7 +340,7 @@ public class BasicEventBus implements EventBusInterface{
 				try{
 					executorService.invokeAll(regularHandlers);
 				}
-				catch(final Exception e){
+				catch(final InterruptedException e){
 					e.printStackTrace();
 				}
 			}
@@ -347,7 +349,7 @@ public class BasicEventBus implements EventBusInterface{
 					try{
 						executorService.invokeAll(regularHandlers);
 					}
-					catch(final Exception e){
+					catch(final InterruptedException e){
 						e.printStackTrace();
 					}
 				});
@@ -414,7 +416,7 @@ public class BasicEventBus implements EventBusInterface{
 				m.invoke(subscriber, event);
 				return Boolean.FALSE;
 			}
-			catch(final Exception e){
+			catch(final InterruptedException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
 				Throwable cause = e;
 
 				//find the root cause

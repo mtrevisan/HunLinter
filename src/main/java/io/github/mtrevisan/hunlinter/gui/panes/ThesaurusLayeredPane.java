@@ -280,8 +280,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
             LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      catch(final IOException ioe){
+         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", ioe.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
@@ -310,10 +310,10 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 				updateSynonymsCounter();
 			}
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
-			LOGGER.error("A bad error occurred", e);
+			LOGGER.error("A bad error occurred", re);
 		}
 	}
 
@@ -414,8 +414,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 				addButton.setEnabled(!alreadyContained);
 			}
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		catch(final IOException ioe){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", ioe.getMessage());
 		}
 	}
 
@@ -439,7 +439,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		try{
 			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
 		}
-		catch(final Exception e){
+		catch(final IllegalArgumentException | IOException e){
 			JOptionPane.showMessageDialog(this, "Error while loading Dictionary FSA\n\n"
 				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
 		}

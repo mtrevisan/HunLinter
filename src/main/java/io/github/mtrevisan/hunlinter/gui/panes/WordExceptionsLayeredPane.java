@@ -216,7 +216,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
                JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
-      catch(final Exception e){
+      catch(final TransformerException | HeadlessException e){
          LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed

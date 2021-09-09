@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -85,7 +86,7 @@ public class CompoundRuleHandler implements Handler{
 
 			return numEntries;
 		}
-		catch(final IOException e){
+		catch(final EOFException e){
 			throw new RuntimeException(e.getMessage());
 		}
 	}

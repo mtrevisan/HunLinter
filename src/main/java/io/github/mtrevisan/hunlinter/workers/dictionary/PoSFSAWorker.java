@@ -103,8 +103,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 		try{
 			metadata = readMetadata(affixData, outputFile, charset);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 		final byte separator = metadata.getSeparator();
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType()
@@ -182,8 +182,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 				return outputFile;
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new RuntimeException(ioe.getMessage());
 			}
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);

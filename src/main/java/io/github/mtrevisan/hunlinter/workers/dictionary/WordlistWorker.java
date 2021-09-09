@@ -115,8 +115,8 @@ public class WordlistWorker extends WorkerDictionary{
 				try{
 					ExternalSorter.sort(outputFile, options, outputFile);
 				}
-				catch(final Exception e){
-					throw new RuntimeException(e);
+				catch(final IOException ioe){
+					throw new RuntimeException(ioe);
 				}
 
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
@@ -128,8 +128,8 @@ public class WordlistWorker extends WorkerDictionary{
 			final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
 			setProcessor(step1.andThen(step2).andThen(step3));
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
 		}
 	}
 
