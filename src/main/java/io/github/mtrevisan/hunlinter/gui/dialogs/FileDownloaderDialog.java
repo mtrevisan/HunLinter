@@ -274,7 +274,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 				final String destinationFolder = FilenameUtils.getFullPath(
 					MainFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 				final Path destinationPath = Path.of(
-					(destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
+					(!destinationFolder.isEmpty() && destinationFolder.charAt(0) == '/'? destinationFolder.substring(1): destinationFolder),
 					FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
 				FileHelper.moveFile(fileToMove, destinationPath);
 

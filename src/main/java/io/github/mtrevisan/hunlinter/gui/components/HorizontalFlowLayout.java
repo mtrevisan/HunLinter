@@ -126,7 +126,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 			final int targetWidth = container.getSize().width;
 
 			final Insets insets = target.getInsets();
-			final int horizontalInsetsAndGap = insets.left + insets.right + getHgap() * 2;
+			final int horizontalInsetsAndGap = insets.left + insets.right + (getHgap() << 1);
 			//when the container height is 0, the preferred height of the container has not yet been calculated
 			//so lets ask for the maximum
 			final int maxWidth = (targetWidth > 0? targetWidth - horizontalInsetsAndGap: Integer.MAX_VALUE);
@@ -192,7 +192,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 
 	private void addToDimension(final Dimension dimension, final int addedRowWidth, final Insets insets){
 		dimension.width += addedRowWidth;
-		dimension.height += insets.top + insets.bottom + getVgap() * 2;
+		dimension.height += insets.top + insets.bottom + (getVgap() << 1);
 	}
 
 

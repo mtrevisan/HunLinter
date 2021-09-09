@@ -270,7 +270,7 @@ public class FSABuilder{
 
 	/** Reallocate and rehash the hash set. */
 	private void expandAndRehash(){
-		final int[] newHashSet = new int[hashSet.length * 2];
+		final int[] newHashSet = new int[(hashSet.length << 1)];
 		final int bucketMask = (newHashSet.length - 1);
 		for(final int state : hashSet)
 			if(state > 0){

@@ -177,7 +177,7 @@ public final class TagPanel extends JPanel{
 			textLabel.setFont(currentFont);
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
-			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
+			final Dimension textLabelSize = new Dimension(ps.width + (PAD << 1), ps.height + (PAD << 2));
 			textLabel.setPreferredSize(textLabelSize);
 			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -205,7 +205,7 @@ public final class TagPanel extends JPanel{
 			final JPanel closePanel = new JPanel(new GridLayout());
 			closePanel.setOpaque(false);
 			ps = closeLabel.getPreferredSize();
-			final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
+			final Dimension closePanelSize = new Dimension(ps.width + (PAD << 1), ps.height + (PAD << 2));
 			closePanel.setPreferredSize(closePanelSize);
 			closePanel.add(closeLabel);
 
@@ -218,7 +218,7 @@ public final class TagPanel extends JPanel{
 			super.paintComponent(g);
 
 			final int width = getWidth() - 1;
-			final int height = getHeight() - PAD * 2 - 1;
+			final int height = getHeight() - (PAD << 1) - 1;
 			final Graphics2D graphics = (Graphics2D)g;
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

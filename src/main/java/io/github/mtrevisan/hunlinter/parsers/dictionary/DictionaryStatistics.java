@@ -183,6 +183,7 @@ public class DictionaryStatistics implements Closeable{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	public final List<String> getMostCommonSyllabes(final int size){
 		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
 		final List<String> list = new ArrayList<>(values.size());

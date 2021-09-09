@@ -468,6 +468,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesValueLabel.setEnabled(true);
 	}
 
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	private String formatFrequencyVariableDecimals(final double x){
 		return String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
 	}
@@ -619,6 +620,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);

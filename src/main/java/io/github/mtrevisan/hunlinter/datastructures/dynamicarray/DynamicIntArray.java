@@ -119,14 +119,13 @@ public class DynamicIntArray implements RandomAccess{
 					// The new SuperBlock will have the same MaxNumberOfDataBlocks as the old one,
 					// but twice the MaxNumberOfElementsPerBlock.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks,
-						lastSuperBlock.maxNumberOfElementsPerBlock * 2, 0);
+					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock << 1, 0);
 				else
 					// If the number of the current full lastSuperBlock is not even,
 					// The new SuperBlock will have the same MaxNumberOfElementsPerBlock as the old one,
 					// but twice the MaxNumberOfDataBlocks.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks * 2,
+					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks << 1,
 						lastSuperBlock.maxNumberOfElementsPerBlock, 0);
 			}
 
@@ -258,7 +257,7 @@ public class DynamicIntArray implements RandomAccess{
 	 * Create a new `blocks` and copy the Blocks from the old one to this new array.
 	 */
 	private void expandArray(){
-		final IntBlock[] newBlocks = new IntBlock[blocks.length * 2];
+		final IntBlock[] newBlocks = new IntBlock[(blocks.length << 1)];
 		if(sizeOfBlocks >= 0)
 			System.arraycopy(blocks, 0, newBlocks, 0, sizeOfBlocks);
 		blocks = newBlocks;

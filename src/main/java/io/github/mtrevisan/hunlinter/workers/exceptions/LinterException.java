@@ -56,19 +56,19 @@ public class LinterException extends RuntimeException{
 		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public LinterException withIndexDataPair(final IndexDataPair<?> data){
+	public final LinterException withIndexDataPair(final IndexDataPair<?> data){
 		this.data = data;
 
 		return this;
 	}
 
-	public LinterException withData(final Object data){
+	public final LinterException withData(final Object data){
 		this.data = IndexDataPair.of(-1, data);
 
 		return this;
 	}
 
-	public LinterException withFixAction(final Runnable fixAction, final FixActionType fixActionType){
+	public final LinterException withFixAction(final Runnable fixAction, final FixActionType fixActionType){
 		this.fixAction = fixAction;
 		this.fixActionType = fixActionType;
 

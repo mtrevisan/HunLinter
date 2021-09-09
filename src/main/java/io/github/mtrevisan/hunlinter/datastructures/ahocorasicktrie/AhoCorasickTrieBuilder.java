@@ -24,8 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
+
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,20 +91,20 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	}
 
 	/**
-	 * Fetch siblings of a parent node
+	 * Fetch siblings of a parent node.
 	 *
-	 * @param parent	Parent node
-	 * @param siblings	Parent node's child nodes, i.e. the siblings
-	 * @return	The amount of the siblings
+	 * @param parent	Parent node.
+	 * @param siblings	Parent node's child nodes, i.e. the siblings.
+	 * @return	The amount of the siblings.
 	 */
-	private int fetch(final RadixTrieNode parent, final Collection<Map.Entry<Integer, RadixTrieNode>> siblings){
+	private int fetch(final RadixTrieNode parent, final Collection<IndexDataPair<RadixTrieNode>> siblings){
 		if(parent.isAcceptable()){
 			final RadixTrieNode fakeNode = new RadixTrieNode(-parent.getDepth() - 1);
 			fakeNode.addChildrenId(parent.getLargestChildrenId());
-			siblings.add(new AbstractMap.SimpleEntry<>(0, fakeNode));
+			siblings.add(IndexDataPair.of(0, fakeNode));
 		}
 		for(final Map.Entry<Character, RadixTrieNode> entry : parent.getSuccess().entrySet())
-			siblings.add(new AbstractMap.SimpleEntry<>(entry.getKey() + 1, entry.getValue()));
+			siblings.add(IndexDataPair.of(entry.getKey() + 1, entry.getValue()));
 		return siblings.size();
 	}
 
@@ -188,7 +189,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		int totalKeysLen = 0;
 		for(int i = 0; i < trie.keyLength.length; i ++)
 			totalKeysLen += trie.keyLength[i];
-		final int newSize = 65_536 + totalKeysLen * 2 + 1;
+		final int newSize = 65_536 + (totalKeysLen << 1) + 1;
 		trie.check = new int[newSize];
 		trie.base = new int[newSize];
 		used = new boolean[newSize];
@@ -197,7 +198,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 		trie.base[0] = 1;
 		nextCheckPos = 0;
 
-		final List<Map.Entry<Integer, RadixTrieNode>> siblings = new ArrayList<>(rootNode.getSuccess().entrySet().size());
+		final List<IndexDataPair<RadixTrieNode>> siblings = new ArrayList<>(rootNode.getSuccess().entrySet().size());
 		fetch(rootNode, siblings);
 		insert(siblings);
 	}
@@ -216,10 +217,10 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	 * @param siblings	The siblings being inserted
 	 * @return	The position to insert them
 	 */
-	private int insert(final List<Map.Entry<Integer, RadixTrieNode>> siblings){
+	private int insert(final List<IndexDataPair<RadixTrieNode>> siblings){
 		int begin = 0;
 		if(!siblings.isEmpty()){
-			int pos = Math.max(siblings.get(0).getKey() + 1, nextCheckPos) - 1;
+			int pos = Math.max(siblings.get(0).getIndex() + 1, nextCheckPos) - 1;
 			int nonZeroNum = 0;
 			int first = 0;
 
@@ -245,8 +246,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				}
 
 				//the distance of the current position from the first sibling node
-				begin = pos - siblings.get(0).getKey();
-				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getKey())){
+				begin = pos - siblings.get(0).getIndex();
+				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getIndex())){
 					//prevent progress from generating zero divide errors
 					final double l = Math.max(1.05, (double) keySize / (memoryGrowthRate + 1));
 					resize((int)(allocSize * l));
@@ -256,7 +257,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 					continue;
 
 				for(int i = 1; i < siblings.size(); i ++)
-					if(trie.check[begin + siblings.get(i).getKey()] != 0)
+					if(trie.check[begin + siblings.get(i).getIndex()] != 0)
 						continue outer;
 
 				break;
@@ -271,25 +272,25 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				nextCheckPos = pos;
 			used[begin] = true;
 
-			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings)
-				trie.check[begin + sibling.getKey()] = begin;
+			for(final IndexDataPair<RadixTrieNode> sibling : siblings)
+				trie.check[begin + sibling.getIndex()] = begin;
 
-			final ArrayList<Map.Entry<Integer, RadixTrieNode>> newSiblings = new ArrayList<>(0);
-			for(final Map.Entry<Integer, RadixTrieNode> sibling : siblings){
+			final ArrayList<IndexDataPair<RadixTrieNode>> newSiblings = new ArrayList<>(0);
+			for(final IndexDataPair<RadixTrieNode> sibling : siblings){
 				newSiblings.clear();
-				newSiblings.ensureCapacity(sibling.getValue().getSuccess().entrySet().size() + 1);
+				newSiblings.ensureCapacity(sibling.getData().getSuccess().entrySet().size() + 1);
 
 				//the termination of a word and not the prefix of other words, in fact, is the leaf node
-				if(fetch(sibling.getValue(), newSiblings) == 0){
-					trie.base[begin + sibling.getKey()] = -sibling.getValue().getLargestChildrenId() - 1;
+				if(fetch(sibling.getData(), newSiblings) == 0){
+					trie.base[begin + sibling.getIndex()] = -sibling.getData().getLargestChildrenId() - 1;
 					memoryGrowthRate++;
 				}
 				else{
 					//DFS
 					final int h = insert(newSiblings);
-					trie.base[begin + sibling.getKey()] = h;
+					trie.base[begin + sibling.getIndex()] = h;
 				}
-				sibling.getValue().setId(begin + sibling.getKey());
+				sibling.getData().setId(begin + sibling.getIndex());
 			}
 		}
 		return begin;

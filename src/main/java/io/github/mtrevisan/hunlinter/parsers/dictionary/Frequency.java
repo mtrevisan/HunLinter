@@ -184,6 +184,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @return a string representation.
 	 */
 	@Override
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	public final String toString(){
 		final StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
 		for(final T value : frequencies.keySet())

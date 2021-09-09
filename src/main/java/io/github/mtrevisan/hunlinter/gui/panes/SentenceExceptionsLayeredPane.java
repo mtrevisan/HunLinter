@@ -260,8 +260,8 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
-		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && unmodifiedException.endsWith(".")
-			&& !alreadyContained);
+		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException) && !unmodifiedException.isEmpty()
+			&& unmodifiedException.charAt(unmodifiedException.length() - 1) == '.' && !alreadyContained);
 
 
 		tagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);

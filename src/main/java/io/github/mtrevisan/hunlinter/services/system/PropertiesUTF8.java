@@ -223,7 +223,7 @@ public class PropertiesUTF8 extends Properties{
 	 */
 	private String storeConversion(final CharSequence line){
 		final int length = line.length();
-		final StringBuilder sb = new StringBuilder(length * 2);
+		final StringBuilder sb = new StringBuilder(length << 1);
 		for(int i = 0; i < length; i ++){
 			final char currentChar = line.charAt(i);
 			switch(currentChar){

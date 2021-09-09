@@ -89,6 +89,7 @@ public final class TimeWatch{
 		return (end > 0l? time(TimeUnit.MILLISECONDS) + SPACE + MILLIS: TIMER_NOT_STOPPED);
 	}
 
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	public String toStringMicros(final int runs){
 		if(end < 0l)
 			return TIMER_NOT_STOPPED;

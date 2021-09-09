@@ -47,7 +47,7 @@ public class LinterWarning extends Exception{
 		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public LinterWarning withIndexDataPair(final IndexDataPair<?> data){
+	public final LinterWarning withIndexDataPair(final IndexDataPair<?> data){
 		this.data = data;
 
 		return this;

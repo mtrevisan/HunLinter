@@ -76,8 +76,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	/**
 	 * Perform a search and return all the entries that are contained into the given text.
 	 *
-	 * @param text	The text
-	 * @return	A list of outputs
+	 * @param text	The text.
+	 * @return	A list of outputs.
 	 */
 	public final List<SearchResult<V>> searchInText(final String text){
 		final ArrayList<SearchResult<V>> collectedHits = new ArrayList<>();
@@ -95,8 +95,8 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	/**
 	 * Perform a search and call the processor for each entry that are contained into the given text.
 	 *
-	 * @param text	The text
-	 * @param processor	A processor which handles the output
+	 * @param text	The text.
+	 * @param processor	A processor which handles the output.
 	 */
 	public final void searchInText(final String text, final HitProcessor<V> processor){
 		Objects.requireNonNull(processor, "Processor cannot be null");
@@ -114,20 +114,20 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Checks if the text contains at least one substring
+	 * Checks if the text contains at least one substring.
 	 *
-	 * @param text	Source text to check
-	 * @return	{@code true} if string contains at least one substring
+	 * @param text	Source text to check.
+	 * @return	{@code true} if string contains at least one substring.
 	 */
 	public final boolean containsKey(final String text){
 		return searchInText(text, (hits, index) -> Boolean.FALSE);
 	}
 
 	/**
-	 * Search text
+	 * Search text.
 	 *
-	 * @param text	The text
-	 * @param hitConsumer	The consumer called in case of a hit
+	 * @param text	The text.
+	 * @param hitConsumer	The consumer called in case of a hit.
 	 */
 	private boolean searchInText(final String text, final BiFunction<int[], Integer, Boolean> hitConsumer){
 		Objects.requireNonNull(text, "Text cannot be null");
@@ -170,11 +170,11 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Update a value corresponding to a key
+	 * Update a value corresponding to a key.
 	 *
-	 * @param key	The key
-	 * @param value	The value
-	 * @return	successful or not（failure if there is no key）
+	 * @param key	The key.
+	 * @param value	The value.
+	 * @return	successful or not（failure if there is no key）.
 	 */
 	public final boolean set(final String key, final V value){
 		final int id = exactMatchSearch(key);
@@ -195,17 +195,17 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Match exactly by a key
+	 * Match exactly by a key.
 	 *
-	 * @param key	The key
-	 * @return	The id of the key (you can use it as a perfect hash function)
+	 * @param key	The key.
+	 * @return	The id of the key (you can use it as a perfect hash function).
 	 */
 	private int exactMatchSearch(final String key){
 		return exactMatchSearch(key, 0, 0, ROOT_NODE_ID);
 	}
 
 	/**
-	 * Match exactly by a key
+	 * Match exactly by a key.
 	 *
 	 * @param key	The key.
 	 * @param position	The starting index of char array.
