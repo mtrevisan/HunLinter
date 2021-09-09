@@ -96,13 +96,15 @@ public class FileListenerManager implements FileListener, Runnable{
 			return FILE_SYSTEM_DEFAULT.newWatchService();
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException("Exception while creating watch service", ioe);
+			LOGGER.warn("Exception while creating watch service", ioe);
+
+			return null;
 		}
 	}
 
 	@Override
 	public final void start(){
-		if(running.compareAndSet(false, true))
+		if(watcher != null && running.compareAndSet(false, true))
 			watcherTask = EXECUTOR.submit(this);
 	}
 
@@ -127,21 +129,23 @@ public class FileListenerManager implements FileListener, Runnable{
 	public final void register(final FileChangeListener listener, final String... patterns){
 		Objects.requireNonNull(listener, "Listener cannot be null");
 
-		for(final String pattern : patterns){
-			final Path dir = (new File(pattern)).getParentFile()
-				.toPath();
-			if(!dir.toFile().exists())
-				LOGGER.warn("File or folder '{}' doesn't exists", dir);
-			else{
-				if(!dirPathToListeners.containsKey(dir))
-					addWatchKeyToDir(dir);
+		if(watcher != null){
+			for(final String pattern : patterns){
+				final Path dir = (new File(pattern)).getParentFile()
+					.toPath();
+				if(!dir.toFile().exists())
+					LOGGER.warn("File or folder '{}' doesn't exists", dir);
+				else{
+					if(!dirPathToListeners.containsKey(dir))
+						addWatchKeyToDir(dir);
 
-				dirPathToListeners.computeIfAbsent(dir, key -> SetHelper.newConcurrentSet())
-					.add(listener);
+					dirPathToListeners.computeIfAbsent(dir, key -> SetHelper.newConcurrentSet())
+						.add(listener);
+				}
 			}
-		}
 
-		addFilePatterns(listener, patterns);
+			addFilePatterns(listener, patterns);
+		}
 	}
 
 	@Override
@@ -184,6 +188,9 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	@Override
 	public final void run(){
+		if(watcher == null)
+			return;
+
 		while(!Thread.interrupted()){
 			try{
 				final WatchKey key = watcher.take();

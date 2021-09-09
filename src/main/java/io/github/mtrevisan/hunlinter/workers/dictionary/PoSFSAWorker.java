@@ -40,6 +40,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.enums.InflectionTag;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.enums.PartOfSpeechTag;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
@@ -104,7 +105,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			metadata = readMetadata(affixData, outputFile, charset);
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WorkerException(ioe);
 		}
 		final byte separator = metadata.getSeparator();
 		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType()
@@ -183,7 +184,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 				return outputFile;
 			}
 			catch(final IOException ioe){
-				throw new RuntimeException(ioe.getMessage());
+				throw new WorkerException(ioe.getMessage());
 			}
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);

@@ -54,13 +54,10 @@ public class CompoundRuleHandler implements Handler{
 
 	@Override
 	public final int parse(final ParsingContext context, final AffixData affixData){
-		try{
-			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
-			final int numEntries = checkValidity(context);
-
-			final Scanner scanner = context.getScanner();
-
+		final int numEntries = checkValidity(context);
+		try(final Scanner scanner = context.getScanner()){
 			final Set<String> compoundRules = new HashSet<>(numEntries);
 			for(int i = 0; i < numEntries; i ++){
 				ParserHelper.assertNotEOF(scanner);

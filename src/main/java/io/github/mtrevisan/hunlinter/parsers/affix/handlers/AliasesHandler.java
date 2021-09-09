@@ -48,8 +48,7 @@ public class AliasesHandler implements Handler{
 
 	@Override
 	public final int parse(final ParsingContext context, final AffixData affixData){
-		try{
-			final Scanner scanner = context.getScanner();
+		try(final Scanner scanner = context.getScanner()){
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());

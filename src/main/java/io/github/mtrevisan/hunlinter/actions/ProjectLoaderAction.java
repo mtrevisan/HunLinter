@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.LanguageChooserDialog;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
@@ -123,7 +124,7 @@ public class ProjectLoaderAction extends AbstractAction{
 			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
 				worker.cancel();
 
-				throw new RuntimeException(e);
+				throw new WorkerException(e);
 			}
 		}, completed, cancelled);
 	}

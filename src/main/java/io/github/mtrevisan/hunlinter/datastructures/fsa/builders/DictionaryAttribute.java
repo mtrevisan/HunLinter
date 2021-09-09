@@ -321,7 +321,7 @@ public enum DictionaryAttribute{
 	static{
 		for(final DictionaryAttribute attr : values())
 			if(ATTRS_BY_PROPERTY_NAME.put(attr.propertyName, attr) != null)
-				throw new RuntimeException("Duplicate property key for: " + attr);
+				throw new Error("Duplicate property key for: " + attr);
 	}
 
 	/** Private enum instance constructor. */

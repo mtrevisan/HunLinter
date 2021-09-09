@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -34,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -53,8 +53,7 @@ public class WordBreakTableHandler implements Handler{
 
 	@Override
 	public final int parse(final ParsingContext context, final AffixData affixData){
-		try{
-			final Scanner scanner = context.getScanner();
+		try(final Scanner scanner = context.getScanner()){
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -68,7 +67,7 @@ public class WordBreakTableHandler implements Handler{
 			return numEntries;
 		}
 		catch(final EOFException ioe){
-			throw new RuntimeException(ioe.getMessage());
+			throw new ParserException(ioe.getMessage());
 		}
 	}
 

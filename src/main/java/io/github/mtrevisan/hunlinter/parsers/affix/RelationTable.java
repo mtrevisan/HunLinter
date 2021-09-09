@@ -60,8 +60,7 @@ public class RelationTable{
 	}
 
 	public final void parse(final ParsingContext context){
-		try{
-			final Scanner scanner = context.getScanner();
+		try(final Scanner scanner = context.getScanner()){
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());

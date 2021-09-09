@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.RegExUtils;
@@ -67,8 +68,7 @@ public class ConversionTable{
 	}
 
 	public final void parse(final ParsingContext context){
-		try{
-			final Scanner scanner = context.getScanner();
+		try(final Scanner scanner = context.getScanner()){
 			if(!NumberUtils.isCreatable(context.getFirstParameter()))
 				throw new LinterException(BAD_FIRST_PARAMETER, context);
 			final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -94,7 +94,7 @@ public class ConversionTable{
 				list.sort(Comparator.comparingInt((Pair<String, String> e) -> e.getKey().length()).reversed());
 		}
 		catch(final EOFException e){
-			throw new RuntimeException(e.getMessage());
+			throw new ParserException(e.getMessage());
 		}
 	}
 
