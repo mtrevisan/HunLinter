@@ -27,9 +27,9 @@ package io.github.mtrevisan.hunlinter.services.text;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -178,7 +178,7 @@ public class SmithWatermanAlignment{
 
 	private Deque<IndexDataPair<Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>();
+		final Deque<IndexDataPair<Integer>> maxScores = new LinkedList<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
@@ -190,7 +190,7 @@ public class SmithWatermanAlignment{
 		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
-		trace.operations = new ArrayDeque<>();
+		trace.operations = new LinkedList<>();
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){

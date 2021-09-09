@@ -30,7 +30,6 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -39,7 +38,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -275,6 +273,7 @@ public class AffixEntry{
 			: canApplyToSuffix(word));
 	}
 
+	@SuppressWarnings("IfStatementMissingBreakInLoop")
 	private boolean canApplyToPrefix(final String word){
 		if(word.startsWith(condition))
 			return true;
@@ -302,6 +301,7 @@ public class AffixEntry{
 		return (j >= cond.length);
 	}
 
+	@SuppressWarnings("IfStatementMissingBreakInLoop")
 	private boolean canApplyToSuffix(final String word){
 		if(word.endsWith(condition))
 			return true;
@@ -356,12 +356,12 @@ public class AffixEntry{
 		Objects.requireNonNull(strategy, "Strategy cannot be null");
 
 		final StringBuilder sb = new StringBuilder();
-		if(continuationFlags != null && !continuationFlags.isEmpty()){
-			sb.append(SLASH);
-			sb.append(strategy.joinFlags(continuationFlags));
-		}
+		if(continuationFlags != null && !continuationFlags.isEmpty())
+			sb.append(SLASH)
+				.append(strategy.joinFlags(continuationFlags));
 		if(morphologicalFields != null && morphologicalFields.length > 0)
-			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
+			sb.append(TAB)
+				.append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
 	}
 

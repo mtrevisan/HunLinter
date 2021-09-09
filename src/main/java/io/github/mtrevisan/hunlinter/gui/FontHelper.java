@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.FutureTask;
@@ -170,7 +170,7 @@ public final class FontHelper{
 	}
 
 	private static void updateComponent(final Component component, final Font font){
-		final Deque<Component> stack = new ArrayDeque<>();
+		final Deque<Component> stack = new LinkedList<>();
 		stack.push(component);
 		while(!stack.isEmpty()){
 			final Component comp = stack.pop();

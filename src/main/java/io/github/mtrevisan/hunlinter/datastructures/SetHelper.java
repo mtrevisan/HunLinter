@@ -257,10 +257,10 @@ public final class SetHelper{
 				.add(entry);
 	}
 
-	public static <K, V> List<V> collect(final Iterable<V> entries, final Function<V, K> keyMapper,
+	public static <K, V> List<V> collect(final Collection<V> entries, final Function<V, K> keyMapper,
 			final BiConsumer<V, V> mergeFunction){
 		//NOTE: cannot force initial capacity to zero because... who knows why java fuck it up...
-		final Map<K, V> compaction = new HashMap<>();
+		final Map<K, V> compaction = new HashMap<>(entries.size());
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
 			final V rule = compaction.putIfAbsent(key, entry);

@@ -10,11 +10,11 @@ import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Deque;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 
@@ -190,7 +190,7 @@ public class FSASerializer implements FSASerializerInterface{
 		int last = 0;
 
 		final BitSet visited = new BitSet();
-		final Deque<Integer> nodes = new ArrayDeque<>();
+		final Deque<Integer> nodes = new LinkedList<>();
 		nodes.push(fsa.getRootNode());
 
 		while(!nodes.isEmpty()){
