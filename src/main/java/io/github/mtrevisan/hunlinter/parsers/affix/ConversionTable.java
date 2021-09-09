@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.RegExUtils;
@@ -67,35 +66,31 @@ public class ConversionTable{
 		this.affixOption = affixOption;
 	}
 
-	public final void parse(final ParsingContext context){
-		try(final Scanner scanner = context.getScanner()){
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER, context);
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
+	public final void parse(final ParsingContext context) throws EOFException{
+		final Scanner scanner = context.getScanner();
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
-			table = new HashMap<>(4);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		table = new HashMap<>(4);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				final String line = scanner.nextLine();
-				final String[] parts = StringUtils.split(line);
+			final String line = scanner.nextLine();
+			final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context);
+			checkValidity(parts, context);
 
-				final String key = reduceKey(parts[1]);
-				table.computeIfAbsent(key, k -> new ArrayList<>(1))
-					.add(Pair.of(parts[1], parts[2]));
-			}
-
-			//sort substitutions by length
-			for(final List<Pair<String, String>> list : table.values())
-				list.sort(Comparator.comparingInt((Pair<String, String> e) -> e.getKey().length()).reversed());
+			final String key = reduceKey(parts[1]);
+			table.computeIfAbsent(key, k -> new ArrayList<>(1))
+				.add(Pair.of(parts[1], parts[2]));
 		}
-		catch(final EOFException e){
-			throw new ParserException(e.getMessage());
-		}
+
+		//sort substitutions by length
+		for(final List<Pair<String, String>> list : table.values())
+			list.sort(Comparator.comparingInt((Pair<String, String> e) -> e.getKey().length()).reversed());
 	}
 
 	private void checkValidity(final String[] parts, final ParsingContext context){

@@ -29,6 +29,8 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ConversionTable;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 
+import java.io.EOFException;
+
 
 public class ConversionTableHandler implements Handler{
 
@@ -40,7 +42,7 @@ public class ConversionTableHandler implements Handler{
 	}
 
 	@Override
-	public final int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
 		final ConversionTable table = new ConversionTable(affixOption);
 		table.parse(context);
 

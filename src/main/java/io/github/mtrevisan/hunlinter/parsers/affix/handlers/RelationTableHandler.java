@@ -29,6 +29,8 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.RelationTable;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 
+import java.io.EOFException;
+
 
 public class RelationTableHandler implements Handler{
 
@@ -40,7 +42,7 @@ public class RelationTableHandler implements Handler{
 	}
 
 	@Override
-	public final int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
 		final RelationTable table = new RelationTable(affixOption);
 		table.parse(context);
 

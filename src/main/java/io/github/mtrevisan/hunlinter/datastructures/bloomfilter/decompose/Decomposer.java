@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter.decompose;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 
@@ -42,6 +43,6 @@ public interface Decomposer<T>{
 	 * @param sink	The sink to which the object is decomposed
 	 * @param charset	The charset to be used
 	 */
-	void decompose(final T object, final ByteSink sink, final Charset charset);
+	void decompose(final T object, final ByteSink sink, final Charset charset) throws IOException;
 
 }

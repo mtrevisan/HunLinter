@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -52,23 +51,19 @@ public class WordBreakTableHandler implements Handler{
 
 
 	@Override
-	public final int parse(final ParsingContext context, final AffixData affixData){
-		try(final Scanner scanner = context.getScanner()){
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER, context);
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
+		final Scanner scanner = context.getScanner();
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
-			final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
+		final Set<String> wordBreakCharacters = readCharacters(scanner, numEntries);
 
-			affixData.addData(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
+		affixData.addData(AffixOption.WORD_BREAK_CHARACTERS.getCode(), wordBreakCharacters);
 
-			return numEntries;
-		}
-		catch(final EOFException ioe){
-			throw new ParserException(ioe.getMessage());
-		}
+		return numEntries;
 	}
 
 	private static Set<String> readCharacters(final Scanner scanner, final int numEntries) throws EOFException{

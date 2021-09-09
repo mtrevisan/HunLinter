@@ -234,10 +234,10 @@ public class BasicEventBus implements EventBusInterface{
 		try{
 			queue.put(event);
 		}
-		catch(final InterruptedException e){
-			e.printStackTrace();
+		catch(final InterruptedException ie){
+			ie.printStackTrace();
 
-			throw new RuntimeException(e);
+			throw new Error("Error using event bus", ie);
 		}
 	}
 
@@ -271,10 +271,10 @@ public class BasicEventBus implements EventBusInterface{
 				while(true)
 					notifySubscribers(queue.take());
 			}
-			catch(final InterruptedException e){
-				e.printStackTrace();
+			catch(final InterruptedException ie){
+				ie.printStackTrace();
 
-				throw new RuntimeException(e);
+				throw new Error("Error using event bus", ie);
 			}
 		}
 
@@ -369,10 +369,10 @@ public class BasicEventBus implements EventBusInterface{
 						handlers.remove(info);
 				}
 			}
-			catch(final InterruptedException e){
-				e.printStackTrace();
+			catch(final InterruptedException ie){
+				ie.printStackTrace();
 
-				throw new RuntimeException(e);
+				throw new Error("Error using event bus", ie);
 			}
 		}
 	}

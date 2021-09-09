@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -53,39 +52,35 @@ public class CompoundRuleHandler implements Handler{
 
 
 	@Override
-	public final int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		final int numEntries = checkValidity(context);
-		try(final Scanner scanner = context.getScanner()){
-			final Set<String> compoundRules = new HashSet<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		final Scanner scanner = context.getScanner();
+		final Set<String> compoundRules = new HashSet<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				final String line = scanner.nextLine();
-				final String[] lineParts = StringUtils.split(line);
+			final String line = scanner.nextLine();
+			final String[] lineParts = StringUtils.split(line);
 
-				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
-				if(option != AffixOption.COMPOUND_RULE)
-					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE, line, AffixOption.COMPOUND_RULE);
+			final AffixOption option = AffixOption.createFromCode(lineParts[0]);
+			if(option != AffixOption.COMPOUND_RULE)
+				throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE, line, AffixOption.COMPOUND_RULE);
 
-				final String rule = lineParts[1];
+			final String rule = lineParts[1];
 
-				checkRuleValidity(rule, line, strategy);
+			checkRuleValidity(rule, line, strategy);
 
-				final boolean inserted = compoundRules.add(rule);
-				if(!inserted)
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE, line)
-						.withIndex(context.getIndex() + i));
-			}
-
-			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
-
-			return numEntries;
+			final boolean inserted = compoundRules.add(rule);
+			if(!inserted)
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, line)
+					.withIndex(context.getIndex() + i));
 		}
-		catch(final EOFException e){
-			throw new ParserException(e.getMessage());
-		}
+
+		affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
+
+		return numEntries;
 	}
 
 	private static int checkValidity(final ParsingContext context){

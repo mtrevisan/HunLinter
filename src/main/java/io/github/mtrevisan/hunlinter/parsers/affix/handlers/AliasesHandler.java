@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -47,33 +46,29 @@ public class AliasesHandler implements Handler{
 
 
 	@Override
-	public final int parse(final ParsingContext context, final AffixData affixData){
-		try(final Scanner scanner = context.getScanner()){
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER, context);
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
+		final Scanner scanner = context.getScanner();
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
-			final List<String> aliases = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		final List<String> aliases = new ArrayList<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				final String line = scanner.nextLine();
-				final String[] parts = StringUtils.split(line);
+			final String line = scanner.nextLine();
+			final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context);
+			checkValidity(parts, context);
 
-				aliases.add(parts[1]);
-			}
-
-			affixData.addData(context.getRuleType(), aliases);
-
-			return numEntries;
+			aliases.add(parts[1]);
 		}
-		catch(final LinterException | NumberFormatException | EOFException e){
-			throw new ParserException(e.getMessage());
-		}
+
+		affixData.addData(context.getRuleType(), aliases);
+
+		return numEntries;
 	}
 
 	private static void checkValidity(final String[] parts, final ParsingContext context){

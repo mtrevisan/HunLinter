@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter.decompose;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 
@@ -41,7 +42,7 @@ public class DefaultDecomposer<T> implements Decomposer<T>{
 	 * Decompose the object
 	 */
 	@Override
-	public final void decompose(final T object, final ByteSink sink, final Charset charset){
+	public final void decompose(final T object, final ByteSink sink, final Charset charset) throws IOException{
 		if(object != null){
 			final byte[] bytes;
 			if(String.class.isAssignableFrom(object.getClass()))

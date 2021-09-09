@@ -30,6 +30,8 @@ import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
@@ -46,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -172,7 +173,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				writeLine(writer, line, NEW_LINE);
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WriterException(ioe);
 		}
 	}
 
@@ -229,7 +230,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WorkerException(ioe);
 		}
 		return minimalPairs;
 	}
@@ -253,7 +254,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WorkerException(ioe);
 		}
 	}
 

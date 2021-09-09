@@ -27,9 +27,11 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 
+import java.io.EOFException;
+
 
 public interface Handler{
 
-	int parse(final ParsingContext context, final AffixData affixData);
+	int parse(final ParsingContext context, final AffixData affixData) throws EOFException;
 
 }

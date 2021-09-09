@@ -25,14 +25,13 @@
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.GUIException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.io.IOException;
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -59,34 +58,30 @@ public class RelationTable{
 		this.affixOption = affixOption;
 	}
 
-	public final void parse(final ParsingContext context){
-		try(final Scanner scanner = context.getScanner()){
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER, context);
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
+	public final void parse(final ParsingContext context) throws EOFException{
+		final Scanner scanner = context.getScanner();
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
-			table = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		table = new ArrayList<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				final String line = scanner.nextLine();
-				final String[] parts = StringUtils.split(line);
+			final String line = scanner.nextLine();
+			final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context);
+			checkValidity(parts, context);
 
-				final String[] substitutions = RegexHelper.split(parts[1], PATTERN);
-				for(int j = 0; j < substitutions.length; j ++){
-					final String substitution = substitutions[j];
-					if(substitution.length() > 1)
-						substitutions[j] = substitution.substring(1, substitution.length() - 1);
-				}
-				table.add(substitutions);
+			final String[] substitutions = RegexHelper.split(parts[1], PATTERN);
+			for(int j = 0; j < substitutions.length; j ++){
+				final String substitution = substitutions[j];
+				if(substitution.length() > 1)
+					substitutions[j] = substitution.substring(1, substitution.length() - 1);
 			}
-		}
-		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
-			throw new GUIException(ioe.getMessage());
+			table.add(substitutions);
 		}
 	}
 

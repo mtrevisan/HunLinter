@@ -272,7 +272,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param value	The value to be decomposed
 	 * @return the decomposed byte array
 	 */
-	private byte[] decomposeValue(final T value){
+	private byte[] decomposeValue(final T value) throws IOException{
 		final ByteSink sink = new ByteSink();
 		Objects.requireNonNullElse(decomposer, decomposerDefault)
 			.decompose(value, sink, charset);
@@ -282,7 +282,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	//Overridden helper functions follow
 	@Override
 	public final boolean add(final T value){
-		return (value != null && add(decomposeValue(value)));
+		try{
+			return (value != null && add(decomposeValue(value)));
+		}
+		catch(final IOException ignored){}
+		return false;
 	}
 
 	@Override

@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
@@ -91,7 +92,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				MetadataBuilder.createWordlistInfo(affixData, "none", metadataPath, charset);
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WorkerException("Cannot create metadata file", ioe);
 		}
 
 
@@ -171,7 +172,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				return outputFile;
 			}
 			catch(final IOException ioe){
-				throw new RuntimeException(ioe.getMessage());
+				throw new WorkerException(ioe.getMessage());
 			}
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);

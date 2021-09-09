@@ -85,32 +85,32 @@ public class AffixHandler implements Handler{
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getThirdParameter());
 
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);
-		try(final Scanner scanner = context.getScanner()){
-			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
-			final String parentFlag = context.getFirstParameter();
+		final Scanner scanner = context.getScanner();
+		final AffixType parentType = AffixType.createFromCode(context.getRuleType());
+		final String parentFlag = context.getFirstParameter();
 
-			//List<AffixEntry> prefixEntries = new ArrayList<>();
-			//List<AffixEntry> suffixEntries = new ArrayList<>();
-			final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
-			final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
-			String line;
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		//List<AffixEntry> prefixEntries = new ArrayList<>();
+		//List<AffixEntry> suffixEntries = new ArrayList<>();
+		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
+		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
+		String line;
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				line = scanner.nextLine();
-				final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
-					aliasesMorphologicalField);
-				entry.setParent(parent);
-
-
-				checkValidity(parentType, parentFlag, context, entry);
+			line = scanner.nextLine();
+			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
+				aliasesMorphologicalField);
+			entry.setParent(parent);
 
 
-				if(entries.contains(entry))
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE, entry.toString())
-						.withIndex(context.getIndex() + i));
-				else
-					entries.add(entry);
+			checkValidity(parentType, parentFlag, context, entry);
+
+
+			if(entries.contains(entry))
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, entry.toString())
+					.withIndex(context.getIndex() + i));
+			else
+				entries.add(entry);
 
 //String regexToMatch = (entry.getMatch() != null? entry.getMatch().pattern().pattern().replaceFirst("^\\^", StringUtils.EMPTY).replaceFirst("\\$$", StringUtils.EMPTY): ".");
 //String[] arr = RegExpTrieSequencer.extractCharacters(regexToMatch);
@@ -122,7 +122,6 @@ public class AffixHandler implements Handler{
 //}
 //else
 //	prefixEntries.put(arr, lst);
-			}
 		}
 		return entries;
 	}
