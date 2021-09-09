@@ -84,12 +84,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
-		final ArrayList<List<Inflection>> expandedPermutationEntries = new ArrayList<>(0);
 		outer:
 		for(final List<String> permutation : permutations){
 			//expand permutation
-			expandedPermutationEntries.clear();
-			expandedPermutationEntries.ensureCapacity(permutation.size());
+			final ArrayList<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.size());
 			for(final String flag : permutation){
 				if(!dicEntries.containsKey(flag)){
 					final List<Inflection> dicEntriesPerFlag = new ArrayList<>(0);
