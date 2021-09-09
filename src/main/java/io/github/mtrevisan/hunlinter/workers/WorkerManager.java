@@ -212,7 +212,7 @@ public class WorkerManager{
 	}
 
 
-	private void createWorker(final String workerName, final Supplier<WorkerAbstract<?>> creator,
+	private static void createWorker(final String workerName, final Supplier<WorkerAbstract<?>> creator,
 			final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
 		WorkerAbstract<?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
@@ -224,8 +224,8 @@ public class WorkerManager{
 		}
 	}
 
-	private <T> void createWorker(final String workerName, final Function<T, WorkerAbstract<?>> creator,
-			final Supplier<T> preStart, final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
+	private static <T> void createWorker(final String workerName, final Function<T, WorkerAbstract<?>> creator, final Supplier<T> preStart,
+			final Consumer<WorkerAbstract<?>> onStart, final Consumer<WorkerAbstract<?>> onEnd){
 		WorkerAbstract<?> worker = WORKERS.get(workerName);
 		if(worker == null || worker.isDone()){
 			final T param = preStart.get();

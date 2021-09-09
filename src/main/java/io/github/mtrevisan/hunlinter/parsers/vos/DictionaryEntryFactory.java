@@ -96,7 +96,7 @@ public class DictionaryEntryFactory{
 		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
 	}
 
-	private String extractWord(final String word){
+	private static String extractWord(final String word){
 		return StringUtils.replace(word, SLASH_ESCAPED, SLASH);
 	}
 
@@ -113,13 +113,13 @@ public class DictionaryEntryFactory{
 			: ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
 	}
 
-	private String expandAliases(final String part, final List<String> aliases){
+	private static String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)
 			? aliases.get(Integer.parseInt(part) - 1)
 			: part);
 	}
 
-	private boolean containsStem(final String[] mfs){
+	private static boolean containsStem(final String[] mfs){
 		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
 	}
 

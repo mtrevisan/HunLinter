@@ -147,7 +147,7 @@ public class LineEntry implements Serializable{
 		return childBones.containsAll(parentBones);
 	}
 
-	private Set<String> extractRuleSpine(final LineEntry rule){
+	private static Set<String> extractRuleSpine(final LineEntry rule){
 		final Set<String> parentBones = new HashSet<>(rule.addition.size());
 		for(final String add : rule.addition){
 			final int lcsLength = StringHelper.longestCommonPrefix(add, rule.removal)

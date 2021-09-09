@@ -149,7 +149,7 @@ public final class OrthographyVEC extends Orthography{
 		return correctedWord;
 	}
 
-	private String correctIJOccurrences(String word){
+	private static String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
 		//correcting also the converse
 		word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);

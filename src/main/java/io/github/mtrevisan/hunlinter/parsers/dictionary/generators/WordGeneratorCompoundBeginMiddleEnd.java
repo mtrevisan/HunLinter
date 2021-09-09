@@ -109,7 +109,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 		return compoundRules;
 	}
 
-	private void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, List<DictionaryEntry>> inputs){
+	private static void checkCompoundBeginMiddleEndInputCorrectness(final Map<String, List<DictionaryEntry>> inputs){
 		for(final Map.Entry<String, List<DictionaryEntry>> entry : inputs.entrySet())
 			if(entry.getValue().isEmpty())
 				throw new LinterException(MISSING_WORD, entry.getKey());

@@ -168,11 +168,11 @@ public class SmithWatermanAlignment{
 		return (x[i - 1].equals(y[j - 1])? COST_MATCH: COST_MISMATCH);
 	}
 
-	private double insertionCost(final double k){
+	private static double insertionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private double deletionCost(final double k){
+	private static double deletionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 

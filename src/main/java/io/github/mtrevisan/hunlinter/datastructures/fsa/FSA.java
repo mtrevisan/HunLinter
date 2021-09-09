@@ -278,7 +278,7 @@ public class FSA extends FSAAbstract{
 	}
 
 	/** Returns an n-byte integer encoded in byte-packed representation. */
-	private int decodeFromBytes(final byte[] arcs, final int start, final int n){
+	private static int decodeFromBytes(final byte[] arcs, final int start, final int n){
 		int r = 0;
 		for(int i = n; -- i >= 0; )
 			r = r << 8 | (arcs[start + i] & 0xFF);

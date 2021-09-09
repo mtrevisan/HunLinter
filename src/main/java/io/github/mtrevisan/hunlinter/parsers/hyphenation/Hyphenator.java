@@ -168,7 +168,7 @@ public class Hyphenator implements HyphenatorInterface{
 		return hyphBreak;
 	}
 
-	private HyphenationBreak calculateBreakpoints(final String word, final AhoCorasickTrie<String> patterns,
+	private static HyphenationBreak calculateBreakpoints(final String word, final AhoCorasickTrie<String> patterns,
 			final HyphenationOptions options){
 		final int wordSize = word.length();
 		final Map<Integer, IndexDataPair<String>> indexesAndRules = new HashMap<>(wordSize);
@@ -241,33 +241,33 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 	}
 
-	private void manageNoHyphenAtStart(final List<String> response, final String nohyp){
+	private static void manageNoHyphenAtStart(final List<String> response, final String nohyp){
 		if(response.get(0).equals(nohyp.substring(1)))
 			response.remove(0);
 	}
 
-	private void manageNoHyphenAtEnd(final List<String> response, final String nohyp){
+	private static void manageNoHyphenAtEnd(final List<String> response, final String nohyp){
 		if(response.get(response.size() - 1).equals(nohyp.substring(0, nohyp.length() - 1)))
 			response.remove(response.size() - 1);
 	}
 
-	private void manageNoHyphenAtMiddle(final List<String> response, final String nohyp){
+	private static void manageNoHyphenAtMiddle(final List<String> response, final String nohyp){
 		final Iterator<String> itr = response.iterator();
 		while(itr.hasNext())
 			if(nohyp.equals(itr.next()))
 				itr.remove();
 	}
 
-	private boolean isStarting(final CharSequence key){
+	private static boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final CharSequence key){
+	private static boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 
 	//FIXME speed-up this, if possible
-	private List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
+	private static List<String> createHyphenatedWord(final String word, final HyphenationBreak hyphBreak){
 		int startIndex = 0;
 		int after = 0;
 		String addAfter = null;
@@ -326,15 +326,15 @@ public class Hyphenator implements HyphenatorInterface{
 		return result;
 	}
 
-	private String removeNonStandardPart(final CharSequence rule){
+	private static String removeNonStandardPart(final CharSequence rule){
 		return RegexHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
-	private int getNormalizedLength(final CharSequence word){
+	private static int getNormalizedLength(final CharSequence word){
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 
-	private int getNormalizedLength(final String word, final int endIndex){
+	private static int getNormalizedLength(final String word, final int endIndex){
 		return Normalizer.normalize(word.substring(0, endIndex - 1), Normalizer.Form.NFKC).length() + 1;
 	}
 

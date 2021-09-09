@@ -134,7 +134,7 @@ public class ConstantArcSizeFSA extends FSAAbstract{
 		return Collections.emptySet();
 	}
 
-	private int skipArc(final int offset){
+	private static int skipArc(final int offset){
 		return offset + ARC_SIZE;
 	}
 

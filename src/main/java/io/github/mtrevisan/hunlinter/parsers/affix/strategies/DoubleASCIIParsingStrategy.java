@@ -77,7 +77,7 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return flags;
 	}
 
-	private String[] extractFlags(final CharSequence rawFlags){
+	private static String[] extractFlags(final CharSequence rawFlags){
 		return RegexHelper.split(rawFlags, PATTERN);
 	}
 
@@ -98,7 +98,7 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
+	private static void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
 			final boolean isFlag = (size != 1
@@ -108,7 +108,7 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		}
 	}
 
-	private boolean canEncode(final CharSequence cs){
+	private static boolean canEncode(final CharSequence cs){
 		final CharsetEncoder encoder = StandardCharsets.US_ASCII.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);

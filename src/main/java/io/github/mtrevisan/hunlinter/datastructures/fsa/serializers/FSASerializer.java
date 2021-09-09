@@ -164,7 +164,7 @@ public class FSASerializer implements FSASerializerInterface{
 	 * @param fsa	The automaton to calculate right language for
 	 * @return	A map with node identifiers as keys and their right language counts as associated values
 	 */
-	private IntIntHashMap rightLanguageForAllStates(final FSAAbstract fsa){
+	private static IntIntHashMap rightLanguageForAllStates(final FSAAbstract fsa){
 		final IntIntHashMap numbers = new IntIntHashMap();
 		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
@@ -185,7 +185,7 @@ public class FSASerializer implements FSASerializerInterface{
 	}
 
 	/** Linearization of states. */
-	private int[] linearize(final FSAAbstract fsa){
+	private static int[] linearize(final FSAAbstract fsa){
 		int[] linearized = new int[0];
 		int last = 0;
 
@@ -278,7 +278,7 @@ public class FSASerializer implements FSASerializerInterface{
 		return true;
 	}
 
-	private int emitArc(final ByteBuffer bb, final OutputStream os, final int gtl, int flags, final byte label, final int targetOffset)
+	private static int emitArc(final ByteBuffer bb, final OutputStream os, final int gtl, int flags, final byte label, final int targetOffset)
 			throws IOException{
 		final int arcBytes = ((flags & FSA.BIT_TARGET_NEXT) != 0? SIZEOF_FLAGS: gtl);
 
@@ -302,7 +302,7 @@ public class FSASerializer implements FSASerializerInterface{
 		return bytes;
 	}
 
-	private int emitNodeData(final ByteBuffer bb, final OutputStream os, final int nodeDataLength, int number) throws IOException{
+	private static int emitNodeData(final ByteBuffer bb, final OutputStream os, final int nodeDataLength, int number) throws IOException{
 		if(nodeDataLength > 0 && os != null){
 			for(int i = 0; i < nodeDataLength; i ++){
 				bb.put((byte)number);

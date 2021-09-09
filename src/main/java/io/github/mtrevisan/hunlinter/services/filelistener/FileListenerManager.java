@@ -93,7 +93,7 @@ public class FileListenerManager implements FileListener, Runnable{
 		listenerToFilePatterns = new ConcurrentHashMap<>(0);
 	}
 
-	private WatchService createWatcher() throws RuntimeException{
+	private static WatchService createWatcher() throws RuntimeException{
 		try{
 			return FILE_SYSTEM_DEFAULT.newWatchService();
 		}
@@ -179,7 +179,7 @@ public class FileListenerManager implements FileListener, Runnable{
 			.addAll(filePatterns);
 	}
 
-	private PathMatcher matcherForExpression(final String pattern){
+	private static PathMatcher matcherForExpression(final String pattern){
 		final String syntaxAndPattern = "glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1);
 		return FILE_SYSTEM_DEFAULT.getPathMatcher(syntaxAndPattern);
 	}
@@ -207,7 +207,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	 * Prevent receiving two separate ENTRY_MODIFY events: file modified and timestamp updated.
 	 * Instead, receive one ENTRY_MODIFY event with two counts
 	 */
-	private void preventMultipleEvents(){
+	private static void preventMultipleEvents(){
 		try{ Thread.sleep(100l); }
 		catch(final InterruptedException e){
 			Thread.currentThread().interrupt();

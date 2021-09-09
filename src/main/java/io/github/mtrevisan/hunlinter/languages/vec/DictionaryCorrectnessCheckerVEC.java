@@ -178,7 +178,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS, derivedWord);
 	}
 
-	private void incompatibilityCheck(final Inflection inflection, final int index){
+	private static void incompatibilityCheck(final Inflection inflection, final int index){
 		final List<String> pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
 			EventBusService.publish(new LinterWarning(SINGLE_POS_NOT_PRESENT)
@@ -232,7 +232,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
-	private AffixEntry getLastAppliedRule(final Inflection inflection){
+	private static AffixEntry getLastAppliedRule(final Inflection inflection){
 		AffixEntry appliedRuleFlag = null;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
 		if(appliedRules != null)

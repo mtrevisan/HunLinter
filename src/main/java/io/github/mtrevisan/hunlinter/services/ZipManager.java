@@ -77,7 +77,7 @@ public class ZipManager{
 		}
 	}
 
-	private List<String> extractFileList(final File projectFolder, final File[] excludeFolderBut){
+	private static List<String> extractFileList(final File projectFolder, final File[] excludeFolderBut){
 		final List<File> exclusions = new ArrayList<>(excludeFolderBut.length);
 		for(final File file : excludeFolderBut)
 			if(file != null)
@@ -89,7 +89,7 @@ public class ZipManager{
 		return filesListInDir;
 	}
 
-	private List<String> extractFilesList(final File dir, final List<File> excludeFolderBut){
+	private static List<String> extractFilesList(final File dir, final List<File> excludeFolderBut){
 		final File[] files = Optional.ofNullable(dir.listFiles())
 			.orElse(new File[0]);
 		final List<String> filesListInDir = new ArrayList<>(files.length);
@@ -147,7 +147,7 @@ public class ZipManager{
 
 	//This method guards against writing files to the file system outside the target folder.
 	//This vulnerability is called Zip Slip.
-	private File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
+	private static File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
 		final File destFile = new File(destinationDir, zipEntry.getName());
 		final String destDirPath = destinationDir.getCanonicalPath();
 		final String destFilePath = destFile.getCanonicalPath();

@@ -76,7 +76,7 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		return flags;
 	}
 
-	private String[] extractFlags(final String rawFlags){
+	private static String[] extractFlags(final String rawFlags){
 		return StringUtils.split(rawFlags, COMMA);
 	}
 
@@ -106,7 +106,7 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final String compoundRule){
+	private static void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
 			final boolean isNumber = (part.length() != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));

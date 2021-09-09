@@ -125,7 +125,7 @@ public class AffixHandler implements Handler{
 		return entries;
 	}
 
-	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
+	private static void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
 		final String ruleTypeCode = ruleType.getOption().getCode();
 		if(!context.getRuleType().equals(ruleTypeCode))
 			throw new LinterException(MISMATCHED_RULE_TYPE, ruleType);

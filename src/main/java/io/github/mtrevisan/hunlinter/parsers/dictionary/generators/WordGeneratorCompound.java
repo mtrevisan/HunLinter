@@ -81,7 +81,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 	}
 
-	protected final List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations, final Map<String, List<DictionaryEntry>> inputs){
+	protected final List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
+			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
 		outer:
@@ -178,7 +179,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		}
 	}
 
-	private List<Inflection> limitResponse(final Set<Inflection> inflections, final int limit){
+	private static List<Inflection> limitResponse(final Set<Inflection> inflections, final int limit){
 		return new ArrayList<>(inflections).subList(0, Math.min(inflections.size(), limit));
 	}
 
@@ -255,11 +256,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return compoundEntries;
 	}
 
-	private boolean containsTriple(final StringBuffer sb, final String compound){
+	private static boolean containsTriple(final StringBuffer sb, final String compound){
 		boolean repeated = false;
 		final int size = sb.length() - 1;
 		if(size > 1){
-			final String interCompounds = sb.substring(Math.max(size - 1, 0), size + 1) + compound.substring(0, Math.min(compound.length(), 2));
+			final String interCompounds = sb.substring(Math.max(size - 1, 0), size + 1)
+				+ compound.substring(0, Math.min(compound.length(), 2));
 			final int len = interCompounds.length();
 			if(len == 3 || len == 4){
 				repeated = (interCompounds.charAt(0) == interCompounds.charAt(1) && interCompounds.charAt(0) == interCompounds.charAt(2));
@@ -270,7 +272,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return repeated;
 	}
 
-	private String enforceNextCompoundCase(final char lastChar, String nextCompound, final StringHelper.Casing lastWordCasing,
+	private static String enforceNextCompoundCase(final char lastChar, String nextCompound, final StringHelper.Casing lastWordCasing,
 			final StringHelper.Casing nextWordCasing){
 		final char nextChar = nextCompound.charAt(0);
 		if(Character.isLetter(lastChar) && Character.isLetter(nextChar)){
@@ -329,7 +331,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return exists;
 	}
 
-	private boolean getNextTuple(final int[] indexes, final List<List<Inflection>> entry){
+	private static boolean getNextTuple(final int[] indexes, final List<List<Inflection>> entry){
 		//obtain next tuple
 		int i = indexes.length - 1;
 		while(i >= 0){

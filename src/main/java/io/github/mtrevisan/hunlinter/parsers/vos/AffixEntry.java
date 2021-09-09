@@ -157,7 +157,7 @@ public class AffixEntry{
 		return appending;
 	}
 
-	private String expandAliases(final String part, final List<String> aliases){
+	private static String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}
 
@@ -218,7 +218,7 @@ public class AffixEntry{
 			: ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
 	}
 
-	private boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
+	private static boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
 		return (LoopHelper.match(tags, tag -> LoopHelper.match(amf, tag::isSupertypeOf) != null) != null);
 	}
 

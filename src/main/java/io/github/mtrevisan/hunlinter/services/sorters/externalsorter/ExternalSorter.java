@@ -67,7 +67,7 @@ public class ExternalSorter{
 	 * @return	A list of temporary flat files.
 	 * @throws IOException	Generic IO exception.
 	 */
-	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
+	private static List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
 		//extract uncompressed file size
 		final long dataLength = FileHelper.getFileSize(file);
 		final long availableMemory = JavaHelper.estimateAvailableMemory();
@@ -121,7 +121,7 @@ public class ExternalSorter{
 	 * @param maxMemory Maximum memory to use (in bytes)
 	 * @return the estimate [B]
 	 */
-	private long estimateBestSizeOfBlocks(final long sizeOfFile, final ExternalSorterOptions options, final long maxMemory){
+	private static long estimateBestSizeOfBlocks(final long sizeOfFile, final ExternalSorterOptions options, final long maxMemory){
 		//we don't want to open up much more than maxTemporaryFiles temporary files, better run out of memory first
 		final long maxTemporaryFiles = options.getMaxTemporaryFiles();
 		long blockSize = sizeOfFile / maxTemporaryFiles + (sizeOfFile % maxTemporaryFiles == 0l? 0l: 1l);
@@ -146,7 +146,7 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final StringArrayList sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private static void saveChunk(final StringArrayList sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
@@ -204,8 +204,8 @@ public class ExternalSorter{
 	 * @param queue	Where the data should be read
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options,
-			final Queue<BinaryFileBuffer> queue) throws IOException{
+	private static void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options, final Queue<BinaryFileBuffer> queue)
+			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			mergeSort(queue, options.isRemoveDuplicates(), writer, options.getLineSeparator());
 		}
@@ -215,7 +215,7 @@ public class ExternalSorter{
 		}
 	}
 
-	private void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer,
+	private static void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer,
 			final String lineSeparator) throws IOException{
 		String lastLine = null;
 		while(!queue.isEmpty()){

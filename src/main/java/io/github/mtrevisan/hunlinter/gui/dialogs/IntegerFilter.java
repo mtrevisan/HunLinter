@@ -70,7 +70,7 @@ class IntegerFilter extends DocumentFilter{
 			super.remove(fb, offset, length);
 	}
 
-	private boolean validInput(final String text){
+	private static boolean validInput(final String text){
 		try{
 			if(StringUtils.isNotBlank(text))
 				Integer.parseInt(text);

@@ -91,7 +91,7 @@ public class CompoundRuleHandler implements Handler{
 		}
 	}
 
-	private int checkValidity(final ParsingContext context){
+	private static int checkValidity(final ParsingContext context){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER, context);
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
@@ -101,7 +101,7 @@ public class CompoundRuleHandler implements Handler{
 		return numEntries;
 	}
 
-	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
+	private static void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
 			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE, line);
 		final String[] compounds = strategy.extractCompoundRule(rule);

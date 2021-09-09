@@ -190,7 +190,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
-	private DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)
+	private static DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)
 			throws IOException{
 		final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
 		if(!metadataPath.toFile().exists())
@@ -199,7 +199,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return MetadataBuilder.read(metadataPath);
 	}
 
-	private void encode(final ByteArrayList encodings, final Collection<Inflection> inflections, final byte separator,
+	private static void encode(final ByteArrayList encodings, final Collection<Inflection> inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
@@ -235,7 +235,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		}
 	}
 
-	private byte[] encode(final byte[] inflectedWord, final ByteBuffer tag, final String stem, final byte separator,
+	private static byte[] encode(final byte[] inflectedWord, final ByteBuffer tag, final String stem, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		byte[] inflectionStem = StringHelper.getRawBytes(stem);
 		//remove the initial part `st:`
@@ -263,7 +263,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 	 *                 allocated.
 	 * @return Returns the same buffer or a new buffer with the given capacity.
 	 */
-	private ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+	private static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
 		if(buffer == null || buffer.capacity() < elements)
 			buffer = ByteBuffer.allocate(elements);
 		else
@@ -271,7 +271,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return buffer;
 	}
 
-	private void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){
+	private static void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
 			for(final String code : suffixInflection){
 				final String[] tags = InflectionTag.createFromCodeAndValue(code).getTags();
@@ -282,7 +282,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 	}
 
 	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
-	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
+	private static Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
 		return SetHelper.bucket(inflection.getMorphologicalFieldsAsArray(), MorphologicalTag::createFromCode,
 			MorphologicalTag.class);
 	}

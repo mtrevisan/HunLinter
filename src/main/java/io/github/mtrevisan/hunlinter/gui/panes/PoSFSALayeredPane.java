@@ -257,7 +257,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		resultTextArea.setText(sj.toString());
 	}
 
-	private List<String> extractTrueWords(final Collection<String> tokens){
+	private static List<String> extractTrueWords(final Collection<String> tokens){
 		final List<String> noWhitespaceTokens = new ArrayList<>(tokens.size());
 		for(final String token : tokens)
 			if(StringHelper.isWord(token))

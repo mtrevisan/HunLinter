@@ -297,7 +297,7 @@ public class AffixParser{
 		}
 	}
 
-	private Handler lookupHandlerByRuleType(final AffixOption ruleType){
+	private static Handler lookupHandlerByRuleType(final AffixOption ruleType){
 		return PARSING_HANDLERS.get(ruleType);
 	}
 

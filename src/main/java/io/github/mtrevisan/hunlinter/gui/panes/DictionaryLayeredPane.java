@@ -180,7 +180,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		column.setWidth(preferences.getInt(COLUMN_WIDTH, 182));
 	}
 
-	private void hideColumn(final TableColumn column){
+	private static void hideColumn(final TableColumn column){
 		column.setMinWidth(0);
 		column.setMaxWidth(0);
 		column.setWidth(0);
@@ -453,7 +453,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 			totalInflectionsValueLabel.setText(null);
 	}
 
-	private void clearOutputTable(final JTable table){
+	private static void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
 	}

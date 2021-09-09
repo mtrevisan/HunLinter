@@ -291,7 +291,7 @@ public class AffixData{
 		return applyConversionTable(word, table);
 	}
 
-	private String applyConversionTable(final String word, final ConversionTable table){
+	private static String applyConversionTable(final String word, final ConversionTable table){
 		return (table != null? table.applyConversionTable(word): word);
 	}
 

@@ -149,7 +149,7 @@ public class Version implements Comparable<Version>{
 			throw new IllegalArgumentException("Argument is not a valid version");
 	}
 
-	private boolean hasLeadingZeros(final CharSequence token){
+	private static boolean hasLeadingZeros(final CharSequence token){
 		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 
@@ -275,7 +275,7 @@ public class Version implements Comparable<Version>{
 		return compareToCore(patch, other.patch);
 	}
 
-	private int compareToCore(final Integer value1, final Integer value2){
+	private static int compareToCore(final Integer value1, final Integer value2){
 		int comparison = 0;
 		if(value1 != null || value2 != null){
 			if(value1 != null && value2 == null)
@@ -293,7 +293,7 @@ public class Version implements Comparable<Version>{
 		return (result != 0? result: preRelease.length - otherPreRelease.length);
 	}
 
-	private int compareIdentifierArrays(final String[] preRelease, final String[] otherPreRelease){
+	private static int compareIdentifierArrays(final String[] preRelease, final String[] otherPreRelease){
 		int result = (otherPreRelease.length - preRelease.length);
 		for(int i = 0; i < getLeastCommonArrayLength(preRelease, otherPreRelease); i ++){
 			result = compareIdentifiers(preRelease[i], otherPreRelease[i]);
@@ -303,11 +303,11 @@ public class Version implements Comparable<Version>{
 		return result;
 	}
 
-	private int getLeastCommonArrayLength(final String[] array1, final String[] array2){
+	private static int getLeastCommonArrayLength(final String[] array1, final String[] array2){
 		return Math.min(array1.length, array2.length);
 	}
 
-	private int compareIdentifiers(final String identifier1, final String identifier2){
+	private static int compareIdentifiers(final String identifier1, final String identifier2){
 		return (StringUtils.isNumeric(identifier1) && StringUtils.isNumeric(identifier2)
 			? Integer.parseInt(identifier1) - Integer.parseInt(identifier2)
 			: identifier1.compareTo(identifier2));

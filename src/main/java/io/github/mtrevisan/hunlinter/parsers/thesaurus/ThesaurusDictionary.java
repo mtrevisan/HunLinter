@@ -101,7 +101,7 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
+	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);

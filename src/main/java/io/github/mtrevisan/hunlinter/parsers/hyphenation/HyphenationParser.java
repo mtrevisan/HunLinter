@@ -266,7 +266,7 @@ public class HyphenationParser{
 	}
 
 	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`). */
-	private String convertUnicode(final CharSequence line){
+	private static String convertUnicode(final CharSequence line){
 		final String[] components = RegexHelper.extract(line, PATTERN_ESCAPED_UNICODE);
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
@@ -520,7 +520,7 @@ public class HyphenationParser{
 			writeln(writer, rule);
 	}
 
-	private void writeln(final BufferedWriter writer, final String line) throws IOException{
+	private static void writeln(final BufferedWriter writer, final String line) throws IOException{
 		writer.write(line);
 		writer.write(NEW_LINE);
 	}

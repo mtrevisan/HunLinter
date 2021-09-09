@@ -125,7 +125,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	 * @param buffer   The buffer to check or {@code null} if a new buffer should be allocated.
 	 * @return Returns the same buffer or a new buffer with the given capacity.
 	 */
-	private ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+	private static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
 		if(buffer == null || buffer.capacity() < elements)
 			buffer = ByteBuffer.allocate(elements);
 		else

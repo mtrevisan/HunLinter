@@ -165,7 +165,7 @@ public class DictionaryMetadataBuilder{
 		return this;
 	}
 
-	private String getConversionPairs(final Map<String, String> conversionPairs){
+	private static String getConversionPairs(final Map<String, String> conversionPairs){
 		final StringBuilder builder = new StringBuilder();
 		for(final Map.Entry<String, String> e : conversionPairs.entrySet()){
 			final String k = e.getKey();

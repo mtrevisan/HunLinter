@@ -137,7 +137,7 @@ public class RegexSequencer{
 		return matches(sequenceA[indexA], sequenceB[indexB]);
 	}
 
-	private boolean matches(final String fieldA, final String fieldB){
+	private static boolean matches(final String fieldA, final String fieldB){
 		final boolean response;
 		final boolean fieldAHasClassStart = fieldA.startsWith(CLASS_START);
 		final boolean fieldBHasClassStart = fieldB.startsWith(CLASS_START);

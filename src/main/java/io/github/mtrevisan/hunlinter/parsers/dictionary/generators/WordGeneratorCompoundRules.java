@@ -100,14 +100,14 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		return compoundRules;
 	}
 
-	private void checkCompoundRuleInputCorrectness(final Map<String, List<DictionaryEntry>> inputs,
+	private static void checkCompoundRuleInputCorrectness(final Map<String, List<DictionaryEntry>> inputs,
 			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
 				throw new LinterException(MISSING_WORD, component, StringUtils.join(compoundRuleComponents, StringUtils.EMPTY));
 	}
 
-	private boolean raiseError(final Map<String, List<DictionaryEntry>> inputs, final String component){
+	private static boolean raiseError(final Map<String, List<DictionaryEntry>> inputs, final String component){
 		return (!FlagParsingStrategy.FLAG_ANY.equals(component) && !FlagParsingStrategy.FLAG_OPTIONAL.equals(component)
 			&& inputs.get(component) == null);
 	}

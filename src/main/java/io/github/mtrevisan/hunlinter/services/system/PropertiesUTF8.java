@@ -132,7 +132,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The beginning of the property that might be continued on the next line.
 	 * @return	Whether the property continues on the following line.
 	 */
-	private boolean continueLine(final CharSequence line){
+	private static boolean continueLine(final CharSequence line){
 		return (line != null && !line.isEmpty() && line.charAt(line.length() - 1) == '\\');
 	}
 
@@ -143,7 +143,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The String to treat.
 	 * @return	The converted line.
 	 */
-	private String loadConversion(final CharSequence line){
+	private static String loadConversion(final CharSequence line){
 		final StringBuilder sb = new StringBuilder(line.length());
 		//replace all the "\." substrings with their corresponding escaped characters
 		for(int index = 0; index < line.length(); index ++){
@@ -221,7 +221,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The String to treat.
 	 * @return	The resulting String.
 	 */
-	private String storeConversion(final CharSequence line){
+	private static String storeConversion(final CharSequence line){
 		final int length = line.length();
 		final StringBuilder sb = new StringBuilder(length << 1);
 		for(int i = 0; i < length; i ++){

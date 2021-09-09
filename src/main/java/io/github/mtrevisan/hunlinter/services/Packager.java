@@ -389,12 +389,12 @@ public class Packager{
 		return files;
 	}
 
-	private void packageFiles(final File inputFolder, final File outputFile) throws IOException{
+	private static void packageFiles(final File inputFolder, final File outputFile) throws IOException{
 		if(inputFolder != null)
 			ZIPPER.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
 	}
 
-	private void packageExtension(final File projectFolder, final File autoCorrectOutputFile, final List<File> autoTextOutputFiles)
+	private static void packageExtension(final File projectFolder, final File autoCorrectOutputFile, final List<File> autoTextOutputFiles)
 			throws IOException{
 		final File outputFile = Path.of(projectFolder.toString(), FilenameUtils.getBaseName(projectFolder.toString()) + EXTENSION_ZIP)
 			.toFile();
@@ -502,7 +502,7 @@ public class Packager{
 		return Files.isRegularFile(path);
 	}
 
-	private boolean existFile(final Path path, final String filename){
+	private static boolean existFile(final Path path, final String filename){
 		return Files.isRegularFile(Paths.get(path.toString(), filename));
 	}
 

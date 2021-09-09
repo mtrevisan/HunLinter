@@ -469,7 +469,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 	}
 
 	@SuppressWarnings("StringConcatenationInFormatCall")
-	private String formatFrequencyVariableDecimals(final double x){
+	private static String formatFrequencyVariableDecimals(final double x){
 		return String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
 	}
 
@@ -550,7 +550,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return renderer;
 	}
 
-	private XYToolTipGenerator createChartTooltip(){
+	private static XYToolTipGenerator createChartTooltip(){
 		return (dataset, series, item) -> {
 			final Number x = dataset.getX(series, item);
 			final Number y = dataset.getY(series, item);
@@ -558,7 +558,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		};
 	}
 
-	private NumberAxis createChartXAxis(final String xAxisTitle){
+	private static NumberAxis createChartXAxis(final String xAxisTitle){
 		//x-axis as integer starting from zero
 		final NumberAxis xAxis = new NumberAxis(xAxisTitle);
 		xAxis.setAutoRangeIncludesZero(false);
@@ -568,7 +568,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return xAxis;
 	}
 
-	private NumberAxis createChartYAxis(final String yAxisTitle){
+	private static NumberAxis createChartYAxis(final String yAxisTitle){
 		//y-axis as percent starting from zero
 		final NumberAxis yAxis = new NumberAxis(yAxisTitle);
 		yAxis.setAutoRangeIncludesZero(true);

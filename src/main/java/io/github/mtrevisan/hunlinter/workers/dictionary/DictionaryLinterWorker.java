@@ -137,12 +137,12 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		setProcessor(step1);
 	}
 
-	private Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Collection<Inflection> inflections){
+	private static Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Collection<Inflection> inflections){
 		inflections.removeIf(inflection -> inflection.hasAppliedRule(lastAppliedRuleFlag));
 		return inflections.iterator();
 	}
 
-	private LinterException wrapException(final Exception e, final Inflection inflection, final IndexDataPair<String> data){
+	private static LinterException wrapException(final Exception e, final Inflection inflection, final IndexDataPair<String> data){
 		String message = e.getMessage();
 		if(inflection.hasInflectionRules())
 			message += " (via " + inflection.getRulesSequence() + ")";

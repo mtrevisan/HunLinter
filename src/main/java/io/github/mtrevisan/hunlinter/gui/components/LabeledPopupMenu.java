@@ -64,7 +64,7 @@ public final class LabeledPopupMenu extends JPopupMenu{
 		repaint();
 	}
 
-	private String composeTitle(final String text){
+	private static String composeTitle(final String text){
 		return "<html><b>" + StringEscapeUtils.escapeHtml4(text) + "</b></html>";
 	}
 

@@ -74,7 +74,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		return null;
 	}
 
-	private int contentLength(final URL url){
+	private static int contentLength(final URL url){
 		int contentLength = -1;
 		try{
 			HttpURLConnection.setFollowRedirects(false);

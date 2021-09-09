@@ -139,7 +139,7 @@ public class RulesReducer{
 		return new LineEntry(removal, addition, condition, word);
 	}
 
-	private List<LineEntry> compactInflections(final List<LineEntry> rules){
+	private static List<LineEntry> compactInflections(final List<LineEntry> rules){
 		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
 		if(rules.size() > 1){
 			//retrieve rule with the longest condition (all the other conditions must be this long)
@@ -154,7 +154,7 @@ public class RulesReducer{
 		return compactedRules;
 	}
 
-	private void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
+	private static void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
 		final String from = rules.get(0).from.iterator().next();
 		final int longestConditionLength = compactedRule.condition.length();
 		for(final LineEntry rule : rules){
@@ -212,7 +212,7 @@ public class RulesReducer{
 			(rule, entry) -> rule.addition.addAll(entry.addition));
 	}
 
-	private void redistributeAddition(final LineEntry entry, final Map<String, LineEntry> map){
+	private static void redistributeAddition(final LineEntry entry, final Map<String, LineEntry> map){
 		final String removalTab = entry.removal + TAB;
 		final String tabCondition = TAB + entry.condition;
 		for(final String addition : entry.addition){
@@ -231,7 +231,7 @@ public class RulesReducer{
 			(rule, entry) -> rule.from.addAll(entry.from));
 	}
 
-	private List<LineEntry> makeAdditionsDisjoint(final Collection<LineEntry> rules){
+	private static List<LineEntry> makeAdditionsDisjoint(final Collection<LineEntry> rules){
 		//transform
 		//	[rem=èra,add=[ereta, ara, era, iera, ièra, areta, iereta],cond=èra,from=…]
 		//	[rem=èra,add=[ereta, ara, era, areta],cond=èra,from=…]
@@ -275,7 +275,7 @@ public class RulesReducer{
 	}
 
 	//add each key, remove the list from the addition
-	private List<String> retrieveAdditionsToBeRemoved(final Collection<LineEntry> rules, final LineEntry rule,
+	private static List<String> retrieveAdditionsToBeRemoved(final Collection<LineEntry> rules, final LineEntry rule,
 			final Collection<LineEntry> temporaryRules, final Map<String, List<String>> lcss, final Iterable<String> keys){
 		final List<String> additionsToBeRemoved = new ArrayList<>(0);
 		for(final String key : keys){
@@ -300,7 +300,7 @@ public class RulesReducer{
 		return additionsToBeRemoved;
 	}
 
-	private void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
+	private static void insertRuleOrUpdateFrom(final List<LineEntry> expandedRules, final LineEntry rule){
 		final int ruleIndex = expandedRules.indexOf(rule);
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
@@ -314,7 +314,7 @@ public class RulesReducer{
 		}
 	}
 
-	private Map<Integer, Set<Character>> collectOverallLastGroups(final Collection<LineEntry> plainRules){
+	private static Map<Integer, Set<Character>> collectOverallLastGroups(final Collection<LineEntry> plainRules){
 		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>(0);
 		if(!plainRules.isEmpty()){
 			//FIXME is a `try` block useful? is `maxLength` correctly calculated?
@@ -485,7 +485,7 @@ public class RulesReducer{
 		return preCondition + parentCondition;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
+	private static boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
 			final Collection<Character> childrenGroup, final Collection<Character> intersectionGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
@@ -590,7 +590,7 @@ public class RulesReducer{
 	 * @param parent	The parent rule
 	 * @return	{@code true} if a bush was created and added to the queue
 	 */
-	private boolean growNewBush(final Collection<LineEntry> queue, final LineEntry parent){
+	private static boolean growNewBush(final Collection<LineEntry> queue, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 
 		final ArrayList<LineEntry> newBushes = new ArrayList<>(0);
@@ -630,7 +630,7 @@ public class RulesReducer{
 		return forest;
 	}
 
-	private List<LineEntry> extractSimilarRules(final Collection<LineEntry> rules, final String parentCondition){
+	private static List<LineEntry> extractSimilarRules(final Collection<LineEntry> rules, final String parentCondition){
 		final List<LineEntry> children = new ArrayList<>(rules.size());
 		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
@@ -645,7 +645,7 @@ public class RulesReducer{
 		return children;
 	}
 
-	private List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
+	private static List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = new ArrayList<>(bush.size());
 		for(final LineEntry child : bush)
@@ -659,7 +659,7 @@ public class RulesReducer{
 		return bubbles;
 	}
 
-	private boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
+	private static boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
 			final Collection<Character> childrenGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
@@ -738,7 +738,7 @@ public class RulesReducer{
 		return list;
 	}
 
-	private List<String> composeAffixRules(final String flag, final AffixType type, final Collection<LineEntry> entries){
+	private static List<String> composeAffixRules(final String flag, final AffixType type, final Collection<LineEntry> entries){
 		final List<String> list = new ArrayList<>(entries.size());
 		for(final LineEntry entry : entries)
 			list.add(entry.toHunspellRule(type, flag));

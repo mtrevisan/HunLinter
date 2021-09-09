@@ -161,7 +161,7 @@ public class HorizontalFlowLayout extends FlowLayout{
 		}
 	}
 
-	private Container getParentContainer(final Container child){
+	private static Container getParentContainer(final Container child){
 		Container container = child;
 		while(container.getSize().width == 0 && container.getParent() != null)
 			container = container.getParent();

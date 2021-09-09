@@ -416,7 +416,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
-	private void clearOutputTable(final JTable table){
+	private static void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
 	}

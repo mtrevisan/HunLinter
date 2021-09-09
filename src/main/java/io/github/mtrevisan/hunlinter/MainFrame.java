@@ -366,7 +366,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(filMenu);
       final RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, MainFrame::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
@@ -585,7 +585,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		workerManager.checkForAbortion(this);
 	}
 
-	private void loadFile(final Path basePath){
+	private static void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		EventBusService.publish(new PreLoadProjectEvent(basePath));
@@ -646,7 +646,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@EventHandler
 	@SuppressWarnings("unused")
-	public final void parsingWarnings(final LinterWarning warningEvent){
+	public static void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
 		final IndexDataPair<?> eventData = warningEvent.getData();
 		if(eventData != null){

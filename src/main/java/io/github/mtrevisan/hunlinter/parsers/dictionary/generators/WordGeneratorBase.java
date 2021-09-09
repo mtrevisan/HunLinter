@@ -76,7 +76,8 @@ class WordGeneratorBase{
 	 * @return	The list of inflections for the given word
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	protected final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound, final RuleEntry overriddenRule){
+	protected final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
+			final RuleEntry overriddenRule){
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();
@@ -102,7 +103,8 @@ class WordGeneratorBase{
 		}
 
 		//extract lastfold inflections
-		List<Inflection> twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections, null);
+		List<Inflection> twofoldInflections = collectInflections(baseInflection, suffixedInflections, prefixedInflections,
+			null);
 		twofoldInflections = getTwofoldInflections(twofoldInflections, isCompound, affixData.isComplexPrefixes(), overriddenRule);
 		checkTwofoldCorrectness(twofoldInflections);
 		printInflections("Twofold inflections:", twofoldInflections);
@@ -112,7 +114,7 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	private List<Inflection> collectInflections(final Inflection baseInflection, final Collection<Inflection> onefoldInflections,
+	private static List<Inflection> collectInflections(final Inflection baseInflection, final Collection<Inflection> onefoldInflections,
 			final Collection<Inflection> twofoldInflections, final Collection<Inflection> lastfoldInflections){
 		final int size = 1 + onefoldInflections.size() + twofoldInflections.size()
 			+ (lastfoldInflections != null? lastfoldInflections.size(): 0);
@@ -135,11 +137,12 @@ class WordGeneratorBase{
 	}
 
 
-	private Inflection getBaseInflection(final DictionaryEntry dicEntry){
+	private static Inflection getBaseInflection(final DictionaryEntry dicEntry){
 		return Inflection.createFromDictionaryEntry(dicEntry);
 	}
 
-	protected final List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
+	protected final List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
+			final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
@@ -222,7 +225,7 @@ class WordGeneratorBase{
 		}
 	}
 
-	private boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
+	private static boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
 		boolean hasNeedAffixFlag = false;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
 		if(appliedRules != null){
@@ -342,11 +345,12 @@ class WordGeneratorBase{
 		return false;
 	}
 
-	private boolean hasToBeExpanded(final DictionaryEntry dicEntry, final Collection<String> appliedAffixes, final String forbiddenWordFlag){
+	private static boolean hasToBeExpanded(final DictionaryEntry dicEntry, final Collection<String> appliedAffixes,
+			final String forbiddenWordFlag){
 		return (!appliedAffixes.isEmpty() && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
-	private boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,
+	private static boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,
 			final boolean isCompound){
 		boolean shouldApply = true;
 		if(isCompound){

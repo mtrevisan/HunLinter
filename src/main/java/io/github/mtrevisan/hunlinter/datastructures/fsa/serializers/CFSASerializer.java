@@ -169,7 +169,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	 * @param fsa	The automaton to calculate right language for
 	 * @return	A map with node identifiers as keys and their right language counts as associated values
 	 */
-	private IntIntMap rightLanguageForAllStates(final FSAAbstract fsa){
+	private static IntIntMap rightLanguageForAllStates(final FSAAbstract fsa){
 		final IntIntMap numbers = new IntIntHashMap();
 		fsa.visitPostOrder(state -> {
 			int thisNodeNumber = 0;
@@ -289,7 +289,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Add a state to linearized list. */
-	private void linearizeState(final FSAAbstract fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
+	private static void linearizeState(final FSAAbstract fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
 			final IntSet visited, final int node){
 		linearized.add(node);
 		visited.add(node);
@@ -302,7 +302,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Compute the set of states that should be linearized first to minimize other states goto length. */
-	private int[] computeFirstStates(final Iterable<IntIntCursor> inLinkCount, final int maxStates, final int minInLinkCount){
+	private static int[] computeFirstStates(final Iterable<IntIntCursor> inLinkCount, final int maxStates, final int minInLinkCount){
 		final PriorityQueue<IntIntHolder> stateInLink = new PriorityQueue<>(1, COMPARATOR);
 		final IntIntHolder scratch = new IntIntHolder();
 		for(final IntIntCursor c : inLinkCount)
@@ -326,7 +326,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Compute in-link count for each state. */
-	private IntIntMap computeInLinkCount(final FSAAbstract fsa){
+	private static IntIntMap computeInLinkCount(final FSAAbstract fsa){
 		final IntIntMap inLinkCount = new IntIntHashMap();
 		final IntSet visited = new IntHashSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
@@ -456,7 +456,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Write a v-int to a byte array. */
-	private int writeVInt(final byte[] array, int value){
+	private static int writeVInt(final byte[] array, int value){
 		if(value < 0)
 			throw new IllegalArgumentException("V-code can't be negative: " + value);
 

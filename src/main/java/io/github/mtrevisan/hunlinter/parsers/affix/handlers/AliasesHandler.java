@@ -75,7 +75,7 @@ public class AliasesHandler implements Handler{
 		}
 	}
 
-	private void checkValidity(final String[] parts, final ParsingContext context){
+	private static void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 2)
 			throw new LinterException(WRONG_FORMAT, context);
 		if(!context.getRuleType().equals(parts[0]))

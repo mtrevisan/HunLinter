@@ -72,7 +72,7 @@ public class WordBreakTableHandler implements Handler{
 		}
 	}
 
-	private Set<String> readCharacters(final Scanner scanner, final int numEntries) throws EOFException{
+	private static Set<String> readCharacters(final Scanner scanner, final int numEntries) throws EOFException{
 		final Set<String> wordBreakCharacters = new HashSet<>(numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			ParserHelper.assertNotEOF(scanner);

@@ -165,15 +165,15 @@ public class HyphenationBreak{
 		array.remove(index);
 	}
 
-	private String reduceKey(final CharSequence key){
+	private static String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private boolean isStarting(final CharSequence key){
+	private static boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final CharSequence key){
+	private static boolean isEnding(final CharSequence key){
 		return (key.charAt(key.length() - 1) == '$');
 	}
 

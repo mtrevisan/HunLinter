@@ -78,7 +78,7 @@ final class CharsetParsingStrategy extends FlagParsingStrategy{
 		return flags;
 	}
 
-	private String[] extractFlags(final CharSequence rawFlags){
+	private static String[] extractFlags(final CharSequence rawFlags){
 		final int size = rawFlags.length();
 		final String[] flags = new String[size];
 		for(int i = 0; i < size; i ++)
