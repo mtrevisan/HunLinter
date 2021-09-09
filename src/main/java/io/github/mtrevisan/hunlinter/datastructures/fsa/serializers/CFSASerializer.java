@@ -25,8 +25,10 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.serializers;
 
 import com.carrotsearch.hppcrt.IntIntMap;
+import com.carrotsearch.hppcrt.IntSet;
 import com.carrotsearch.hppcrt.cursors.IntIntCursor;
 import com.carrotsearch.hppcrt.maps.IntIntHashMap;
+import com.carrotsearch.hppcrt.sets.IntHashSet;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.CFSA;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
@@ -37,10 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
@@ -257,8 +257,8 @@ public class CFSASerializer implements FSASerializerInterface{
 
 	/** Linearize all states, putting {@code states} in front of the automaton and calculating stable state offsets. */
 	private int linearizeAndCalculateOffsets(final FSAAbstract fsa, final DynamicIntArray states, final DynamicIntArray linearized,
-														  final IntIntMap offsets) throws IOException{
-		final Collection<Integer> visited = new HashSet<>();
+			final IntIntMap offsets) throws IOException{
+		final IntSet visited = new IntHashSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		linearized.clear();
 
@@ -289,8 +289,8 @@ public class CFSASerializer implements FSASerializerInterface{
 	}
 
 	/** Add a state to linearized list. */
-	private void linearizeState(final FSAAbstract fsa, final DynamicIntArray nodes, final DynamicIntArray linearized, final Collection<Integer> visited,
-										 final int node){
+	private void linearizeState(final FSAAbstract fsa, final DynamicIntArray nodes, final DynamicIntArray linearized,
+			final IntSet visited, final int node){
 		linearized.add(node);
 		visited.add(node);
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
@@ -328,7 +328,7 @@ public class CFSASerializer implements FSASerializerInterface{
 	/** Compute in-link count for each state. */
 	private IntIntMap computeInLinkCount(final FSAAbstract fsa){
 		final IntIntMap inLinkCount = new IntIntHashMap();
-		final Collection<Integer> visited = new HashSet<>();
+		final IntSet visited = new IntHashSet();
 		final DynamicIntArray nodes = new DynamicIntArray();
 		nodes.push(fsa.getRootNode());
 

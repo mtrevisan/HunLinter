@@ -29,7 +29,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 
 public class Orthography{
@@ -64,9 +63,10 @@ public class Orthography{
 
 	public final boolean hasSyllabationErrors(final String[] syllabes){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-		return IntStream.range(0, errors.length)
-			.mapToObj(idx -> errors[idx])
-			.anyMatch(error -> error);
+		for(int idx = 0; idx < errors.length; idx ++)
+			if(errors[idx])
+				return true;
+		return false;
 	}
 
 	public final StringJoiner formatHyphenation(final String[] syllabes){

@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa;
 
+import com.carrotsearch.hppcrt.IntSet;
+import com.carrotsearch.hppcrt.sets.IntHashSet;
 import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.ByteSequenceIterator;
@@ -33,9 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
@@ -208,7 +208,7 @@ public abstract class FSAAbstract implements Iterable<ByteBuffer>{
 		}
 
 		//process nodes from second stack
-		final Collection<Integer> visited = new HashSet<>(out.size() - 1);
+		final IntSet visited = new IntHashSet(out.size() - 1);
 		for(int i = out.size() - 1; i >= 0; i --){
 			final int state = out.get(i);
 			if(!visited.contains(state) && !v.accept(state))

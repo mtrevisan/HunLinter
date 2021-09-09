@@ -40,7 +40,7 @@ public class CopyOverAsNumberHandler implements Handler{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER, context);
 
-		affixData.addData(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
+		affixData.addData(context.getRuleType(), Integer.valueOf(context.getAllButFirstParameter()));
 
 		return Integer.parseInt(context.getFirstParameter());
 	}

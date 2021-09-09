@@ -24,11 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
+import com.carrotsearch.hppcrt.CharCharMap;
+import com.carrotsearch.hppcrt.maps.CharCharHashMap;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,7 +62,7 @@ final class GraphemeVEC{
 
 	private static final Pattern SINGLE_SYLLABE_IU = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[iu][aeiou]$");
 	private static final Pattern SINGLE_SYLLABE_IU_UMLAUT = RegexHelper.pattern("^[^aeiouàèéíïòóúü]+[ïü][aeiou]$");
-	private static final Map<Character, Character> IU_UMLAUT = new HashMap<>(4);
+	private static final CharCharMap IU_UMLAUT = new CharCharHashMap(4);
 	static{
 		IU_UMLAUT.put('i', 'ï');
 		IU_UMLAUT.put('u', 'ü');
@@ -124,7 +124,8 @@ final class GraphemeVEC{
 		return word;
 	}
 
-	private static String correctGrapheme(String word, final CharSequence grapheme, final Iterable<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
+	private static String correctGrapheme(String word, final CharSequence grapheme,
+			final Iterable<Pattern> eterophonicSequenceFalsePositives, final String newPhoneme){
 		if(word.contains(grapheme)){
 			final String newPhonemePattern = "$1" + newPhoneme + "$2";
 			for(final Pattern p : eterophonicSequenceFalsePositives)

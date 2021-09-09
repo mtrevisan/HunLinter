@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 
 /**
@@ -81,7 +80,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 */
 	public final List<SearchResult<V>> searchInText(final String text){
 		final ArrayList<SearchResult<V>> collectedHits = new ArrayList<>();
-		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final HitConsumer consumer = (hits, index) -> {
 			collectedHits.ensureCapacity(collectedHits.size() + hits.length);
 			final int position = index + 1;
 			for(final int hit : hits)
@@ -101,7 +100,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	public final void searchInText(final String text, final HitProcessor<V> processor){
 		Objects.requireNonNull(processor, "Processor cannot be null");
 
-		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final HitConsumer consumer = (hits, index) -> {
 			final int position = index + 1;
 			for(final int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
@@ -129,7 +128,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	 * @param text	The text.
 	 * @param hitConsumer	The consumer called in case of a hit.
 	 */
-	private boolean searchInText(final String text, final BiFunction<int[], Integer, Boolean> hitConsumer){
+	private boolean searchInText(final String text, final HitConsumer hitConsumer){
 		Objects.requireNonNull(text, "Text cannot be null");
 
 		boolean found = false;

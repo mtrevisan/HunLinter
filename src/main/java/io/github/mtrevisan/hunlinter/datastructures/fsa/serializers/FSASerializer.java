@@ -206,7 +206,7 @@ public class FSASerializer implements FSASerializerInterface{
 
 			for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc))
 				if(!fsa.isArcTerminal(arc)){
-					int target = fsa.getEndNode(arc);
+					final int target = fsa.getEndNode(arc);
 					if(!visited.get(target))
 						nodes.push(target);
 				}

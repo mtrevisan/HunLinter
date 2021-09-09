@@ -60,7 +60,8 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 	}
 
 	@Override
-	public final Component getListCellRendererComponent(final JList<? extends String> list, final String value, final int lineIndex, final boolean isSelected, final boolean cellHasFocus){
+	public final Component getListCellRendererComponent(final JList<? extends String> list, final String value, final int lineIndex,
+			final boolean isSelected, final boolean cellHasFocus){
 		final int index = boundaryIndex.apply(lineIndex);
 		if(index >= 0){
 			final Watercolors watercolor = COLORS[index % COLORS_SIZE];

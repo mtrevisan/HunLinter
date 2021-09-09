@@ -40,19 +40,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public final class SetHelper{
 
 	private SetHelper(){}
 
-
-	public static Set<Character> makeCharacterSetFrom(final CharSequence text){
-		return text.codePoints()
-			.mapToObj(chr -> (char)chr)
-			.collect(Collectors.toSet());
-	}
 
 	public static <T> Set<T> newConcurrentSet(){
 		return Collections.newSetFromMap(new ConcurrentHashMap<>(0));

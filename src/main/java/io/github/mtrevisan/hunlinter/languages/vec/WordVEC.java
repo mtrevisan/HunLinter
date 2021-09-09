@@ -38,7 +38,6 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 
 
 public final class WordVEC{
@@ -126,10 +125,13 @@ public final class WordVEC{
 	private WordVEC(){}
 
 	public static int countGraphemes(final String word){
-		return (int)IntStream.range(0, word.length())
-			.mapToObj(word::charAt)
-			.filter(chr -> Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0)
-			.count();
+		int count = 0;
+		for(int i = 0; i < word.length(); i ++){
+			final char chr = word.charAt(i);
+			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0)
+				count ++;
+		}
+		return count;
 	}
 
 	public static boolean isApostrophe(final char chr){

@@ -61,6 +61,11 @@ public class SmithWatermanAlignment{
 	/** must be GAP_OPENING_PENALTY < GAP_EXTENSION_PENALTY < 0. */
 	private static final double GAP_EXTENSION_PENALTY = -1. / 3.;
 
+	private static final Character MINUS = '-';
+	private static final Character PLUS = '+';
+	private static final Character SPACE = ' ';
+	private static final Character START = '*';
+
 
 	//TODO introduce getters
 	public static class Trace{
@@ -197,16 +202,16 @@ public class SmithWatermanAlignment{
 			trace.firstIndexB = lastIndexB - 1;
 
 			if(lastIndexA != 0 && lastIndexB != 0 && tmp == matching(lastIndexA, lastIndexB)){
-				trace.operations.push(x[lastIndexA - 1].equals(y[lastIndexB - 1])? ' ': '*');
+				trace.operations.push(x[lastIndexA - 1].equals(y[lastIndexB - 1])? SPACE: START);
 				lastIndexA --;
 				lastIndexB --;
 			}
 			else if(lastIndexA != 0 && tmp == deletion(lastIndexA, lastIndexB)){
-				trace.operations.push('-');
+				trace.operations.push(MINUS);
 				lastIndexA --;
 			}
 			else if(lastIndexB != 0 && tmp == insertion(lastIndexA, lastIndexB)){
-				trace.operations.push('+');
+				trace.operations.push(PLUS);
 				lastIndexB --;
 			}
 		}

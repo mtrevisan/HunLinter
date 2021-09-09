@@ -24,13 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.gui.renderers;
 
+import com.carrotsearch.hppcrt.IntSet;
+import com.carrotsearch.hppcrt.sets.IntHashSet;
+
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.io.Serial;
-import java.util.Collection;
-import java.util.HashSet;
 
 
 public class TableRenderer extends DefaultTableCellRenderer{
@@ -40,7 +41,7 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	private static final MatteBorder BORDER_ERROR = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED);
 
-	private final Collection<Integer> errors = new HashSet<>(0);
+	private final IntSet errors = new IntHashSet(0);
 
 
 	public final void setErrorOnRow(final int line){
@@ -52,7 +53,8 @@ public class TableRenderer extends DefaultTableCellRenderer{
 	}
 
 	@Override
-	public final Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column){
+	public final Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+			final boolean hasFocus, final int row, final int column){
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 		setText(value != null? String.valueOf(value): null);
