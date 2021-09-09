@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
@@ -37,6 +38,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,13 +71,13 @@ public class AffixHandler implements Handler{
 
 			return Integer.parseInt(context.getThirdParameter());
 		}
-		catch(final IOException ioe){
-			throw new RuntimeException(ioe.getMessage());
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
+			throw new ParserException(ioe.getMessage());
 		}
 	}
 
 	private static List<AffixEntry> readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
-			throws IOException{
+			throws EOFException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		final int numEntries = Integer.parseInt(context.getThirdParameter());

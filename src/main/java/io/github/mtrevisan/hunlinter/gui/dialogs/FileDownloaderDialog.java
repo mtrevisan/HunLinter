@@ -69,6 +69,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private DownloadTask task;
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public FileDownloaderDialog(final Frame parent) throws IOException, ParseException, VersionException{
 		super(parent, "File downloader", true);
 
@@ -213,7 +214,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(final VersionException | IOException | ParseException | HeadlessException ignored){}
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final VersionException | IOException | ParseException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
    private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
@@ -249,7 +250,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final byte[] content = DownloaderHelper.readFileContent(localPath);
 			DownloaderHelper.validate(content, remoteObject);
 		}
-		catch(final IOException | DownloadException | NoSuchAlgorithmException e){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException | DownloadException | NoSuchAlgorithmException e){
 			statusLabel.setText(e.getMessage());
 		}
 	}
@@ -307,13 +308,13 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

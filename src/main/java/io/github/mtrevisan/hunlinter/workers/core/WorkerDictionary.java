@@ -25,6 +25,8 @@
 package io.github.mtrevisan.hunlinter.workers.core;
 
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
@@ -68,15 +70,13 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			else
 				processLinesSequential(path, charset, dataProcessor);
 		}
-		catch(final LinterException e){
-			throw e;
-		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new ParserException(ioe);
 		}
 	}
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
@@ -113,8 +113,9 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			processLinesSequentialBySize(path, charset, dataProcessor, fileSize);
 	}
 
-	private void processLinesSequentialByLine(final Path path, final Charset charset,
-			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	private void processLinesSequentialByLine(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor)
+			throws IOException{
 		//read entire file in memory
 		final List<String> lines = FileHelper.readAllLines(path, charset);
 		if(!workerData.isNoHeader())
@@ -210,7 +211,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			writer.write(lineSeparator);
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WriterException(ioe);
 		}
 	}
 

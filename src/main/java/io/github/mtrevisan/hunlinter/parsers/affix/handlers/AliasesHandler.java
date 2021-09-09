@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +73,7 @@ public class AliasesHandler implements Handler{
 			return numEntries;
 		}
 		catch(final LinterException | NumberFormatException | EOFException e){
-			throw new RuntimeException(e.getMessage());
+			throw new ParserException(e.getMessage());
 		}
 	}
 

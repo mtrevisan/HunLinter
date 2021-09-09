@@ -92,6 +92,7 @@ public class ThesaurusParser{
 	 * @param theFile	The reference to the thesaurus file
 	 * @throws IOException	If an I/O error occurs
 	 */
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public final void parse(final File theFile) throws IOException{
 		clear();
 

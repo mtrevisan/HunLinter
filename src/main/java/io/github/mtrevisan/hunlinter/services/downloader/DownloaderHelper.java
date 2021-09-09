@@ -114,6 +114,7 @@ public final class DownloaderHelper{
 	 * @return	A list of pairs version-release-notes
 	 * @throws VersionException	If something went wrong, or current version is already the last one
 	 */
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException, ParseException{
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
 			final String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
@@ -137,6 +138,7 @@ public final class DownloaderHelper{
 		}
 	}
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException, ParseException{
 		//find last build by filename
 		final String filename = "-" + version;
@@ -152,6 +154,7 @@ public final class DownloaderHelper{
 		}
 	}
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static byte[] readFileContent(final String localPath) throws IOException{
 		try(final FileInputStream fis = new FileInputStream(localPath)){
 			return IOUtils.toByteArray(fis);

@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class ThesaurusEntry{
 		this.synonyms = synonyms;
 	}
 
-	public ThesaurusEntry(final String line, final Scanner scanner) throws IOException{
+	public ThesaurusEntry(final String line, final Scanner scanner) throws EOFException{
 		Objects.requireNonNull(line, "Line cannot be null");
 		Objects.requireNonNull(scanner, "Scanner cannot be null");
 

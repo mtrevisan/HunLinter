@@ -137,18 +137,13 @@ public final class FileHelper{
 	}
 
 	public static Charset readCharset(final String charsetName){
-		try{
-			final Charset cs = Charset.forName(CHARSET_ALIASES.getOrDefault(charsetName, charsetName));
+		final Charset cs = Charset.forName(CHARSET_ALIASES.getOrDefault(charsetName, charsetName));
 
-			//line should be a valid charset
-			if(!HUNSPELL_CHARSETS.contains(cs))
-				throw new Exception();
-
-			return cs;
-		}
-		catch(final Exception e){
+		//line should be a valid charset
+		if(!HUNSPELL_CHARSETS.contains(cs))
 			throw new LinterException(WRONG_FILE_FORMAT_CHARSET, charsetName);
-		}
+
+		return cs;
 	}
 
 	public static Charset determineCharset(final Path path){

@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.GUIException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -86,7 +87,7 @@ public class RelationTable{
 			}
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
-			throw new RuntimeException(ioe.getMessage());
+			throw new GUIException(ioe.getMessage());
 		}
 	}
 

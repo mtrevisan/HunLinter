@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.Duplicate;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
@@ -275,7 +276,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 			}
 			catch(final IOException ioe){
-				throw new RuntimeException(ioe);
+				throw new WriterException(ioe);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());

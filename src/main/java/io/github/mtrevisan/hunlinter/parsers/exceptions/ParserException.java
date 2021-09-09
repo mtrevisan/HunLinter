@@ -22,43 +22,28 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.workers.exceptions;
+package io.github.mtrevisan.hunlinter.parsers.exceptions;
 
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
-public class LinterWarning extends Exception{
+public class ParserException extends RuntimeException{
 
 	@Serial
-	private static final long serialVersionUID = 3853411643385148097L;
+	private static final long serialVersionUID = 572132987071971443L;
 
 
-	private int index;
-	private Object data;
-
-
-	public LinterWarning(final String message, final Object... parameters){
+	public ParserException(final String message, final Object... parameters){
 		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public final LinterWarning withIndex(final int index){
-		this.index = index;
-
-		return this;
-	}
-
-	public final int getIndex(){
-		return index;
-	}
-
-	public final Object getData(){
-		return data;
+	public ParserException(final Throwable throwable){
+		super(throwable);
 	}
 
 

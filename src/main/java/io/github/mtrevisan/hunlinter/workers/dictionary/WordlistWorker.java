@@ -27,6 +27,8 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.SorterException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorter;
@@ -104,7 +106,6 @@ public class WordlistWorker extends WorkerDictionary{
 				resetProcessing("Sorting");
 
 				//sort file & remove duplicates
-				final ExternalSorter sorter = new ExternalSorter();
 				final ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(charset)
 					.sortInParallel()
@@ -116,7 +117,7 @@ public class WordlistWorker extends WorkerDictionary{
 					ExternalSorter.sort(outputFile, options, outputFile);
 				}
 				catch(final IOException ioe){
-					throw new RuntimeException(ioe);
+					throw new SorterException(ioe);
 				}
 
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
@@ -129,7 +130,7 @@ public class WordlistWorker extends WorkerDictionary{
 			setProcessor(step1.andThen(step2).andThen(step3));
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new ParserException(ioe);
 		}
 	}
 

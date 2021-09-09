@@ -60,6 +60,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	private MappedByteBuffer buffer;
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws IOException{
 		if(backingFile == null)
 			throw new IllegalArgumentException(EMPTY_BACKUP_FILE);

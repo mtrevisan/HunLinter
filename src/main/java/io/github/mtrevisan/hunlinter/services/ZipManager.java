@@ -49,6 +49,7 @@ public class ZipManager{
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void zipDirectory(final File dir, final int compressionLevel, final File zipFile, final File... excludeFolderBut)
 			throws IOException{
 		Files.deleteIfExists(zipFile.toPath());

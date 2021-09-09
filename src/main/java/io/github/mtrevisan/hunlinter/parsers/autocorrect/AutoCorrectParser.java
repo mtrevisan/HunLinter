@@ -185,6 +185,7 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public final void save(final File acoFile) throws TransformerException{
 		final Document doc = xmlManager.newXMLDocumentStandalone();
 

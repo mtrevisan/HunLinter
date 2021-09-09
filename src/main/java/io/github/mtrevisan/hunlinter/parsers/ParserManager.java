@@ -191,6 +191,7 @@ public class ParserManager implements FileChangeListener{
 		flm.stop();
 	}
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public final void openAffixFile(final File affFile) throws IOException{
 		if(!affFile.exists()){
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);

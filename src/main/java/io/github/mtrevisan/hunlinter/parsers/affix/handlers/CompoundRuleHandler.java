@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
@@ -36,7 +37,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.EOFException;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -87,7 +87,7 @@ public class CompoundRuleHandler implements Handler{
 			return numEntries;
 		}
 		catch(final EOFException e){
-			throw new RuntimeException(e.getMessage());
+			throw new ParserException(e.getMessage());
 		}
 	}
 

@@ -27,6 +27,8 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -79,7 +81,7 @@ public class SorterWorker extends WorkerDictionary{
 				lines = FileHelper.readAllLines(dicParser.getDicFile().toPath(), dicParser.getCharset());
 			}
 			catch(final IOException ioe){
-				throw new RuntimeException(ioe.getMessage());
+				throw new WorkerException(ioe.getMessage());
 			}
 
 			setProgress(33);
@@ -108,7 +110,7 @@ public class SorterWorker extends WorkerDictionary{
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			}
 			catch(final IOException ioe){
-				throw new RuntimeException(ioe.getMessage());
+				throw new WriterException(ioe.getMessage());
 			}
 
 			return null;

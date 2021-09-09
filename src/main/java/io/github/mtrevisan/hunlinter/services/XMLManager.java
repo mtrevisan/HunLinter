@@ -97,6 +97,7 @@ public final class XMLManager{
 
 	/** Transform the DOM Object to an XML File. */
 	@SafeVarargs
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();

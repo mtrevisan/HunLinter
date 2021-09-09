@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.services;
 
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -99,11 +100,11 @@ public final class ParserHelper{
 				progressCallback.accept(100);
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new WorkerException(ioe);
 		}
 	}
 
-	public static void assertLinesCount(final List<String> lines) throws IOException{
+	public static void assertLinesCount(final List<String> lines) throws EOFException{
 		if(lines.isEmpty())
 			throw new EOFException("Unexpected EOF while reading file");
 		final String line = lines.get(0);

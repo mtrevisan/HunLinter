@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -50,6 +51,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class ExternalSorter{
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
 		final List<File> files = splitAndSortFiles(inputFile, options);
 
@@ -67,6 +69,7 @@ public class ExternalSorter{
 	 * @return	A list of temporary flat files.
 	 * @throws IOException	Generic IO exception.
 	 */
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	private static List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
 		//extract uncompressed file size
 		final long dataLength = FileHelper.getFileSize(file);
@@ -172,6 +175,7 @@ public class ExternalSorter{
 	 * @param outputFile The output {@link File} to merge the results to
 	 * @throws IOException generic IO exception
 	 */
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	private static void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
 		final Comparator<String> comparator = options.getComparator();

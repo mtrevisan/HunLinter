@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.gui.models.SortableListModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.GUIException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
 import javax.swing.*;
@@ -153,7 +154,7 @@ public class DictionarySortDialog extends JDialog{
 			loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
 		}
 		catch(final IOException ioe){
-			throw new RuntimeException(ioe);
+			throw new GUIException(ioe);
 		}
 	}
 
@@ -226,13 +227,13 @@ public class DictionarySortDialog extends JDialog{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

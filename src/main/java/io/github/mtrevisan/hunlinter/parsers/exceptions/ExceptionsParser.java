@@ -142,6 +142,7 @@ public class ExceptionsParser{
 		return dictionary.contains(exception);
 	}
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public final void save(final File excFile) throws TransformerException{
 		final Document doc = xmlManager.newXMLDocumentStandalone();
 
