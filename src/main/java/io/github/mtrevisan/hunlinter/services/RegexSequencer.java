@@ -47,11 +47,11 @@ public class RegexSequencer{
 		return SPLIT_SEQUENCE.apply(sequence);
 	}
 
-	public final String[] getEmptySequence(){
+	public static String[] getEmptySequence(){
 		return new String[0];
 	}
 
-	public final int length(final String[] sequence){
+	public static int length(final String[] sequence){
 		return sequence.length;
 	}
 
@@ -64,7 +64,7 @@ public class RegexSequencer{
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals} method.
 	 */
-	public final boolean startsWith(final String[] sequence, final String[] prefix){
+	public static boolean startsWith(final String[] sequence, final String[] prefix){
 		final int count = prefix.length;
 		if(count > sequence.length)
 			return false;
@@ -84,7 +84,7 @@ public class RegexSequencer{
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals} method.
 	 */
-	public final boolean endsWith(final String[] sequence, final String[] suffix){
+	public static boolean endsWith(final String[] sequence, final String[] suffix){
 		final int count = suffix.length;
 		if(count > sequence.length)
 			return false;
@@ -105,7 +105,7 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
 	 */
-	public final String[] characterAt(final String[] sequence, final int index){
+	public static String[] characterAt(final String[] sequence, final int index){
 		return subSequence(sequence, index, index + 1);
 	}
 
@@ -119,11 +119,11 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
 	 */
-	public final String[] subSequence(final String[] sequence, final int beginIndex){
+	public static String[] subSequence(final String[] sequence, final int beginIndex){
 		return (beginIndex > 0? subSequence(sequence, beginIndex, length(sequence)): sequence);
 	}
 
-	public final boolean equals(final String[] sequenceA, final String[] sequenceB){
+	public static boolean equals(final String[] sequenceA, final String[] sequenceB){
 		if(sequenceA.length != sequenceB.length)
 			return false;
 
@@ -133,7 +133,7 @@ public class RegexSequencer{
 		return true;
 	}
 
-	public final boolean equalsAtIndex(final String[] sequenceA, final String[] sequenceB, final int indexA, final int indexB){
+	public static boolean equalsAtIndex(final String[] sequenceA, final String[] sequenceB, final int indexA, final int indexB){
 		return matches(sequenceA[indexA], sequenceB[indexB]);
 	}
 
@@ -161,21 +161,21 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or {@code endIndex} is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than {@code endIndex}.
 	 */
-	public final String[] subSequence(final String[] sequence, final int beginIndex, final int endIndex){
+	public static String[] subSequence(final String[] sequence, final int beginIndex, final int endIndex){
 		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
 	}
 
-	public final String[] concat(final String[] sequenceA, final String[] sequenceB){
+	public static String[] concat(final String[] sequenceA, final String[] sequenceB){
 		return (sequenceA.length > 0? ArrayUtils.addAll(sequenceA, sequenceB): sequenceB);
 	}
 
-	public final String[] reverse(final String[] sequence){
+	public static String[] reverse(final String[] sequence){
 		final String[] reverse = Arrays.copyOf(sequence, sequence.length);
 		ArrayUtils.reverse(reverse);
 		return reverse;
 	}
 
-	public final String toString(final String[] sequence){
+	public static String toString(final String[] sequence){
 		return StringUtils.join(sequence, StringUtils.EMPTY);
 	}
 

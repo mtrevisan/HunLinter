@@ -344,7 +344,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	/** Merge the distribution with the others. */
-	protected final Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
+	protected static Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
 			final Map<String, List<DictionaryEntry>> distribution, final Integer compoundMinimumLength, final String forbiddenWordFlag){
 		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());

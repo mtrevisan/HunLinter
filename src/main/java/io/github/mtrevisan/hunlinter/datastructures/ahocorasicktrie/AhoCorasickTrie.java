@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.HitProcessor;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 
 import java.io.IOException;

@@ -136,8 +136,8 @@ public class LineEntry implements Serializable{
 			additions[0] = StringUtils.reverse(additions[0]);
 			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
 		}
-		final String reversedCondition = SEQUENCER_REGEXP
-			.toString(SEQUENCER_REGEXP.reverse(RegexSequencer.splitSequence(condition)));
+		final String reversedCondition = RegexSequencer
+			.toString(RegexSequencer.reverse(RegexSequencer.splitSequence(condition)));
 		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
 	}
 
@@ -177,7 +177,7 @@ public class LineEntry implements Serializable{
 		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[0]));
 		if(lcs != null){
 			final Set<Character> group = extractGroup(lcs.length());
-			final int entryConditionLength = SEQUENCER_REGEXP.length(RegexSequencer.splitSequence(condition));
+			final int entryConditionLength = RegexSequencer.length(RegexSequencer.splitSequence(condition));
 			if(lcs.length() + (group.isEmpty()? 0: 1) > entryConditionLength)
 				condition = RegexHelper.makeGroup(group, comparator) + lcs;
 		}

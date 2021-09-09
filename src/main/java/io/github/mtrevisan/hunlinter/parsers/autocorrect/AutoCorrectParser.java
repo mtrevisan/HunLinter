@@ -86,12 +86,12 @@ public class AutoCorrectParser{
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 			throw new LinterException(INVALID_ROOT, AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName());
 
-		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
+		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
-			final Node mediaType = xmlManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
+			final Node mediaType = XMLManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
 			if(mediaType != null){
 				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
-					xmlManager.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
+					XMLManager.extractAttributeValue(child, AUTO_CORRECT_CORRECT_FORM));
 				dictionary.add(correctionEntry);
 			}
 		}
@@ -201,7 +201,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		xmlManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
+		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
 	}
 
 	public final void clear(){

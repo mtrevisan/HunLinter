@@ -581,7 +581,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	@Override
 	public final void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion(this);
+		WorkerManager.checkForAbortion(this);
 	}
 
 	private static void loadFile(final Path basePath){
@@ -917,7 +917,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerData().getWorkerName();
-					workerManager.callOnEnd(workerName);
+					WorkerManager.callOnEnd(workerName);
 				}
 			}
 		}

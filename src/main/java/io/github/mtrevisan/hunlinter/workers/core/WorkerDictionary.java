@@ -204,7 +204,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 
-	protected final void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
+	protected static void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
 		try{
 			writer.write(line);
 			writer.write(lineSeparator);
@@ -214,7 +214,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
-	protected final void closeWriter(final Writer writer){
+	protected static void closeWriter(final Writer writer){
 		try{
 			writer.close();
 		}

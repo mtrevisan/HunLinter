@@ -680,8 +680,8 @@ public class RulesReducer{
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
 				final String[] aCondition = RegexSequencer.splitSequence(anEntry.condition);
-				final String[] commonPreCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 0, 1);
-				final String[] commonPostCondition = LineEntry.SEQUENCER_REGEXP.subSequence(aCondition, 2);
+				final String[] commonPreCondition = RegexSequencer.subSequence(aCondition, 0, 1);
+				final String[] commonPostCondition = RegexSequencer.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
 				group.clear();
 				for(final LineEntry similarity : similarities)

@@ -113,7 +113,7 @@ public class WordlistWorker extends WorkerDictionary{
 					.removeDuplicates()
 					.build();
 				try{
-					sorter.sort(outputFile, options, outputFile);
+					ExternalSorter.sort(outputFile, options, outputFile);
 				}
 				catch(final Exception e){
 					throw new RuntimeException(e);

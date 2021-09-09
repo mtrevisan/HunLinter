@@ -82,7 +82,7 @@ public class WorkerManager{
 		this.parserManager = parserManager;
 	}
 
-	public final void checkForAbortion(final Frame parentFrame){
+	public static void checkForAbortion(final Frame parentFrame){
 		for(final Map.Entry<String, WorkerAbstract<?>> workerNameWorker : WORKERS.entrySet()){
 			final WorkerAbstract<?> worker = workerNameWorker.getValue();
 			if(worker != null && worker.getState() == SwingWorker.StateValue.STARTED){
@@ -92,7 +92,7 @@ public class WorkerManager{
 		}
 	}
 
-	public final void callOnEnd(final String workerName){
+	public static void callOnEnd(final String workerName){
 		final Consumer<WorkerAbstract<?>> onEnding = ON_ENDS.remove(workerName);
 		if(onEnding != null)
 			onEnding.accept(WORKERS.get(workerName));

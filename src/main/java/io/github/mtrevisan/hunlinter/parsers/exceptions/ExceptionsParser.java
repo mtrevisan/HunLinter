@@ -92,9 +92,9 @@ public class ExceptionsParser{
 		if(!WORD_EXCEPTIONS_ROOT_ELEMENT.equals(rootElement.getNodeName()))
 			throw new LinterException(INVALID_ROOT, configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName());
 
-		final List<Node> children = xmlManager.extractChildren(rootElement, node -> xmlManager.isElement(node, AUTO_CORRECT_BLOCK));
+		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
 		for(final Node child : children){
-			final Node mediaType = xmlManager.extractAttribute(child, WORD_EXCEPTIONS_WORD);
+			final Node mediaType = XMLManager.extractAttribute(child, WORD_EXCEPTIONS_WORD);
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
 		}
@@ -157,7 +157,7 @@ public class ExceptionsParser{
 			root.appendChild(elem);
 		}
 
-		xmlManager.createXML(excFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
+		XMLManager.createXML(excFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
 	}
 
 	public final void clear(){

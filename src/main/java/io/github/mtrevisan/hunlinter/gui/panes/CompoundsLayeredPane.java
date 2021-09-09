@@ -275,7 +275,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@Override
 	public final void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion(parentFrame);
+		WorkerManager.checkForAbortion(parentFrame);
 	}
 
    private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed

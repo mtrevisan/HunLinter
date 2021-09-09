@@ -247,7 +247,7 @@ public class Packager{
 				try(final Stream<Path> stream = Files.list(autoCorrectPath)){
 					stream.filter(file -> !Files.isDirectory(file))
 						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_DAT))
-						.forEach(path -> ZIPPER.unzipFile(path.toFile(), autoCorrectPath));
+						.forEach(path -> ZipManager.unzipFile(path.toFile(), autoCorrectPath));
 				}
 			}
 			//extract all .bau in autotext folder
@@ -257,7 +257,7 @@ public class Packager{
 						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_BAU))
 						.forEach(path -> {
 							final Path outputPath = Path.of(autoTextPath.toString(), FilenameUtils.getBaseName(path.toFile().getName()));
-							ZIPPER.unzipFile(path.toFile(), outputPath);
+							ZipManager.unzipFile(path.toFile(), outputPath);
 						});
 				}
 			}
@@ -274,18 +274,18 @@ public class Packager{
 		final Node parentNode = pair.getRight();
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node != null && CONFIGURATION_NODE_NAME_DICTIONARIES.equals(node.getNodeValue()))
 				return getLanguages(child);
 		}
 		return Collections.emptyList();
 	}
 
-	private List<String> getLanguages(final Node entry){
+	private static List<String> getLanguages(final Node entry){
 		final Set<String> languageSets = new HashSet<>(0);
 		final List<Node> children = extractChildren(entry);
 		for(final Node child : children)
-			if(xmlManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
 				languageSets.addAll(Arrays.asList(locales));
 			}
@@ -391,7 +391,7 @@ public class Packager{
 
 	private static void packageFiles(final File inputFolder, final File outputFile) throws IOException{
 		if(inputFolder != null)
-			ZIPPER.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
+			ZipManager.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
 	}
 
 	private static void packageExtension(final File projectFolder, final File autoCorrectOutputFile, final List<File> autoTextOutputFiles)
@@ -404,7 +404,7 @@ public class Packager{
 		if(autoCorrectOutputFile != null)
 			outputFiles.add(autoCorrectOutputFile);
 		outputFiles.addAll(autoTextOutputFiles);
-		ZIPPER.zipDirectory(projectFolder, Deflater.BEST_COMPRESSION, outputFile, outputFiles.toArray(new File[0]));
+		ZipManager.zipDirectory(projectFolder, Deflater.BEST_COMPRESSION, outputFile, outputFiles.toArray(new File[0]));
 	}
 
 	public final String getLanguage(){
@@ -517,9 +517,9 @@ public class Packager{
 		final List<Node> children = extractChildren(rootElement);
 		final ArrayList<String> configurationPaths = new ArrayList<>(children.size());
 		for(final Node child : children){
-			final Node mediaType = xmlManager.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
+			final Node mediaType = XMLManager.extractAttribute(child, MANIFEST_FILE_ENTRY_MEDIA_TYPE);
 			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
-				configurationPaths.add(xmlManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
+				configurationPaths.add(XMLManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
 		configurationPaths.trimToSize();
 		return configurationPaths;
@@ -546,7 +546,7 @@ public class Packager{
 		final Map<String, Object> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node == null)
 				continue;
 
@@ -566,7 +566,7 @@ public class Packager{
 		final List<Node> children = extractChildren(entry);
 		children.removeIf(node -> !ArrayUtils.contains(extractLocale(node), language));
 		for(final Node child : children){
-			final String attributeValue = xmlManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
+			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
 			final String childFolders = extractLocation(child);
 			if(attributeValue.startsWith(FILENAME_PREFIX_HYPHENATION)){
 				final File file = absolutizeFolder(childFolders, basePath, originPath);
@@ -587,7 +587,7 @@ public class Packager{
 
 	private Map<String, Object> getFoldersForInternalPaths(final Node entry, final String nodeValue, final Path basePath,
 			final Path originPath) throws IOException{
-		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, this::extractFolder);
+		final String folder = onNodeNameApply(entry, CONFIGURATION_NODE_NAME_INTERNAL_PATHS, Packager::extractFolder);
 		Objects.requireNonNull(folder, "Folder cannot be null");
 
 		final File file = absolutizeFolder(folder, basePath, originPath);
@@ -628,49 +628,49 @@ public class Packager{
 			.toFile();
 	}
 
-	private String extractLocation(final Node parentNode){
+	private static String extractLocation(final Node parentNode){
 		return extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCATIONS);
 	}
 
-	private String[] extractLocale(final Node parentNode){
+	private static String[] extractLocale(final Node parentNode){
 		final String locale = extractProperty(parentNode, CONFIGURATION_NODE_NAME_LOCALES);
 		return StringUtils.split(locale);
 	}
 
-	private String extractProperty(final Node parentNode, final String propertyName){
+	private static String extractProperty(final Node parentNode, final String propertyName){
 		final NodeList nodes = parentNode.getChildNodes();
 		for(int i = 0; i < nodes.getLength(); i ++){
 			final Node node = nodes.item(i);
-			if(xmlManager.isElement(node, CONFIGURATION_PROPERTY)
-					&& propertyName.equals(xmlManager.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
+			if(XMLManager.isElement(node, CONFIGURATION_PROPERTY)
+					&& propertyName.equals(XMLManager.extractAttributeValue(node, CONFIGURATION_NODE_NAME)))
 				return node.getChildNodes().item(1).getFirstChild().getNodeValue();
 		}
 		return null;
 	}
 
-	private String extractFolder(final Node parentNode){
+	private static String extractFolder(final Node parentNode){
 		final List<Node> children = extractChildren(parentNode);
-		return (!children.isEmpty()? xmlManager.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
+		return (!children.isEmpty()? XMLManager.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
 	}
 
-	private <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
+	private static <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
-			final Node node = xmlManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
+			final Node node = XMLManager.extractAttribute(child, CONFIGURATION_NODE_NAME);
 			if(node != null && nodeName.equals(node.getNodeValue()))
 				return fun.apply(child);
 		}
 		return null;
 	}
 
-	private List<Node> extractChildren(final Element parentElement){
-		return xmlManager.extractChildren(parentElement,
+	private static List<Node> extractChildren(final Element parentElement){
+		return XMLManager.extractChildren(parentElement,
 			node -> (node.getNodeType() == Node.ELEMENT_NODE && MANIFEST_FILE_ENTRY.equals(node.getNodeName())));
 	}
 
-	private List<Node> extractChildren(final Node parentNode){
-		return xmlManager.extractChildren(parentNode,
-			node -> xmlManager.isElement(node, CONFIGURATION_NODE));
+	private static List<Node> extractChildren(final Node parentNode){
+		return XMLManager.extractChildren(parentNode,
+			node -> XMLManager.isElement(node, CONFIGURATION_NODE));
 	}
 
 }

@@ -53,7 +53,7 @@ public class Orthography{
 		return correctApostrophes(word);
 	}
 
-	protected final String correctApostrophes(final String word){
+	private static String correctApostrophes(final String word){
 		return StringUtils.replaceChars(word, WRONG_APOSTROPHES, CORRECT_APOSTROPHES);
 	}
 

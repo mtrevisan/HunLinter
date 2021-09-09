@@ -50,7 +50,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class ExternalSorter{
 
-	public final void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
+	public static void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
 		final List<File> files = splitAndSortFiles(inputFile, options);
 
 		if(!files.isEmpty())

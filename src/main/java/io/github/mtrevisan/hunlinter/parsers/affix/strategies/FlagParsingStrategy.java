@@ -53,7 +53,7 @@ public abstract class FlagParsingStrategy{
 	 */
 	public abstract String[] parseFlags(final String rawFlags);
 
-	protected final void checkForDuplicates(final String[] flags){
+	protected static void checkForDuplicates(final String[] flags){
 		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);

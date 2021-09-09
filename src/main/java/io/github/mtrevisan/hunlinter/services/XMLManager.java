@@ -97,7 +97,7 @@ public final class XMLManager{
 
 	/** Transform the DOM Object to an XML File. */
 	@SafeVarargs
-	public final void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
+	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
@@ -109,11 +109,11 @@ public final class XMLManager{
 		transformer.transform(domSource, streamResult);
 	}
 
-	public boolean isElement(final Node entry, final String elementName){
+	public static boolean isElement(final Node entry, final String elementName){
 		return (entry.getNodeType() == Node.ELEMENT_NODE && elementName.equals(entry.getNodeName()));
 	}
 
-	public List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
+	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
 		final ArrayList<Node> children = new ArrayList<>(0);
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
@@ -123,11 +123,11 @@ public final class XMLManager{
 		return children;
 	}
 
-	public Node extractAttribute(final Node entry, final String name){
+	public static Node extractAttribute(final Node entry, final String name){
 		return entry.getAttributes().getNamedItem(name);
 	}
 
-	public String extractAttributeValue(final Node entry, final String name){
+	public static String extractAttributeValue(final Node entry, final String name){
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
 	}
 
