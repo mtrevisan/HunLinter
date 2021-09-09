@@ -164,7 +164,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public final boolean greaterThan(final Version other){
+	public final boolean isGreaterThan(final Version other){
 		return (compareTo(other) > 0);
 	}
 
@@ -175,7 +175,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public final boolean greaterThanOrEqualTo(final Version other){
+	public final boolean isGreaterThanOrEqualTo(final Version other){
 		return (compareTo(other) >= 0);
 	}
 
@@ -186,7 +186,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public final boolean lessThan(final Version other){
+	public final boolean isLessThan(final Version other){
 		return (compareTo(other) < 0);
 	}
 
@@ -197,7 +197,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public final boolean lessThanOrEqualTo(final Version other){
+	public final boolean isLessThanOrEqualTo(final Version other){
 		return (compareTo(other) <= 0);
 	}
 

@@ -194,11 +194,11 @@ public class Packager{
 
 		clear();
 
-		if(!existDirectory(projectPath))
+		if(!isDirectoryExisting(projectPath))
 			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " doesn't exists, cannot load project");
 
 		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
-		if(!existFile(mainManifestPath))
+		if(!isFileExisting(mainManifestPath))
 			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
 				+ ", cannot load project");
 
@@ -219,9 +219,9 @@ public class Packager{
 	public static boolean isProjectFolder(final File file){
 		try{
 			final Path path = file.toPath();
-			return (existDirectory(path)
-				&& existFile(Paths.get(path.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML))
-				&& existFile(Paths.get(path.toString(), FILENAME_DESCRIPTION_XML))
+			return (isDirectoryExisting(path)
+				&& isFileExisting(Paths.get(path.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML))
+				&& isFileExisting(Paths.get(path.toString(), FILENAME_DESCRIPTION_XML))
 			);
 		}
 		catch(final InvalidPathException ignored){}
@@ -488,21 +488,21 @@ public class Packager{
 	private static Path getPackageBaseDirectory(final File affFile){
 		Path parentPath = affFile.toPath()
 			.getParent();
-		while(parentPath != null && !existFile(parentPath, FILENAME_DESCRIPTION_XML)
-				&& !existFile(parentPath, FILENAME_MANIFEST_JSON))
+		while(parentPath != null && !isFileExisting(parentPath, FILENAME_DESCRIPTION_XML)
+				&& !isFileExisting(parentPath, FILENAME_MANIFEST_JSON))
 			parentPath = parentPath.getParent();
 		return parentPath;
 	}
 
-	private static boolean existDirectory(final Path path){
+	private static boolean isDirectoryExisting(final Path path){
 		return Files.isDirectory(path);
 	}
 
-	private static boolean existFile(final Path path){
+	private static boolean isFileExisting(final Path path){
 		return Files.isRegularFile(path);
 	}
 
-	private static boolean existFile(final Path path, final String filename){
+	private static boolean isFileExisting(final Path path, final String filename){
 		return Files.isRegularFile(Paths.get(path.toString(), filename));
 	}
 

@@ -317,7 +317,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 			try{
 				final String flag = getSelectedFlag();
-				final boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
+				final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
 				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(), parserManager.getDicParser(),
 					parserManager.getWordGenerator());
 				rulesReducerWorker.addPropertyChangeListener(this);
@@ -338,7 +338,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		return (item != null? StringUtils.split(item.toString())[1]: null);
 	}
 
-	private boolean getKeepLongestCommonAffix(){
+	private boolean isKeepLongestCommonAffix(){
 		return optimizeClosedGroupCheckBox.isSelected();
 	}
 

@@ -131,7 +131,7 @@ public final class StringHelper{
 		final int maxSuffixLength = Math.min(aLength, bLength);
 		while(s < maxSuffixLength && a.charAt(aLength - s - 1) == b.charAt(bLength - s - 1))
 			s ++;
-		if(validSurrogatePairAt(a, aLength - s - 1) || validSurrogatePairAt(b, bLength - s - 1))
+		if(isValidSurrogatePairAt(a, aLength - s - 1) || isValidSurrogatePairAt(b, bLength - s - 1))
 			s --;
 		return a.subSequence(aLength - s, aLength).toString();
 	}
@@ -146,7 +146,7 @@ public final class StringHelper{
 		final int maxPrefixLength = Math.min(a.length(), b.length());
 		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
 			p ++;
-		if(validSurrogatePairAt(a, p - 1) || validSurrogatePairAt(b, p - 1))
+		if(isValidSurrogatePairAt(a, p - 1) || isValidSurrogatePairAt(b, p - 1))
 			p --;
 		return a.subSequence(0, p).toString();
 	}
@@ -155,7 +155,7 @@ public final class StringHelper{
 	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
 	 * Out-of-range indexes return false.
 	 */
-	private static boolean validSurrogatePairAt(final CharSequence text, final int index){
+	private static boolean isValidSurrogatePairAt(final CharSequence text, final int index){
 		return (index >= 0 && index <= (text.length() - 2)
 			&& Character.isHighSurrogate(text.charAt(index))
 			&& Character.isLowSurrogate(text.charAt(index + 1)));

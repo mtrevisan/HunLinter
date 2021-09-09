@@ -42,7 +42,7 @@ class IntegerFilter extends DocumentFilter{
 		sb.insert(offset, text);
 
 		final String newText = sb.toString();
-		if(validInput(newText))
+		if(isTextValid(newText))
 			super.insertString(fb, offset, text, attr);
 	}
 
@@ -54,7 +54,7 @@ class IntegerFilter extends DocumentFilter{
 		sb.replace(offset, offset + length, text);
 
 		final String newText = sb.toString();
-		if(validInput(newText))
+		if(isTextValid(newText))
 			super.replace(fb, offset, length, text, attrs);
 	}
 
@@ -66,11 +66,11 @@ class IntegerFilter extends DocumentFilter{
 		sb.delete(offset, offset + length);
 
 		final String newText = sb.toString();
-		if(validInput(newText))
+		if(isTextValid(newText))
 			super.remove(fb, offset, length);
 	}
 
-	private static boolean validInput(final String text){
+	private static boolean isTextValid(final String text){
 		try{
 			if(StringUtils.isNotBlank(text))
 				Integer.parseInt(text);

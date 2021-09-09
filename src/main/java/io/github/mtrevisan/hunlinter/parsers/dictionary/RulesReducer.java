@@ -564,7 +564,7 @@ public class RulesReducer{
 
 				finalRules.addAll(bubbles);
 			}
-			else if(LoopHelper.allMatch(queue, rule -> rule.condition.length() > parentConditionLength + 1))
+			else if(LoopHelper.matchesAll(queue, rule -> rule.condition.length() > parentConditionLength + 1))
 				for(final Character chr : childrenGroup){
 					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
 					if(!queue.contains(entry))

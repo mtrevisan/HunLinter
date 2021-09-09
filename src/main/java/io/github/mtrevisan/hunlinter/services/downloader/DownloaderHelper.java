@@ -124,7 +124,7 @@ public final class DownloaderHelper{
 			for(final Object elem : jsonArray){
 				final JSONObject obj = (JSONObject)elem;
 				final Version tagName = new Version((String)obj.get(PROPERTY_KEY_TAG_NAME));
-				if(tagName.greaterThan(applicationVersion))
+				if(tagName.isGreaterThan(applicationVersion))
 					whatsNew.add(Pair.of(tagName, (String)obj.get(PROPERTY_KEY_WHATS_NEW)));
 			}
 

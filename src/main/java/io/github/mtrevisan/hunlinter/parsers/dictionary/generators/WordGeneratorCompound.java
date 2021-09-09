@@ -186,7 +186,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final Collection<List<String>> continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
-		final boolean allowTwofoldAffixesInCompound = affixData.allowTwofoldAffixesInCompound();
+		final boolean allowTwofoldAffixesInCompound = affixData.isTwofoldAffixesInCompound();
 
 		final List<Inflection> inflections = new ArrayList<>(1);
 		final List<String> flags = new ArrayList<>(continuationFlags.size());

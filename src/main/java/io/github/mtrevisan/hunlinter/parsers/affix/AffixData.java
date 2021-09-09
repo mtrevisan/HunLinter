@@ -334,7 +334,7 @@ public class AffixData{
 		return getData(AffixOption.ONLY_IN_COMPOUND_FLAG);
 	}
 
-	public final boolean allowTwofoldAffixesInCompound(){
+	public final boolean isTwofoldAffixesInCompound(){
 		return containsData(AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND);
 	}
 

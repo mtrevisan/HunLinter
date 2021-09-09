@@ -52,7 +52,7 @@ class VersionCompareTest{
 		Version v1 = new Version("2.3.7-alpha");
 		Version v2 = new Version("2.3.7-beta");
 
-		Assertions.assertTrue(v1.lessThan(v2));
+		Assertions.assertTrue(v1.isLessThan(v2));
 	}
 
 	@Test
@@ -60,7 +60,7 @@ class VersionCompareTest{
 		Version v1 = new Version("2.3.7-beta.1");
 		Version v2 = new Version("2.3.7-beta.2");
 
-		Assertions.assertTrue(v1.lessThan(v2));
+		Assertions.assertTrue(v1.isLessThan(v2));
 	}
 
 }

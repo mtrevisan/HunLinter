@@ -42,7 +42,7 @@ public final class GlyphComparator{
 	 * @param chrs	Characters to be checked for equality.
 	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
-	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
+	public static boolean haveIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
 		final BufferedImage[] glyphs = new BufferedImage[chrs.length];
 		glyphs[0] = renderImage(font, chrs[0]);
 		for(int i = 0; i < chrs.length - 1; i ++)

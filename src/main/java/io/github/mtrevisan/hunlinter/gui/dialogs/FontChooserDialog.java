@@ -297,7 +297,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	}//GEN-LAST:event_familyNameTextFieldKeyReleased
 
 	private void familyNameListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
-		if(createSelectedFont())
+		if(storeSelectedFont())
 			setSelectedFont();
 	}//GEN-LAST:event_familyNameListValueChanged
 
@@ -348,7 +348,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	}
 
 	/** Create a new Font object to return as the selected font. */
-	private boolean createSelectedFont(){
+	private boolean storeSelectedFont(){
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();

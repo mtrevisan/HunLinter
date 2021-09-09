@@ -95,7 +95,7 @@ class WordGeneratorBase{
 		printInflections((affixData.isComplexPrefixes()? "Prefix inflections:": "Suffix inflections:"), suffixedInflections);
 
 		List<Inflection> prefixedInflections = new ArrayList<>(0);
-		if(!isCompound || affixData.allowTwofoldAffixesInCompound()){
+		if(!isCompound || affixData.isTwofoldAffixesInCompound()){
 			//extract prefixed inflections
 			prefixedInflections = getTwofoldInflections(suffixedInflections, isCompound, !affixData.isComplexPrefixes(),
 				overriddenRule);
@@ -321,7 +321,7 @@ class WordGeneratorBase{
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null)
 					removeCircumfixFlag = (entry.hasContinuationFlag(circumfixFlag)
-						&& (entry.getType() == AffixType.SUFFIX ^ match(appliedRules, entry, circumfixFlag)));
+						&& (entry.getType() == AffixType.SUFFIX ^ matches(appliedRules, entry, circumfixFlag)));
 
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
@@ -336,7 +336,7 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	private static boolean match(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){
+	private static boolean matches(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){
 		final AffixType entryType = entry.getType();
 		final int size = (appliedRules != null? appliedRules.length: 0);
 		for(int i = 0; i < size; i ++){

@@ -49,10 +49,6 @@ public class ZipManager{
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
 
 
-	public static void zipDirectory(final File dir, final int compressionLevel, final File zipFile) throws IOException{
-		zipDirectory(dir, compressionLevel, zipFile, new File[0]);
-	}
-
 	public static void zipDirectory(final File dir, final int compressionLevel, final File zipFile, final File... excludeFolderBut)
 			throws IOException{
 		Files.deleteIfExists(zipFile.toPath());

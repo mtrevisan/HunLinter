@@ -57,7 +57,7 @@ public final class LoopHelper{
 	}
 
 
-	public static <T> boolean allMatch(final Iterable<T> collection, final Predicate<T> condition){
+	public static <T> boolean matchesAll(final Iterable<T> collection, final Predicate<T> condition){
 		boolean result = true;
 		if(collection != null)
 			for(final T elem : collection)

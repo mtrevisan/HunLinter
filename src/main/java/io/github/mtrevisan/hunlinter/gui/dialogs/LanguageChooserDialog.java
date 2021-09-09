@@ -105,7 +105,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
 		dispose();
    }//GEN-LAST:event_languageListValueChanged
 
-	public final boolean languageChosen(){
+	public final boolean isLanguageChosen(){
    	return languageChosen;
 	}
 

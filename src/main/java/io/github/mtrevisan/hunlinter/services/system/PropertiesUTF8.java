@@ -88,7 +88,7 @@ public class PropertiesUTF8 extends Properties{
 					property.setLength(0);
 					property.append(line);
 					//reads the whole property if it is on multiple lines
-					while(continueLine(line)){
+					while(isLineContinuing(line)){
 						//remove the `\` character
 						property.setLength(property.length() - 1);
 						line = in.readLine();
@@ -133,7 +133,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The beginning of the property that might be continued on the next line.
 	 * @return	Whether the property continues on the following line.
 	 */
-	private static boolean continueLine(final CharSequence line){
+	private static boolean isLineContinuing(final CharSequence line){
 		return (line != null && !line.isEmpty() && line.charAt(line.length() - 1) == '\\');
 	}
 
