@@ -218,7 +218,11 @@ public class AffixEntry{
 	}
 
 	private static boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
-		return (LoopHelper.match(tags, tag -> LoopHelper.match(amf, tag::isSupertypeOf) != null) != null);
+		for(final MorphologicalTag tag : tags)
+			for(final String elem : amf)
+				if(tag.isSupertypeOf(elem))
+					return true;
+		return false;
 	}
 
 	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){

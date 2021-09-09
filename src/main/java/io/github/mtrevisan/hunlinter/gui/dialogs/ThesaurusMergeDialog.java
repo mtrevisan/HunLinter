@@ -86,11 +86,7 @@ public class ThesaurusMergeDialog extends JDialog{
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		lineComboBox.setFont(currentFont);
-      lineComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            lineComboBoxActionPerformed(evt);
-         }
-      });
+      lineComboBox.addActionListener(this::lineComboBoxActionPerformed);
 
       mergerScrollPane.setBackground(java.awt.Color.white);
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
@@ -103,11 +99,7 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportView(mergerTextArea);
 
       mergeButton.setText("Merge");
-      mergeButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            mergeButtonActionPerformed(evt);
-         }
-      });
+      mergeButton.addActionListener(this::mergeButtonActionPerformed);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);

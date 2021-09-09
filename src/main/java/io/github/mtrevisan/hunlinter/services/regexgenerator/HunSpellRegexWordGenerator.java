@@ -47,29 +47,21 @@ import java.util.Queue;
  */
 public class HunSpellRegexWordGenerator{
 
-	private static class GeneratedElement{
-		private final List<String> word;
-		private final int stateIndex;
-
-		GeneratedElement(final List<String> word, final int stateIndex){
-			this.word = word;
-			this.stateIndex = stateIndex;
-		}
+	private record GeneratedElement(List<String> word, int stateIndex){
 
 		@Override
-		public final boolean equals(final Object obj){
+		public boolean equals(final Object obj){
 			if(this == obj)
 				return true;
 			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			final GeneratedElement rhs = (GeneratedElement)obj;
-			return (stateIndex == rhs.stateIndex
-				&& word.equals(rhs.word));
+			return (stateIndex == rhs.stateIndex && word.equals(rhs.word));
 		}
 
 		@Override
-		public final int hashCode(){
+		public int hashCode(){
 			int result = (word == null? 0: word.hashCode());
 			result = 31 * result + Integer.hashCode(stateIndex);
 			return result;

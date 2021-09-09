@@ -63,8 +63,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class Packager{
 
@@ -81,8 +79,6 @@ public class Packager{
 	public static final String KEY_FILE_SENTENCE_EXCEPTIONS = "file.sentence.exceptions";
 	public static final String KEY_FILE_WORD_EXCEPTIONS = "file.word.exceptions";
 	public static final String KEY_FILE_AUTO_TEXT = "file.auto.text";
-
-	private static final ZipManager ZIPPER = new ZipManager();
 
 	private static final String FOLDER_META_INF = "META-INF";
 	private static final String FILENAME_DESCRIPTION_XML = "description.xml";
@@ -142,16 +138,7 @@ public class Packager{
 		KEY_FILE_MAPPER.put(KEY_FILE_AUTO_TEXT, CONFIGURATION_NODE_NAME_AUTO_TEXT);
 	}
 
-	private static final class ConfigurationData{
-		final String foldersSeparator;
-		final String nodePropertyFile1;
-		final String nodePropertyFile2;
-
-		ConfigurationData(final String foldersSeparator, final String nodePropertyFile1, final String nodePropertyFile2){
-			this.foldersSeparator = foldersSeparator;
-			this.nodePropertyFile1 = nodePropertyFile1;
-			this.nodePropertyFile2 = nodePropertyFile2;
-		}
+	private record ConfigurationData(String foldersSeparator, String nodePropertyFile1, String nodePropertyFile2){
 
 		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath) throws IOException{
 			final Map<String, File> folders = new HashMap<>(2);
@@ -228,7 +215,7 @@ public class Packager{
 		return false;
 	}
 
-	public final List<String> getAvailableLanguages(){
+	public final List<String> getLanguages(){
 		return languages;
 	}
 
@@ -318,8 +305,9 @@ public class Packager{
 			if(configurationFiles.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
 					+ StringUtils.join(configurationFiles));
-			if(match(uniqueFolders, String::isEmpty) != null)
-				throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
+			for(final String folder : uniqueFolders)
+				if(folder.isEmpty())
+					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
 	}
 

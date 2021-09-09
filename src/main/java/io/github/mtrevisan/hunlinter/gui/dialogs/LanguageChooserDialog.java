@@ -71,11 +71,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
       setResizable(false);
 
       languageList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      languageList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-         public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-            languageListValueChanged(evt);
-         }
-      });
+      languageList.addListSelectionListener(this::languageListValueChanged);
       languageScrollPane.setViewportView(languageList);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

@@ -349,9 +349,6 @@ public class DictionaryLayeredPane extends JLayeredPane{
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 

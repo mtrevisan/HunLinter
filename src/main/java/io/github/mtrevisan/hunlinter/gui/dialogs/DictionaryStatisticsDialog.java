@@ -252,11 +252,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       mainTabbedPane.addTab("Word stresses", stressesPanel);
 
       exportButton.setText("Export");
-      exportButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            exportButtonActionPerformed(evt);
-         }
-      });
+      exportButton.addActionListener(this::exportButtonActionPerformed);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);

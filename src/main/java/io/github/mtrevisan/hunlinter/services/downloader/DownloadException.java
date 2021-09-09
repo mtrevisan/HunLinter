@@ -22,30 +22,38 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.parsers.enums;
+package io.github.mtrevisan.hunlinter.services.downloader;
+
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 
 
-public enum AffixType{
+public class DownloadException extends Exception{
 
-	SUFFIX(AffixOption.SUFFIX),
-	PREFIX(AffixOption.PREFIX);
+	@Serial
+	private static final long serialVersionUID = 1946584089550870095L;
 
 
-	private final AffixOption option;
-
-	AffixType(final AffixOption option){
-		this.option = option;
+	public DownloadException(final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public static AffixType createFromCode(final String code){
-		for(final AffixType tag : values())
-			if(tag.option.is(code))
-				return tag;
-		return null;
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
-	public AffixOption getOption(){
-		return option;
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws IOException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

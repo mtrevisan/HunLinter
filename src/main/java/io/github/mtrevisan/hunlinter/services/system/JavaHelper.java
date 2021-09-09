@@ -80,6 +80,7 @@ public final class JavaHelper{
 	 *
 	 * @return estimated available memory
 	 */
+	@SuppressWarnings("CallToSystemGC")
 	public static long estimateAvailableMemory(){
 		System.gc();
 

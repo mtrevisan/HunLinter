@@ -24,10 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.log;
 
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Optional;
 
 
 public final class ExceptionHelper{
@@ -80,8 +77,12 @@ public final class ExceptionHelper{
 		if(stackTrace.length > 0){
 			final String className = ExceptionHelper.class.getName();
 			final String classPackage = className.substring(0, className.indexOf('.') + 1);
-			stackTrace0 = Optional.ofNullable(LoopHelper.match(stackTrace, trace -> trace.getClassName().startsWith(classPackage)))
-				.orElse(stackTrace[0]);
+			stackTrace0 = stackTrace[0];
+			for(final StackTraceElement trace : stackTrace)
+				if(trace.getClassName().startsWith(classPackage)){
+					stackTrace0 = trace;
+					break;
+				}
 		}
 		return stackTrace0;
 	}

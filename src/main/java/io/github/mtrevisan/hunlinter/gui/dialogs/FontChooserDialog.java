@@ -60,12 +60,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 14);
 
 
-	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{
-		private final JList<String> targetList;
-
-		ListSearchTextFieldDocumentHandler(final JList<String> targetList){
-			this.targetList = targetList;
-		}
+	private record ListSearchTextFieldDocumentHandler(JList<String> targetList) implements DocumentListener{
 
 		@Override
 		public final void insertUpdate(final DocumentEvent e){
@@ -176,19 +171,11 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
       familyNameList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      familyNameList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-         public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-            familyNameListValueChanged(evt);
-         }
-      });
+      familyNameList.addListSelectionListener(this::familyNameListValueChanged);
       familyNameScrollPane.setViewportView(familyNameList);
 
       monospacedCheckBox.setText("Show monospaced fonts only");
-      monospacedCheckBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            monospacedCheckBoxActionPerformed(evt);
-         }
-      });
+      monospacedCheckBox.addActionListener(this::monospacedCheckBoxActionPerformed);
 
       sampleLabel.setText("Sample:");
 
@@ -204,18 +191,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
       okButton.setText("OK");
       okButton.setPreferredSize(new java.awt.Dimension(65, 23));
-      okButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            okButtonActionPerformed(evt);
-         }
-      });
+      okButton.addActionListener(this::okButtonActionPerformed);
 
       cancelButton.setText("Cancel");
-      cancelButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cancelButtonActionPerformed(evt);
-         }
-      });
+      cancelButton.addActionListener(this::cancelButtonActionPerformed);
 
       sizeLabel.setText("Size:");
 

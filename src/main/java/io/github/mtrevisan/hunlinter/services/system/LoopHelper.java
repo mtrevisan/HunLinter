@@ -38,37 +38,6 @@ public final class LoopHelper{
 	private LoopHelper(){}
 
 
-	public static <T> T match(final T[] array, final Predicate<T> condition){
-		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i ++){
-			final T elem = array[i];
-			if(condition.test(elem))
-				return elem;
-		}
-		return null;
-	}
-
-	public static <T> T match(final Iterable<T> collection, final Predicate<T> condition){
-		if(collection != null)
-			for(final T elem : collection)
-				if(condition.test(elem))
-					return elem;
-		return null;
-	}
-
-
-	public static <T> boolean matchesAll(final Iterable<T> collection, final Predicate<T> condition){
-		boolean result = true;
-		if(collection != null)
-			for(final T elem : collection)
-				if(!condition.test(elem)){
-					result = false;
-					break;
-				}
-		return result;
-	}
-
-
 	public static void applyIf(final NodeList nodes, final Predicate<Node> condition, final Predicate<Node> fun){
 		if(nodes != null)
 			for(int i = 0; i < nodes.getLength(); i ++){

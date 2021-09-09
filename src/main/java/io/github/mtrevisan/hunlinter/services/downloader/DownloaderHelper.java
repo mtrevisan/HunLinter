@@ -111,9 +111,9 @@ public final class DownloaderHelper{
 	 * Extracts a list of version and whats-news
 	 *
 	 * @return	A list of pairs version-release-notes
-	 * @throws Exception	If something went wrong, or current version is already the last one
+	 * @throws VersionException	If something went wrong, or current version is already the last one
 	 */
-	public static List<Pair<Version, String>> extractNewerVersions() throws Exception{
+	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException, ParseException{
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
 			final String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
@@ -129,14 +129,14 @@ public final class DownloaderHelper{
 			}
 
 			if(whatsNew.isEmpty())
-				throw new Exception(ALREADY_UPDATED);
+				throw new VersionException(ALREADY_UPDATED);
 
 			whatsNew.sort(VERSION_COMPARATOR);
 			return whatsNew;
 		}
 	}
 
-	public static GITFileData extractVersionData(final Version version) throws Exception{
+	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException, ParseException{
 		//find last build by filename
 		final String filename = "-" + version;
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).openStream()){
@@ -144,7 +144,7 @@ public final class DownloaderHelper{
 			final GITFileData fileData = extractData(filename, dataBytes);
 
 			if(fileData == null)
-				throw new Exception(ALREADY_UPDATED);
+				throw new VersionException(ALREADY_UPDATED);
 
 			fileData.version = version;
 			return fileData;
@@ -157,13 +157,14 @@ public final class DownloaderHelper{
 		}
 	}
 
-	public static void validate(final byte[] content, final GITFileData object) throws Exception{
+	public static void validate(final byte[] content, final GITFileData object) throws DownloadException, NoSuchAlgorithmException{
 		if(object.size != null && content.length != object.size)
-			throw new Exception("Size mismatch while downloading " + object.name + ", expected " + object.size + " B, had " + content.length + " B");
+			throw new DownloadException("Size mismatch while downloading {}, expected {} B, had {} B", object.name, object.size,
+				content.length);
 
 		final String downloadedSha = calculateGitSha1(content);
 		if(!downloadedSha.equals(object.sha))
-			throw new Exception("SHA mismatch while downloading " + object.name);
+			throw new DownloadException("SHA mismatch while downloading {}", object.name);
 	}
 
 	private static GITFileData extractData(final String filename, final byte[] directoryContent) throws ParseException{

@@ -30,10 +30,10 @@ import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serial;
@@ -130,11 +130,7 @@ public class HelpDialog extends JDialog{
 
       authorLabelValue.setText("<html><a href=#>Mauro Trevisan</a></html>");
       authorLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-      authorLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mouseClicked(java.awt.event.MouseEvent evt) {
-            authorLabelValueMouseClicked(evt);
-         }
-      });
+      authorLabelValue.addMouseListener(new MyMouseAdapter());
 
       homePageLabel.setText("Home page:");
 
@@ -247,7 +243,15 @@ public class HelpDialog extends JDialog{
    }//GEN-LAST:event_homePageLabelValueMouseClicked
 
 
-   // Variables declaration - do not modify//GEN-BEGIN:variables
+	private static class MyMouseAdapter extends MouseAdapter{
+		@Override
+		public void mouseClicked(final MouseEvent evt){
+			authorLabelValueMouseClicked(evt);
+		}
+	}
+
+
+	// Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel authorLabel;
    private javax.swing.JLabel authorLabelValue;
    private javax.swing.JLabel copyright;
@@ -262,5 +266,5 @@ public class HelpDialog extends JDialog{
    private javax.swing.JLabel releaseDate;
    private javax.swing.JLabel releaseDateValue;
    private javax.swing.JLabel supportedOptionsLabel;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 }

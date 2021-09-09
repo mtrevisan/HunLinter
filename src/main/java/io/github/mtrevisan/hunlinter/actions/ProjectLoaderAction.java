@@ -93,7 +93,7 @@ public class ProjectLoaderAction extends AbstractAction{
 			try{
 				packager.reload(projectPath);
 
-				final List<String> availableLanguages = packager.getAvailableLanguages();
+				final List<String> availableLanguages = packager.getLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
 					//choose between available languages

@@ -50,8 +50,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
@@ -142,21 +140,12 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             cmpInputComboBoxKeyReleased();
          }
       });
-      inputComboBox.addItemListener(new ItemListener(){
-         @Override
-         public void itemStateChanged(final ItemEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
+      inputComboBox.addItemListener(evt -> cmpInputComboBoxKeyReleased());
 
       limitLabel.setText("Limit:");
 
       limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            limitComboBoxActionPerformed(evt);
-         }
-      });
+      limitComboBox.addActionListener(this::limitComboBoxActionPerformed);
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
@@ -178,11 +167,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       inputScrollPane.setViewportView(inputTextArea);
 
       loadInputButton.setText("Load input from dictionary");
-      loadInputButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            loadInputButtonActionPerformed(evt);
-         }
-      });
+      loadInputButton.addActionListener(this::loadInputButtonActionPerformed);
 
       openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");

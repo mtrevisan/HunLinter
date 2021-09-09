@@ -162,11 +162,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
       addButton.setMnemonic('A');
       addButton.setText("Add");
       addButton.setEnabled(false);
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       table.setFont(currentFont);
       table.setModel(new ThesaurusTableModel());
@@ -313,9 +309,6 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 				dm.setSynonyms(theParser.getSynonymsDictionary());
 				updateSynonymsCounter();
 			}
-		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
 		}
 		catch(final Exception e){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());

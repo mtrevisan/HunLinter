@@ -52,8 +52,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 /**
  * @see <a href="https://gist.github.com/hindol-viz/394ebc553673e2cd0699">Hindol viz</a>
@@ -93,7 +91,7 @@ public class FileListenerManager implements FileListener, Runnable{
 		listenerToFilePatterns = new ConcurrentHashMap<>(0);
 	}
 
-	private static WatchService createWatcher() throws RuntimeException{
+	private static WatchService createWatcher(){
 		try{
 			return FILE_SYSTEM_DEFAULT.newWatchService();
 		}
@@ -285,7 +283,11 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	public static boolean matchesAny(final Path input, final Iterable<PathMatcher> patterns){
-		return (match(patterns, pattern -> matches(input, pattern)) != null);
+		if(patterns != null)
+			for(final PathMatcher pattern : patterns)
+				if(matches(input, pattern))
+					return true;
+		return false;
 	}
 
 	public static boolean matches(final Path input, final PathMatcher pattern){

@@ -40,8 +40,6 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.StringJoiner;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class ThesaurusEntry{
 
@@ -119,7 +117,11 @@ public class ThesaurusEntry{
 //		return synonyms.stream()
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
-		return (match(synonyms, entry -> entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym)) != null);
+		if(synonyms != null)
+			for(final SynonymsEntry entry : synonyms)
+				if(entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym))
+					return true;
+		return false;
 //		for(final SynonymsEntry entry : synonyms)
 //			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
 //				return entry.containsSynonym(synonym);
@@ -128,13 +130,21 @@ public class ThesaurusEntry{
 
 	public final boolean contains(final Collection<String> partOfSpeeches, final List<String> synonyms){
 		final Collection<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && match(this.synonyms, entry -> entry.contains(partOfSpeeches, ss)) != null);
+		final boolean removed = ss.remove(definition);
+		if(removed)
+			for(final SynonymsEntry entry : this.synonyms)
+				if(entry.contains(partOfSpeeches, ss))
+					return true;
+		return false;
 	}
 
 	public final boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
 		final Collection<String> ss = new ArrayList<>(synonyms);
-		return (ss.remove(definition) && match(this.synonyms, entry -> entry.containsPartOfSpeech(partOfSpeeches)) != null
-			|| match(this.synonyms, entry -> entry.intersects(partOfSpeeches, ss)) != null);
+		final boolean removed = ss.remove(definition);
+		for(final SynonymsEntry entry : this.synonyms)
+			if(removed && entry.containsPartOfSpeech(partOfSpeeches) || entry.intersects(partOfSpeeches, ss))
+				return true;
+		return false;
 	}
 
 	public final void saveToIndex(final BufferedWriter writer, final int idx) throws IOException{

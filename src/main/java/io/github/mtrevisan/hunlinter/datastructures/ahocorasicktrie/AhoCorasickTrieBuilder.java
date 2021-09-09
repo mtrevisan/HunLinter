@@ -220,33 +220,33 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	private int insert(final List<IndexDataPair<RadixTrieNode>> siblings){
 		int begin = 0;
 		if(!siblings.isEmpty()){
-			int pos = Math.max(siblings.get(0).getIndex() + 1, nextCheckPos) - 1;
+			int checkPos = Math.max(siblings.get(0).getIndex() + 1, nextCheckPos) - 1;
 			int nonZeroNum = 0;
 			int first = 0;
 
-			if(allocSize <= pos)
-				resize(pos + 1);
+			if(allocSize <= checkPos)
+				resize(checkPos + 1);
 
-			outer:
 			//the goal of this loop body is to find `n` free spaces that satisfy `base[begin + a_1…a_n] == 0`, `a_1` to `a_n` are `n` nodes
 			//in siblings
+			outer:
 			while(true){
-				pos ++;
+				checkPos ++;
 
-				if(allocSize <= pos)
-					resize(pos + 1);
+				if(allocSize <= checkPos)
+					resize(checkPos + 1);
 
-				if(trie.check[pos] != 0){
+				if(trie.check[checkPos] != 0){
 					nonZeroNum ++;
 					continue;
 				}
 				else if(first == 0){
-					nextCheckPos = pos;
+					nextCheckPos = checkPos;
 					first = 1;
 				}
 
 				//the distance of the current position from the first sibling node
-				begin = pos - siblings.get(0).getIndex();
+				begin = checkPos - siblings.get(0).getIndex();
 				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getIndex())){
 					//prevent progress from generating zero divide errors
 					final double l = Math.max(1.05, (double) keySize / (memoryGrowthRate + 1));
@@ -264,12 +264,12 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 			}
 
 			// -- Simple heuristics --
-			//if the percentage of non-empty contents in check between the index `nextCheckPos` and `check` is greater than
-			//some constant value (e.g. 0.9), new `next_check_pos` index is written by `check`
-			if((double)nonZeroNum / (pos - nextCheckPos + 1) >= 0.95)
-				//from the position `next_check_pos` to `pos`, if the occupied space is above 95%, the next time you insert the node,
-				//you can start directly from the `pos` position
-				nextCheckPos = pos;
+			//if the percentage of non-empty contents in check between the index `nextCheckPos` and `checkPos` is greater than
+			//some constant value (e.g. 0.9), new `nextCheckPos` index is written by `checkPos`
+			if((double)nonZeroNum / (checkPos - nextCheckPos + 1) >= 0.95)
+				//from the position `nextCheckPos` to `checkPos`, if the occupied space is above 95%, the next time you insert the node,
+				//you can start directly from the `checkPos` position
+				nextCheckPos = checkPos;
 			used[begin] = true;
 
 			for(final IndexDataPair<RadixTrieNode> sibling : siblings)

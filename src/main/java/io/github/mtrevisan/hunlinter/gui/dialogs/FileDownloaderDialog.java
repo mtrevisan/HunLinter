@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.services.downloader.DownloadListenerInterfa
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadTask;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.downloader.GITFileData;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
@@ -36,6 +37,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,7 +66,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private DownloadTask task;
 
 
-	public FileDownloaderDialog(final Frame parent) throws Exception{
+	public FileDownloaderDialog(final Frame parent) throws IOException, ParseException, VersionException{
 		super(parent, "File downloader", true);
 
 		initComponents();
@@ -118,18 +120,10 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       statusLabel.setText(" ");
 
       whatsNewButton.setText("What's new");
-      whatsNewButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            whatsNewButtonActionPerformed(evt);
-         }
-      });
+      whatsNewButton.addActionListener(this::whatsNewButtonActionPerformed);
 
       downloadButton.setText("Download");
-      downloadButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            downloadButtonActionPerformed(evt);
-         }
-      });
+      downloadButton.addActionListener(this::downloadButtonActionPerformed);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);

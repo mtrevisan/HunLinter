@@ -79,16 +79,25 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 			finalizeProcessing("Project loaded successfully");
 		}
-		catch(final Exception e){
-			if(! JavaHelper.isInterruptedException(e)){
-				final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-				LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
-			}
+		catch(final FileNotFoundException e){
+			logExceptionError(e);
 
-			cancel(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
+			cancel(new ProjectNotFoundException(packager.getProjectPath(), e));
+		}
+		catch(final Exception e){
+			logExceptionError(e);
+
+			cancel(e);
 		}
 
 		return null;
+	}
+
+	private void logExceptionError(final Exception e){
+		if(!JavaHelper.isInterruptedException(e)){
+			final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+			LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
+		}
 	}
 
 }

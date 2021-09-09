@@ -371,8 +371,9 @@ public class RulesReducer{
 				children.add(rule);
 
 		final Map<LineEntry, Set<Character>> groups = new HashMap<>(0);
-		if(LoopHelper.match(children, child -> groups.put(child, child.extractGroup(condition.length())) != null) != null)
-			throw new IllegalStateException("Duplicate key");
+		for(final LineEntry child : children)
+			if(groups.put(child, child.extractGroup(condition.length())) != null)
+				throw new IllegalStateException("Duplicate key");
 
 		rules.removeAll(sameCondition);
 
@@ -424,8 +425,14 @@ public class RulesReducer{
 				final Collection<Character> overallLastGroup = new HashSet<>(characters);
 				overallLastGroup.removeAll(notPresentConditions);
 				final String yesCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
-				final LineEntry notRule = LoopHelper.match(finalRules,
-					rule -> rule.condition.equals(notCondition) || rule.condition.equals(yesCondition));
+
+				LineEntry notRule = null;
+				for(final LineEntry rule : finalRules)
+					if(rule.condition.equals(notCondition) || rule.condition.equals(yesCondition)){
+						notRule = rule;
+						break;
+					}
+
 				if(notRule != null)
 					notRule.condition = parent.condition;
 				else{
@@ -564,7 +571,7 @@ public class RulesReducer{
 
 				finalRules.addAll(bubbles);
 			}
-			else if(LoopHelper.matchesAll(queue, rule -> rule.condition.length() > parentConditionLength + 1))
+			else if(matchesAll(queue, parentConditionLength + 1))
 				for(final Character chr : childrenGroup){
 					final LineEntry entry = LineEntry.createFrom(parent, chr + parent.condition);
 					if(!queue.contains(entry))
@@ -583,6 +590,13 @@ public class RulesReducer{
 		}
 
 		return finalRules;
+	}
+
+	private static boolean matchesAll(final Iterable<LineEntry> queue, final int maxLength){
+		for(final LineEntry rule : queue)
+			if(rule.condition.length() <= maxLength)
+				return false;
+		return true;
 	}
 
 	/**

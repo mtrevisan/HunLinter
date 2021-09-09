@@ -140,18 +140,10 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       noHyphenationLabel.setText("No hyph character:");
 
       addButton.setText("Add");
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       acceptButton.setText("Accept");
-      acceptButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            acceptButtonActionPerformed(evt);
-         }
-      });
+      acceptButton.addActionListener(this::acceptButtonActionPerformed);
 
 		final Font currentFont = FontHelper.getCurrentFont();
 

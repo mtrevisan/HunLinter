@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public enum AffixOption{
 
@@ -181,7 +179,10 @@ public enum AffixOption{
 	}
 
 	public static AffixOption createFromCode(final String code){
-		return match(values(), option -> option.code.equals(code));
+		for(final AffixOption option : values())
+			if(option.code.equals(code))
+				return option;
+		return null;
 	}
 
 	public String getCode(){

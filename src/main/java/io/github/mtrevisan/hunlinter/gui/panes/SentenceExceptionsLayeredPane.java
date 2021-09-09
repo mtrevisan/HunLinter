@@ -124,11 +124,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
       addButton.setMnemonic('A');
       addButton.setText("Add");
       addButton.setEnabled(false);
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       scrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       scrollPane.setViewportView(tagPanel);

@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrateg
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -120,7 +119,11 @@ public class DictionaryEntryFactory{
 	}
 
 	private static boolean containsStem(final String[] mfs){
-		return (LoopHelper.match(mfs, mf -> mf.startsWith(MorphologicalTag.STEM.getCode())) != null);
+		final int size = (mfs != null? mfs.length: 0);
+		for(int i = 0; i < size; i ++)
+			if(mfs[i].startsWith(MorphologicalTag.STEM.getCode()))
+				return true;
+		return false;
 	}
 
 }

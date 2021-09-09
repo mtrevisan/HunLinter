@@ -137,11 +137,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
       resultScrollPane.setViewportView(resultTextArea);
 
       openPoSFSAButton.setText("Load PoS FSA");
-      openPoSFSAButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openPoSFSAButtonActionPerformed(evt);
-         }
-      });
+      openPoSFSAButton.addActionListener(this::openPoSFSAButtonActionPerformed);
 
       setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);

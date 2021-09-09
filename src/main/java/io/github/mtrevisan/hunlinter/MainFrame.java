@@ -331,11 +331,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open project…");
-      filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filOpenProjectMenuItemActionPerformed(evt);
-         }
-      });
+      filOpenProjectMenuItem.addActionListener(this::filOpenProjectMenuItemActionPerformed);
       filMenu.add(filOpenProjectMenuItem);
 
       filCreatePackageMenuItem.setAction(new CreatePackageAction(parserManager));

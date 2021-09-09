@@ -55,10 +55,10 @@ public interface FSASerializerInterface{
 	/**
 	 * @return Returns the set of flags supported by the serializer (and the output automaton).
 	 */
-	Set<FSAFlags> getFlags();
+	Set<FSAFlags> getSupportedFlags();
 
 	/**
-	 * Sets the filler separator (only if {@link #getFlags()} returns {@link FSAFlags#SEPARATORS}).
+	 * Sets the filler separator (only if {@link #getSupportedFlags()} returns {@link FSAFlags#SEPARATORS}).
 	 *
 	 * @param filler The filler separator byte.
 	 * @return Returns {@code this} for call chaining.
@@ -66,7 +66,7 @@ public interface FSASerializerInterface{
 	FSASerializerInterface withFiller(final byte filler);
 
 	/**
-	 * Sets the annotation separator (only if {@link #getFlags()} returns {@link FSAFlags#SEPARATORS}).
+	 * Sets the annotation separator (only if {@link #getSupportedFlags()} returns {@link FSAFlags#SEPARATORS}).
 	 *
 	 * @param annotationSeparator The filler separator byte.
 	 * @return Returns {@code this} for call chaining.
@@ -75,7 +75,7 @@ public interface FSASerializerInterface{
 
 	/**
 	 * Enables support for right language count on nodes, speeding up perfect hash
-	 * counts (only if {@link #getFlags()} returns {@link FSAFlags#NUMBERS}).
+	 * counts (only if {@link #getSupportedFlags()} returns {@link FSAFlags#NUMBERS}).
 	 *
 	 * @return Returns {@code this} for call chaining.
 	 */

@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * Serializes in-memory {@link FSA} graphs to a binary format compatible with
- * Jan Daciuk's {@code fsa}'s package <code>FSA5</code> format.
+ * Jan Daciuk's {@code fsa}'s package {@code FSA5} format.
  *
  * <p>
  * It is possible to serialize the automaton with numbers required for perfect
@@ -34,16 +34,16 @@ import java.util.Set;
 public class FSASerializer implements FSASerializerInterface{
 
 	/** Maximum number of bytes for a serialized arc. */
-	private final static int MAX_ARC_SIZE = 1 + 5;
+	private static final int MAX_ARC_SIZE = 1 + 5;
 
 	/** Maximum number of bytes for per-node data. */
-	private final static int MAX_NODE_DATA_SIZE = 16;
+	private static final int MAX_NODE_DATA_SIZE = 16;
 
 	/** Number of bytes for the arc's flags header (arc representation without the goto address). */
-	private final static int SIZEOF_FLAGS = 1;
+	private static final int SIZEOF_FLAGS = 1;
 
 	/** Supported flags. */
-	private final static Set<FSAFlags> flags = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.SEPARATORS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
+	private static final Set<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.SEPARATORS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
 		FSAFlags.NEXTBIT);
 
 	public byte fillerByte = FSA.DEFAULT_FILLER;
@@ -94,7 +94,7 @@ public class FSASerializer implements FSASerializerInterface{
 	}
 
 	/**
-	 * Serialize root state {@code s} to an output stream in <code>FSA</code> format.
+	 * Serialize root state {@code s} to an output stream in {@code FSA} format.
 	 *
 	 * @return	{@code os} for chaining.
 	 * @see #serializeWithNumbers()
@@ -148,7 +148,7 @@ public class FSASerializer implements FSASerializerInterface{
 			progressCallback.accept(80);
 
 		//emit the automaton
-		boolean gtlUnchanged = emitArcs(fsa, os, linearized, gtl, nodeDataLength);
+		final boolean gtlUnchanged = emitArcs(fsa, os, linearized, gtl, nodeDataLength);
 		assert gtlUnchanged: "gtl changed in the final pass.";
 
 		if(progressCallback != null)
@@ -180,8 +180,8 @@ public class FSASerializer implements FSASerializerInterface{
 
 	/** Return supported flags. */
 	@Override
-	public final Set<FSAFlags> getFlags(){
-		return flags;
+	public final Set<FSAFlags> getSupportedFlags(){
+		return SUPPORTED_FLAGS;
 	}
 
 	/** Linearization of states. */

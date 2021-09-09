@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 
 
 public class DictionaryEntry{
@@ -113,14 +111,6 @@ public class DictionaryEntry{
 		return removed;
 	}
 
-	/**
-	 * @param isTerminalAffix	The method used to determine if a flag is a terminal
-	 * @return	Whether there are continuation flags that are not terminal affixes
-	 */
-	public final boolean hasNonTerminalContinuationFlags(final Predicate<String> isTerminalAffix){
-		return (LoopHelper.match(continuationFlags, Predicate.not(isTerminalAffix)) != null);
-	}
-
 	public final List<String> getContinuationFlags(){
 		return continuationFlags;
 	}
@@ -136,7 +126,10 @@ public class DictionaryEntry{
 	public final boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
 			final Set<String> list = new HashSet<>(continuationFlags);
-			return (LoopHelper.match(flags, Predicate.not(list::add)) != null);
+			for(final String flag : flags)
+				if(!list.add(flag))
+					return true;
+			return false;
 		}
 		return false;
 	}
@@ -193,7 +186,11 @@ public class DictionaryEntry{
 	}
 
 	public final boolean hasPartOfSpeech(){
-		return (LoopHelper.match(morphologicalFields, MorphologicalTag.PART_OF_SPEECH::isSupertypeOf) != null);
+		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		for(int i = 0; i < size; i ++)
+			if(MorphologicalTag.PART_OF_SPEECH.isSupertypeOf(morphologicalFields[i]))
+				return true;
+		return false;
 	}
 
 	/**

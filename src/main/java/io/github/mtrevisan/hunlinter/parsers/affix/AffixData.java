@@ -49,8 +49,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class AffixData{
 
@@ -195,7 +193,10 @@ public class AffixData{
 	}
 
 	public final boolean isManagedByCompoundRule(final String flag){
-		return (match(getCompoundRules(), rule -> isManagedByCompoundRule(rule, flag)) != null);
+		for(final String rule : getCompoundRules())
+			if(isManagedByCompoundRule(rule, flag))
+				return true;
+		return false;
 	}
 
 	public final boolean isManagedByCompoundRule(final String compoundRule, final String flag){

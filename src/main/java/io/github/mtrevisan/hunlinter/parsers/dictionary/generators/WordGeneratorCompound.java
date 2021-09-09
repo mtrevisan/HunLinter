@@ -31,7 +31,6 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.Affixes;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import org.apache.commons.lang3.StringUtils;
@@ -318,7 +317,12 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 	//is word a non-compound with a REP substitution (see checkcompoundrep)?
 	private boolean existsCompoundAsReplacement(final String word){
-		boolean exists = (LoopHelper.match(compoundAsReplacement, word::contains) != null);
+		boolean exists = false;
+		for(final String elem : compoundAsReplacement)
+			if(word.contains(elem)){
+				exists = true;
+				break;
+			}
 		if(!exists && word.length() >= 2){
 			final String convertedWord = affixData.applyReplacementTable(word);
 			if(dicInclusionTestWorker.isInDictionary(convertedWord)){

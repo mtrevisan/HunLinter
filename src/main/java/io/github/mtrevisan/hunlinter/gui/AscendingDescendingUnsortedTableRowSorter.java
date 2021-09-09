@@ -52,12 +52,7 @@ class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends Ta
 	 */
 	@Override
 	public final int convertRowIndexToModel(final int index){
-		try{
-			return super.convertRowIndexToModel(index);
-		}
-		catch(final IndexOutOfBoundsException ignored){
-			return -1;
-		}
+		return super.convertRowIndexToModel(index);
 	}
 
 }

@@ -176,7 +176,7 @@ public class SerializerTestBase{
 	private void checkSerialization(List<byte[]> input, FSAAbstract root) throws IOException{
 		FSASerializerInterface serializer = createSerializer();
 		checkSerialization0(serializer, input, root);
-		if(serializer.getFlags().contains(FSAFlags.NUMBERS))
+		if(serializer.getSupportedFlags().contains(FSAFlags.NUMBERS))
 			checkSerialization0(serializer.serializeWithNumbers(), input, root);
 	}
 
@@ -189,7 +189,7 @@ public class SerializerTestBase{
 
 	@Test
 	void automatonWithNodeNumbers() throws IOException{
-		Assertions.assertTrue(createSerializer().getFlags().contains(FSAFlags.NUMBERS));
+		Assertions.assertTrue(createSerializer().getSupportedFlags().contains(FSAFlags.NUMBERS));
 
 		List<String> input = Arrays.asList("a", "aba", "ac", "b", "ba", "c");
 		List<byte[]> in = input.stream()

@@ -46,8 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 /** Manages pairs of mistyped words and their correct spelling. */
 public class AutoCorrectParser{
@@ -162,9 +160,11 @@ public class AutoCorrectParser{
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	public final boolean contains(final String incorrect, final String correct){
-		return (match(dictionary,
-			elem -> !incorrect.isEmpty() && !correct.isEmpty()
-				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
+		for(final CorrectionEntry elem : dictionary)
+			if(!incorrect.isEmpty() && !correct.isEmpty()
+					&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct))
+				return true;
+		return false;
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){

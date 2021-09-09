@@ -210,7 +210,7 @@ public class CFSASerializer implements FSASerializerInterface{
 
 	/** Return supported flags. */
 	@Override
-	public final Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getSupportedFlags(){
 		return SUPPORTED_FLAGS;
 	}
 
@@ -276,7 +276,7 @@ public class CFSASerializer implements FSASerializerInterface{
 			linearizeState(fsa, nodes, linearized, visited, node);
 		}
 
-		//calculate new state offsets. This is iterative. We start with maximum potential offsets and recalculate until converged
+		//calculate new state offsets iteratively (start with maximum potential offsets and recalculate until converged)
 		final int maxOffset = Integer.MAX_VALUE;
 		for(int i = 0; i < linearized.size(); i ++)
 			offsets.put(linearized.get(i), maxOffset);

@@ -337,11 +337,13 @@ public class HyphenationParser{
 	public final void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
-		for(final Level lev : Level.values())
-			rules.get(lev).clear();
 		patterns.clear();
-		for(final Level lev : Level.values())
-			REDUCED_PATTERNS.get(lev).clear();
+		for(final Level lev : Level.values()){
+			rules.get(lev)
+				.clear();
+			REDUCED_PATTERNS.get(lev)
+				.clear();
+		}
 		for(final Map<String, String> elem : customHyphenations.values())
 			elem.clear();
 		options.clear();

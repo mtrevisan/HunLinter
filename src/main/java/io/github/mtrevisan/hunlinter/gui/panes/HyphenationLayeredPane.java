@@ -175,20 +175,12 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
       addRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
       addRuleLevelComboBox.setEnabled(false);
-      addRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addRuleLevelComboBoxActionPerformed(evt);
-         }
-      });
+      addRuleLevelComboBox.addActionListener(this::addRuleLevelComboBoxActionPerformed);
 
       addRuleButton.setMnemonic('A');
       addRuleButton.setText("Add rule");
       addRuleButton.setEnabled(false);
-      addRuleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addRuleButtonActionPerformed(evt);
-         }
-      });
+      addRuleButton.addActionListener(this::addRuleButtonActionPerformed);
 
       addRuleSyllabationLabel.setText("New syllabation:");
       addRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
@@ -202,11 +194,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
       addRuleSyllabesCountValueLabel.setText("…");
 
       optionsButton.setText("Options");
-      optionsButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optionsButtonActionPerformed(evt);
-         }
-      });
+      optionsButton.addActionListener(this::optionsButtonActionPerformed);
 
       openHypButton.setAction(new OpenFileAction(Packager.KEY_FILE_HYPHENATION, packager));
       openHypButton.setText("Open Hyphenation");

@@ -97,19 +97,11 @@ public class DictionarySortDialog extends JDialog{
 
       btnNextUnsortedArea.setText("▼");
       btnNextUnsortedArea.setToolTipText("Next unsorted area");
-      btnNextUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnNextUnsortedAreaActionPerformed(evt);
-         }
-      });
+      btnNextUnsortedArea.addActionListener(this::btnNextUnsortedAreaActionPerformed);
 
       btnPreviousUnsortedArea.setText("▲");
       btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
-      btnPreviousUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnPreviousUnsortedAreaActionPerformed(evt);
-         }
-      });
+      btnPreviousUnsortedArea.addActionListener(this::btnPreviousUnsortedAreaActionPerformed);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);

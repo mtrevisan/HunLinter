@@ -83,6 +83,7 @@ public final class FontHelper{
 	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
 	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
 
+	@SuppressWarnings("StaticVariableMayNotBeInitialized")
 	private static String languageSample;
 	private static Font currentFont = FontChooserDialog.getDefaultFont();
 
@@ -110,6 +111,7 @@ public final class FontHelper{
 		return bestFont;
 	}
 
+	@SuppressWarnings("StaticVariableUsedBeforeInitialization")
 	public static void extractFonts(final String languageSample){
 		Objects.requireNonNull(languageSample, "Language sample cannot be null");
 

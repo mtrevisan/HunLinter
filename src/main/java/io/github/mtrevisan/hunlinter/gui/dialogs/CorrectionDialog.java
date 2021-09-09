@@ -102,18 +102,10 @@ public class CorrectionDialog extends JDialog{
       btnOk.setMaximumSize(new java.awt.Dimension(65, 23));
       btnOk.setMinimumSize(new java.awt.Dimension(65, 23));
       btnOk.setPreferredSize(new java.awt.Dimension(65, 23));
-      btnOk.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnOkActionPerformed(evt);
-         }
-      });
+      btnOk.addActionListener(this::btnOkActionPerformed);
 
       btnCancel.setText("Cancel");
-      btnCancel.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnCancelActionPerformed(evt);
-         }
-      });
+      btnCancel.addActionListener(this::btnCancelActionPerformed);
 
       javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
       buttonPanel.setLayout(buttonPanelLayout);

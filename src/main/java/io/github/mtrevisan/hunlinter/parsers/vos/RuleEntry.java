@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.vos;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 
 import java.util.List;
 import java.util.Objects;
@@ -97,7 +96,11 @@ public class RuleEntry{
 	}
 
 	public final boolean isProductiveFor(final String word){
-		return (LoopHelper.match(entries, entry -> entry.canApplyTo(word)) != null);
+		if(entries != null)
+			for(final AffixEntry entry : entries)
+				if(entry.canApplyTo(word))
+					return true;
+		return false;
 	}
 
 	@Override

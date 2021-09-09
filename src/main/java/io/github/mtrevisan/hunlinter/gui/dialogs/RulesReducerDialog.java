@@ -121,25 +121,13 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		ruleComboBox.setFont(currentFont);
-      ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            ruleComboBoxActionPerformed(evt);
-         }
-      });
+      ruleComboBox.addActionListener(this::ruleComboBoxActionPerformed);
 
       optimizeClosedGroupCheckBox.setText("Optimize for closed group");
-      optimizeClosedGroupCheckBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optimizeClosedGroupCheckBoxActionPerformed(evt);
-         }
-      });
+      optimizeClosedGroupCheckBox.addActionListener(this::optimizeClosedGroupCheckBoxActionPerformed);
 
       reduceButton.setText("Reduce");
-      reduceButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            reduceButtonActionPerformed(evt);
-         }
-      });
+      reduceButton.addActionListener(this::reduceButtonActionPerformed);
 
       currentSetLabel.setText("Current set:");
 

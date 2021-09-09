@@ -86,21 +86,10 @@ public class PropertiesUTF8 extends Properties{
 				if(!line.isEmpty() && COMMENT.indexOf(line.charAt(0)) < 0){
 					//removes the beginning separators
 					property.setLength(0);
-					property.append(line);
-					//reads the whole property if it is on multiple lines
-					while(isLineContinuing(line)){
-						//remove the `\` character
-						property.setLength(property.length() - 1);
-						line = in.readLine();
-						property.append(removeWhiteSpaces(line));
-					}
+					readWholeLine(property, line, in);
 
 					if(!property.isEmpty()){
-						int endOfKey = 0;
-						//calculates the ending index of the key
-						final int l = property.length();
-						while(endOfKey < l && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
-							endOfKey ++;
+						final int endOfKey = getEndIndexOfKey(property);
 						String key = property.substring(0, endOfKey);
 						String value = property.substring(endOfKey + 1);
 
@@ -112,6 +101,26 @@ public class PropertiesUTF8 extends Properties{
 				}
 			}
 		}
+	}
+
+	private void readWholeLine(final StringBuilder property, String line, final BufferedReader in) throws IOException{
+		property.append(line);
+		//reads the whole property if it is on multiple lines
+		while(isLineContinuing(line)){
+			//remove the `\` character
+			property.setLength(property.length() - 1);
+			line = in.readLine();
+			property.append(removeWhiteSpaces(line));
+		}
+	}
+
+	/** Calculates the ending index of the key. */
+	private int getEndIndexOfKey(final StringBuilder property){
+		int endOfKey = 0;
+		final int l = property.length();
+		while(endOfKey < l && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
+			endOfKey ++;
+		return endOfKey;
 	}
 
 	/**

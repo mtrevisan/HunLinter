@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.List;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public class WordGeneratorAffixRules extends WordGeneratorBase{
 
@@ -86,12 +84,21 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 				final Inflection inflection = itr.next();
 				final boolean hasOnlyInCompoundFlag = inflection.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
-				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules,
-					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
+				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules, onlyInCompoundFlag) != null);
 				if(hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules)
 					itr.remove();
 			}
 		}
+	}
+
+	private static AffixEntry match(final AffixEntry[] array, final String onlyInCompoundFlag){
+		final int size = (array != null? array.length: 0);
+		for(int i = 0; i < size; i ++){
+			final AffixEntry appliedRule = array[i];
+			if(appliedRule.hasContinuationFlag(onlyInCompoundFlag))
+				return appliedRule;
+		}
+		return null;
 	}
 
 }

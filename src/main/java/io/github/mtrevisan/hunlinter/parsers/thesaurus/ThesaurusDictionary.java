@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -71,13 +70,7 @@ public class ThesaurusDictionary{
 		for(int i = 0; i < size; i ++)
 			sj.add(partOfSpeeches[i]);
 		final String wholePartOfSpeeches = sj.toString();
-		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
-		for(int i = 0; i < synonyms.length; i ++){
-			final String s = synonyms[i].toLowerCase(Locale.ROOT);
-			if(uniqueValues.add(s))
-				uniqueSynonyms.add(s);
-		}
+		final Collection<String> uniqueSynonyms = uniqueValues(synonyms);
 
 		boolean result = false;
 		for(String currentDefinition : uniqueSynonyms){
@@ -101,6 +94,17 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
+	private Collection<String> uniqueValues(final String[] synonyms){
+		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
+		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
+		for(int i = 0; i < synonyms.length; i ++){
+			final String s = synonyms[i].toLowerCase(Locale.ROOT);
+			if(uniqueValues.add(s))
+				uniqueSynonyms.add(s);
+		}
+		return uniqueSynonyms;
+	}
+
 	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
@@ -121,7 +125,10 @@ public class ThesaurusDictionary{
 	public final boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
-		return (LoopHelper.match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
+		for(final ThesaurusEntry entry : dictionary.values())
+			if(entry.contains(pos, syns))
+				return true;
+		return false;
 	}
 
 	//FIXME? remove only one entry?

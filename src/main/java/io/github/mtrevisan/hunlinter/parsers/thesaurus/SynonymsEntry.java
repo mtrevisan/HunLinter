@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -120,7 +119,11 @@ public class SynonymsEntry{
 	}
 
 	public final boolean containsSynonym(final String synonym){
-		return (LoopHelper.match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
+		if(synonyms != null)
+			for(final String s : synonyms)
+				if(ThesaurusDictionary.removeSynonymUse(s).equals(synonym))
+					return true;
+		return false;
 	}
 
 	public final boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
