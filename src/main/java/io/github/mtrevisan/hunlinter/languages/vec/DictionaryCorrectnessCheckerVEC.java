@@ -240,11 +240,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void ciuiCheck(final String subword, final Inflection inflection){
-		if(!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN)){
-			final String phonemizedSubword = GraphemeVEC.handleJHJWIUmlautPhonemes(subword);
-			if(RegexHelper.find(phonemizedSubword, patternPhonemeCijjhnhiv))
-				throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV, inflection.getWord());
-		}
+		if(!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && RegexHelper.find(subword, patternPhonemeCijjhnhiv))
+			throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV, inflection.getWord());
 
 		if(RegexHelper.find(subword, PATTERN_V_IU_V))
 			throw new LinterException(WORD_CANNOT_HAVE_V_IU_V, inflection.getWord());

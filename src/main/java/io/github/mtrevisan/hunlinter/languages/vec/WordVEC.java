@@ -54,7 +54,7 @@ public final class WordVEC{
 	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
-	public static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
+	static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
@@ -218,14 +218,13 @@ public final class WordVEC{
 	public static String markDefaultStress(String word){
 		int stressIndex = getIndexOfStress(word);
 		if(stressIndex < 0){
-			final String phones = GraphemeVEC.handleJHJWIUmlautPhonemes(word);
-			final int lastChar = getLastUnstressedVowelIndex(phones, phones.length());
+			final int lastChar = getLastUnstressedVowelIndex(word, word.length());
 
 			//last vowel if the word ends with consonant, penultimate otherwise
 			//default to the second vowel of a group of two (first one on a monosyllabe)
-			if(endsWithVowel(phones))
-				stressIndex = getLastUnstressedVowelIndex(phones, lastChar);
-			if(stressIndex >= 0 && RegexHelper.find(phones, DEFAULT_STRESS_GROUP))
+			if(endsWithVowel(word))
+				stressIndex = getLastUnstressedVowelIndex(word, lastChar);
+			if(stressIndex >= 0 && RegexHelper.find(word, DEFAULT_STRESS_GROUP))
 				stressIndex --;
 			else if(stressIndex < 0)
 				stressIndex = lastChar;
