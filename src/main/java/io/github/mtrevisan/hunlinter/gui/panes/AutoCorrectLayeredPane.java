@@ -47,19 +47,24 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.DefaultRowSorter;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.transform.TransformerException;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -69,7 +74,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 
 public class AutoCorrectLayeredPane extends JLayeredPane{
@@ -287,14 +292,14 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          //try adding the correction
          final String incorrect = incorrectTextField.getText();
          final String correct = correctTextField.getText();
-         final Supplier<Boolean> duplicatesDiscriminator = () -> {
+         final BooleanSupplier duplicatesDiscriminator = () -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Duplicate detected",
                JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);
          };
          final DuplicationResult<CorrectionEntry> duplicationResult = parserManager.getAcoParser()
-         .insertCorrection(incorrect, correct, duplicatesDiscriminator);
+         	.insertCorrection(incorrect, correct, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
             final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();

@@ -103,7 +103,7 @@ public class PropertiesUTF8 extends Properties{
 		}
 	}
 
-	private void readWholeLine(final StringBuilder property, String line, final BufferedReader in) throws IOException{
+	private static void readWholeLine(final StringBuilder property, String line, final BufferedReader in) throws IOException{
 		property.append(line);
 		//reads the whole property if it is on multiple lines
 		while(isLineContinuing(line)){
@@ -115,10 +115,10 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 	/** Calculates the ending index of the key. */
-	private int getEndIndexOfKey(final StringBuilder property){
+	private static int getEndIndexOfKey(final StringBuilder property){
 		int endOfKey = 0;
-		final int l = property.length();
-		while(endOfKey < l && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
+		final int len = property.length();
+		while(endOfKey < len && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
 			endOfKey ++;
 		return endOfKey;
 	}
@@ -189,7 +189,7 @@ public class PropertiesUTF8 extends Properties{
 						}
 						//index must point on the last character of the escaped sequence to avoid missing the next character
 						index --;
-						currentChar = (char) value;
+						currentChar = (char)value;
 					default:
 						break;
 				}
@@ -263,11 +263,11 @@ public class PropertiesUTF8 extends Properties{
 		return sb.toString();
 	}
 
-
 	@Override
 	public final synchronized Object clone(){
 		return super.clone();
 	}
+
 
 	@SuppressWarnings("unused")
 	@Serial

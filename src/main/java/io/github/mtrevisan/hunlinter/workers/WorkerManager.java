@@ -38,6 +38,7 @@ import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.CompoundRulesWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryLinterWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DuplicatesWorker;
+import io.github.mtrevisan.hunlinter.workers.dictionary.InflectionReader;
 import io.github.mtrevisan.hunlinter.workers.dictionary.MinimalPairsWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.PoSFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.dictionary.SorterWorker;
@@ -201,7 +202,7 @@ public class WorkerManager{
 			final AffixData affixData = affParser.getAffixData();
 			final String compoundFlag = affixData.getCompoundFlag();
 			final List<Inflection> compounds = Collections.synchronizedList(new ArrayList<>(0));
-			final BiConsumer<Inflection, Integer> inflectionReader = (inflection, row) -> {
+			final InflectionReader inflectionReader = (inflection, row) -> {
 				if(!inflection.distributeByCompoundRule(affixData).isEmpty() || inflection.hasContinuationFlag(compoundFlag))
 					compounds.add(inflection);
 			};

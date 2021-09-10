@@ -93,7 +93,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 		return null;
 	}
 
-	private void logExceptionError(final Exception e){
+	private static void logExceptionError(final Exception e){
 		if(!JavaHelper.isInterruptedException(e)){
 			final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
 			LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);

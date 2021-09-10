@@ -180,7 +180,8 @@ public enum DictionaryAttribute{
 		public EncoderType fromString(final String value){
 			try{
 				return EncoderType.valueOf(value.trim().toUpperCase(Locale.ROOT));
-			}catch(final IllegalArgumentException e){
+			}
+			catch(final IllegalArgumentException e){
 				throw new IllegalArgumentException("Invalid encoder name '" + value.trim() + "', only these coders are valid: " + Arrays.toString(EncoderType.values()));
 			}
 		}

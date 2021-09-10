@@ -47,13 +47,12 @@ public class CompoundRulesWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Compound rules extraction";
 
 
-	public CompoundRulesWorker(final ParserManager parserManager, final BiConsumer<Inflection, Integer> inflectionReader,
-			final Runnable completed){
+	public CompoundRulesWorker(final ParserManager parserManager, final InflectionReader inflectionReader, final Runnable completed){
 		this(parserManager.getDicParser(), parserManager.getWordGenerator(), inflectionReader, completed);
 	}
 
-	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final BiConsumer<Inflection, Integer> inflectionReader, final Runnable completed){
+	public CompoundRulesWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final InflectionReader inflectionReader,
+			final Runnable completed){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()

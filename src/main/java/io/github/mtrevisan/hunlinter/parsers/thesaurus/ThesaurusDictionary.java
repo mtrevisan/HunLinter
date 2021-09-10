@@ -94,7 +94,7 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private Collection<String> uniqueValues(final String[] synonyms){
+	private static Collection<String> uniqueValues(final String[] synonyms){
 		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
 		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
 		for(int i = 0; i < synonyms.length; i ++){

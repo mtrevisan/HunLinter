@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 
 /** Manages pairs of mistyped words and their correct spelling. */
@@ -130,14 +130,14 @@ public class AutoCorrectParser{
 	 * @return The duplication result
 	 */
 	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
-			final Supplier<Boolean> duplicatesDiscriminator){
+			final BooleanSupplier duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE, "Incorrect", incorrect);
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
 			throw new LinterException(BAD_QUOTE, "Correct", correct);
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
-		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.get());
+		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.getAsBoolean());
 		if(forceInsertion)
 			dictionary.add(new CorrectionEntry(incorrect, correct));
 
