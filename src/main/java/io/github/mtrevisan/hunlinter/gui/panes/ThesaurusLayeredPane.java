@@ -327,7 +327,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	@SuppressWarnings({"unused", "NumberEquality"})
+	@SuppressWarnings({"unused", "NumberEquality", "unchecked"})
 	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;

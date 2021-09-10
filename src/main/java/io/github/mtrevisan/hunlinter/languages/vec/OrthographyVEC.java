@@ -69,14 +69,12 @@ public final class OrthographyVEC extends Orthography{
 			starting = "inn";
 		}
 		String ending = "";
-		if(strippedWord.endsWith("onne")){
-			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
+		if(strippedWord.endsWith("onne"))
 			ending = "onne";
-		}
-		else if(strippedWord.endsWith("enne")){
-			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
+		else if(strippedWord.endsWith("enne"))
 			ending = "enne";
-		}
+		if(!ending.isEmpty())
+			strippedWord = strippedWord.substring(0, strippedWord.length() - ending.length());
 		strippedWord = RegexHelper.replaceAll(strippedWord, PATTERN_CONSONANT_GEMINATES, "$1");
 		return starting + strippedWord + ending;
 	};

@@ -61,9 +61,9 @@ public final class DownloaderHelper{
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
 
-	private static final Comparator<Pair<Version, String>> VERSION_COMPARATOR;
+	private static final Comparator<Map.Entry<Version, String>> VERSION_COMPARATOR;
 	static{
-		final Comparator<Pair<Version, String>> cmp = Comparator.comparing(Pair::getKey);
+		final Comparator<Map.Entry<Version, String>> cmp = Map.Entry.comparingByKey();
 		VERSION_COMPARATOR = cmp.reversed();
 	}
 
@@ -71,22 +71,25 @@ public final class DownloaderHelper{
 	private static final String PROPERTY_KEY_TAG_NAME = "tag_name";
 	private static final String PROPERTY_KEY_WHATS_NEW = "body";
 	private static final String PROPERTY_KEY_FILENAME = "name";
-	public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
-	public static final String PROPERTY_KEY_VERSION = "version";
-	public static final String PROPERTY_KEY_BUILD_TIMESTAMP = "buildTimestamp";
+	private static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
+	private static final String PROPERTY_KEY_VERSION = "version";
+	private static final String PROPERTY_KEY_BUILD_TIMESTAMP = "buildTimestamp";
 
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
 	private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
-	public static final Map<String, Object> APPLICATION_PROPERTIES;
+	public static final String ARTIFACT_ID;
+	public static final Version APPLICATION_VERSION;
+	public static final LocalDate BUILD_TIMESTAMP;
 	static{
-		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
+		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"),
+				StandardCharsets.UTF_8)){
 			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);
 
-			APPLICATION_PROPERTIES = Map.of(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID),
-				PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION),
-				PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
+			ARTIFACT_ID = prop.getProperty(PROPERTY_KEY_ARTIFACT_ID);
+			APPLICATION_VERSION = new Version(prop.getProperty(PROPERTY_KEY_VERSION));
+			BUILD_TIMESTAMP = LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP));
 		}
 		catch(final IOException ioe){
 			throw new Error("Cannot instantiate application properties map", ioe);
@@ -121,12 +124,11 @@ public final class DownloaderHelper{
 
 			final JSONParser parser = new JSONParser();
 			final JSONArray jsonArray = (JSONArray)parser.parse(response);
-			final Version applicationVersion = new Version((String)APPLICATION_PROPERTIES.get(PROPERTY_KEY_VERSION));
 			final List<Pair<Version, String>> whatsNew = new ArrayList<>(jsonArray.size());
 			for(final Object elem : jsonArray){
 				final JSONObject obj = (JSONObject)elem;
 				final Version tagName = new Version((String)obj.get(PROPERTY_KEY_TAG_NAME));
-				if(tagName.isGreaterThan(applicationVersion))
+				if(tagName.isGreaterThan(APPLICATION_VERSION))
 					whatsNew.add(Pair.of(tagName, (String)obj.get(PROPERTY_KEY_WHATS_NEW)));
 			}
 

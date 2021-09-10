@@ -285,7 +285,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             else
 					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
-            final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
+            @SuppressWarnings("unchecked")
+				final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
             dm.setInflections(words);
          }
          catch(final RuntimeException re){

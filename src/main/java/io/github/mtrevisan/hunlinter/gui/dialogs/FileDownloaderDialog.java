@@ -89,7 +89,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		//copy to default download folder
 		localPath = System.getProperty("user.home") + "/Downloads/" + remoteObject.name;
 
-		currentVersionLabel.setText((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION));
+		currentVersionLabel.setText(DownloaderHelper.APPLICATION_VERSION.toString());
 		newVersionLabel.setText(remoteObject.version.toString());
 		downloadSizeLabel.setText(remoteObject.size != null? StringHelper.byteCountToHumanReadable(remoteObject.size): "--");
 	}
@@ -111,7 +111,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      versionAvailableLabel.setText("A new version of " + DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " is available.");
+      versionAvailableLabel.setText("A new version of " + DownloaderHelper.ARTIFACT_ID + " is available.");
 
       currentVersionPreLabel.setText("Current version:");
 

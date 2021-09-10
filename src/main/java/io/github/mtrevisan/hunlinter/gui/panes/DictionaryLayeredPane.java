@@ -414,6 +414,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
+				@SuppressWarnings("unchecked")
 				final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
 				dm.setInflections(inflections);
 

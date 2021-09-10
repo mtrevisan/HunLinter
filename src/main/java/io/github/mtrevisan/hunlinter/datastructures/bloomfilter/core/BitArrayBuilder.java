@@ -54,7 +54,7 @@ public final class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					final File file = File.createTempFile(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
+					final File file = File.createTempFile(DownloaderHelper.ARTIFACT_ID + "-duplicates-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}

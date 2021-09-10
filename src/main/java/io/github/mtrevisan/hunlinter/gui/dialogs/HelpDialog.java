@@ -68,13 +68,9 @@ public class HelpDialog extends JDialog{
 		}
 		catch(final IOException ignored){}
 
-		final String artifactID = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
-		final String version = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION);
-		final LocalDate buildTimestamp = (LocalDate)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
-
-		productNameValue.setText(artifactID);
-		productVersionValue.setText(version);
-		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
+		productNameValue.setText(DownloaderHelper.ARTIFACT_ID);
+		productVersionValue.setText(DownloaderHelper.APPLICATION_VERSION.toString());
+		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(DownloaderHelper.BUILD_TIMESTAMP));
 		managedOptionsTextArea.setText("""
 			General:
 			\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
