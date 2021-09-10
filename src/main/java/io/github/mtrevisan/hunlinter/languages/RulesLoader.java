@@ -62,8 +62,10 @@ public class RulesLoader{
 	private final Set<String> multipleStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
-	private final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
-	private final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
+	private Character[] letterAndRulesNotCombinableKeys;
+	private Map<Character, LetterMatcherEntry[]> letterAndRulesNotCombinable;
+	private String[] ruleAndRulesNotCombinableKeys;
+	private Map<String, RuleMatcherEntry[]> ruleAndRulesNotCombinable;
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
@@ -98,6 +100,7 @@ public class RulesLoader{
 			if(flags != null)
 				cannotContainStress.addAll(Arrays.asList(flags));
 
+			final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 			List<String> rules = readPropertyAsList("notCombinableRules", '/');
 			for(int i = 0; i < rules.size(); i ++){
 				final String masterFlag = rules.get(i ++);
@@ -105,9 +108,17 @@ public class RulesLoader{
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new ArrayList<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
+			ruleAndRulesNotCombinableKeys = new String[ruleAndRulesNotCombinable.size()];
+			this.ruleAndRulesNotCombinable = new HashMap<>(ruleAndRulesNotCombinable.size());
+			int offset = 0;
+			for(final Map.Entry<String, List<RuleMatcherEntry>> entry : ruleAndRulesNotCombinable.entrySet()){
+				ruleAndRulesNotCombinableKeys[offset ++] = entry.getKey();
+				this.ruleAndRulesNotCombinable.put(entry.getKey(), entry.getValue().toArray(new RuleMatcherEntry[0]));
+			}
 
 			Character letter = null;
 			rules = readPropertyAsList("letterAndRulesNotCombinable", '/');
+			final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
 			for(int i = 0; i < rules.size(); i ++){
 				final String elem = rules.get(i);
 				if(elem.length() == 1)
@@ -122,6 +133,13 @@ public class RulesLoader{
 								: WORD_WITH_LETTER_CANNOT_HAVE),
 							letter, wrongFlags, correctRule));
 				}
+			}
+			letterAndRulesNotCombinableKeys = new Character[letterAndRulesNotCombinable.size()];
+			this.letterAndRulesNotCombinable = new HashMap<>(letterAndRulesNotCombinable.size());
+			offset = 0;
+			for(final Map.Entry<Character, List<LetterMatcherEntry>> entry : letterAndRulesNotCombinable.entrySet()){
+				letterAndRulesNotCombinableKeys[offset ++] = entry.getKey();
+				this.letterAndRulesNotCombinable.put(entry.getKey(), entry.getValue().toArray(new LetterMatcherEntry[0]));
 			}
 		}
 	}
@@ -194,22 +212,20 @@ public class RulesLoader{
 
 	public final void letterToFlagIncompatibilityCheck(final Inflection inflection){
 		final String word = inflection.getWord();
-		final Set<Character> keys = letterAndRulesNotCombinable.keySet();
-		for(final Character key : keys)
-			if(StringUtils.containsAny(word, key)){
-				final List<LetterMatcherEntry> letterMatcherEntries = letterAndRulesNotCombinable.get(key);
-				for(final LetterMatcherEntry letterMatcherEntry : letterMatcherEntries)
-					letterMatcherEntry.match(inflection);
+		for(int i = 0; i < letterAndRulesNotCombinableKeys.length; i ++)
+			if(StringUtils.containsAny(word, letterAndRulesNotCombinableKeys[i])){
+				final LetterMatcherEntry[] letterMatcherEntries = letterAndRulesNotCombinable.get(letterAndRulesNotCombinableKeys[i]);
+				for(int j = 0; j < letterMatcherEntries.length; j ++)
+					letterMatcherEntries[j].match(inflection);
 			}
 	}
 
 	public final void flagToFlagIncompatibilityCheck(final Inflection inflection){
-		final Set<String> rules = ruleAndRulesNotCombinable.keySet();
-		for(final String rule : rules)
-			if(inflection.hasContinuationFlag(rule)){
-				final List<RuleMatcherEntry> entries = ruleAndRulesNotCombinable.get(rule);
-				for(final RuleMatcherEntry entry : entries)
-					entry.match(inflection);
+		for(int i = 0; i < ruleAndRulesNotCombinableKeys.length; i ++)
+			if(inflection.hasContinuationFlag(ruleAndRulesNotCombinableKeys[i])){
+				final RuleMatcherEntry[] ruleMatcherEntries = ruleAndRulesNotCombinable.get(ruleAndRulesNotCombinableKeys[i]);
+				for(int j = 0; j < ruleMatcherEntries.length; j ++)
+					ruleMatcherEntries[j].match(inflection);
 			}
 	}
 

@@ -155,8 +155,8 @@ public final class OrthographyVEC extends Orthography{
 		word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
 		word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.PHONEME_JJH);
 		boolean iInsideIntoJFalsePositive = false;
-		for(final Pattern p : PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES)
-			if(RegexHelper.find(word, p)){
+		for(int i = 0; i < PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES.size(); i ++)
+			if(RegexHelper.find(word, PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES.get(i))){
 				iInsideIntoJFalsePositive = true;
 				break;
 			}
