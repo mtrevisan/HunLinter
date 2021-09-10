@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.gui.components;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import java.awt.*;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

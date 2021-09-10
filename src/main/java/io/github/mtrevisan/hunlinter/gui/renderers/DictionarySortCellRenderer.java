@@ -29,7 +29,6 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import java.awt.Component;
 import java.awt.Font;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

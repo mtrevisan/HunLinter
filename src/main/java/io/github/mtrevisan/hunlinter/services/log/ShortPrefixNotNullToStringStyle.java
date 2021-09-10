@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.services.log;
 
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

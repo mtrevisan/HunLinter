@@ -36,7 +36,6 @@ import javax.swing.text.NumberFormatter;
 import javax.swing.text.Position;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

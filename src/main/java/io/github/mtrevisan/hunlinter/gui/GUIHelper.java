@@ -89,6 +89,7 @@ public final class GUIHelper{
 
 
 			@Override
+			@SuppressWarnings("NewExceptionWithoutArguments")
 			protected Object clone() throws CloneNotSupportedException{
 				throw new CloneNotSupportedException();
 			}
@@ -324,6 +325,7 @@ public final class GUIHelper{
 
 
 			@Override
+			@SuppressWarnings("NewExceptionWithoutArguments")
 			protected Object clone() throws CloneNotSupportedException{
 				throw new CloneNotSupportedException();
 			}
@@ -357,6 +359,7 @@ public final class GUIHelper{
 
 
 			@Override
+			@SuppressWarnings("NewExceptionWithoutArguments")
 			protected Object clone() throws CloneNotSupportedException{
 				throw new CloneNotSupportedException();
 			}

@@ -34,7 +34,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -102,6 +101,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 
 
 	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
 	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}

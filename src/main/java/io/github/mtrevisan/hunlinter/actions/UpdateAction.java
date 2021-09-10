@@ -98,6 +98,7 @@ public class UpdateAction extends AbstractAction{
 
 
 		@Override
+		@SuppressWarnings("NewExceptionWithoutArguments")
 		protected Object clone() throws CloneNotSupportedException{
 			throw new CloneNotSupportedException();
 		}
@@ -117,6 +118,7 @@ public class UpdateAction extends AbstractAction{
 
 
 	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
 	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}

@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.services.RecentItems;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

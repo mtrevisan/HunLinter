@@ -131,6 +131,7 @@ public class ProjectLoaderAction extends AbstractAction{
 
 
 	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
 	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}

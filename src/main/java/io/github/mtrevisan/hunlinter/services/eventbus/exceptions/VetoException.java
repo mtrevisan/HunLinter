@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.services.eventbus.exceptions;
 
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

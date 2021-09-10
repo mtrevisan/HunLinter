@@ -182,7 +182,8 @@ public enum DictionaryAttribute{
 				return EncoderType.valueOf(value.trim().toUpperCase(Locale.ROOT));
 			}
 			catch(final IllegalArgumentException e){
-				throw new IllegalArgumentException("Invalid encoder name '" + value.trim() + "', only these coders are valid: " + Arrays.toString(EncoderType.values()));
+				throw new IllegalArgumentException("Invalid encoder name '" + value.trim() + "', only these coders are valid: "
+					+ Arrays.toString(EncoderType.values()), e);
 			}
 		}
 	},
@@ -204,7 +205,8 @@ public enum DictionaryAttribute{
 				if(!conversionPairs.containsKey(twoStrings[0]))
 					conversionPairs.put(twoStrings[0], twoStrings[1]);
 				else
-					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: " + twoStrings[0]);
+					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: "
+						+ twoStrings[0]);
 			}
 			return conversionPairs;
 		}
@@ -229,7 +231,8 @@ public enum DictionaryAttribute{
 				if(!conversionPairs.containsKey(twoStrings[0]))
 					conversionPairs.put(twoStrings[0], twoStrings[1]);
 				else
-					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: " + twoStrings[0]);
+					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: "
+						+ twoStrings[0]);
 			}
 			return conversionPairs;
 		}

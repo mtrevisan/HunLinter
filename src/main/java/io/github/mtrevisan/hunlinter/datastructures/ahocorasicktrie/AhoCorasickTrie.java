@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

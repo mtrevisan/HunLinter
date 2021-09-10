@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.xml.transform.TransformerException;
 import java.awt.*;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

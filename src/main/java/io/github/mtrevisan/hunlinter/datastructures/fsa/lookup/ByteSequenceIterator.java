@@ -121,7 +121,7 @@ public class ByteSequenceIterator implements Iterator<ByteBuffer>{
 		else{
 			cache = advance();
 			if(cache == null)
-				throw new NoSuchElementException();
+				throw new NoSuchElementException("No elements remaining in the iterator");
 		}
 		return cache;
 	}

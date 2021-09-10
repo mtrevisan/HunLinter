@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.gui.models;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 
 import javax.swing.table.AbstractTableModel;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

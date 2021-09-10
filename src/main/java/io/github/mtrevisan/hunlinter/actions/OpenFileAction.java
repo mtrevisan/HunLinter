@@ -89,6 +89,7 @@ public class OpenFileAction extends AbstractAction{
 
 
 	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
 	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}

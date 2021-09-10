@@ -50,8 +50,8 @@ import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterFSAWorker;
 import io.github.mtrevisan.hunlinter.workers.thesaurus.ThesaurusLinterWorker;
 import org.slf4j.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.SwingWorker;
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -157,10 +157,10 @@ public class WorkerManager{
 		createWorker(AutoCorrectLinterWorker.WORKER_NAME, creator, onStart, onEnd);
 	}
 
-	public final void createDictionaryStatistics(final Supplier<Boolean> preStart, final Consumer<WorkerAbstract<?>> onStart,
+	public final void createDictionaryStatistics(final BooleanSupplier preStart, final Consumer<WorkerAbstract<?>> onStart,
 			final Consumer<WorkerAbstract<?>> onEnd, final Frame parentFrame){
 		final Supplier<WorkerAbstract<?>> creator = () -> {
-			final boolean performHyphenationStatistics = preStart.get();
+			final boolean performHyphenationStatistics = preStart.getAsBoolean();
 			return new StatisticsWorker(parserManager, performHyphenationStatistics, parentFrame);
 		};
 		createWorker(StatisticsWorker.WORKER_NAME, creator, onStart, onEnd);

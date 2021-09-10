@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -78,6 +77,7 @@ public class AffixRulesReducerAction extends AbstractAction{
 
 
 	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
 	protected final Object clone() throws CloneNotSupportedException{
 		throw new CloneNotSupportedException();
 	}

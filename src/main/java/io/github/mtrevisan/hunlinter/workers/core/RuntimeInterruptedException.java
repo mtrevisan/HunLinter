@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
