@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -43,8 +44,8 @@ public class FSASerializer implements FSASerializerInterface{
 	private static final int SIZEOF_FLAGS = 1;
 
 	/** Supported flags. */
-	private static final Set<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.SEPARATORS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
-		FSAFlags.NEXTBIT);
+	private static final Set<FSAFlags> SUPPORTED_FLAGS = Collections.unmodifiableSet(EnumSet.of(FSAFlags.NUMBERS, FSAFlags.SEPARATORS,
+		FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT));
 
 	public byte fillerByte = FSA.DEFAULT_FILLER;
 

@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.PriorityQueue;
@@ -62,8 +63,8 @@ public class CFSASerializer implements FSASerializerInterface{
 	private static final Logger LOGGER = LoggerFactory.getLogger(CFSASerializer.class);
 
 	/** Supported flags. */
-	private static final Set<FSAFlags> SUPPORTED_FLAGS = EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE, FSAFlags.STOPBIT,
-		FSAFlags.NEXTBIT);
+	private static final Set<FSAFlags> SUPPORTED_FLAGS = Collections.unmodifiableSet(EnumSet.of(FSAFlags.NUMBERS, FSAFlags.FLEXIBLE,
+		FSAFlags.STOPBIT, FSAFlags.NEXTBIT));
 
 	/** No-state id. */
 	private static final int NO_STATE = -1;
@@ -203,6 +204,7 @@ public class CFSASerializer implements FSASerializerInterface{
 		invertedLabelsIndex = new int[256];
 		for(int i = labelsIndex.length - 1; i > 0 && !labelAndCount.isEmpty(); --i){
 			final IntIntHolder p = labelAndCount.pollFirst();
+			assert p != null;
 			invertedLabelsIndex[p.a] = i;
 			labelsIndex[i] = (byte)p.a;
 		}

@@ -69,6 +69,7 @@ public abstract class BloomFilterParameters{
 	 *
 	 * @return	The tightening ratio.
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public double getTighteningRatio(){
 		return TIGHTENING_RATIO_DEFAULT;
 	}
@@ -78,6 +79,7 @@ public abstract class BloomFilterParameters{
 	 *
 	 * @return	The bit array type.
 	 */
+	@SuppressWarnings("DesignForExtension")
 	public BitArrayBuilder.Type getBitArrayType(){
 		return BIT_ARRAY_TYPE_DEFAULT;
 	}

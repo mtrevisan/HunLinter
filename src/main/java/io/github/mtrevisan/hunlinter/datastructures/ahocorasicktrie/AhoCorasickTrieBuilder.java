@@ -290,7 +290,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 					final int h = insert(newSiblings);
 					trie.base[begin + sibling.getIndex()] = h;
 				}
-				sibling.getData().setId(begin + sibling.getIndex());
+				sibling.getData()
+					.setId(begin + sibling.getIndex());
 			}
 		}
 		return begin;

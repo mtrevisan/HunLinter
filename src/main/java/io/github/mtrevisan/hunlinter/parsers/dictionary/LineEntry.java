@@ -34,7 +34,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -59,8 +58,6 @@ public class LineEntry implements Serializable{
 	private static final String CANNOT_EXTRACT_GROUP = "Cannot extract group from [{}] at index {} from last because of the presence of the word `{}` that is too short";
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
-
-	public static final RegexSequencer SEQUENCER_REGEXP = new RegexSequencer();
 
 	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
