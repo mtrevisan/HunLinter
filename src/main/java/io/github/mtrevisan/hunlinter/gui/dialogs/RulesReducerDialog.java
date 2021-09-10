@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
+import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
@@ -292,11 +293,11 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	@Override
 	public final void propertyChange(final PropertyChangeEvent evt){
 		final String propertyName = evt.getPropertyName();
-		if("progress".equals(propertyName)){
+		if(MainFrame.PROPERTY_NAME_PROGRESS.equals(propertyName)){
 			final int progress = (Integer)evt.getNewValue();
 			mainProgressBar.setValue(progress);
 		}
-		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
+		else if(MainFrame.PROPERTY_NAME_STATE.equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
 			reducedSetTextArea.setCaretPosition(0);
 
 			ruleComboBox.setEnabled(true);

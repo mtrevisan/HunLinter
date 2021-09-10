@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
@@ -54,7 +55,6 @@ public class SelectFontAction extends AbstractAction{
 	@Serial
 	private static final long serialVersionUID = -4735745104118440213L;
 
-	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
 
 
@@ -92,7 +92,7 @@ public class SelectFontAction extends AbstractAction{
 			FontHelper.setCurrentFont(font, parentFrame);
 
 			final String language = parserManager.getLanguage();
-			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
+			preferences.put(MainFrame.FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
 		final FontChooserDialog dialog = new FontChooserDialog(sampleExtractor, onSelection, parentFrame);

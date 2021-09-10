@@ -176,8 +176,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = 29;
 	public static final Integer ACTION_COMMAND_PARSER_RELOAD_DICTIONARY = 30;
 
-	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
+	public static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
+
+	public static final String PROPERTY_NAME_PROGRESS = "progress";
+	public static final String PROPERTY_NAME_STATE = "state";
+	public static final String PROPERTY_NAME_PAUSED = "paused";
 
 
 	private final FutureTask<JFileChooser> futureOpenProjectPathFileChooser;
@@ -915,14 +919,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@Override
 	public final void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
-			case "progress" -> {
+			case PROPERTY_NAME_PROGRESS -> {
 				final int progress = (Integer)evt.getNewValue();
 				mainProgressBar.setValue(progress);
 			}
-			case "state" -> {
+			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerData().getWorkerName();
+					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
 					WorkerManager.callOnEnd(workerName);
 				}
 			}

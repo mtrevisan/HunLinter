@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
+import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
@@ -73,6 +74,10 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	public final WD getWorkerData(){
 		return workerData;
+	}
+
+	public final String getWorkerName(){
+		return workerData.getWorkerName();
 	}
 
 	@Override
@@ -151,7 +156,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	public final void pause(){
 		if(!isDone() && paused.compareAndSet(false, true))
-			firePropertyChange("paused", Boolean.FALSE, Boolean.TRUE);
+			firePropertyChange(MainFrame.PROPERTY_NAME_PAUSED, Boolean.FALSE, Boolean.TRUE);
 	}
 
 	public final boolean isPaused(){
@@ -168,7 +173,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 				PAUSE_LOCK.unlock();
 			}
 
-			firePropertyChange("paused", Boolean.TRUE, Boolean.FALSE);
+			firePropertyChange(MainFrame.PROPERTY_NAME_PAUSED, Boolean.TRUE, Boolean.FALSE);
 		}
 	}
 

@@ -306,7 +306,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 	@Override
 	public final void propertyChange(final PropertyChangeEvent evt){
-		if("progress".equals(evt.getPropertyName()))
+		if(MainFrame.PROPERTY_NAME_PROGRESS.equals(evt.getPropertyName()))
 			fileProgressBar.setValue((Integer)evt.getNewValue());
 	}
 
