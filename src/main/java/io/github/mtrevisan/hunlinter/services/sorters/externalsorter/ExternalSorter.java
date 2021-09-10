@@ -52,7 +52,6 @@ public final class ExternalSorter{
 
 	private ExternalSorter(){}
 
-	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
 		final List<File> files = splitAndSortFiles(inputFile, options);
 

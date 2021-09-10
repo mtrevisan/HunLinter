@@ -74,7 +74,6 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private DownloadTask task;
 
 
-	@SuppressWarnings("OverlyBroadThrowsClause")
 	public FileDownloaderDialog(final Frame parent) throws IOException, ParseException, VersionException{
 		super(parent, "File downloader", true);
 
@@ -219,7 +218,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(@SuppressWarnings("OverlyBroadCatchBlock") final VersionException | IOException | ParseException | HeadlessException ignored){}
+		catch(final VersionException | IOException | ParseException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
    private void downloadButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
@@ -255,7 +254,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final byte[] content = DownloaderHelper.readFileContent(localPath);
 			DownloaderHelper.validate(content, remoteObject);
 		}
-		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException | DownloadException | NoSuchAlgorithmException e){
+		catch(final IOException | DownloadException | NoSuchAlgorithmException e){
 			statusLabel.setText(e.getMessage());
 		}
 	}

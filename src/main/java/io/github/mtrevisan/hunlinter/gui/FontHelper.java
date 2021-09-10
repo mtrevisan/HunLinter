@@ -60,8 +60,8 @@ public final class FontHelper{
 
 
 	private static FutureTask<List<Font>> futureAllFonts;
-	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
-	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
+	private static final ArrayList<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
+	private static final ArrayList<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
 
 	@SuppressWarnings("StaticVariableMayNotBeInitialized")
 	private static String languageSample;
@@ -124,16 +124,23 @@ public final class FontHelper{
 		if(!languageSample.equals(FontHelper.languageSample)){
 			FontHelper.languageSample = languageSample;
 
-			FAMILY_NAMES_ALL.clear();
-			FAMILY_NAMES_MONOSPACED.clear();
-
 			final List<Font> allFonts = JavaHelper.waitForFuture(futureAllFonts);
+			if(FAMILY_NAMES_ALL.isEmpty()){
+				FAMILY_NAMES_ALL.ensureCapacity(allFonts.size());
+				FAMILY_NAMES_MONOSPACED.ensureCapacity(allFonts.size());
+			}
+			else{
+				FAMILY_NAMES_ALL.clear();
+				FAMILY_NAMES_MONOSPACED.clear();
+			}
 			for(final Font font : allFonts)
 				if(font.canDisplayUpTo(languageSample) < 0){
 					FAMILY_NAMES_ALL.add(font);
 					if(isMonospaced(font))
 						FAMILY_NAMES_MONOSPACED.add(font);
 				}
+			FAMILY_NAMES_ALL.trimToSize();
+			FAMILY_NAMES_MONOSPACED.trimToSize();
 		}
 	}
 

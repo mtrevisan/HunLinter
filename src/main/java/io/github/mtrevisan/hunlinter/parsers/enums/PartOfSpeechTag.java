@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -109,10 +110,13 @@ public enum PartOfSpeechTag{
 	UNIT_OF_MEASURE("unit_of_measure", "UOM");
 
 
-	private static final Map<String, PartOfSpeechTag> VALUES = new HashMap<>(values().length);
+	private static final Map<String, PartOfSpeechTag> VALUES;
 	static{
-		for(final PartOfSpeechTag tag : EnumSet.allOf(PartOfSpeechTag.class))
-			VALUES.put(MorphologicalTag.PART_OF_SPEECH.getCode() + tag.code, tag);
+		final EnumSet<PartOfSpeechTag> tags = EnumSet.allOf(PartOfSpeechTag.class);
+		final Map<String, PartOfSpeechTag> map = new HashMap<>(tags.size());
+		for(final PartOfSpeechTag tag : tags)
+			map.put(MorphologicalTag.PART_OF_SPEECH.getCode() + tag.code, tag);
+		VALUES = Collections.unmodifiableMap(map);
 	}
 
 	private final String code;

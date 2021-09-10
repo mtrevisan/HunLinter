@@ -48,7 +48,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,17 +78,19 @@ public final class DownloaderHelper{
 	private static final String DEFAULT_PACKAGING_EXTENSION = ".jar";
 	private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
-	public static final Map<String, Object> APPLICATION_PROPERTIES = new HashMap<>(3);
+	public static final Map<String, Object> APPLICATION_PROPERTIES;
 	static{
 		try(final InputStreamReader is = new InputStreamReader(HelpDialog.class.getResourceAsStream("/version.properties"), StandardCharsets.UTF_8)){
 			final PropertiesUTF8 prop = new PropertiesUTF8();
 			prop.load(is);
 
-			APPLICATION_PROPERTIES.put(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID));
-			APPLICATION_PROPERTIES.put(PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION));
-			APPLICATION_PROPERTIES.put(PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
+			APPLICATION_PROPERTIES = Map.of(PROPERTY_KEY_ARTIFACT_ID, prop.getProperty(PROPERTY_KEY_ARTIFACT_ID),
+				PROPERTY_KEY_VERSION, prop.getProperty(PROPERTY_KEY_VERSION),
+				PROPERTY_KEY_BUILD_TIMESTAMP, LocalDate.parse(prop.getProperty(PROPERTY_KEY_BUILD_TIMESTAMP)));
 		}
-		catch(final IOException ignored){}
+		catch(final IOException ioe){
+			throw new Error("Cannot instantiate application properties map", ioe);
+		}
 	}
 
 

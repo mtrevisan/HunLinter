@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -232,10 +233,13 @@ public enum InflectionTag{
 	NORDIC("nordic", "n");
 
 
-	private static final Map<String, InflectionTag> VALUES = new HashMap<>(values().length);
+	private static final Map<String, InflectionTag> VALUES;
 	static{
-		for(final InflectionTag tag : EnumSet.allOf(InflectionTag.class))
-			VALUES.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);
+		final EnumSet<InflectionTag> tags = EnumSet.allOf(InflectionTag.class);
+		final Map<String, InflectionTag> map = new HashMap<>(tags.size());
+		for(final InflectionTag tag : tags)
+			map.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);
+		VALUES = Collections.unmodifiableMap(map);
 	}
 
 	private final String code;

@@ -71,7 +71,7 @@ public class WordTokenizer{
 		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj + ")");
 	}
 
-	public static final String DEFAULT_TOKENIZING_CHARACTERS = " \u00A0ᅟ" +
+	protected static final String DEFAULT_TOKENIZING_CHARACTERS = " \u00A0ᅟ" +
 		"ᅠ\u1680"
 		+ "\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007"
 		+ "\u2008\u2009\u200A\u200B\u200c\u200d\u200e\u200f"

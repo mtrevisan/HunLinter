@@ -54,20 +54,21 @@ import java.util.Set;
 public class DictionaryMetadata{
 
 	/** Default attribute values. */
-	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
-		.frequencyIncluded(false)
-		.ignorePunctuation()
-		.ignoreNumbers()
-		.ignoreCamelCase()
-		.ignoreAllUppercase()
-		.ignoreDiacritics()
-		.convertCase()
-		.supportRunOnWords()
-		.toMap();
+	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = Collections.unmodifiableMap(
+		new DictionaryMetadataBuilder()
+			.frequencyIncluded(false)
+			.ignorePunctuation()
+			.ignoreNumbers()
+			.ignoreCamelCase()
+			.ignoreAllUppercase()
+			.ignoreDiacritics()
+			.convertCase()
+			.supportRunOnWords()
+			.toMap());
 
 	/** Required attributes. */
-	private static final Set<DictionaryAttribute> REQUIRED_ATTRIBUTES =
-		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
+	private static final Set<DictionaryAttribute> REQUIRED_ATTRIBUTES = Collections.unmodifiableSet(
+		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING));
 
 
 	/**

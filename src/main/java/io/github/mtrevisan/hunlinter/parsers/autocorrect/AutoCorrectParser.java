@@ -162,7 +162,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public final boolean contains(final CharSequence incorrect, final CharSequence correct){
+	public final boolean contains(final String incorrect, final String correct){
 		for(int i = 0; i < dictionary.size(); i ++){
 			final CorrectionEntry elem = dictionary.get(i);
 			if(!incorrect.isEmpty() && !correct.isEmpty()
@@ -190,7 +190,6 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
-	@SuppressWarnings("OverlyBroadThrowsClause")
 	public final void save(final File acoFile) throws TransformerException{
 		final Document doc = xmlManager.newXMLDocumentStandalone();
 

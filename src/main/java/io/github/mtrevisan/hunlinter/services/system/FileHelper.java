@@ -55,7 +55,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -74,18 +73,16 @@ public final class FileHelper{
 
 	private static final String WRONG_FILE_FORMAT_CHARSET = "The file is not in an allowable charset ({})";
 
-
-	private static final List<Charset> HUNSPELL_CHARSETS;
-	private static final Map<String, String> CHARSET_ALIASES = new HashMap<>(3);
-
 	private static final String ISO_8859_10 = "ISO-8859-10";
 	private static final String ISO_8859_14 = "ISO-8859-14";
 
+	private static final List<Charset> HUNSPELL_CHARSETS;
+	private static final Map<String, String> CHARSET_ALIASES = Map.of(
+		"MICROSOFT-CP1251", "WINDOWS-1251",
+		"TIS620-2533", "TIS-620",
+		"ISCII-DEVANAGARI", "x-ISCII91"
+	);
 	static{
-		CHARSET_ALIASES.put("MICROSOFT-CP1251", "WINDOWS-1251");
-		CHARSET_ALIASES.put("TIS620-2533", "TIS-620");
-		CHARSET_ALIASES.put("ISCII-DEVANAGARI", "x-ISCII91");
-
 		HUNSPELL_CHARSETS = Stream.of(
 				"UTF-8",
 				"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9",

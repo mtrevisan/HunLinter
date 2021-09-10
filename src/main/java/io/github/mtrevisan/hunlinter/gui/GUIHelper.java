@@ -269,6 +269,7 @@ public final class GUIHelper{
 					processMouseEvent(e);
 				}
 
+				@SuppressWarnings("MethodMayBeStatic")
 				private void processMouseEvent(final MouseEvent e){
 					if(e.isPopupTrigger()){
 						//select row

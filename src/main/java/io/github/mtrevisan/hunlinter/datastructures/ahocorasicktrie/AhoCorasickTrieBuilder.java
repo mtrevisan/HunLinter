@@ -249,7 +249,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				begin = checkPos - siblings.get(0).getIndex();
 				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getIndex())){
 					//prevent progress from generating zero divide errors
-					final double l = Math.max(1.05, (double) keySize / (memoryGrowthRate + 1));
+					final double l = Math.max(1.05, (double)keySize / (memoryGrowthRate + 1));
 					resize((int)(allocSize * l));
 				}
 

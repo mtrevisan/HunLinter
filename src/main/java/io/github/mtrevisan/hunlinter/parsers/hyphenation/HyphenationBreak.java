@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,13 +41,12 @@ public class HyphenationBreak{
 			final int wordLength);
 	}
 
-	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = new HashMap<>(4);
-	static{
-		NO_HYPHENATION_MANAGE_METHODS.put("  ", HyphenationBreak::manageInside);
-		NO_HYPHENATION_MANAGE_METHODS.put("^ ", HyphenationBreak::manageStartsWith);
-		NO_HYPHENATION_MANAGE_METHODS.put(" $", HyphenationBreak::manageEndsWith);
-		NO_HYPHENATION_MANAGE_METHODS.put("^$", HyphenationBreak::manageWhole);
-	}
+	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = Map.of(
+		"  ", HyphenationBreak::manageInside,
+		"^ ", HyphenationBreak::manageStartsWith,
+		" $", HyphenationBreak::manageEndsWith,
+		"^$", HyphenationBreak::manageWhole
+	);
 
 	public static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
 

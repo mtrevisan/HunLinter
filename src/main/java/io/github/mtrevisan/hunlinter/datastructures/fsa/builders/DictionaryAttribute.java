@@ -34,6 +34,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -321,11 +322,13 @@ public enum DictionaryAttribute{
 		return value;
 	}
 
-	private static final Map<String, DictionaryAttribute> ATTRS_BY_PROPERTY_NAME = new HashMap<>(values().length);
+	private static final Map<String, DictionaryAttribute> ATTRS_BY_PROPERTY_NAME;
 	static{
-		for(final DictionaryAttribute attr : values())
-			if(ATTRS_BY_PROPERTY_NAME.put(attr.propertyName, attr) != null)
-				throw new Error("Duplicate property key for: " + attr);
+		final DictionaryAttribute[] values = values();
+		final Map<String, DictionaryAttribute> map = new HashMap<>(values.length);
+		for(final DictionaryAttribute attr : values)
+			map.put(attr.propertyName, attr);
+		ATTRS_BY_PROPERTY_NAME = Collections.unmodifiableMap(map);
 	}
 
 	/** Private enum instance constructor. */

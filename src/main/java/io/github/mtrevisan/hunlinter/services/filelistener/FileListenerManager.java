@@ -38,7 +38,6 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,12 +66,9 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	private static final FileSystem FILE_SYSTEM_DEFAULT = FileSystems.getDefault();
 
-	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT
-		= new HashMap<>(2);
-	static{
-		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified);
-		FILE_CHANGE_LISTENER_BY_EVENT.put(StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);
-	}
+	private static final Map<WatchEvent.Kind<?>, BiConsumer<FileChangeListener, Path>> FILE_CHANGE_LISTENER_BY_EVENT = Map.of(
+		StandardWatchEventKinds.ENTRY_MODIFY, FileChangeListener::fileModified,
+		StandardWatchEventKinds.ENTRY_DELETE, FileChangeListener::fileDeleted);
 
 
 	private WatchService watcher;
