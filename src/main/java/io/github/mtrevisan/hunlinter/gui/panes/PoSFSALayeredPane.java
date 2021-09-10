@@ -42,9 +42,11 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;

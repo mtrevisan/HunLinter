@@ -27,8 +27,10 @@ package io.github.mtrevisan.hunlinter.gui.components;
 import org.apache.commons.text.StringEscapeUtils;
 
 import javax.accessibility.AccessibleContext;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
+import java.awt.Font;
 
 
 public final class LabeledPopupMenu extends JPopupMenu{

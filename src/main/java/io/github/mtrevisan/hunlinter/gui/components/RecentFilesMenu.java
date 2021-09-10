@@ -26,7 +26,8 @@ package io.github.mtrevisan.hunlinter.gui.components;
 
 import io.github.mtrevisan.hunlinter.services.RecentItems;
 
-import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;

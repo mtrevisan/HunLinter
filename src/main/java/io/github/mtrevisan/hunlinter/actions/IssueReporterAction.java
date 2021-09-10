@@ -26,7 +26,8 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;

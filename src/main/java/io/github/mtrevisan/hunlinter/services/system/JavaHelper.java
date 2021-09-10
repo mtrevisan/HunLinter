@@ -28,7 +28,7 @@ import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.helpers.MessageFormatter;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;

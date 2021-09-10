@@ -1,11 +1,16 @@
 /*
  * Created by JFormDesigner on Tue Feb 11 12:34:53 CET 2020
  */
-
 package unit731.hunlinter;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.GroupLayout;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
+import java.awt.Window;
 
 
 /**

@@ -31,10 +31,13 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParse
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import javax.swing.ListModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;

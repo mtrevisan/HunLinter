@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui.events;
 
-import javax.swing.*;
+import javax.swing.JLayeredPane;
 import java.util.Objects;
 
 

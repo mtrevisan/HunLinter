@@ -29,7 +29,7 @@ import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;

@@ -29,8 +29,11 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.NotSerializableException;

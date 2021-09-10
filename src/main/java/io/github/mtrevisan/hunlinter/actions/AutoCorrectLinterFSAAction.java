@@ -28,7 +28,9 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
 import io.github.mtrevisan.hunlinter.gui.panes.ThesaurusLayeredPane;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.MenuSelectionManager;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.NotSerializableException;

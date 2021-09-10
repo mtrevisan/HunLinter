@@ -29,8 +29,13 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.util.ArrayList;
 import java.util.Deque;

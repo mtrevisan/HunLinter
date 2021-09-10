@@ -43,8 +43,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JPopupMenu;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;

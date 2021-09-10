@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.downloader;
 
-import javax.swing.*;
+import javax.swing.SwingWorker;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;

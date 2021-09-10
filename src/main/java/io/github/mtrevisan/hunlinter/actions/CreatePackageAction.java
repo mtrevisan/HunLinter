@@ -26,7 +26,9 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.MenuSelectionManager;
 import java.awt.event.ActionEvent;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;

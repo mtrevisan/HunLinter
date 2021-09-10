@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui.models;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

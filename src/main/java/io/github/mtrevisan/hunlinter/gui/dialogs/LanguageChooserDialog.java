@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultListModel;
+import java.awt.Frame;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Consumer;

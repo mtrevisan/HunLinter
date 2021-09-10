@@ -30,8 +30,10 @@ import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JDialog;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

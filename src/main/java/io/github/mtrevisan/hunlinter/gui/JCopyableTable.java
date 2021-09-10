@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import javax.swing.*;
+import javax.swing.JTable;
 import java.io.Serial;
 
 

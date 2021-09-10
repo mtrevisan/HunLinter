@@ -35,8 +35,11 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LanguageNotChosenExcepti
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;

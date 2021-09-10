@@ -24,7 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import java.awt.event.ActionEvent;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;

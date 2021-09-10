@@ -27,10 +27,12 @@ package io.github.mtrevisan.hunlinter.gui.renderers;
 import com.carrotsearch.hppcrt.IntSet;
 import com.carrotsearch.hppcrt.sets.IntHashSet;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.Serial;
 
 

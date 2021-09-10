@@ -33,9 +33,12 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.GUIException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Frame;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
