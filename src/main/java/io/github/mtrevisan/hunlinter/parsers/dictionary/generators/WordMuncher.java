@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,7 +128,7 @@ public class WordMuncher{
 		final List<Inflection> originatingRules = new ArrayList<>(0);
 		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
-		final List<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
+		final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
 		for(final RuleEntry ruleEntry : ruleEntries){
 			originatingRulesFromEntry.clear();
 			for(final AffixEntry affixEntry : ruleEntry.getEntries())

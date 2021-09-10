@@ -33,7 +33,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 
-public class RegexSequencer{
+public final class RegexSequencer{
 
 	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
@@ -42,6 +42,8 @@ public class RegexSequencer{
 
 	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: RegexHelper.split(seq, PATTERN)));
 
+
+	private RegexSequencer(){}
 
 	public static String[] splitSequence(final String sequence){
 		return SPLIT_SEQUENCE.apply(sequence);

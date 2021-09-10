@@ -176,7 +176,7 @@ class WordGeneratorBase{
 		}
 	}
 
-	private void filterInflections(final Collection<Inflection> inflections){
+	private void filterInflections(final Iterable<Inflection> inflections){
 		enforceCircumfix(inflections);
 
 		enforceNeedAffixFlag(inflections);

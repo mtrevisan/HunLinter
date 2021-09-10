@@ -159,7 +159,7 @@ public class AutoCorrectParser{
 	}
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
-	public final boolean contains(final String incorrect, final String correct){
+	public final boolean contains(final CharSequence incorrect, final CharSequence correct){
 		for(final CorrectionEntry elem : dictionary)
 			if(!incorrect.isEmpty() && !correct.isEmpty()
 					&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct))

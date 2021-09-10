@@ -76,7 +76,7 @@ public class LineEntry implements Serializable{
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
+	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final Collection<LineEntry> parentRulesFrom){
 		final List<String> words = new ArrayList<>(parentRulesFrom.size());
 		for(final LineEntry rule : parentRulesFrom)
 			words.addAll(rule.extractFromEndingWith(condition));

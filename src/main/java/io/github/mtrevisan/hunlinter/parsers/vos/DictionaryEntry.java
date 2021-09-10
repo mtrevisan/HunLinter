@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,7 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 
 public class DictionaryEntry{
@@ -125,7 +125,7 @@ public class DictionaryEntry{
 
 	public final boolean hasContinuationFlags(final String[] flags){
 		if(continuationFlags != null && flags != null){
-			final Set<String> list = new HashSet<>(continuationFlags);
+			final Collection<String> list = new HashSet<>(continuationFlags);
 			for(final String flag : flags)
 				if(!list.add(flag))
 					return true;

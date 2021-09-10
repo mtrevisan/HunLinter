@@ -224,7 +224,7 @@ public class RulesReducer{
 		}
 	}
 
-	private List<LineEntry> compactRules(final List<LineEntry> rules){
+	private List<LineEntry> compactRules(final Collection<LineEntry> rules){
 		//same removal, addition, and condition parts
 		return SetHelper.collect(rules,
 			entry -> entry.removal + TAB + RegexHelper.sortAndMergeSet(entry.addition, comparator) + TAB + entry.condition,

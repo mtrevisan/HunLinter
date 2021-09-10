@@ -408,7 +408,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
 				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final HunLinterTableModelInterface<Inflection> dm = (InflectionTableModel)table.getModel();
+				final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
 				dm.setInflections(inflections);
 
 				//show first row
@@ -459,8 +459,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		@Override
 		public String getValueAtRow(final int row){
 			final TableModel model = getModel();
-			final String inflection = (String)model.getValueAt(row, 0);
-			final String morphologicalFields = (String)model.getValueAt(row, 1);
+			final CharSequence inflection = (CharSequence)model.getValueAt(row, 0);
+			final CharSequence morphologicalFields = (CharSequence)model.getValueAt(row, 1);
 			final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
 				.map(AffixEntry::toString)
 				.orElse(null);

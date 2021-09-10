@@ -36,7 +36,6 @@ import java.util.Comparator;
 
 class ExternalSorterTest{
 
-	private final ExternalSorter sorter = new ExternalSorter();
 	private final Comparator<String> DEFAULT_COMPARATOR = Comparator.naturalOrder();
 
 	private File inputFile;

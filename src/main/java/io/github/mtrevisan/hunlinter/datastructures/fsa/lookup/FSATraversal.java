@@ -153,7 +153,7 @@ public final class FSATraversal{
 	 */
 	public FSAMatchResult match(final byte[] sequence, final int start, final int length, int node){
 		if(node == 0)
-			return new FSAMatchResult(FSAMatchResult.NO_MATCH, start, node);
+			return new FSAMatchResult(FSAMatchResult.NO_MATCH, start, 0);
 
 		final int end = start + length;
 		for(int i = start; i < end; i ++){

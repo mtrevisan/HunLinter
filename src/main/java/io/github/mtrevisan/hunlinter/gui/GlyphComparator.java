@@ -24,9 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
 
 
 public final class GlyphComparator{
@@ -74,7 +77,7 @@ public final class GlyphComparator{
 		return img;
 	}
 
-	private static float visualSimilarity(final BufferedImage img1, final BufferedImage img2){
+	private static float visualSimilarity(final RenderedImage img1, final RenderedImage img2){
 		final DataBuffer data1 = img1.getData().getDataBuffer();
 		final DataBuffer data2 = img2.getData().getDataBuffer();
 		final int size = data1.getSize();

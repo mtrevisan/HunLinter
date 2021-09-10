@@ -25,7 +25,7 @@
 package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
 
-class SuperBlock{
+final class SuperBlock{
 
 	//as in S0, S1, etc
 	private final boolean even;

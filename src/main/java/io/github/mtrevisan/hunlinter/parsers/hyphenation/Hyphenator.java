@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -249,7 +250,7 @@ public class Hyphenator implements HyphenatorInterface{
 			response.remove(response.size() - 1);
 	}
 
-	private static void manageNoHyphenAtMiddle(final List<String> response, final String nohyp){
+	private static void manageNoHyphenAtMiddle(final Collection<String> response, final String nohyp){
 		final Iterator<String> itr = response.iterator();
 		while(itr.hasNext())
 			if(nohyp.equals(itr.next()))

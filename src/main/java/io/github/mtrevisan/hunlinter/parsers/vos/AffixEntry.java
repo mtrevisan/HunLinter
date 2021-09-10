@@ -225,7 +225,7 @@ public class AffixEntry{
 		return false;
 	}
 
-	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
+	public static String[] extractMorphologicalFields(final Iterable<DictionaryEntry> compoundEntries){
 		int size = 0;
 		for(final DictionaryEntry compoundEntry : compoundEntries)
 			size += compoundEntry.morphologicalFields.length + 1;

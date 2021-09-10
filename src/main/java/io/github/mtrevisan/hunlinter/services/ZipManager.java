@@ -44,10 +44,12 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 
-public class ZipManager{
+public final class ZipManager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
 
+
+	private ZipManager(){}
 
 	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void zipDirectory(final File dir, final int compressionLevel, final File zipFile, final File... excludeFolderBut)

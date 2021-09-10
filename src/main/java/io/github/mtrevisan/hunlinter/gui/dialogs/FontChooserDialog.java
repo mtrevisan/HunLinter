@@ -62,17 +62,17 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	private record ListSearchTextFieldDocumentHandler(JList<String> targetList) implements DocumentListener{
 
 		@Override
-		public final void insertUpdate(final DocumentEvent e){
+		public void insertUpdate(final DocumentEvent e){
 			update(e);
 		}
 
 		@Override
-		public final void removeUpdate(final DocumentEvent e){
+		public void removeUpdate(final DocumentEvent e){
 			update(e);
 		}
 
 		@Override
-		public final void changedUpdate(final DocumentEvent e){
+		public void changedUpdate(final DocumentEvent e){
 			update(e);
 		}
 

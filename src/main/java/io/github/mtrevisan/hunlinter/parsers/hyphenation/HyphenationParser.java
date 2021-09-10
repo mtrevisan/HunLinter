@@ -252,7 +252,7 @@ public class HyphenationParser{
 			}
 
 			if(level == Level.NON_COMPOUND)
-				addDefaults(level, charset);
+				addDefaults(Level.NON_COMPOUND, charset);
 		}
 		catch(final LinterException | IOException e){
 			throw new LinterException(e, e.getMessage());
@@ -314,7 +314,7 @@ public class HyphenationParser{
 		}
 	}
 
-	public static boolean isAugmentedRule(final String line){
+	public static boolean isAugmentedRule(final CharSequence line){
 		return StringUtils.contains(line, AUGMENTED_RULE);
 	}
 

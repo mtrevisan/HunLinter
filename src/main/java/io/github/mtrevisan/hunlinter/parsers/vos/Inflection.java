@@ -30,6 +30,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.StringJoiner;
@@ -64,7 +65,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
-			final DictionaryEntry dicEntry, final List<String> remainingContinuationFlags, final boolean combinable){
+			final DictionaryEntry dicEntry, final Collection<String> remainingContinuationFlags, final boolean combinable){
 		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};

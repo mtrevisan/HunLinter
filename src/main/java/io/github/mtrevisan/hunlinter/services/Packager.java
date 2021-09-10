@@ -382,8 +382,8 @@ public class Packager{
 			ZipManager.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
 	}
 
-	private static void packageExtension(final File projectFolder, final File autoCorrectOutputFile, final List<File> autoTextOutputFiles)
-			throws IOException{
+	private static void packageExtension(final File projectFolder, final File autoCorrectOutputFile,
+			final Collection<File> autoTextOutputFiles) throws IOException{
 		final File outputFile = Path.of(projectFolder.toString(), FilenameUtils.getBaseName(projectFolder.toString()) + EXTENSION_ZIP)
 			.toFile();
 		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
