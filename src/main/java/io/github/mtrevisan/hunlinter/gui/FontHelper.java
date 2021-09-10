@@ -59,9 +59,19 @@ public final class FontHelper{
 		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 
 
-	private static final FutureTask<List<Font>> FUTURE_ALL_FONTS;
-	static{
-		FUTURE_ALL_FONTS = JavaHelper.createFuture(() -> {
+	private static FutureTask<List<Font>> futureAllFonts;
+	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
+	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
+
+	@SuppressWarnings("StaticVariableMayNotBeInitialized")
+	private static String languageSample;
+	private static Font currentFont = FontChooserDialog.getDefaultFont();
+
+
+	private FontHelper(){}
+
+	public static void loadAllFonts(){
+		futureAllFonts = JavaHelper.createFuture(() -> {
 			LOGGER.info("Load system fonts");
 			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getAvailableFontFamilyNames();
@@ -73,8 +83,8 @@ public final class FontHelper{
 				//filter out non-plain fonts
 				//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
 				if(font.isPlain()
-						&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
-						&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
+					&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+					&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
 					allFonts.add(font);
 				else
 					LOGGER.debug("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
@@ -85,15 +95,6 @@ public final class FontHelper{
 			return allFonts;
 		});
 	}
-	private static final List<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
-	private static final List<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
-
-	@SuppressWarnings("StaticVariableMayNotBeInitialized")
-	private static String languageSample;
-	private static Font currentFont = FontChooserDialog.getDefaultFont();
-
-
-	private FontHelper(){}
 
 	public static Font chooseBestFont(final String languageSample){
 		extractFonts(languageSample);
@@ -126,7 +127,7 @@ public final class FontHelper{
 			FAMILY_NAMES_ALL.clear();
 			FAMILY_NAMES_MONOSPACED.clear();
 
-			final List<Font> allFonts = JavaHelper.waitForFuture(FUTURE_ALL_FONTS);
+			final List<Font> allFonts = JavaHelper.waitForFuture(futureAllFonts);
 			for(final Font font : allFonts)
 				if(font.canDisplayUpTo(languageSample) < 0){
 					FAMILY_NAMES_ALL.add(font);

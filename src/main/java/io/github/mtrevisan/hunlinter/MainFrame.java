@@ -973,6 +973,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final MainFrame mainFrame = new MainFrame();
 			EventBusService.subscribe(mainFrame);
 			mainFrame.setVisible(true);
+
+			FontHelper.loadAllFonts();
 		});
 	}
 
