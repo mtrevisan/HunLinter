@@ -134,7 +134,8 @@ public class DictionaryStatistics implements Closeable{
 				stressFromLastFrequencies.addValue(stressIndex);
 			syllabeLengthsFrequencies.addValue(syllabes.size());
 			final StringBuilder sb = new StringBuilder();
-			for(final String syllabe : syllabes){
+			for(int  i = 0; i < syllabes.size(); i ++){
+				final String syllabe = syllabes.get(i);
 				sb.append(syllabe);
 				if(orthography.countGraphemes(syllabe) == syllabe.length())
 					syllabesFrequencies.addValue(syllabe);
@@ -187,9 +188,11 @@ public class DictionaryStatistics implements Closeable{
 	public final List<String> getMostCommonSyllabes(final int size){
 		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
 		final List<String> list = new ArrayList<>(values.size());
-		for(final String value : values)
+		for(int i = 0; i < values.size(); i ++){
+			final String value = values.get(i);
 			list.add(value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value))
 				+ "f%%)", syllabesFrequencies.getPercentOf(value) * 100.));
+		}
 		return list;
 	}
 

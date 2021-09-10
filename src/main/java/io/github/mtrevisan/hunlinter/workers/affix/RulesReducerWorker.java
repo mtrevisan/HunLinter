@@ -85,8 +85,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final AffixType type = ruleToBeReduced.getType();
 
-		final Collection<String> originalLines = new ArrayList<>(0);
-		final Collection<LineEntry> originalRules = new ArrayList<>(0);
+		final List<String> originalLines = new ArrayList<>(0);
+		final List<LineEntry> originalRules = new ArrayList<>(0);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);

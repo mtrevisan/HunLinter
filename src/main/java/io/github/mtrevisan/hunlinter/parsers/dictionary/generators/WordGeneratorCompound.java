@@ -79,23 +79,26 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 	}
 
-	protected final List<List<List<Inflection>>> generateCompounds(final Iterable<List<String>> permutations,
+	protected final List<List<List<Inflection>>> generateCompounds(final List<List<String>> permutations,
 			final Map<String, List<DictionaryEntry>> inputs){
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
 		outer:
-		for(final List<String> permutation : permutations){
+		for(int i = 0; i < permutations.size(); i ++){
+			final List<String> permutation = permutations.get(i);
 			//expand permutation
 			final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.size());
-			for(final String flag : permutation){
+			for(int j = 0; j < permutation.size(); j ++){
+				final String flag = permutation.get(j);
 				if(!dicEntries.containsKey(flag)){
 					final List<Inflection> dicEntriesPerFlag = new ArrayList<>(0);
-					for(final DictionaryEntry entry : inputs.get(flag)){
-						final List<Inflection> inflections = applyAffixRules(entry, true, null);
+					final List<DictionaryEntry> flagEntries = inputs.get(flag);
+					for(int k = 0; k < flagEntries.size(); k ++){
+						final List<Inflection> inflections = applyAffixRules(flagEntries.get(k), true, null);
 
 						final int size = (inflections != null? inflections.size(): 0);
-						for(int i = 0; i < size; i ++){
-							final Inflection inflection = inflections.get(i);
+						for(int m = 0; m < size; m ++){
+							final Inflection inflection = inflections.get(m);
 							if(inflection.hasContinuationFlag(flag))
 								dicEntriesPerFlag.add(inflection);
 						}
@@ -118,7 +121,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		return entries;
 	}
 
-	protected final List<Inflection> applyCompound(final Iterable<List<List<Inflection>>> entries, final int limit){
+	protected final List<Inflection> applyCompound(final List<List<List<Inflection>>> entries, final int limit){
 		final String compoundFlag = affixData.getCompoundFlag();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		final String forceCompoundUppercaseFlag = affixData.getForceCompoundUppercaseFlag();
@@ -129,7 +132,8 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final StringBuffer sb = new StringBuffer();
 		final Set<Inflection> inflections = new LinkedHashSet<>(0);
 		//generate compounds:
-		for(final List<List<Inflection>> entry : entries){
+		for(int i = 0; i < entries.size(); i ++){
+			final List<List<Inflection>> entry = entries.get(i);
 			//compose compound:
 			boolean completed = false;
 			final int[] indexes = new int[entry.size()];
@@ -182,15 +186,15 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private List<Inflection> generateInflections(final String compoundWord, final List<DictionaryEntry> compoundEntries,
-			final Collection<List<String>> continuationFlags){
+			final List<List<String>> continuationFlags){
 		final boolean hasForbidCompoundFlag = (affixData.getForbidCompoundFlag() != null);
 		final boolean hasPermitCompoundFlag = (affixData.getPermitCompoundFlag() != null);
 		final boolean allowTwofoldAffixesInCompound = affixData.isTwofoldAffixesInCompound();
 
 		final List<Inflection> inflections = new ArrayList<>(1);
 		final List<String> flags = new ArrayList<>(continuationFlags.size());
-		for(final List<String> continuationFlag : continuationFlags)
-			flags.addAll(continuationFlag);
+		for(int i = 0; i < continuationFlags.size(); i ++)
+			flags.addAll(continuationFlags.get(i));
 		final Inflection p = Inflection.createFromCompound(compoundWord, flags, compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
 			inflections.add(p);
@@ -350,16 +354,17 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** Merge the distribution with the others. */
 	protected static Map<String, List<DictionaryEntry>> mergeDistributions(final Map<String, List<DictionaryEntry>> compoundRules,
 			final Map<String, List<DictionaryEntry>> distribution, final Integer compoundMinimumLength, final String forbiddenWordFlag){
-		final Collection<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
+		final List<Map.Entry<String, List<DictionaryEntry>>> list = new ArrayList<>(compoundRules.entrySet());
 		list.addAll(distribution.entrySet());
 
 		final Map<String, List<DictionaryEntry>> map = new HashMap<>(list.size());
-		for(final Map.Entry<String, List<DictionaryEntry>> m : list){
+		for(int i = 0; i < list.size(); i ++){
+			final Map.Entry<String, List<DictionaryEntry>> m = list.get(i);
 			final List<DictionaryEntry> entries = m.getValue();
 			final List<DictionaryEntry> value = new ArrayList<>(0);
 			final int size = (entries != null? entries.size(): 0);
-			for(int i = 0; i < size; i ++){
-				final DictionaryEntry entry = entries.get(i);
+			for(int j = 0; j < size; j ++){
+				final DictionaryEntry entry = entries.get(j);
 				if(compoundMinimumLength != null && entry.getWord().length() >= compoundMinimumLength
 						&& !entry.hasContinuationFlag(forbiddenWordFlag))
 					value.add(entry);

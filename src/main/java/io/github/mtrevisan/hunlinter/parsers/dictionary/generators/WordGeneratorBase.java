@@ -128,11 +128,13 @@ class WordGeneratorBase{
 	}
 
 
-	private void printInflections(final String title, final Collection<Inflection> inflections){
+	private void printInflections(final String title, final List<Inflection> inflections){
 		if(LOGGER.isDebugEnabled() && !inflections.isEmpty()){
 			LOGGER.debug(title);
-			for(final Inflection inflection : inflections)
+			for(int i = 0; i < inflections.size(); i ++){
+				final Inflection inflection = inflections.get(i);
 				LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()), inflection.getRulesSequence());
+			}
 		}
 	}
 
@@ -147,26 +149,29 @@ class WordGeneratorBase{
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
-	private List<Inflection> getTwofoldInflections(final Iterable<Inflection> onefoldInflections, final boolean isCompound,
+	private List<Inflection> getTwofoldInflections(final List<Inflection> onefoldInflections, final boolean isCompound,
 			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<Inflection> twofoldInflections = new ArrayList<>(0);
-		for(final Inflection inflection : onefoldInflections)
+		for(int i = 0; i < onefoldInflections.size(); i ++){
+			final Inflection inflection = onefoldInflections.get(i);
 			if(inflection.isCombinable()){
 				final List<Inflection> prods = getOnefoldInflections(inflection, isCompound, reverse, overriddenRule);
 
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				//add parent derivations
-				for(final Inflection prod : prods)
-					prod.prependAppliedRules(appliedRules);
+				for(int j = 0; j < prods.size(); j ++)
+					prods.get(j).prependAppliedRules(appliedRules);
 
 				twofoldInflections.addAll(prods);
 			}
+		}
 		return twofoldInflections;
 	}
 
-	private void checkTwofoldCorrectness(final Iterable<Inflection> twofoldInflections){
+	private void checkTwofoldCorrectness(final List<Inflection> twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
-		for(final Inflection prod : twofoldInflections){
+		for(int i = 0; i < twofoldInflections.size(); i ++){
+			final Inflection prod = twofoldInflections.get(i);
 			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
 			final List<String> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
 			if(!aff.isEmpty()){

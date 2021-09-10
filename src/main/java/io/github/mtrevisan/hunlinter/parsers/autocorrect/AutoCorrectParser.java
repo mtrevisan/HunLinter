@@ -85,7 +85,8 @@ public class AutoCorrectParser{
 			throw new LinterException(INVALID_ROOT, AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName());
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
-		for(final Node child : children){
+		for(int i = 0; i < children.size(); i ++){
+			final Node child = children.get(i);
 			final Node mediaType = XMLManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
 			if(mediaType != null){
 				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
@@ -101,9 +102,10 @@ public class AutoCorrectParser{
 		//check for duplications
 		int index = 0;
 		final Collection<String> map = new HashSet<>(dictionary.size());
-		for(final CorrectionEntry s : dictionary){
-			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, s.getIncorrectForm(), s.getCorrectForm())
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry entry = dictionary.get(i);
+			if(!map.add(entry.getIncorrectForm()))
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, entry.getIncorrectForm(), entry.getCorrectForm())
 					.withIndex(index));
 
 			index ++;
@@ -151,7 +153,8 @@ public class AutoCorrectParser{
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
 		final List<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
-		for(final CorrectionEntry correction : dictionary){
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry correction = dictionary.get(i);
 			if(correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
 				duplicates.add(correction);
 		}
@@ -160,10 +163,12 @@ public class AutoCorrectParser{
 
 	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	public final boolean contains(final CharSequence incorrect, final CharSequence correct){
-		for(final CorrectionEntry elem : dictionary)
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry elem = dictionary.get(i);
 			if(!incorrect.isEmpty() && !correct.isEmpty()
 					&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct))
 				return true;
+		}
 		return false;
 	}
 
@@ -194,7 +199,8 @@ public class AutoCorrectParser{
 		root.setAttribute(XMLManager.ROOT_ATTRIBUTE_NAME, XMLManager.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
-		for(final CorrectionEntry correction : dictionary){
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry correction = dictionary.get(i);
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
 			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getIncorrectForm());

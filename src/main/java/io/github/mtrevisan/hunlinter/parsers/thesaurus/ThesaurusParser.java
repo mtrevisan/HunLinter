@@ -271,7 +271,8 @@ public class ThesaurusParser{
 			//save data
 			int idx = charset.name().length() + 1;
 			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();
-			for(final ThesaurusEntry synonym : synonyms){
+			for(int i = 0; i < synonyms.size(); i ++){
+				final ThesaurusEntry synonym = synonyms.get(i);
 				synonym.saveToIndex(indexWriter, idx);
 
 				final int synonymsLength = synonym.saveToData(dataWriter, charset);

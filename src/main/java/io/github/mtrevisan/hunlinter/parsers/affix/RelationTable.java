@@ -94,10 +94,11 @@ public class RelationTable{
 
 	public final String extractAsList(){
 		final StringJoiner sj = new StringJoiner(", ");
-		for(final String[] list : table){
+		for(int i = 0; i < table.size(); i ++){
+			final String[] list = table.get(i);
 			final String base = list[0];
-			for(int i = 1; i < list.length; i ++)
-				sj.add(base + StringUtils.SPACE + list[i]);
+			for(int j = 1; j < list.length; j ++)
+				sj.add(base + StringUtils.SPACE + list[j]);
 		}
 		return sj.toString();
 	}

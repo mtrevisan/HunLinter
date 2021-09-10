@@ -108,15 +108,16 @@ public class Hyphenator implements HyphenatorInterface{
 			final List<String> rules2ndLevel = new ArrayList<>();
 
 			//apply second level hyphenation for the word parts
-			int i = 0;
-			for(final String compound : compounds){
+			int offset = 0;
+			for(int  i = 0; i < compounds.size(); i ++){
+				final String compound = compounds.get(i);
 				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);
 
 				syllabes.addAll(createHyphenatedWord(compound, subHyph));
 				rules2ndLevel.addAll(subHyph.getRules());
-				if(i < rules.size())
-					rules2ndLevel.add(rules.get(i ++));
+				if(offset < rules.size())
+					rules2ndLevel.add(rules.get(offset ++));
 			}
 
 			rules = rules2ndLevel;
@@ -178,7 +179,8 @@ public class Hyphenator implements HyphenatorInterface{
 
 			final int normalizedWordSize = getNormalizedLength(word);
 			final List<SearchResult<String>> itr = patterns.searchInText(w);
-			for(final SearchResult<String> r : itr){
+			for(int i = 0; i < itr.size(); i ++){
+				final SearchResult<String> r = itr.get(i);
 				final String rule = r.getValue();
 
 				//number of non-letter characters

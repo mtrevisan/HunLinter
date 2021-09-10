@@ -89,8 +89,8 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			for(final DictionaryEntry originator : originators)
-				LOGGER.trace("Inferred inflection: {}", originator);
+			for(int i = 0; i < originators.size(); i ++)
+				LOGGER.trace("Inferred inflection: {}", originators.get(i));
 		return originators;
 	}
 
@@ -101,9 +101,12 @@ public class WordMuncher{
 		final List<DictionaryEntry> originators = new ArrayList<>(0);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
-		for(final RuleEntry ruleEntry : ruleEntries)
+		for(int i = 0; i < ruleEntries.size(); i ++){
+			final RuleEntry ruleEntry = ruleEntries.get(i);
 			//for each affix entry in rule
-			for(final AffixEntry affixEntry : ruleEntry.getEntries())
+			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
+			for(int j = 0; j < affixEntries.size(); j++){
+				final AffixEntry affixEntry = affixEntries.get(j);
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
@@ -120,7 +123,8 @@ public class WordMuncher{
 					if(baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty() || baseInflectionPartOfSpeech.equals(partOfSpeech))
 						originators.add(originatorEntry);
 				}
-
+			}
+		}
 		return originators;
 	}
 
@@ -129,15 +133,19 @@ public class WordMuncher{
 		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
-		for(final RuleEntry ruleEntry : ruleEntries){
+		for(int i = 0; i < ruleEntries.size(); i ++){
+			final RuleEntry ruleEntry = ruleEntries.get(i);
 			originatingRulesFromEntry.clear();
-			for(final AffixEntry affixEntry : ruleEntry.getEntries())
+			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
+			for(int j = 0; j < affixEntries.size(); j ++){
+				final AffixEntry affixEntry = affixEntries.get(j);
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
 					final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
 					if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
 						originatingRulesFromEntry.add(originatingRule);
 				}
+			}
 			if(!originatingRulesFromEntry.isEmpty()){
 				//originatingRulesFromEntry should not have inflections from identical word
 				final Map<String, List<Inflection>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, DictionaryEntry::getWord);

@@ -306,7 +306,8 @@ public class HyphenationParser{
 		options.getNoHyphen()
 			.addAll(retroCompatibilityNoHyphen);
 
-		for(final String noHyphen : retroCompatibilityNoHyphen){
+		for(int i = 0; i < retroCompatibilityNoHyphen.size(); i ++){
+			final String noHyphen = retroCompatibilityNoHyphen.get(i);
 			final String line = ONE + noHyphen + ONE;
 			if(!isRuleDuplicated(noHyphen, line, level))
 				rules.get(level)
@@ -512,14 +513,14 @@ public class HyphenationParser{
 	private void savePatternsByLevel(final BufferedWriter writer, final Level level) throws IOException{
 		final List<String> patternsByLevel = new ArrayList<>(rules.get(level).values());
 		patternsByLevel.sort(comparator);
-		for(final String pattern : patternsByLevel)
-			writeln(writer, pattern);
+		for(int i = 0; i < patternsByLevel.size(); i ++)
+			writeln(writer, patternsByLevel.get(i));
 
 		//write custom hyphenations
 		final List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
 		customs.sort(comparator);
-		for(final String rule : customs)
-			writeln(writer, rule);
+		for(int i = 0; i < customs.size(); i ++)
+			writeln(writer, customs.get(i));
 	}
 
 	private static void writeln(final BufferedWriter writer, final String line) throws IOException{

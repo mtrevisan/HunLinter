@@ -111,7 +111,8 @@ public class AffixData{
 
 	private Map<AffixOption, Object> extractSingleFlags(){
 		final Map<AffixOption, Object> singleFlags = new EnumMap<>(AffixOption.class);
-		for(final AffixOption option : SINGLE_FLAG_TAGS){
+		for(int i = 0; i < SINGLE_FLAG_TAGS.size(); i ++){
+			final AffixOption option = SINGLE_FLAG_TAGS.get(i);
 			final Object entry = getData(option);
 			if(entry != null)
 				singleFlags.put(option, entry);
@@ -145,10 +146,10 @@ public class AffixData{
 		return (T)data.getOrDefault(key, defaultValue);
 	}
 
-	private List<String> getStringData(final Collection<AffixOption> keys){
+	private List<String> getStringData(final List<AffixOption> keys){
 		final List<String> strings = new ArrayList<>(keys.size());
-		for(final AffixOption key : keys)
-			strings.add(getData(key));
+		for(int i = 0; i < keys.size(); i ++)
+			strings.add(getData(keys.get(i)));
 		return strings;
 	}
 

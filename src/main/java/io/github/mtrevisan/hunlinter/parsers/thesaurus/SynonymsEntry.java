@@ -120,8 +120,8 @@ public class SynonymsEntry{
 
 	public final boolean containsSynonym(final String synonym){
 		if(synonyms != null)
-			for(final String s : synonyms)
-				if(ThesaurusDictionary.removeSynonymUse(s).equals(synonym))
+			for(int i = 0; i < synonyms.size(); i ++)
+				if(ThesaurusDictionary.removeSynonymUse(synonyms.get(i)).equals(synonym))
 					return true;
 		return false;
 	}

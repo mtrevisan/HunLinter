@@ -82,8 +82,8 @@ public class HyphenationBreak{
 	public final void enforceNoHyphens(final List<String> syllabes, final Iterable<String> noHyphen){
 		if(syllabes.size() > 1){
 			int wordLength = 0;
-			for(final String syllabe : syllabes)
-				wordLength += syllabe.length();
+			for(int i = 0; i < syllabes.size(); i ++)
+				wordLength += syllabes.get(i).length();
 			for(final String nohyp : noHyphen){
 				final String reducedKey = reduceKey(nohyp);
 				final NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);

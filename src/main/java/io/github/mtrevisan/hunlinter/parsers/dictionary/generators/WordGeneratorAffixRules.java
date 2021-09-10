@@ -65,12 +65,12 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 			enforceOnlyInCompound(inflections);
 
 		//convert using output table
-		for(final Inflection inflection : inflections)
-			inflection.applyOutputConversionTable(affixData::applyOutputConversionTable);
+		for(int i = 0; i < inflections.size(); i ++)
+			inflections.get(i).applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			for(final Inflection inflection : inflections)
-				LOGGER.trace("Inflected word: {}", inflection);
+			for(int i = 0; i < inflections.size(); i ++)
+				LOGGER.trace("Inflected word: {}", inflections.get(i));
 
 		return inflections;
 	}

@@ -70,10 +70,11 @@ public class ThesaurusDictionary{
 		for(int i = 0; i < size; i ++)
 			sj.add(partOfSpeeches[i]);
 		final String wholePartOfSpeeches = sj.toString();
-		final Collection<String> uniqueSynonyms = uniqueValues(synonyms);
+		final List<String> uniqueSynonyms = uniqueValues(synonyms);
 
 		boolean result = false;
-		for(String currentDefinition : uniqueSynonyms){
+		for(int i = 0; i < uniqueSynonyms.size(); i ++){
+			String currentDefinition = uniqueSynonyms.get(i);
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, uniqueSynonyms,
 				currentDefinition);
 
@@ -94,8 +95,8 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private static Collection<String> uniqueValues(final String[] synonyms){
-		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
+	private static List<String> uniqueValues(final String[] synonyms){
+		final List<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
 		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
 		for(int i = 0; i < synonyms.length; i ++){
 			final String s = synonyms[i].toLowerCase(Locale.ROOT);
@@ -105,13 +106,15 @@ public class ThesaurusDictionary{
 		return uniqueSynonyms;
 	}
 
-	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
+	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		for(final String synonym : synonyms)
+		for(int i = 0; i < synonyms.size(); i ++){
+			final String synonym = synonyms.get(i);
 			if(!synonym.equals(definition))
 				sj.add(synonym);
+		}
 		return new SynonymsEntry(sj.toString());
 	}
 

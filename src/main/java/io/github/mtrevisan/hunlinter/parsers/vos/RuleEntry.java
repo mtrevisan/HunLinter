@@ -97,8 +97,8 @@ public class RuleEntry{
 
 	public final boolean isProductiveFor(final String word){
 		if(entries != null)
-			for(final AffixEntry entry : entries)
-				if(entry.canApplyTo(word))
+			for(int i = 0; i < entries.size(); i ++)
+				if(entries.get(i).canApplyTo(word))
 					return true;
 		return false;
 	}

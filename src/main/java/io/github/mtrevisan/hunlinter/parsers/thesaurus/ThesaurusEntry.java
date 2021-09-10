@@ -105,8 +105,8 @@ public class ThesaurusEntry{
 
 	public final Set<String> getSynonymsSet(){
 		final Set<String> set = new HashSet<>(synonyms.size());
-		for(final SynonymsEntry synonym : synonyms)
-			set.addAll(synonym.getSynonyms());
+		for(int i = 0; i < synonyms.size(); i ++)
+			set.addAll(synonyms.get(i).getSynonyms());
 		return set;
 	}
 
@@ -119,9 +119,11 @@ public class ThesaurusEntry{
 //			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
 //			.anyMatch(entry -> entry.containsSynonym(synonym));
 		if(synonyms != null)
-			for(final SynonymsEntry entry : synonyms)
+			for(int i = 0; i < synonyms.size(); i ++){
+				final SynonymsEntry entry = synonyms.get(i);
 				if(entry.hasSamePartOfSpeeches(partOfSpeeches) && entry.containsSynonym(synonym))
 					return true;
+			}
 		return false;
 //		for(final SynonymsEntry entry : synonyms)
 //			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
@@ -133,8 +135,8 @@ public class ThesaurusEntry{
 		final Collection<String> ss = new ArrayList<>(synonyms);
 		final boolean removed = ss.remove(definition);
 		if(removed)
-			for(final SynonymsEntry entry : this.synonyms)
-				if(entry.contains(partOfSpeeches, ss))
+			for(int i = 0; i < this.synonyms.size(); i ++)
+				if(this.synonyms.get(i).contains(partOfSpeeches, ss))
 					return true;
 		return false;
 	}
@@ -142,9 +144,11 @@ public class ThesaurusEntry{
 	public final boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
 		final Collection<String> ss = new ArrayList<>(synonyms);
 		final boolean removed = ss.remove(definition);
-		for(final SynonymsEntry entry : this.synonyms)
+		for(int i = 0; i < this.synonyms.size(); i ++){
+			final SynonymsEntry entry = this.synonyms.get(i);
 			if(removed && entry.containsPartOfSpeech(partOfSpeeches) || entry.intersects(partOfSpeeches, ss))
 				return true;
+		}
 		return false;
 	}
 
@@ -159,8 +163,8 @@ public class ThesaurusEntry{
 		final int synonymsEntries = getSynonymsEntries();
 		saveToIndex(dataWriter, synonymsEntries);
 		int synonymsLength = 1;
-		for(final SynonymsEntry synonym : synonyms){
-			final String s = synonym.toString();
+		for(int i = 0; i < synonyms.size(); i ++){
+			final String s = synonyms.get(i).toString();
 			dataWriter.write(s);
 			dataWriter.write(NEW_LINE);
 
@@ -172,8 +176,8 @@ public class ThesaurusEntry{
 	@Override
 	public final String toString(){
 		final StringJoiner sj = new StringJoiner("\r\n");
-		for(final SynonymsEntry synonym : synonyms)
-			sj.add(definition + ": " + String.join(", ", synonym.toString()));
+		for(int i = 0; i < synonyms.size(); i ++)
+			sj.add(definition + ": " + String.join(", ", synonyms.get(i).toString()));
 		return sj.toString();
 	}
 

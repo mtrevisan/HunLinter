@@ -225,14 +225,15 @@ public class AffixEntry{
 		return false;
 	}
 
-	public static String[] extractMorphologicalFields(final Iterable<DictionaryEntry> compoundEntries){
+	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		int size = 0;
-		for(final DictionaryEntry compoundEntry : compoundEntries)
-			size += compoundEntry.morphologicalFields.length + 1;
+		for(int i = 0; i < compoundEntries.size(); i ++)
+			size += compoundEntries.get(i).morphologicalFields.length + 1;
 
 		int offset = 0;
 		final String[] mf = new String[size];
-		for(final DictionaryEntry compoundEntry : compoundEntries){
+		for(int i = 0; i < compoundEntries.size(); i ++){
+			final DictionaryEntry compoundEntry = compoundEntries.get(i);
 			final String compound = compoundEntry.getWord();
 			mf[offset ++] = MorphologicalTag.PART.attachValue(compound);
 			for(final String cemf : compoundEntry.morphologicalFields)
