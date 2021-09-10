@@ -193,8 +193,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -262,7 +262,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		WorkerManager.checkForAbortion(parentFrame);
 	}
 
-   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
+   private void limitComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
       final String inputText = ((String)inputComboBox.getEditor().getItem()).trim();
       final int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
       final String inputCompounds = inputTextArea.getText();
@@ -292,7 +292,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       	clearOutputTable(table);
    }//GEN-LAST:event_limitComboBoxActionPerformed
 
-   private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
+   private void loadInputButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
       final AffixParser affParser = parserManager.getAffParser();
       final FlagParsingStrategy strategy = affParser.getAffixData()
       .getFlagParsingStrategy();

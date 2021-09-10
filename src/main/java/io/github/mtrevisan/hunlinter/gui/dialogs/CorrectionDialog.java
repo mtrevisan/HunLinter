@@ -106,7 +106,7 @@ public class CorrectionDialog extends JDialog{
       btnCancel.setText("Cancel");
       btnCancel.addActionListener(this::btnCancelActionPerformed);
 
-      javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
+      final javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
       buttonPanel.setLayout(buttonPanelLayout);
       buttonPanelLayout.setHorizontalGroup(
          buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,7 +129,7 @@ public class CorrectionDialog extends JDialog{
 
       buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,11 +163,11 @@ public class CorrectionDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+   private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
       dispose();
    }//GEN-LAST:event_btnCancelActionPerformed
 
-   private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+   private void btnOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
       try{
 			final String incorrect = incorrectTextField.getText();
 			final String correct = correctTextField.getText();

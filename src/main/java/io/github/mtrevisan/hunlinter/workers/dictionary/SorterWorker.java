@@ -81,7 +81,7 @@ public class SorterWorker extends WorkerDictionary{
 				lines = FileHelper.readAllLines(dicParser.getDicFile().toPath(), dicParser.getCharset());
 			}
 			catch(final IOException ioe){
-				throw new WorkerException(ioe.getMessage());
+				throw new WorkerException(ioe, ioe.getMessage());
 			}
 
 			setProgress(33);
@@ -110,7 +110,7 @@ public class SorterWorker extends WorkerDictionary{
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			}
 			catch(final IOException ioe){
-				throw new WriterException(ioe.getMessage());
+				throw new WriterException(ioe, ioe.getMessage());
 			}
 
 			return null;

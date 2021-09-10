@@ -171,7 +171,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				sleepOnPause();
 			}
 			catch(final RuntimeException re){
-				final LinterException le = new LinterException(re.getMessage(), re.getCause(), data);
+				final LinterException le = new LinterException(re, re.getMessage())
+					.withData(data);
 				manageException(le);
 
 				if(workerData.isCancelOnException())

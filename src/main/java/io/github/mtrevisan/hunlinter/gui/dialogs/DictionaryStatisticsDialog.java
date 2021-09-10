@@ -212,7 +212,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       longestWordSyllabesValueLabel.setText("…");
       longestWordSyllabesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
-      javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
+      final javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
       lengthsPanel.setLayout(lengthsPanelLayout);
       lengthsPanelLayout.setHorizontalGroup(
          lengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -225,7 +225,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mainTabbedPane.addTab("Word lengths", lengthsPanel);
 
-      javax.swing.GroupLayout syllabesPanelLayout = new javax.swing.GroupLayout(syllabesPanel);
+      final javax.swing.GroupLayout syllabesPanelLayout = new javax.swing.GroupLayout(syllabesPanel);
       syllabesPanel.setLayout(syllabesPanelLayout);
       syllabesPanelLayout.setHorizontalGroup(
          syllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,7 +238,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mainTabbedPane.addTab("Word syllabes", syllabesPanel);
 
-      javax.swing.GroupLayout stressesPanelLayout = new javax.swing.GroupLayout(stressesPanel);
+      final javax.swing.GroupLayout stressesPanelLayout = new javax.swing.GroupLayout(stressesPanel);
       stressesPanel.setLayout(stressesPanelLayout);
       stressesPanelLayout.setHorizontalGroup(
          stressesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,7 +254,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       exportButton.setText("Export");
       exportButton.addActionListener(this::exportButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -353,7 +353,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+   private void exportButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 		final JFileChooser saveTextFileFileChooser = JavaHelper.waitForFuture(futureSaveTextFileFileChooser);
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){

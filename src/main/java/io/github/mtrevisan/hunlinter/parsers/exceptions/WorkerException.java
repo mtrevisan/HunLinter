@@ -38,12 +38,16 @@ public class WorkerException extends RuntimeException{
 	private static final long serialVersionUID = 7555378898049067691L;
 
 
-	public WorkerException(final String message, final Object... parameters){
-		super(JavaHelper.textFormat(message, parameters));
+	public WorkerException(final Throwable cause){
+		super(cause);
 	}
 
-	public WorkerException(final Throwable throwable){
-		super(throwable);
+	public WorkerException(final String message, final Object... parameters){
+		this(null, message, parameters);
+	}
+
+	public WorkerException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 

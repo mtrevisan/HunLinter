@@ -104,7 +104,7 @@ public class DictionarySortDialog extends JDialog{
       btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
       btnPreviousUnsortedArea.addActionListener(this::btnPreviousUnsortedAreaActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,7 +175,7 @@ public class DictionarySortDialog extends JDialog{
 		setCellRenderer(dicCellRenderer);
 	}
 
-   private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
+   private void btnNextUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);
@@ -191,7 +191,7 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
-   private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
+   private void btnPreviousUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);

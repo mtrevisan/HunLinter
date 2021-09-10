@@ -139,7 +139,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
 
 		wordTextField.setFont(currentFont);
       wordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             wordTextFieldKeyReleased(evt);
          }
       });
@@ -168,7 +168,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
       addRuleTextField.setFont(currentFont);
       addRuleTextField.setEnabled(false);
       addRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             addRuleTextFieldKeyReleased(evt);
          }
       });
@@ -219,8 +219,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
       setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -306,19 +306,19 @@ public class HyphenationLayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void wordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wordTextFieldKeyReleased
+   private void wordTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wordTextFieldKeyReleased
       debouncer.call(this);
    }//GEN-LAST:event_wordTextFieldKeyReleased
 
-   private void addRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_addRuleTextFieldKeyReleased
+   private void addRuleTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_addRuleTextFieldKeyReleased
       addRuleDebouncer.call(this);
    }//GEN-LAST:event_addRuleTextFieldKeyReleased
 
-   private void addRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleLevelComboBoxActionPerformed
+   private void addRuleLevelComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleLevelComboBoxActionPerformed
       addRuleDebouncer.call(this);
    }//GEN-LAST:event_addRuleLevelComboBoxActionPerformed
 
-   private void addRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleButtonActionPerformed
+   private void addRuleButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleButtonActionPerformed
       final  String newRule = addRuleTextField.getText();
       final HyphenationParser.Level level = HyphenationParser.Level.values()[addRuleLevelComboBox.getSelectedIndex()];
       final String foundRule = parserManager.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
@@ -349,7 +349,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
       }
    }//GEN-LAST:event_addRuleButtonActionPerformed
 
-   private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
+   private void optionsButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
       final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
          try{
             parserManager.getHypParser().setOptions(options);

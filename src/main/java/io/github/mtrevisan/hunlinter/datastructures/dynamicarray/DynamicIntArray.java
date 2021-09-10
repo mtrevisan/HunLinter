@@ -52,7 +52,7 @@ public class DynamicIntArray implements RandomAccess{
 		clear();
 	}
 
-	public synchronized final void clear(){
+	public final synchronized void clear(){
 		blocks = new IntBlock[CAPACITY_DEFAULT];
 		//the first Block, this is in SB0, so it can only have one element
 		blocks[0] = new IntBlock(1);

@@ -52,7 +52,11 @@ public class LinterException extends RuntimeException{
 	}
 
 	public LinterException(final String message, final Object... parameters){
-		super(JavaHelper.textFormat(message, parameters));
+		this(null, message, parameters);
+	}
+
+	public LinterException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 	public final LinterException withIndexDataPair(final IndexDataPair<?> data){

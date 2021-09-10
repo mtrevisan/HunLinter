@@ -159,7 +159,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameLabel.setText("Family name:");
 
       familyNameTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             familyNameTextFieldKeyReleased(evt);
          }
       });
@@ -198,12 +198,12 @@ public class FontChooserDialog extends javax.swing.JDialog{
       sizeLabel.setText("Size:");
 
       sizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             sizeTextFieldKeyReleased(evt);
          }
       });
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,7 +259,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void familyNameTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_familyNameTextFieldKeyReleased
+	private void familyNameTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_familyNameTextFieldKeyReleased
 		int index = familyNameList.getSelectedIndex();
 		switch(evt.getKeyCode()){
 			case KeyEvent.VK_UP -> {
@@ -274,12 +274,12 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		}
 	}//GEN-LAST:event_familyNameTextFieldKeyReleased
 
-	private void familyNameListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
+	private void familyNameListValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
 		if(storeSelectedFont())
 			setSelectedFont();
 	}//GEN-LAST:event_familyNameListValueChanged
 
-	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
+	private void monospacedCheckBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
 		final List<String> fonts = (monospacedCheckBox.isSelected()
 			? FontHelper.getFamilyNamesMonospaced()
 			: FontHelper.getFamilyNamesAll());
@@ -291,17 +291,17 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		setSelectedFont();
 	}//GEN-LAST:event_monospacedCheckBoxActionPerformed
 
-   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+   private void okButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
 		onSelection.accept(selectedFont);
 
 		dispose();
    }//GEN-LAST:event_okButtonActionPerformed
 
-   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+   private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
 		dispose();
    }//GEN-LAST:event_cancelButtonActionPerformed
 
-   private void sizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
+   private void sizeTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
 		final int code = evt.getKeyCode();
 		if(code == KeyEvent.VK_UP){
 			final int fontSize = Integer.parseInt(sizeTextField.getText()) + 1;

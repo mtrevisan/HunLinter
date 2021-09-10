@@ -99,12 +99,15 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		//special case: if we're removing the suffix in the infix code, move it to the suffix code instead
 		if(truncateSuffixBytes == 0 && maxInfixIndex + maxInfixLength == source.length){
 			truncateSuffixBytes = maxInfixLength;
-			maxInfixIndex = maxInfixLength = 0;
+			maxInfixLength = 0;
+			maxInfixIndex = 0;
 		}
 
 		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
-			maxInfixIndex = maxSubsequenceLength = 0;
-			maxInfixLength = truncateSuffixBytes = REMOVE_EVERYTHING;
+			maxSubsequenceLength = 0;
+			maxInfixIndex = 0;
+			truncateSuffixBytes = REMOVE_EVERYTHING;
+			maxInfixLength = REMOVE_EVERYTHING;
 		}
 
 		final int len1 = target.length - maxSubsequenceLength;

@@ -264,8 +264,8 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 	@Override
-	public final synchronized Object clone(){
-		return super.clone();
+	public final synchronized PropertiesUTF8 clone(){
+		return (PropertiesUTF8)super.clone();
 	}
 
 

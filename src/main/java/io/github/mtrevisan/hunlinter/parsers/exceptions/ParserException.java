@@ -38,12 +38,16 @@ public class ParserException extends RuntimeException{
 	private static final long serialVersionUID = 572132987071971443L;
 
 
-	public ParserException(final String message, final Object... parameters){
-		super(JavaHelper.textFormat(message, parameters));
+	public ParserException(final Throwable cause){
+		super(cause);
 	}
 
-	public ParserException(final Throwable throwable){
-		super(throwable);
+	public ParserException(final String message, final Object... parameters){
+		this(null, message, parameters);
+	}
+
+	public ParserException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 

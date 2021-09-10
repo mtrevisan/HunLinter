@@ -153,7 +153,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       noHyphenationList.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       noHyphenationScrollPane.setViewportView(noHyphenationList);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,12 +251,12 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			model.remove(selectedRowIDs[i] - i);
 	}
 
-	private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+	private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 		final DefaultListModel<String> model = (DefaultListModel<String>)(noHyphenationList.getModel());
 		model.addElement(noHyphenationTextField.getText());
 	}//GEN-LAST:event_addButtonActionPerformed
 
-   private void acceptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButtonActionPerformed
+   private void acceptButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButtonActionPerformed
 		final int minLeftNonCompound = (!minLeftNonCompoundTextField.getText().isEmpty()? Integer.parseInt(minLeftNonCompoundTextField.getText()): -1);
 		final int minRightNonCompound = (!minRightNonCompoundTextField.getText().isEmpty()? Integer.parseInt(minRightNonCompoundTextField.getText()): -1);
 		final int minLeftCompound = (!minLeftCompoundTextField.getText().isEmpty()? Integer.parseInt(minLeftCompoundTextField.getText()): -1);

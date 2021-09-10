@@ -520,7 +520,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       setJMenuBar(mainMenuBar);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -553,7 +553,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
-	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
+	private void filOpenProjectMenuItemActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final JFileChooser openProjectPathFileChooser = JavaHelper.waitForFuture(futureOpenProjectPathFileChooser);
@@ -569,7 +569,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
 
-	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	private void filEmptyRecentProjectsMenuItemActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
 		recentProjectsMenu.setEnabled(false);

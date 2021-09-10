@@ -87,7 +87,7 @@ public class UpdateAction extends AbstractAction{
 		private static final long serialVersionUID = -5644390861803492172L;
 		private final FileDownloaderDialog dialog;
 
-		private CancelAction(FileDownloaderDialog dialog){this.dialog = dialog;}
+		private CancelAction(final FileDownloaderDialog dialog){this.dialog = dialog;}
 
 		@Override
 		public void actionPerformed(final ActionEvent e){

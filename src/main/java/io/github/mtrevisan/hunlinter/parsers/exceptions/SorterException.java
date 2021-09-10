@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.exceptions;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,8 +38,16 @@ public class SorterException extends RuntimeException{
 	private static final long serialVersionUID = 2041181194982038921L;
 
 
-	public SorterException(final Throwable throwable){
-		super(throwable);
+	public SorterException(final Throwable cause){
+		super(cause);
+	}
+
+	public SorterException(final String message, final Object... parameters){
+		this(null, message, parameters);
+	}
+
+	public SorterException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 

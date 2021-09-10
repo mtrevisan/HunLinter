@@ -137,7 +137,7 @@ public class HelpDialog extends JDialog{
       homePageLabelValue.setText("<html><a href=#>https://github.com/mtrevisan/HunLinter</a></html>");
       homePageLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
       homePageLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mouseClicked(java.awt.event.MouseEvent evt) {
+         public void mouseClicked(final java.awt.event.MouseEvent evt) {
             homePageLabelValueMouseClicked(evt);
          }
       });
@@ -157,7 +157,7 @@ public class HelpDialog extends JDialog{
       managedOptionsTextArea.setWrapStyleWord(true);
       managedOptionsScrollPane.setViewportView(managedOptionsTextArea);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

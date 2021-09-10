@@ -74,7 +74,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
       languageList.addListSelectionListener(this::languageListValueChanged);
       languageScrollPane.setViewportView(languageList);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,7 +94,7 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void languageListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_languageListValueChanged
+   private void languageListValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_languageListValueChanged
 		languageChosen = true;
 		onSelection.accept(languageList.getSelectedValue());
 

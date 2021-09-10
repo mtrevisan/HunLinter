@@ -137,7 +137,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		incorrectTextField.setFont(currentFont);
       incorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             incorrectTextFieldKeyReleased(evt);
          }
       });
@@ -148,7 +148,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       correctTextField.setFont(currentFont);
       correctTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             correctTextFieldKeyReleased(evt);
          }
       });
@@ -229,8 +229,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -279,15 +279,15 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void incorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_incorrectTextFieldKeyReleased
+   private void incorrectTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_incorrectTextFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_incorrectTextFieldKeyReleased
 
-   private void correctTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correctTextFieldKeyReleased
+   private void correctTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correctTextFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_correctTextFieldKeyReleased
 
-   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the correction
          final String incorrect = incorrectTextField.getText();

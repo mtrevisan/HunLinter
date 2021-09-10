@@ -152,7 +152,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,7 +233,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			rulesReducerWorker.cancel();
 	}
 
-   public final void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+   public final void ruleComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
 		if(flag != null){
 			mainProgressBar.setValue(0);
@@ -254,7 +254,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		}
    }//GEN-LAST:event_ruleComboBoxActionPerformed
 
-   private void reduceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
+   private void reduceButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
 		mainProgressBar.setValue(0);
 		reducedSetTextArea.setText(null);
 		ruleComboBox.setEnabled(false);
@@ -264,7 +264,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
 
-   private void optimizeClosedGroupCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optimizeClosedGroupCheckBoxActionPerformed
+   private void optimizeClosedGroupCheckBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optimizeClosedGroupCheckBoxActionPerformed
 		reducedSetTextArea.setText(null);
    }//GEN-LAST:event_optimizeClosedGroupCheckBoxActionPerformed
 

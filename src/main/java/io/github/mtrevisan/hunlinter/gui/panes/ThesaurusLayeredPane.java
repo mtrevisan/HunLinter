@@ -154,7 +154,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 		synonymsTextField.setFont(currentFont);
       synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             synonymsTextFieldKeyReleased(evt);
          }
       });
@@ -197,8 +197,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
       setLayer(synonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(synonymsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -235,11 +235,11 @@ public class ThesaurusLayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void synonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_synonymsTextFieldKeyReleased
+   private void synonymsTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_synonymsTextFieldKeyReleased
       debouncer.call(this);
    }//GEN-LAST:event_synonymsTextFieldKeyReleased
 
-   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the synonyms
          final String synonyms = synonymsTextField.getText();

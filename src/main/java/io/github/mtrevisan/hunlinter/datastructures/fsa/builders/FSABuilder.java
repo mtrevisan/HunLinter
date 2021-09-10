@@ -131,7 +131,7 @@ public class FSABuilder{
 	 *
 	 * @param sequence The array holding input sequence of bytes.
 	 */
-	public synchronized final void add(final byte[] sequence){
+	public final synchronized void add(final byte[] sequence){
 		if(serialized == null)
 			throw new IllegalArgumentException("Automaton already built");
 		final int len = sequence.length;
@@ -170,7 +170,7 @@ public class FSABuilder{
 	 *
 	 * @return	The {@link FSAAbstract} just constructed
 	 */
-	public synchronized final FSAAbstract complete(){
+	public final synchronized FSAAbstract complete(){
 		add(new byte[0]);
 
 		if(nextArcOffset[0] - activePath[0] == 0)
@@ -255,7 +255,8 @@ public class FSABuilder{
 		for(int i = 0; ; ){
 			int state = hashSet[slot];
 			if(state == 0){
-				state = hashSet[slot] = serialize(activePathIndex);
+				state = serialize(activePathIndex);
+				hashSet[slot] = state;
 				if(++ hashSize > hashSet.length / 2)
 					expandAndRehash();
 
@@ -336,9 +337,11 @@ public class FSABuilder{
 			activePath = Arrays.copyOf(activePath, size);
 			nextArcOffset = Arrays.copyOf(nextArcOffset, size);
 
-			for(int i = p; i < size; i ++)
+			for(int i = p; i < size; i ++){
 				//assume max labels count
-				nextArcOffset[i] = activePath[i] = allocateState(MAX_LABELS);
+				activePath[i] = allocateState(MAX_LABELS);
+				nextArcOffset[i] = activePath[i];
+			}
 		}
 	}
 

@@ -38,12 +38,16 @@ public class WriterException extends RuntimeException{
 	private static final long serialVersionUID = 2979994717892287563L;
 
 
-	public WriterException(final String message, final Object... parameters){
-		super(JavaHelper.textFormat(message, parameters));
+	public WriterException(final Throwable cause){
+		super(cause);
 	}
 
-	public WriterException(final Throwable throwable){
-		super(throwable);
+	public WriterException(final String message, final Object... parameters){
+		this(null, message, parameters);
+	}
+
+	public WriterException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 

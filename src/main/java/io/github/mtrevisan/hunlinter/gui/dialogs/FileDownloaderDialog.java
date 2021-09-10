@@ -129,7 +129,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       downloadButton.setText("Download");
       downloadButton.addActionListener(this::downloadButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -193,7 +193,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void whatsNewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
+	private void whatsNewButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
 		try{
 			final List<Pair<Version, String>> whatsNew = DownloaderHelper.extractNewerVersions();
 			final String message = whatsNew.stream()
@@ -217,7 +217,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final VersionException | IOException | ParseException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
-   private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+   private void downloadButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
 		downloadButton.setEnabled(false);
 
 		task = new DownloadTask(localPath, remoteObject, this);

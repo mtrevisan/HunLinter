@@ -172,7 +172,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				return outputFile;
 			}
 			catch(final IOException ioe){
-				throw new WorkerException(ioe.getMessage());
+				throw new WorkerException(ioe, ioe.getMessage());
 			}
 		};
 		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);

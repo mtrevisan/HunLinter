@@ -125,7 +125,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             textFieldKeyReleased(evt);
          }
       });
@@ -144,8 +144,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
       setLayer(resultScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openPoSFSAButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -174,11 +174,11 @@ public class PoSFSALayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void textFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
+   private void textFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
-   private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
+   private void openPoSFSAButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
 
 		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenPoSFSAFileChooser);

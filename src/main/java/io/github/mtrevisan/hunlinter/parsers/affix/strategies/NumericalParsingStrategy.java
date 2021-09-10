@@ -87,8 +87,8 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
 				throw new LinterException(FLAG_MUST_BE_IN_RANGE, MAX_NUMERICAL_FLAG, flag);
 		}
-		catch(final NumberFormatException e){
-			throw new LinterException(BAD_FORMAT, flag);
+		catch(final NumberFormatException nfe){
+			throw new LinterException(nfe, BAD_FORMAT, flag);
 		}
 	}
 

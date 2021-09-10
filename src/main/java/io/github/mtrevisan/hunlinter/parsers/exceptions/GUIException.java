@@ -38,12 +38,16 @@ public class GUIException extends RuntimeException{
 	private static final long serialVersionUID = -4010230500849871966L;
 
 
-	public GUIException(final String message, final Object... parameters){
-		super(JavaHelper.textFormat(message, parameters));
+	public GUIException(final Throwable cause){
+		super(cause);
 	}
 
-	public GUIException(final Throwable throwable){
-		super(throwable);
+	public GUIException(final String message, final Object... parameters){
+		this(null, message, parameters);
+	}
+
+	public GUIException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
 

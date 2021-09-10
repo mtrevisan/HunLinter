@@ -107,7 +107,7 @@ public class Hyphenation{
 	}
 
 	public final boolean isHyphenated(){
-		return (rules.size() > 0);
+		return !rules.isEmpty();
 	}
 
 	public final boolean isCompound(){

@@ -72,7 +72,7 @@ public class AffixHandler implements Handler{
 			return Integer.parseInt(context.getThirdParameter());
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
-			throw new ParserException(ioe.getMessage());
+			throw new ParserException(ioe.getMessage(), ioe);
 		}
 	}
 

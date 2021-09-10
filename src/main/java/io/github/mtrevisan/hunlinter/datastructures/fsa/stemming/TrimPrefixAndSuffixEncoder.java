@@ -80,7 +80,8 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 		int truncateSuffixBytes = (source.length - (maxSubsequenceIndex + maxSubsequenceLength));
 		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
 			maxSubsequenceLength = 0;
-			truncatePrefixBytes = truncateSuffixBytes = REMOVE_EVERYTHING;
+			truncateSuffixBytes = REMOVE_EVERYTHING;
+			truncatePrefixBytes = truncateSuffixBytes;
 		}
 
 		final int len1 = target.length - maxSubsequenceLength;

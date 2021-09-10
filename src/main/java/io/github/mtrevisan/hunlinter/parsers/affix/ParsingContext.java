@@ -41,8 +41,6 @@ public class ParsingContext{
 	private String[] lineParts;
 
 
-	public ParsingContext(){}
-
 	public final void update(final String line, final int index, final Scanner scanner){
 		Objects.requireNonNull(line, "Line cannot be null");
 		Objects.requireNonNull(scanner, "Scanner cannot be null");

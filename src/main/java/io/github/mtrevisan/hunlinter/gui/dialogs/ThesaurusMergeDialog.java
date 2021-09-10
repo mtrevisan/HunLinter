@@ -100,7 +100,7 @@ public class ThesaurusMergeDialog extends JDialog{
       mergeButton.setText("Merge");
       mergeButton.addActionListener(this::mergeButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -135,7 +135,7 @@ public class ThesaurusMergeDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void lineComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
+   private void lineComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
 		final int synonymsIndex = lineComboBox.getSelectedIndex();
 
 		final String def = (baseSynonyms.containsSynonym(definition)? StringUtils.EMPTY: definition);
@@ -146,7 +146,7 @@ public class ThesaurusMergeDialog extends JDialog{
 		mergerTextArea.setCaretPosition(0);
    }//GEN-LAST:event_lineComboBoxActionPerformed
 
-   private void mergeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeButtonActionPerformed
+   private void mergeButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeButtonActionPerformed
 		merged = true;
 
 		dispose();

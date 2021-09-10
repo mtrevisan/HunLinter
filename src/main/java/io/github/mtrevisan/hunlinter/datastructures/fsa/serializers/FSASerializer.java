@@ -82,14 +82,14 @@ public class FSASerializer implements FSASerializerInterface{
 
 	@Override
 	public final FSASerializer withFiller(final byte filler){
-		this.fillerByte = filler;
+		fillerByte = filler;
 
 		return this;
 	}
 
 	@Override
 	public final FSASerializer withAnnotationSeparator(final byte annotationSeparator){
-		this.annotationByte = annotationSeparator;
+		annotationByte = annotationSeparator;
 
 		return this;
 	}
@@ -111,7 +111,7 @@ public class FSASerializer implements FSASerializerInterface{
 		//calculate the number of bytes required for the node data, if serializing with numbers
 		int nodeDataLength = 0;
 		if(serializeWithNumbers){
-			this.numbers = rightLanguageForAllStates(fsa);
+			numbers = rightLanguageForAllStates(fsa);
 			int maxNumber = numbers.get(fsa.getRootNode());
 			while(maxNumber > 0){
 				nodeDataLength ++;

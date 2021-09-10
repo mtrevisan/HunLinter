@@ -209,7 +209,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
       inputTextField.setEnabled(false);
       inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             inputTextFieldKeyReleased(evt);
          }
       });
@@ -262,8 +262,8 @@ public class DictionaryLayeredPane extends JLayeredPane{
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -390,7 +390,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
-	private void inputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyReleased
+	private void inputTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyReleased
 		debouncer.call(this);
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 

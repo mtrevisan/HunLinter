@@ -129,7 +129,7 @@ public final class LexicographicalComparator{
 				});
 			}
 			catch(final PrivilegedActionException e){
-				throw new Error("Could not initialize intrinsics", e.getCause());
+				throw new Error("Could not initialize intrinsics", e);
 			}
 		}
 

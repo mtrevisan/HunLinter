@@ -254,8 +254,8 @@ public class HyphenationParser{
 			if(level == Level.NON_COMPOUND)
 				addDefaults(level, charset);
 		}
-		catch(final LinterException | IOException t){
-			throw new LinterException(t.getMessage());
+		catch(final LinterException | IOException e){
+			throw new LinterException(e, e.getMessage());
 		}
 
 		//build tries
