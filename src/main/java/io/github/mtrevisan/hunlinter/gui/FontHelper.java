@@ -59,6 +59,7 @@ public final class FontHelper{
 		RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 
 
+	@SuppressWarnings("StaticVariableMayNotBeInitialized")
 	private static FutureTask<List<Font>> futureAllFonts;
 	private static final ArrayList<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
 	private static final ArrayList<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);

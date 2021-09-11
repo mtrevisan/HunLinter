@@ -288,7 +288,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 				FileHelper.browse(new File(localPath));
 
 				//exit
-				System.exit(0);
+				JavaHelper.exit(0);
 			}
 		}
 		catch(final URISyntaxException | IllegalArgumentException | IOException | InterruptedException e){

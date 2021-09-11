@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -50,10 +51,12 @@ public class ExitAction extends AbstractAction{
 
 	@Override
 	public final void actionPerformed(final ActionEvent event){
-		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
-		parentFrame.dispose();
+		if(event != null){
+			final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
+			parentFrame.dispose();
+		}
 
-		System.exit(0);
+		JavaHelper.exit(0);
 	}
 
 

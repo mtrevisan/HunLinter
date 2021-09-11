@@ -103,11 +103,20 @@ public final class JavaHelper{
 			SwingUtilities.invokeLater(runnable);
 	}
 
+	public static void exit(final int status){
+		new Thread("app-exit"){
+			@Override
+			public void run(){
+				System.exit(status);
+			}
+		}.start();
+	}
+
 	@SuppressWarnings("BusyWait")
 	public static void delayedRun(final Runnable runnable, final long delayMillis){
 		final long requestedStartTime = System.currentTimeMillis() + delayMillis;
 		new Thread(() -> {
-			while(true){
+			while(!Thread.interrupted()){
 				try{
 					final long leftToSleep = requestedStartTime - System.currentTimeMillis();
 					if(leftToSleep > 0l)
@@ -160,7 +169,7 @@ public final class JavaHelper{
 			}));
 
 		//exit
-		System.exit(0);
+		exit(0);
 	}
 
 }
