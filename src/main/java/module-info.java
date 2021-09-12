@@ -10,8 +10,8 @@ module io.github.mtrevisan.hunlinter{
 	requires org.jfree.jfreechart;
 	requires logback.classic;
 	requires logback.core;
-	requires slf4j.api;
 	requires hppcrt;
+	requires org.slf4j;
 
 	exports io.github.mtrevisan.hunlinter.services.log to logback.core;
 
