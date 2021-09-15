@@ -203,13 +203,13 @@ public final class GUIHelper{
 
 	public static void copyCallback(final Component invoker){
 		String textToCopy = null;
-		if(invoker instanceof JTextComponent)
-			textToCopy = ((JTextComponent)invoker).getText();
-		else if(invoker instanceof JLabel)
-			textToCopy = ((JLabel)invoker).getText();
-		else if(invoker instanceof JCopyableTable){
-			final int selectedRow = ((JTable)invoker).convertRowIndexToModel(((JTable)invoker).getSelectedRow());
-			textToCopy = ((JCopyableTable)invoker).getValueAtRow(selectedRow);
+		if(invoker instanceof JTextComponent textComponent)
+			textToCopy = textComponent.getText();
+		else if(invoker instanceof JLabel label)
+			textToCopy = label.getText();
+		else if(invoker instanceof JCopyableTable table){
+			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
+			textToCopy = table.getValueAtRow(selectedRow);
 		}
 
 		if(textToCopy != null)
@@ -217,11 +217,11 @@ public final class GUIHelper{
 	}
 
 	public static void exportTableCallback(final Component invoker){
-		if(invoker instanceof JCopyableTable){
+		if(invoker instanceof JCopyableTable table){
 			final StringJoiner sj = new StringJoiner(StringUtils.LF);
-			final int rows = ((JTable)invoker).getModel().getRowCount();
+			final int rows = table.getModel().getRowCount();
 			for(int row = 0; row < rows; row ++){
-				final String textToCopy = ((JCopyableTable)invoker).getValueAtRow(row);
+				final String textToCopy = table.getValueAtRow(row);
 				sj.add(textToCopy);
 			}
 			if(sj.length() > 0)
@@ -273,9 +273,9 @@ public final class GUIHelper{
 				private void processMouseEvent(final MouseEvent e){
 					if(e.isPopupTrigger()){
 						//select row
-						if(field instanceof JCopyableTable){
-							final int selectedRow = ((JTable)field).rowAtPoint(e.getPoint());
-							((JTable)field).setRowSelectionInterval(selectedRow, selectedRow);
+						if(field instanceof JCopyableTable table){
+							final int selectedRow = table.rowAtPoint(e.getPoint());
+							table.setRowSelectionInterval(selectedRow, selectedRow);
 						}
 
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());

@@ -267,8 +267,8 @@ public class DictionaryEntry{
 					throw new LinterException(NON_EXISTENT_RULE, affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 
-				if(rule instanceof RuleEntry){
-					if(((RuleEntry)rule).getType() == AffixType.SUFFIX)
+				if(rule instanceof RuleEntry ruleEntry){
+					if(ruleEntry.getType() == AffixType.SUFFIX)
 						suffixes.add(affix);
 					else
 						prefixes.add(affix);

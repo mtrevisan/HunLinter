@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_10Charset;
 import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_14Charset;
@@ -58,10 +59,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -93,21 +92,24 @@ public final class FileHelper{
 	);
 	static{
 		Arrays.sort(HUNSPELL_CHARSET_NAMES);
-		HUNSPELL_CHARSETS = Arrays.stream(HUNSPELL_CHARSET_NAMES)
-			.map(name -> {
-				name = CHARSET_ALIASES.getOrDefault(name, name);
 
-				Charset cs = null;
-				if(Charset.isSupported(name))
-					cs = Charset.forName(name);
-				else if(ISO_8859_10.equals(name))
-					cs = new ISO8859_10Charset();
-				else if(ISO_8859_14.equals(name))
-					cs = new ISO8859_14Charset();
-				return cs;
-			})
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+		HUNSPELL_CHARSETS = new ArrayList<>(HUNSPELL_CHARSET_NAMES.length);
+		for(String name : HUNSPELL_CHARSET_NAMES){
+			name = CHARSET_ALIASES.getOrDefault(name, name);
+
+			Charset cs = null;
+			if(Charset.isSupported(name))
+				cs = Charset.forName(name);
+			else if(ISO_8859_10.equals(name))
+				cs = new ISO8859_10Charset();
+			else if(ISO_8859_14.equals(name))
+				cs = new ISO8859_14Charset();
+			else
+				LOGGER.warn(ParserManager.MARKER_APPLICATION, "Cannot create decoder for charset {}", name);
+
+			if(cs != null)
+				HUNSPELL_CHARSETS.add(cs);
+		}
 	}
 
 

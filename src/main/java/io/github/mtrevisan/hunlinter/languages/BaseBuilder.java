@@ -101,10 +101,10 @@ public final class BaseBuilder{
 				Collator collator = Collator.getInstance(Locale.forLanguageTag(language));
 
 				//make ordering per-word
-				if(collator instanceof RuleBasedCollator){
+				if(collator instanceof RuleBasedCollator ruleBasedCollator){
 					try{
 						//insert a collation rule to sort the space character before the underscore
-						final String rules = ((RuleBasedCollator)collator).getRules();
+						final String rules = ruleBasedCollator.getRules();
 						collator = new RuleBasedCollator(RegexHelper.replaceAll(rules, PATTERN_REPLACEMENT, "<' '='\t'<'_'"));
 					}
 					catch(final ParseException ignored){}

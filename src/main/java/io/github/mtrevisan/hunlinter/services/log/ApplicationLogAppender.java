@@ -88,8 +88,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
 				if(textAreas != null)
 					for(final JTextArea textArea : textAreas){
-						textArea.append(message);
 						textArea.setCaretPosition(textArea.getDocument().getLength());
+						textArea.append(message);
 					}
 				final List<JLabel> labels = LABELS.get(marker);
 				if(labels != null)

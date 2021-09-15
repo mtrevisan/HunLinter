@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Font;
@@ -50,6 +52,7 @@ public final class FontHelper{
 	private static final Logger LOGGER = LoggerFactory.getLogger(FontHelper.class);
 
 	private static final String CLIENT_PROPERTY_KEY_FONTABLE = "fontable";
+	private static final String CLIENT_PROPERTY_KEY_LOGGABLE = "loggable";
 
 	private static final float SAME_FONT_MAX_THRESHOLD = 0.000_6f;
 
@@ -152,15 +155,15 @@ public final class FontHelper{
 
 	public static List<String> getFamilyNamesAll(){
 		final List<String> names = new ArrayList<>(FAMILY_NAMES_ALL.size());
-		for(final Font font : FAMILY_NAMES_ALL)
-			names.add(font.getName());
+		for(int i = 0; i < FAMILY_NAMES_ALL.size(); i ++)
+			names.add(FAMILY_NAMES_ALL.get(i).getName());
 		return names;
 	}
 
 	public static List<String> getFamilyNamesMonospaced(){
 		final List<String> names = new ArrayList<>(FAMILY_NAMES_MONOSPACED.size());
-		for(final Font font : FAMILY_NAMES_MONOSPACED)
-			names.add(font.getName());
+		for(int i = 0; i < FAMILY_NAMES_MONOSPACED.size(); i ++)
+			names.add(FAMILY_NAMES_MONOSPACED.get(i).getName());
 		return names;
 	}
 
@@ -172,6 +175,12 @@ public final class FontHelper{
 		if(components != null)
 			for(final JComponent component : components)
 				component.putClientProperty(CLIENT_PROPERTY_KEY_FONTABLE, Boolean.TRUE);
+	}
+
+	public static void addLoggableProperty(final JComponent... components){
+		if(components != null)
+			for(final JComponent component : components)
+				component.putClientProperty(CLIENT_PROPERTY_KEY_LOGGABLE, Boolean.TRUE);
 	}
 
 	public static void setCurrentFont(final Font font, final Component... parentFrames){
@@ -190,13 +199,16 @@ public final class FontHelper{
 		while(!stack.isEmpty()){
 			final Component comp = stack.pop();
 
-			if(comp instanceof JEditorPane)
-				((JComponent)comp).putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-			if((comp instanceof JComponent) && ((JComponent)comp).getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
+			if(comp instanceof JEditorPane editorPane)
+				editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+			if((comp instanceof JComponent trueComponent) && trueComponent.getClientProperty(CLIENT_PROPERTY_KEY_FONTABLE) == Boolean.TRUE)
 				comp.setFont(font);
+			//reaffirms the positioning (sometimes it returns to the principle of the text area)
+			if((comp instanceof JTextArea textArea) && textArea.getClientProperty(CLIENT_PROPERTY_KEY_LOGGABLE) == Boolean.TRUE)
+				SwingUtilities.invokeLater(() -> textArea.setCaretPosition(textArea.getDocument().getLength()));
 
-			if(comp instanceof Container)
-				for(final Component c : ((Container)comp).getComponents())
+			if(comp instanceof Container container)
+				for(final Component c : container.getComponents())
 					stack.push(c);
 		}
 	}

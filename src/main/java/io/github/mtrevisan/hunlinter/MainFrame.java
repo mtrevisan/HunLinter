@@ -96,17 +96,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLayeredPane;
-import javax.swing.KeyStroke;
-import javax.swing.MenuSelectionManager;
-import javax.swing.SwingWorker;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
 import javax.swing.text.DefaultCaret;
@@ -209,6 +199,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		//add "fontable" property
 		FontHelper.addFontableProperty(parsingResultTextArea);
+		FontHelper.addLoggableProperty(parsingResultTextArea);
 
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
@@ -322,8 +313,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       parsingResultTextArea.setColumns(20);
       parsingResultTextArea.setRows(1);
       parsingResultTextArea.setTabSize(3);
-      final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
-      caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
       parsingResultScrollPane.setViewportView(parsingResultTextArea);
 
       mainTabbedPane.addTab("Inflections", dicLayeredPane);
@@ -647,9 +636,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
 
-		if(cause instanceof ProjectNotFoundException){
+		if(cause instanceof ProjectNotFoundException pnfe){
 			//remove the file from the recent projects menu
-			recentProjectsMenu.removeEntry(((ProjectNotFoundException)cause).getProjectPath().toString());
+			recentProjectsMenu.removeEntry(pnfe.getProjectPath().toString());
 
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());

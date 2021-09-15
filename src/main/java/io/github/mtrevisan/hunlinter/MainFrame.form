@@ -419,9 +419,6 @@
             <Property name="rows" type="int" value="1"/>
             <Property name="tabSize" type="int" value="3"/>
           </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();&#xd;&#xa;caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);"/>
-          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

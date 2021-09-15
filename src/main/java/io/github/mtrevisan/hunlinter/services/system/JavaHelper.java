@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -106,12 +105,7 @@ public final class JavaHelper{
 	}
 
 	public static void exit(final int status){
-		new Thread("app-exit"){
-			@Override
-			public void run(){
-				System.exit(status);
-			}
-		}.start();
+		new Thread(() -> System.exit(status)).start();
 	}
 
 	@SuppressWarnings("BusyWait")

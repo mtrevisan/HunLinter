@@ -103,7 +103,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){
-		return (dicEntry instanceof Inflection? ((Inflection)dicEntry).compoundEntries: null);
+		return (dicEntry instanceof Inflection inflection? inflection.compoundEntries: null);
 	}
 
 	@Override
