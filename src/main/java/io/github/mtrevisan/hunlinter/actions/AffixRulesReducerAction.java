@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.RulesReducerDialog;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
@@ -67,6 +68,7 @@ public class AffixRulesReducerAction extends AbstractAction{
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		final RulesReducerDialog rulesReducerDialog = new RulesReducerDialog(parserManager, parentFrame);
+		EventBusService.subscribe(rulesReducerDialog);
 		rulesReducerDialog.setLocationRelativeTo(parentFrame);
 		rulesReducerDialog.addWindowListener(new WindowAdapter(){
 			@Override

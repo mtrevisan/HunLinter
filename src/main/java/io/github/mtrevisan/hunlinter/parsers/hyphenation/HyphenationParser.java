@@ -106,7 +106,6 @@ public class HyphenationParser{
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 
 	private static final String ONE = "1";
-	static final String WORD_BOUNDARY = ".";
 	private static final char AUGMENTED_RULE = '/';
 
 	private static final String COMMA = ",";
@@ -118,18 +117,6 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_INVALID_RULE_START = RegexHelper.pattern("^\\.[\\d]");
 	private static final Pattern PATTERN_INVALID_RULE_END = RegexHelper.pattern("[\\d]\\.$");
 	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = RegexHelper.pattern("[13579]");
-
-	static final int PARAM_RULE = 1;
-	static final int PARAM_ADD_BEFORE = 2;
-	public static final int PARAM_HYPHEN = 3;
-	static final int PARAM_ADD_AFTER = 4;
-	static final int PARAM_START = 5;
-	static final int PARAM_CUT = 6;
-	static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
-	static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
-
-	static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
@@ -261,9 +248,6 @@ public class HyphenationParser{
 
 			if(level == Level.NON_COMPOUND)
 				addDefaults(Level.NON_COMPOUND, charset);
-		}
-		catch(final LinterException le){
-			throw le;
 		}
 		catch(final IOException ioe){
 			throw new LinterException(ioe, ioe.getMessage());

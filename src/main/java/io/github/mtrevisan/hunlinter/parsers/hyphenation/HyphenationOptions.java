@@ -33,7 +33,7 @@ public class HyphenationOptions{
 	private final int minDefault;
 
 
-	public HyphenationOptions(final int minDefault){
+	HyphenationOptions(final int minDefault){
 		this.minDefault = Math.max(minDefault, 0);
 
 		clear();

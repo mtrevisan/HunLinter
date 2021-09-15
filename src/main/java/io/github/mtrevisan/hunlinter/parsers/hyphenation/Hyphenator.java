@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,9 +42,23 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class Hyphenator implements HyphenatorInterface{
+
+	private static final String WORD_BOUNDARY = ".";
+	private static final int PARAM_RULE = 1;
+	private static final int PARAM_ADD_BEFORE = 2;
+	public static final int PARAM_HYPHEN = 3;
+	private static final int PARAM_ADD_AFTER = 4;
+	private static final int PARAM_START = 5;
+	private static final int PARAM_CUT = 6;
+	private static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	private static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
+	private static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
+
+	private static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
 
 	private final HyphenationParser hypParser;
 	private final String breakCharacter;
@@ -105,7 +118,7 @@ public class Hyphenator implements HyphenatorInterface{
 		//if there is a second level
 		if(hypParser.isSecondLevelPresent()){
 			syllabes.clear();
-			final List<String> rules2ndLevel = new ArrayList<>();
+			final List<String> rules2ndLevel = new ArrayList<>(0);
 
 			//apply second level hyphenation for the word parts
 			int offset = 0;
@@ -141,7 +154,7 @@ public class Hyphenator implements HyphenatorInterface{
 	private HyphenationBreak hyphenate(String word, final Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns,
 			final HyphenationParser.Level level, final HyphenationOptions options){
 		//clear already present word boundaries' characters
-		word = RegexHelper.clear(word, HyphenationParser.PATTERN_WORD_BOUNDARIES);
+		word = RegexHelper.clear(word, PATTERN_WORD_BOUNDARIES);
 		final int wordSize = word.length();
 
 		final String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
@@ -173,7 +186,7 @@ public class Hyphenator implements HyphenatorInterface{
 		final int wordSize = word.length();
 		final Map<Integer, IndexDataPair<String>> indexesAndRules = new HashMap<>(wordSize);
 		if(patterns != null){
-			final String w = HyphenationParser.WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + HyphenationParser.WORD_BOUNDARY;
+			final String w = WORD_BOUNDARY + word.toLowerCase(Locale.ROOT) + WORD_BOUNDARY;
 			final int leftMin = options.getLeftMin();
 			final int rightMin = options.getRightMin();
 
@@ -252,7 +265,7 @@ public class Hyphenator implements HyphenatorInterface{
 			response.remove(response.size() - 1);
 	}
 
-	private static void manageNoHyphenAtMiddle(final Collection<String> response, final String nohyp){
+	private static void manageNoHyphenAtMiddle(final Iterable<String> response, final String nohyp){
 		final Iterator<String> itr = response.iterator();
 		while(itr.hasNext())
 			if(nohyp.equals(itr.next()))
@@ -274,7 +287,7 @@ public class Hyphenator implements HyphenatorInterface{
 		String addAfter = null;
 		final int size = word.length();
 		final List<String> result = new ArrayList<>(0);
-		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, HyphenationParser.PATTERN_AUGMENTED_RULE);
+		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, PATTERN_AUGMENTED_RULE);
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
 				String subword = word.substring(startIndex, endIndex);
@@ -290,18 +303,18 @@ public class Hyphenator implements HyphenatorInterface{
 				final String augmentedPatternData = hyphBreak.getRule(endIndex);
 				if(augmentedPatternData != null && HyphenationParser.isAugmentedRule(augmentedPatternData)){
 					final int index = HyphenationParser.getIndexOfBreakpoint(RegexHelper.clear(augmentedPatternData,
-						HyphenationParser.PATTERN_WORD_INITIAL));
+						PATTERN_WORD_INITIAL));
 
 					m.reset(augmentedPatternData);
 					if(m.find()){
-						final String addBefore = m.group(HyphenationParser.PARAM_ADD_BEFORE);
-						addAfter = m.group(HyphenationParser.PARAM_ADD_AFTER);
-						String start = m.group(HyphenationParser.PARAM_START);
-						String cut = m.group(HyphenationParser.PARAM_CUT);
+						final String addBefore = m.group(PARAM_ADD_BEFORE);
+						addAfter = m.group(PARAM_ADD_AFTER);
+						String start = m.group(PARAM_START);
+						String cut = m.group(PARAM_CUT);
 						if(start == null){
-							final String rule = m.group(HyphenationParser.PARAM_RULE);
+							final String rule = m.group(PARAM_RULE);
 							start = Integer.toString(1);
-							cut = Integer.toString(RegexHelper.clear(rule, HyphenationParser.PATTERN_POINTS_AND_NUMBERS).length());
+							cut = Integer.toString(RegexHelper.clear(rule, PATTERN_POINTS_AND_NUMBERS).length());
 						}
 
 						//remove last characters from subword

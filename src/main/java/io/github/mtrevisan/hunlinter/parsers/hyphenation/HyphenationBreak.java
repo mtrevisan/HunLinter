@@ -48,13 +48,13 @@ public class HyphenationBreak{
 		"^$", HyphenationBreak::manageWhole
 	);
 
-	public static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
+	static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
 
 
 	private final Map<Integer, IndexDataPair<String>> indexesAndRules;
 
 
-	public HyphenationBreak(final Map<Integer, IndexDataPair<String>> indexesAndRules){
+	HyphenationBreak(final Map<Integer, IndexDataPair<String>> indexesAndRules){
 		Objects.requireNonNull(indexesAndRules, "Indexes and rules cannot be null");
 
 		this.indexesAndRules = indexesAndRules;

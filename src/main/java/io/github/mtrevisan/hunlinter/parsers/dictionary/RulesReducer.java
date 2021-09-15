@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
+import com.carrotsearch.hppcrt.IntObjectMap;
+import com.carrotsearch.hppcrt.maps.IntObjectHashMap;
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
@@ -194,7 +196,7 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(50);
 
-		final Map<Integer, Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
+		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
 		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
 
 		if(progressCallback != null)
@@ -320,8 +322,8 @@ public class RulesReducer{
 		}
 	}
 
-	private static Map<Integer, Set<Character>> collectOverallLastGroups(final List<LineEntry> plainRules){
-		final Map<Integer, Set<Character>> overallLastGroups = new HashMap<>(0);
+	private static IntObjectMap<Set<Character>> collectOverallLastGroups(final List<LineEntry> plainRules){
+		final IntObjectMap<Set<Character>> overallLastGroups = new IntObjectHashMap<>(0);
 		if(!plainRules.isEmpty()){
 			//FIXME is a `try` block useful? is `maxLength` correctly calculated?
 			try{
@@ -341,7 +343,7 @@ public class RulesReducer{
 		return overallLastGroups;
 	}
 
-	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		//expand same conditions (if any); store surely disjoint rules
 		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules, overallLastGroups);
 
@@ -351,7 +353,7 @@ public class RulesReducer{
 		return nonOverlappingRules;
 	}
 
-	private List<LineEntry> disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinSameConditions(final Collection<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>(0);
 
 		//bucket by same condition
@@ -368,7 +370,7 @@ public class RulesReducer{
 		return finalRules;
 	}
 
-	private void disjoinSameConditions(final Collection<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups,
+	private void disjoinSameConditions(final Collection<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups,
 			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
 		//extract children
 		final List<LineEntry> children = new ArrayList<>(rules.size());
@@ -479,7 +481,7 @@ public class RulesReducer{
 
 	private String chooseCondition(final String parentCondition, final Set<Character> parentGroup,
 			final Set<Character> childrenGroup, final Collection<Character> groupsIntersection,
-			final Map<Integer, Set<Character>> overallLastGroups){
+			final IntObjectMap<Set<Character>> overallLastGroups){
 		final int parentConditionLength = parentCondition.length();
 		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childrenGroup,
 			groupsIntersection);
@@ -516,7 +518,7 @@ public class RulesReducer{
 		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
 	}
 
-	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final Map<Integer, Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		//bucket by condition ending
 		final List<List<LineEntry>> forest = bucketByConditionEnding(rules);
 
@@ -536,7 +538,7 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> disjoinSameEndingConditionsBush(final Collection<LineEntry> bush,
-			final Map<Integer, Set<Character>> overallLastGroups){
+			final IntObjectMap<Set<Character>> overallLastGroups){
 		final List<LineEntry> finalRules = new ArrayList<>(0);
 
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);

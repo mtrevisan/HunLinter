@@ -96,10 +96,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.KeyStroke;
+import javax.swing.MenuSelectionManager;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
-import javax.swing.text.DefaultCaret;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -197,7 +206,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
-		//add "fontable" property
 		FontHelper.addFontableProperty(parsingResultTextArea);
 		FontHelper.addLoggableProperty(parsingResultTextArea);
 
@@ -596,6 +604,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@SuppressWarnings("unused")
 	public final void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
 		parsingResultTextArea.setText(null);
+		filOpenProjectMenuItem.setEnabled(false);
+		recentProjectsMenu.setEnabled(false);
 
 		if(parserManager != null)
 			parserManager.stopFileListener();
@@ -618,6 +628,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			FontHelper.setCurrentFont(temporaryFont, this);
 
 			filOpenProjectMenuItem.setEnabled(false);
+			recentProjectsMenu.setEnabled(false);
 		};
 		final ActionListener projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
 			initialize, this::loadFileCompleted, this::loadFileCancelled, this);
@@ -665,6 +676,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void loadFileCompleted(){
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
+			recentProjectsMenu.setEnabled(true);
 			filCreatePackageMenuItem.setEnabled(true);
 //			filFontMenuItem.setEnabled(true);
 			dicLinterMenuItem.setEnabled(true);

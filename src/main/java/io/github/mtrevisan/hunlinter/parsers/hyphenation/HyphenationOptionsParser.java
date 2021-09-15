@@ -74,7 +74,7 @@ public class HyphenationOptionsParser{
 		noHyphen.clear();
 	}
 
-	public final boolean parseLine(final String line){
+	final boolean parseLine(final String line){
 		boolean managed = true;
 		if(line.startsWith(MIN_LEFT_HYPHENATION))
 			nonCompoundOptions.setLeftMin(Integer.parseInt(extractValue(line)));

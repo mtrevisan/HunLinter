@@ -33,6 +33,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.affix.RulesReducerWorker;
@@ -75,6 +76,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private final ParserManager parserManager;
 
 	private RulesReducerWorker rulesReducerWorker;
+	private final ActionListener actionListener;
 
 
 	public RulesReducerDialog(final ParserManager parserManager, final Frame parent){
@@ -83,6 +85,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
+		actionListener = this::ruleComboBoxActionPerformed;
 
 		initComponents();
 
@@ -128,7 +131,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		ruleComboBox.setFont(currentFont);
-      ruleComboBox.addActionListener(this::ruleComboBoxActionPerformed);
+      ruleComboBox.addActionListener(actionListener);
 
       optimizeClosedGroupCheckBox.setText("Optimize for closed group");
       optimizeClosedGroupCheckBox.addActionListener(this::optimizeClosedGroupCheckBoxActionPerformed);
@@ -217,9 +220,20 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
+
+	@EventHandler
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
+			return;
+
+		reload();
+	}
+
 	public final void reload(){
 		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
+		ruleComboBoxActionPerformed(null);
 
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
@@ -231,16 +245,23 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		affixEntries.sort(null);
 
 		JavaHelper.executeOnEventDispatchThread(() -> {
+			final Object selectedItem = ruleComboBox.getSelectedItem();
+			ruleComboBox.removeActionListener(actionListener);
+
 			ruleComboBox.removeAllItems();
 			for(final String elem : affixEntries)
 				ruleComboBox.addItem(elem);
+
+			//restore previous selection
+			ruleComboBox.addActionListener(actionListener);
+			ruleComboBox.setSelectedItem(selectedItem);
 		});
 
 		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
 			rulesReducerWorker.cancel();
 	}
 
-   public final void ruleComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+   private void ruleComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
 		if(flag != null){
 			mainProgressBar.setValue(0);
