@@ -28,7 +28,8 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -81,23 +82,20 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 		}
 		catch(final FileNotFoundException e){
 			logExceptionError(e);
-
-			cancel(new ProjectNotFoundException(packager.getProjectPath(), e));
 		}
-		catch(final IOException | SAXException e){
-			logExceptionError(e);
-
-			cancel(e);
+		catch(final IOException | SAXException | LinterException | LinterIllegalArgumentException e){
+			if(JavaHelper.isInterruptedException(e))
+				cancel(e);
+			else
+				logExceptionError(e);
 		}
 
 		return null;
 	}
 
 	private static void logExceptionError(final Exception e){
-		if(!JavaHelper.isInterruptedException(e)){
-			final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-			LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
-		}
+		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
 	}
 
 }

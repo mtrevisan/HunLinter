@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -55,40 +54,46 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 
-//TODO https://github.com/mtrevisan/hunspell-stemmer/blob/master/src/hunspell_stemmer/Dictionary.java
 public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final String WRONG_FILE_FORMAT_CHARSET = "The file is not in an allowable charset ({})";
+	private static final String CANNOT_READ_FILE = "The file cannot be read with the given charset {}";
+	private static final String WRONG_FILE_FORMAT_CHARSET = "The file is not in an allowable charset ({}), found {}";
 
 	private static final String ISO_8859_10 = "ISO-8859-10";
 	private static final String ISO_8859_14 = "ISO-8859-14";
+	private static final String MICROSOFT_CP_1251 = "MICROSOFT-CP1251";
+	private static final String ISCII_DEVANAGARI = "ISCII-DEVANAGARI";
+	private static final String TIS_620_2533 = "TIS620-2533";
 
+	private static final String[] HUNSPELL_CHARSET_NAMES = {
+		"UTF-8",
+		"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9",
+		ISO_8859_10, "ISO-8859-13", ISO_8859_14, "ISO-8859-15",
+		"KOI8-R", "KOI8-U", MICROSOFT_CP_1251, ISCII_DEVANAGARI, TIS_620_2533
+	};
 	private static final List<Charset> HUNSPELL_CHARSETS;
 	private static final Map<String, String> CHARSET_ALIASES = Map.of(
-		"MICROSOFT-CP1251", "WINDOWS-1251",
-		"TIS620-2533", "TIS-620",
-		"ISCII-DEVANAGARI", "x-ISCII91"
+		MICROSOFT_CP_1251, "WINDOWS-1251",
+		ISCII_DEVANAGARI, "x-ISCII91",
+		TIS_620_2533, "TIS-620"
 	);
 	static{
-		HUNSPELL_CHARSETS = Stream.of(
-				"UTF-8",
-				"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9",
-				ISO_8859_10, "ISO-8859-13", ISO_8859_14, "ISO-8859-15",
-				"KOI8-R", "KOI8-U", "MICROSOFT-CP1251", "ISCII-DEVANAGARI",
-				"TIS620-2533")
+		Arrays.sort(HUNSPELL_CHARSET_NAMES);
+		HUNSPELL_CHARSETS = Arrays.stream(HUNSPELL_CHARSET_NAMES)
 			.map(name -> {
 				name = CHARSET_ALIASES.getOrDefault(name, name);
 
@@ -133,32 +138,59 @@ public final class FileHelper{
 		}
 	}
 
-	public static Charset readCharset(final String charsetName){
-		final Charset cs = Charset.forName(CHARSET_ALIASES.getOrDefault(charsetName, charsetName));
-
-		//line should be a valid charset
-		if(!HUNSPELL_CHARSETS.contains(cs))
-			throw new LinterException(WRONG_FILE_FORMAT_CHARSET, charsetName);
-
-		return cs;
-	}
-
-	public static Charset determineCharset(final Path path){
+	public static Charset determineCharset(final Path path, final int limitLinesRead){
+		String fileCharsetName = null;
 		for(final Charset cs : HUNSPELL_CHARSETS){
 			try(final BufferedReader reader = Files.newBufferedReader(path, cs)){
-				reader.read();
-				return cs;
+				if(fileCharsetName == null)
+					fileCharsetName = readHunspellCharsetName(reader, limitLinesRead);
+
+				if(fileCharsetName != null && fileCharsetName.equals(getHunspellCharsetName(cs)))
+					return cs;
 			}
 			catch(final IOException ignored){}
 		}
 
-		final StringJoiner sj = new StringJoiner(", ");
-		for(final Charset charset : HUNSPELL_CHARSETS)
-			sj.add(charset.name());
-		final String charsets = sj.toString();
-		throw new LinterIllegalArgumentException(WRONG_FILE_FORMAT_CHARSET, charsets);
+		if(Arrays.binarySearch(HUNSPELL_CHARSET_NAMES, fileCharsetName) >= 0)
+			throw new LinterIllegalArgumentException(CANNOT_READ_FILE, fileCharsetName);
+		else
+			throw new LinterIllegalArgumentException(WRONG_FILE_FORMAT_CHARSET, HUNSPELL_CHARSETS.toString().toUpperCase(Locale.ROOT),
+				fileCharsetName);
 	}
 
+	private static String readHunspellCharsetName(final BufferedReader reader, final int limitLinesRead) throws IOException{
+		//scan each lines until either a valid charset name is found as the first line (hyphenation or thesaurus file),
+		//or `SET <charsetName>` is found (affix file)
+		int linesRead = 0;
+		while(limitLinesRead < 0 || linesRead < limitLinesRead){
+			String line = reader.readLine();
+			if(line == null)
+				break;
+
+			linesRead ++;
+			try{
+				line = line.trim()
+					.toUpperCase(Locale.ROOT);
+				if(line.startsWith("SET "))
+					line = line.substring(4);
+				final Charset fileCharset = Charset.forName(CHARSET_ALIASES.getOrDefault(line, line));
+					return getHunspellCharsetName(fileCharset);
+			}
+			catch(final RuntimeException ignored){}
+		}
+		return null;
+	}
+
+	public static String getHunspellCharsetName(final Charset charset){
+		String charsetName = charset.name()
+			.toUpperCase(Locale.ROOT);
+		for(final Map.Entry<String, String> entry : CHARSET_ALIASES.entrySet())
+			if(entry.getValue().equals(charsetName)){
+				charsetName = entry.getKey();
+				break;
+			}
+		return (Arrays.binarySearch(HUNSPELL_CHARSET_NAMES, charsetName) >= 0? charsetName: null);
+	}
 
 	public static File createDeleteOnExitFile(final String filename, final String extension) throws IOException{
 		final File file = File.createTempFile(filename, extension);

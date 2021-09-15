@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AffixHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AliasesHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CompoundRuleHandler;
@@ -42,6 +43,8 @@ import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +77,9 @@ import java.util.regex.Pattern;
  * @see <a href="http://manpages.ubuntu.com/manpages/trusty/en/man4/hunspell.4.html">Ubuntu manuals 4</a>
  */
 public class AffixParser{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AffixParser.class);
+
 
 	private static final String BAD_FIRST_LINE = "The first non-comment line in the affix file must be a 'SET charset', was: `{}`";
 	private static final String GLOBAL_ERROR_MESSAGE = "{}, line {}";
@@ -187,7 +193,8 @@ public class AffixParser{
 		int index = 0;
 		boolean encodingRead = false;
 		final Path affPath = affFile.toPath();
-		final Charset charset = FileHelper.determineCharset(affPath);
+		final Charset charset = FileHelper.determineCharset(affPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Affix charset is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
 			final ParsingContext context = new ParsingContext();
 			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
@@ -207,6 +214,9 @@ public class AffixParser{
 				if(handler != null){
 					try{
 						index += handler.parse(context, data);
+					}
+					catch(final LinterException le){
+						throw le;
 					}
 					catch(final RuntimeException re){
 						throw new LinterException(re, GLOBAL_ERROR_MESSAGE, re.getMessage(), index);

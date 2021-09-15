@@ -87,7 +87,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			processor.apply(null);
 		}
 		catch(final RuntimeException re){
-			if(workerData.isCancelOnException())
+			if(workerData.isCancelOnException() && JavaHelper.isInterruptedException(re))
 				cancel(re);
 		}
 		return null;
@@ -200,24 +200,22 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 * @param exception	Exception that causes the cancellation
 	 */
 	protected final void cancel(final Exception exception){
-		if(!JavaHelper.isInterruptedException(exception)){
-			if(exception != null){
-				final String errorMessage = ExceptionHelper.getMessage(exception);
-				LOGGER.error(errorMessage, exception);
+		if(exception != null){
+			final String errorMessage = ExceptionHelper.getMessage(exception);
+			LOGGER.error(errorMessage, exception);
 
-				JOptionPane.showOptionDialog(null,
-					"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE, null, null, null);
-			}
-			else
-				LOGGER.error("Generic error");
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
-
-			workerData.callCancelledCallback(exception);
-
-			cancel(true);
+			JOptionPane.showOptionDialog(null,
+				"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
+				JOptionPane.ERROR_MESSAGE, null, null, null);
 		}
+		else
+			LOGGER.error("Generic error");
+
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
+
+		workerData.callCancelledCallback(exception);
+
+		cancel(true);
 	}
 
 	/** User cancelled worker. */

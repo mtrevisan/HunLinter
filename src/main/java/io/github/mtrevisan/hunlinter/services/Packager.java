@@ -409,7 +409,7 @@ public class Packager{
 		if(affFile != null){
 			try{
 				final Path affPath = affFile.toPath();
-				final Charset charset = FileHelper.determineCharset(affPath);
+				final Charset charset = FileHelper.determineCharset(affPath, -1);
 				final CharSequence content = Files.readString(affPath, charset);
 				final List<String> extractions = RegexHelper.extract(content, LANGUAGE_SAMPLE_EXTRACTOR, 10);
 				sampleText = String.join(StringUtils.EMPTY, String.join(StringUtils.EMPTY, extractions).chars()

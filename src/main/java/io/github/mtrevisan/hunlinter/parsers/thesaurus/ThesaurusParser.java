@@ -24,18 +24,20 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -58,6 +60,9 @@ import java.util.regex.Pattern;
  */
 public class ThesaurusParser{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ThesaurusParser.class);
+
+
 	private static final String WRONG_FORMAT = "Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{}`";
 	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
@@ -78,6 +83,7 @@ public class ThesaurusParser{
 	private static final char[] NEW_LINE = {'\n'};
 
 	private final ThesaurusDictionary dictionary;
+	private Charset charset;
 
 
 	public ThesaurusParser(final String language){
@@ -99,14 +105,15 @@ public class ThesaurusParser{
 		clear();
 
 		final Path thePath = theFile.toPath();
-		final Charset charset = FileHelper.determineCharset(thePath);
+		charset = FileHelper.determineCharset(thePath, 20);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Thesaurus charset is {}", charset.name());
 		final Map<String, ThesaurusEntry> entries = new HashMap<>(0);
 		try(final Scanner scanner = FileHelper.createScanner(thePath, charset)){
-			String line = scanner.nextLine();
-			FileHelper.readCharset(line);
+			//skip charset
+			scanner.nextLine();
 
 			while(scanner.hasNextLine()){
-				line = scanner.nextLine();
+				final String line = scanner.nextLine();
 				if(line.isEmpty())
 					continue;
 
@@ -132,7 +139,8 @@ public class ThesaurusParser{
 	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
-	public final DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms, final Predicate<String> duplicatesDiscriminator){
+	public final DuplicationResult<ThesaurusEntry> insertSynonyms(final String partOfSpeechAndSynonyms,
+			final Predicate<String> duplicatesDiscriminator){
 		final String[] posAndSyns = StringUtils.split(partOfSpeechAndSynonyms, ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
@@ -140,7 +148,8 @@ public class ThesaurusParser{
 		final String partOfSpeech = posAndSyns[0].trim();
 		final int prefix = (StringUtils.startsWithAny(partOfSpeech, PART_OF_SPEECH_START)? 1: 0);
 		final int suffix = (StringUtils.endsWithAny(partOfSpeech, PART_OF_SPEECH_END)? 1: 0);
-		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix), PART_OF_SPEECH_SPLITTER);
+		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix),
+			PART_OF_SPEECH_SPLITTER);
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
@@ -259,21 +268,22 @@ public class ThesaurusParser{
 
 	public final void save(final File theIndexFile, final File theDataFile) throws IOException{
 		//save index and data files
-		final Charset charset = StandardCharsets.UTF_8;
+		final Path thePath = theDataFile.toPath();
 		try(
 				final BufferedWriter indexWriter = Files.newBufferedWriter(theIndexFile.toPath(), charset);
-				final BufferedWriter dataWriter = Files.newBufferedWriter(theDataFile.toPath(), charset)){
+				final BufferedWriter dataWriter = Files.newBufferedWriter(thePath, charset)){
 			//save charset
-			indexWriter.write(charset.name());
+			final String hunspellCharsetName = FileHelper.getHunspellCharsetName(charset);
+			indexWriter.write(hunspellCharsetName);
 			indexWriter.write(NEW_LINE);
 			//save counter
 			indexWriter.write(Integer.toString(dictionary.size()));
 			indexWriter.write(NEW_LINE);
 			//save charset
-			dataWriter.write(charset.name());
+			dataWriter.write(hunspellCharsetName);
 			dataWriter.write(NEW_LINE);
 			//save data
-			int idx = charset.name().length() + 1;
+			int idx = hunspellCharsetName.length() + 1;
 			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();
 			for(int i = 0; i < synonyms.size(); i ++){
 				final ThesaurusEntry synonym = synonyms.get(i);

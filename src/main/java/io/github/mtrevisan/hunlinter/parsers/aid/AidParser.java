@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.aid;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +39,9 @@ import java.util.Scanner;
 
 
 public class AidParser{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AidParser.class);
+
 
 	private final List<String> lines = new ArrayList<>(0);
 
@@ -50,8 +56,12 @@ public class AidParser{
 		lines.clear();
 
 		final Path aidPath = aidFile.toPath();
-		final Charset charset = FileHelper.determineCharset(aidPath);
+		final Charset charset = FileHelper.determineCharset(aidPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Aid charset is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(aidPath, charset)){
+			//skip charset
+			scanner.nextLine();
+
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				if(!line.isEmpty())

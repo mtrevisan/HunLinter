@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.helpers.MessageFormatter;
 
@@ -93,7 +94,8 @@ public final class JavaHelper{
 
 	public static boolean isInterruptedException(final Exception exception){
 		final Throwable t = (exception != null && exception.getCause() != null? exception.getCause(): exception);
-		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException || exception instanceof ClosedChannelException);
+		return (t instanceof InterruptedException || t instanceof RuntimeInterruptedException
+			|| exception instanceof ClosedChannelException);
 	}
 
 	public static void executeOnEventDispatchThread(final Runnable runnable){

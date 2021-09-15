@@ -27,12 +27,15 @@ package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -67,6 +70,9 @@ import java.util.regex.Pattern;
  */
 public class HyphenationParser{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationParser.class);
+
+
 	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
 	private static final String DUPLICATED_CUSTOM_HYPHENATION = "Custom hyphenation `{}` is already present";
 	private static final String DUPLICATED_HYPHENATION = "Duplicate found: `{}`";
@@ -85,7 +91,7 @@ public class HyphenationParser{
 //	private static final String HYPHEN = "‐";
 //	private static final String HYPHEN_MINUS = "-";
 	public static final String MINUS_SIGN = "-";
-	public static final char EQUALS_SIGN = '=';
+	static final char EQUALS_SIGN = '=';
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "–";
 //	private static final char EM_DASH = '—';
@@ -100,8 +106,8 @@ public class HyphenationParser{
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 
 	private static final String ONE = "1";
-	public static final String WORD_BOUNDARY = ".";
-	public static final char AUGMENTED_RULE = '/';
+	static final String WORD_BOUNDARY = ".";
+	private static final char AUGMENTED_RULE = '/';
 
 	private static final String COMMA = ",";
 
@@ -113,22 +119,22 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_INVALID_RULE_END = RegexHelper.pattern("[\\d]\\.$");
 	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = RegexHelper.pattern("[13579]");
 
-	public static final int PARAM_RULE = 1;
-	public static final int PARAM_ADD_BEFORE = 2;
+	static final int PARAM_RULE = 1;
+	static final int PARAM_ADD_BEFORE = 2;
 	public static final int PARAM_HYPHEN = 3;
-	public static final int PARAM_ADD_AFTER = 4;
-	public static final int PARAM_START = 5;
-	public static final int PARAM_CUT = 6;
-	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	public static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
-	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
+	static final int PARAM_ADD_AFTER = 4;
+	static final int PARAM_START = 5;
+	static final int PARAM_CUT = 6;
+	static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
+	static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
+	static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
 
-	public static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
+	static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
 
-	public static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
+	static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
 
 	private static final char[] NEW_LINE = {'\n'};
 
@@ -149,6 +155,7 @@ public class HyphenationParser{
 	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private HyphenationOptionsParser options;
+	private Charset charset;
 
 
 	public HyphenationParser(final Comparator<String> comparator){
@@ -215,13 +222,14 @@ public class HyphenationParser{
 	public final void parse(final File hypFile){
 		final Path hypPath = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
-		final Charset charset = FileHelper.determineCharset(hypPath);
+		charset = FileHelper.determineCharset(hypPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Hyphenation charset is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(hypPath, charset)){
-			String line = scanner.nextLine();
-			FileHelper.readCharset(line);
+			//skip charset
+			scanner.nextLine();
 
 			while(scanner.hasNextLine()){
-				line = scanner.nextLine();
+				String line = scanner.nextLine();
 				if(ParserHelper.isHyphenationComment(line))
 					continue;
 
@@ -254,8 +262,11 @@ public class HyphenationParser{
 			if(level == Level.NON_COMPOUND)
 				addDefaults(Level.NON_COMPOUND, charset);
 		}
-		catch(final LinterException | IOException e){
-			throw new LinterException(e, e.getMessage());
+		catch(final LinterException le){
+			throw le;
+		}
+		catch(final IOException ioe){
+			throw new LinterException(ioe, ioe.getMessage());
 		}
 
 		//build tries
@@ -491,10 +502,10 @@ public class HyphenationParser{
 	}
 
 	public final void save(final File hypFile) throws IOException{
-		final Charset charset = StandardCharsets.UTF_8;
 		final Path hypPath = hypFile.toPath();
 		try(final BufferedWriter writer = Files.newBufferedWriter(hypPath, charset)){
-			writeln(writer, charset.name());
+			final String hunspellCharsetName = FileHelper.getHunspellCharsetName(charset);
+			writeln(writer, hunspellCharsetName);
 
 			writer.newLine();
 			options.write(writer);
