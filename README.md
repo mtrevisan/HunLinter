@@ -332,9 +332,12 @@ It is possible to right-click on a row to bring up the popup menu and select whe
 - eliminated double reloading of dictionary in sort dialog when something changes
 - understood how `ICON` and `OCONV` works
 - supported ISO-8859-10, ISO-8859-14, and ISCII-DEVANAGARI charsets
+- added a check on declared charset and real charset of a file
+- adjusted scroll to the bottom of the log text area while changing font
 - decreased the loading time of sorting dialog
 - increased speed by 55% (for dictionary linter: from 2m 13s to 1m)
 - decreased start-up time
+- corrected some typos
 
 <a name="changelog-2.1.0"></a>
 ### version 2.1.0 - 20210807
