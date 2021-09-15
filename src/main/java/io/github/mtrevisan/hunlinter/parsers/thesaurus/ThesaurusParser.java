@@ -39,8 +39,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -98,6 +100,7 @@ public class ThesaurusParser{
 
 		final Path thePath = theFile.toPath();
 		final Charset charset = FileHelper.determineCharset(thePath);
+		final Map<String, ThesaurusEntry> entries = new HashMap<>(0);
 		try(final Scanner scanner = FileHelper.createScanner(thePath, charset)){
 			String line = scanner.nextLine();
 			FileHelper.readCharset(line);
@@ -107,11 +110,12 @@ public class ThesaurusParser{
 				if(line.isEmpty())
 					continue;
 
-				final boolean added = dictionary.add(new ThesaurusEntry(line, scanner));
-				if(!added)
+				final ThesaurusEntry entry = new ThesaurusEntry(line, scanner);
+				if(entries.put(entry.getDefinition(), entry) != null)
 					throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
 			}
 		}
+		dictionary.addAll(entries);
 	}
 
 	public final int getSynonymsCount(){

@@ -64,6 +64,10 @@ public class ThesaurusDictionary{
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
+	public final void addAll(final Map<String, ThesaurusEntry> entries){
+		dictionary.putAll(entries);
+	}
+
 	public final boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
