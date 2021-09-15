@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.services.text;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -178,7 +179,7 @@ public class SmithWatermanAlignment{
 
 	private Deque<IndexDataPair<Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		final Deque<IndexDataPair<Integer>> maxScores = new LinkedList<>();
+		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)

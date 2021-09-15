@@ -84,8 +84,8 @@ public final class FontHelper{
 				//filter out non-plain fonts
 				//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
 				if(font.isPlain()
-					&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
-					&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
+						&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'l', 'I', '1')
+						&& !GlyphComparator.haveIdenticalGlyphs(font, SAME_FONT_MAX_THRESHOLD, 'O', '0'))
 					allFonts.add(font);
 				else
 					LOGGER.debug("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
@@ -103,7 +103,7 @@ public final class FontHelper{
 		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
 		final Font defaultFont = FontChooserDialog.getDefaultFont();
 		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0).deriveFont(15.f));
-		if(!bestFont.equals(defaultFont)){
+		if(!bestFont.equals(defaultFont))
 			for(final Font f : fonts){
 				final String defaultFontName = defaultFont.getName();
 				if(f.getName().equals(defaultFontName)){
@@ -111,7 +111,6 @@ public final class FontHelper{
 					break;
 				}
 			}
-		}
 
 		LOGGER.info("Best font: '{}', size {}", bestFont.getFontName(), bestFont.getSize());
 

@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter;
 
 import java.nio.charset.Charset;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -46,7 +47,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 
-	private final Deque<BloomFilterInterface<T>> filters = new LinkedList<>();
+	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>();
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
