@@ -676,7 +676,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void loadFileCompleted(){
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
-			recentProjectsMenu.setEnabled(true);
+			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filCreatePackageMenuItem.setEnabled(true);
 //			filFontMenuItem.setEnabled(true);
 			dicLinterMenuItem.setEnabled(true);

@@ -56,7 +56,6 @@ public class Hyphenator implements HyphenatorInterface{
 	private static final int PARAM_START = 5;
 	private static final int PARAM_CUT = 6;
 	private static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	private static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
 	private static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
 
 	private static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
@@ -198,13 +197,13 @@ public class Hyphenator implements HyphenatorInterface{
 				final String rule = r.getValue();
 
 				//number of non-letter characters
-				final int delta = HyphenationParser.getKeyFromData(rule).length() - HyphenationParser.getKeyFromData(rule).length();
+				final int delta = getKeyLengthFromData(rule) - getKeyLengthFromData(rule);
 				final int startingIndex = r.getIndexBegin() - delta;
 
 				//cycle the pattern's characters searching for numbers
 				//start from -1 since the initial dot has to be skipped
 				int j = -1;
-				final String reducedRule = removeNonStandardPart(rule);
+				final String reducedRule = HyphenationParser.removeNonStandardPart(rule);
 				for(final char chr : reducedRule.toCharArray()){
 					if(!Character.isDigit(chr))
 						j ++;
@@ -224,6 +223,19 @@ public class Hyphenator implements HyphenatorInterface{
 		}
 
 		return new HyphenationBreak(indexesAndRules);
+	}
+
+	private static int getKeyLengthFromData(final CharSequence rule){
+		int length = 0;
+		for(int i = 0; i < rule.length(); i ++){
+			final char chr = rule.charAt(i);
+			if(chr == '/')
+				break;
+
+			if(!Character.isDigit(chr))
+				length ++;
+		}
+		return length;
 	}
 
 	@Override
@@ -295,7 +307,7 @@ public class Hyphenator implements HyphenatorInterface{
 //				final String subword = word.substring(startIndex, endIndex);
 				sb.setLength(0);
 //				sb.append(subword);
-				sb.append(word.substring(startIndex, endIndex));
+				sb.append(word, startIndex, endIndex);
 
 				if(StringUtils.isNotBlank(addAfter)){
 					//append first characters to next subword
@@ -315,22 +327,30 @@ public class Hyphenator implements HyphenatorInterface{
 					if(m.find()){
 						final String addBefore = m.group(PARAM_ADD_BEFORE);
 						addAfter = m.group(PARAM_ADD_AFTER);
-						String start = m.group(PARAM_START);
-						String cut = m.group(PARAM_CUT);
-						if(start == null){
+						final String startPart = m.group(PARAM_START);
+						final int start;
+						final int cut;
+						if(startPart == null){
 							final String rule = m.group(PARAM_RULE);
-							start = Integer.toString(1);
-							cut = Integer.toString(RegexHelper.clear(rule, PATTERN_POINTS_AND_NUMBERS).length());
+
+							start = 1;
+							cut = getKeyLengthFromData(rule);
+						}
+						else{
+							final String cutPart = m.group(PARAM_CUT);
+
+							start = Integer.parseInt(startPart);
+							cut = Integer.parseInt(cutPart);
 						}
 
 						//remove last characters from subword
 						//  ll3a/aa=b,2,2
 						//syll able
 						//sylaa-bble
-						final int delta = index - Integer.parseInt(start) + 1;
+						final int delta = index - start + 1;
 //						final int end = subword.length() - delta;
 						final int end = sb.length() - delta;
-						after = Integer.parseInt(cut) - delta;
+						after = cut - delta;
 //						subword = subword.substring(0, end) + addBefore;
 						sb.replace(end, sb.length(), addBefore);
 					}
@@ -347,10 +367,6 @@ public class Hyphenator implements HyphenatorInterface{
 		result.add(subword);
 
 		return result;
-	}
-
-	private static String removeNonStandardPart(final CharSequence rule){
-		return RegexHelper.clear(rule, HyphenationParser.PATTERN_REDUCE);
 	}
 
 	private static int getNormalizedLength(final CharSequence word){

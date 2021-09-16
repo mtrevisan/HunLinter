@@ -118,10 +118,7 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_INVALID_RULE_END = RegexHelper.pattern("[\\d]\\.$");
 	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = RegexHelper.pattern("[13579]");
 
-	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
-
-	static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
 
 	private static final char[] NEW_LINE = {'\n'};
 
@@ -323,8 +320,8 @@ public class HyphenationParser{
 		final String foundNodeValue = rules.get(level)
 			.get(key);
 		if(foundNodeValue != null){
-			final String clearedLine = RegexHelper.clear(line, PATTERN_REDUCE);
-			final String clearedFoundNodeValue = RegexHelper.clear(foundNodeValue, PATTERN_REDUCE);
+			final String clearedLine = removeNonStandardPart(line);
+			final String clearedFoundNodeValue = removeNonStandardPart(foundNodeValue);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
 		return duplicatedRule;
@@ -536,8 +533,35 @@ public class HyphenationParser{
 			: rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
-	public static String getKeyFromData(final CharSequence rule){
-		return RegexHelper.clear(rule, PATTERN_KEY);
+	/**
+	 * Removes the non-standard part `/-=-`.
+	 */
+	static String removeNonStandardPart(final CharSequence rule){
+		final StringBuilder sb = new StringBuilder(rule.length());
+		for(int i = 0; i < rule.length(); i ++){
+			final char chr = rule.charAt(i);
+			if(chr == '/')
+				break;
+
+			sb.append(chr);
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Removes every number from the rule, and keep only the word part (eliminating the non-standard part `/-=-`).
+	 */
+	private static String getKeyFromData(final CharSequence rule){
+		final StringBuilder sb = new StringBuilder(rule.length());
+		for(int i = 0; i < rule.length(); i ++){
+			final char chr = rule.charAt(i);
+			if(chr == '/')
+				break;
+
+			if(!Character.isDigit(chr))
+				sb.append(chr);
+		}
+		return sb.toString();
 	}
 
 }
