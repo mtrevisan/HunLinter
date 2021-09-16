@@ -289,13 +289,18 @@ public class Hyphenator implements HyphenatorInterface{
 		final int size = word.length();
 		final List<String> result = new ArrayList<>(0);
 		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, PATTERN_AUGMENTED_RULE);
+		final StringBuilder sb = new StringBuilder();
 		for(int endIndex = 0; endIndex < size; endIndex ++)
 			if(hyphBreak.isBreakpoint(endIndex)){
-				String subword = word.substring(startIndex, endIndex);
+//				final String subword = word.substring(startIndex, endIndex);
+				sb.setLength(0);
+//				sb.append(subword);
+				sb.append(word.substring(startIndex, endIndex));
 
 				if(StringUtils.isNotBlank(addAfter)){
 					//append first characters to next subword
-					subword = addAfter + subword.substring(after);
+//					subword = addAfter + subword.substring(after);
+					sb.replace(0, after, addAfter);
 					after = 0;
 					addAfter = null;
 				}
@@ -323,13 +328,16 @@ public class Hyphenator implements HyphenatorInterface{
 						//syll able
 						//sylaa-bble
 						final int delta = index - Integer.parseInt(start) + 1;
-						final int end = subword.length() - delta;
+//						final int end = subword.length() - delta;
+						final int end = sb.length() - delta;
 						after = Integer.parseInt(cut) - delta;
-						subword = subword.substring(0, end) + addBefore;
+//						subword = subword.substring(0, end) + addBefore;
+						sb.replace(end, sb.length(), addBefore);
 					}
 				}
 
-				result.add(subword);
+//				result.add(subword);
+				result.add(sb.toString());
 				startIndex = endIndex;
 			}
 
