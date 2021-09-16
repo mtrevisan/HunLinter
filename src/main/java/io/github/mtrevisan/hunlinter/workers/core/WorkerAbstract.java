@@ -123,20 +123,20 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 
-	protected final void manageException(final LinterException e){
-		if(JavaHelper.isInterruptedException(e))
-			cancel(e);
-		else if(e.getData() != null){
-			final String errorMessage = ExceptionHelper.getMessage(e);
-			final IndexDataPair<?> data = e.getData();
+	protected final void manageException(final LinterException le){
+		if(JavaHelper.isInterruptedException(le))
+			cancel(le);
+		else if(le.getData() != null){
+			final String errorMessage = ExceptionHelper.getMessage(le);
+			final IndexDataPair<?> data = le.getData();
 			final int index = data.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), e.getMessage(),
+			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), le.getMessage(),
 				lineText, data.getData());
 		}
 		else
-			e.printStackTrace();
+			le.printStackTrace();
 	}
 
 

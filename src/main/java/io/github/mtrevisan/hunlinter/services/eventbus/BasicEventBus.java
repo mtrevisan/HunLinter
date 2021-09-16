@@ -173,8 +173,8 @@ public class BasicEventBus implements EventBusInterface{
 				try{
 					killQueue.put(info);
 				}
-				catch(final InterruptedException e){
-					e.printStackTrace();
+				catch(final InterruptedException ie){
+					ie.printStackTrace();
 				}
 
 				continue;
@@ -340,8 +340,8 @@ public class BasicEventBus implements EventBusInterface{
 				try{
 					executorService.invokeAll(regularHandlers);
 				}
-				catch(final InterruptedException e){
-					e.printStackTrace();
+				catch(final InterruptedException ie){
+					ie.printStackTrace();
 				}
 			}
 			else
@@ -349,8 +349,8 @@ public class BasicEventBus implements EventBusInterface{
 					try{
 						executorService.invokeAll(regularHandlers);
 					}
-					catch(final InterruptedException e){
-						e.printStackTrace();
+					catch(final InterruptedException ie){
+						ie.printStackTrace();
 					}
 				});
 		}

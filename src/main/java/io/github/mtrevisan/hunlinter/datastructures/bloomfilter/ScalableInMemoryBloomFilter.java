@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.datastructures.bloomfilter;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
