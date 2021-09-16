@@ -392,7 +392,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		final String unmodifiedIncorrectText = incorrectTextField.getText().trim();
 		final String unmodifiedCorrectText = correctTextField.getText().trim();
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
+				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
 		formerFilterIncorrectText = unmodifiedIncorrectText;
@@ -421,7 +421,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	private void updateAutoCorrectionsCounter(){
-		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
+		final String text = DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter());
+		correctionsRecordedValueLabel.setText(text);
 	}
 
 	private static final class MyJCopyableTable extends JCopyableTable{
