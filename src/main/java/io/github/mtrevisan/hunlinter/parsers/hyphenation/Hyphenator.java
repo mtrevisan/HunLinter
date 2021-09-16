@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickT
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.StringUtils;
 
@@ -277,7 +278,7 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private static boolean isEnding(final CharSequence key){
-		return (key.charAt(key.length() - 1) == '$');
+		return (JavaHelper.lastChar(key) == '$');
 	}
 
 	//FIXME speed-up this, if possible

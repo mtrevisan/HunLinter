@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,7 +66,7 @@ public class SynonymsEntry{
 		if(components.length == 2){
 			final String partOfSpeech = components[0].trim();
 			final char firstChar = partOfSpeech.charAt(0);
-			final char lastChart = partOfSpeech.charAt(partOfSpeech.length() - 1);
+			final char lastChart = JavaHelper.lastChar(partOfSpeech);
 			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
 				throw new LinterException(POS_NOT_IN_PARENTHESIS, partOfSpeechAndSynonyms);
 

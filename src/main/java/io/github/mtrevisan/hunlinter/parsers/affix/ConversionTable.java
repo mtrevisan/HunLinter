@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.affix;
 
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -184,7 +185,7 @@ public class ConversionTable{
 	}
 
 	private static boolean isEnding(final CharSequence key){
-		return (key.charAt(key.length() - 1) == '$');
+		return (JavaHelper.lastChar(key) == '$');
 	}
 
 	public final String extractAsList(){

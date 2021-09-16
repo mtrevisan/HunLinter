@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.Affixes;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
 import org.apache.commons.lang3.StringUtils;
@@ -246,7 +247,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 					lastWordCasing = StringHelper.classifyCasing(sb.toString());
 				final StringHelper.Casing nextWordCasing = StringHelper.classifyCasing(nextCompound);
 
-				final char lastChar = sb.charAt(sb.length() - 1);
+				final char lastChar = JavaHelper.lastChar(sb);
 				//FIXME if nextCompound is changed, then check for duplicates
 				nextCompound = enforceNextCompoundCase(lastChar, nextCompound, lastWordCasing, nextWordCasing);
 

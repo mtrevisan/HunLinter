@@ -238,10 +238,14 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
 		final List<String> affixEntries = new ArrayList<>(affixes.size());
-		for(final RuleEntry affix : affixes)
-			affixEntries.add((affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX)
-				+ StringUtils.SPACE
-				+ affix.getEntries().get(0).getFlag());
+		final StringBuilder sb = new StringBuilder(6);
+		for(final RuleEntry affix : affixes){
+			sb.setLength(0);
+			sb.append((affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX).getCode())
+				.append(StringUtils.SPACE)
+				.append(affix.getFlag());
+			affixEntries.add(sb.toString());
+		}
 		affixEntries.sort(null);
 
 		JavaHelper.executeOnEventDispatchThread(() -> {

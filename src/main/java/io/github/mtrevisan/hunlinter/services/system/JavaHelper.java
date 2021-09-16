@@ -54,6 +54,10 @@ public final class JavaHelper{
 			.getMessage();
 	}
 
+	public static char lastChar(final CharSequence text){
+		return text.charAt(text.length() - 1);
+	}
+
 
 	public static <T> FutureTask<T> createFuture(final Callable<T> callable){
 		final FutureTask<T> futureTask = new FutureTask<>(callable);

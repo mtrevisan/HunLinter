@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.util.ArrayList;
@@ -174,7 +175,7 @@ public class HyphenationBreak{
 	}
 
 	private static boolean isEnding(final CharSequence key){
-		return (key.charAt(key.length() - 1) == '$');
+		return (JavaHelper.lastChar(key) == '$');
 	}
 
 	@Override

@@ -107,7 +107,7 @@ public class PropertiesUTF8 extends Properties{
 		property.append(line);
 		//reads the whole property if it is on multiple lines
 		while(isLineContinuing(line)){
-			//remove the `\` character
+			//remove the last (`\`) character
 			property.setLength(property.length() - 1);
 			line = in.readLine();
 			property.append(removeWhiteSpaces(line));
@@ -143,7 +143,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @return	Whether the property continues on the following line.
 	 */
 	private static boolean isLineContinuing(final CharSequence line){
-		return (line != null && !line.isEmpty() && line.charAt(line.length() - 1) == '\\');
+		return (line != null && !line.isEmpty() && JavaHelper.lastChar(line) == '\\');
 	}
 
 	/**
