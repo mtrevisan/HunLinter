@@ -315,7 +315,7 @@ public class HyphenationParser{
 		return (!isAugmentedRule(line) && StringUtils.contains(line, EQUALS_SIGN));
 	}
 
-	private boolean isRuleDuplicated(final String key, final CharSequence line, final Level level){
+	private boolean isRuleDuplicated(final String key, final String line, final Level level){
 		boolean duplicatedRule = false;
 		final String foundNodeValue = rules.get(level)
 			.get(key);
@@ -536,16 +536,9 @@ public class HyphenationParser{
 	/**
 	 * Removes the non-standard part `/-=-`.
 	 */
-	static String removeNonStandardPart(final CharSequence rule){
-		final StringBuilder sb = new StringBuilder(rule.length());
-		for(int i = 0; i < rule.length(); i ++){
-			final char chr = rule.charAt(i);
-			if(chr == '/')
-				break;
-
-			sb.append(chr);
-		}
-		return sb.toString();
+	static String removeNonStandardPart(final String rule){
+		final int index = rule.indexOf('/');
+		return (index >= 0? rule.substring(0, index): rule);
 	}
 
 	/**

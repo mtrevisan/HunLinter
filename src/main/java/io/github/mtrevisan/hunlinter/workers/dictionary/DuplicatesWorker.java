@@ -172,7 +172,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
@@ -221,7 +221,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 			};
 			final ProgressCallback progressCallback = lineIndex -> {
-				setProgress(Math.min(lineIndex, 100));
+				setWorkerProgress(lineIndex);
 
 				sleepOnPause();
 			};
@@ -270,7 +270,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					writer.write(sj.toString());
 					writer.newLine();
 
-					setProgress(++ writtenSoFar, totalSize);
+					setWorkerProgress(++ writtenSoFar, totalSize);
 
 					sleepOnPause();
 				}

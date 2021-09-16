@@ -92,7 +92,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}

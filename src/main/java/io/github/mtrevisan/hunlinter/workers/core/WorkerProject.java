@@ -56,7 +56,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	@Override
 	protected final Void doInBackground(){
-		prepareProcessing("Opening project");
+		prepareProcessing(null);
 
 		final Packager packager = workerData.getPackager();
 		try{
@@ -73,7 +73,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 				() -> parserManager.openWordExceptionsFile(packager.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
 				stages.get(index).execute();
-				setProgress(Math.min((int)Math.ceil((index + 1) * 100. / stages.size()), 100));
+				setWorkerProgress(index + 1, stages.size());
 
 				sleepOnPause();
 			}

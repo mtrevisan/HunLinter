@@ -96,7 +96,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	@SuppressWarnings("SameReturnValue")
 	protected final Void prepareProcessing(final String message){
 		setProgress(0);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
+		if(message != null)
+			LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
 		watch.reset();
 		return null;
@@ -139,13 +140,13 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 
-	protected final void setProgress(final long index, final long total){
-		final int progress = calculateProgress(index, total);
-		setProgress(Math.min(progress, 100));
+	protected final void setWorkerProgress(final long index, final long total){
+		final int progress = Math.min((int)Math.floor((index * 100.) / total), 100);
+		setWorkerProgress(progress);
 	}
 
-	private static int calculateProgress(final long index, final long total){
-		return Math.min((int)Math.floor((index * 100.) / total), 100);
+	protected final void setWorkerProgress(final int progress){
+		setProgress(Math.min(progress, 100));
 	}
 
 	@Override

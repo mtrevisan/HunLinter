@@ -92,7 +92,7 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}

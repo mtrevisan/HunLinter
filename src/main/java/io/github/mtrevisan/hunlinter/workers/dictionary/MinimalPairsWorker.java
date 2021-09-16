@@ -156,7 +156,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
@@ -224,7 +224,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				sourceBR.reset();
 
-				setProgress(readSoFarSource, totalSizeSource);
+				setWorkerProgress(readSoFarSource, totalSizeSource);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
@@ -248,7 +248,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setProgress(index ++, size);
+				setWorkerProgress(index ++, size);
 
 				sleepOnPause();
 			}

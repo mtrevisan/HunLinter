@@ -149,7 +149,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};

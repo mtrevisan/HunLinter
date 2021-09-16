@@ -27,12 +27,15 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.LanguageChooserDialog;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LanguageNotChosenException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.swing.AbstractAction;
@@ -58,6 +61,8 @@ public class ProjectLoaderAction extends AbstractAction{
 
 	@Serial
 	private static final long serialVersionUID = 2457698626251961045L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectLoaderAction.class);
 
 
 	private final Path projectPath;
@@ -91,6 +96,8 @@ public class ProjectLoaderAction extends AbstractAction{
 	@Override
 	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Opening project");
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createProjectLoaderWorker(worker -> {

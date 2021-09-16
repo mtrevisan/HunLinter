@@ -166,7 +166,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if(progress.incrementAndGet() % progressStep == 0)
-					setProgress(progressIndex.incrementAndGet(), 100);
+					setWorkerProgress(progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
@@ -191,7 +191,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
-					setProgress(progressIndex.incrementAndGet(), 100);
+					setWorkerProgress(progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}

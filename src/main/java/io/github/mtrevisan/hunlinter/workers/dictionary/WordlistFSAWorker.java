@@ -143,7 +143,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				builder.add(encoding);
 
 				if(++ progress % progressStep == 0)
-					setProgress(++ progressIndex, 100);
+					setWorkerProgress(++ progressIndex);
 
 				sleepOnPause();
 			}
@@ -160,7 +160,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final FSASerializerInterface serializer = new CFSASerializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
-					setProgress(percent, 100);
+					setWorkerProgress(percent);
 
 					sleepOnPause();
 				});
