@@ -97,7 +97,7 @@ public class ProjectLoaderAction extends AbstractAction{
 	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Opening project");
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Opening project at {}", projectPath);
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createProjectLoaderWorker(worker -> {

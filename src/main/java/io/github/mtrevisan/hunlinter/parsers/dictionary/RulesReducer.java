@@ -687,8 +687,13 @@ public class RulesReducer{
 				bubbles.add(child);
 
 		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
-		bubbles.removeIf(bubble -> parent.from.containsAll(bubble.from)
-			&& bubble.from.equals(new HashSet<>(parent.extractFromEndingWith(bubble.condition))));
+		final Iterator<LineEntry> itr = bubbles.iterator();
+		while(itr.hasNext()){
+			final LineEntry bubble = itr.next();
+			if(parent.from.containsAll(bubble.from)
+					&& bubble.from.equals(new HashSet<>(parent.extractFromEndingWith(bubble.condition))))
+				itr.remove();
+		}
 
 		return bubbles;
 	}

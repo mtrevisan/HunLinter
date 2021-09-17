@@ -31,7 +31,6 @@ import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -85,7 +85,7 @@ public class AffixEntry{
 	final List<String> continuationFlags;
 	/** condition that must be met before the affix can be applied. */
 	private final String condition;
-	final String[] morphologicalFields;
+	final List<String> morphologicalFields;
 
 
 	public AffixEntry(final String line, final int index, final AffixType parentType, final String parentFlag,
@@ -111,7 +111,9 @@ public class AffixEntry{
 		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		condition = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
-		morphologicalFields = (lineParts.length > 5? StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField)): null);
+		morphologicalFields = (lineParts.length > 5
+			? new ArrayList<>(Arrays.asList(StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField))))
+			: null);
 
 		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? new ArrayList<>(Arrays.asList(classes)): null);
@@ -191,9 +193,10 @@ public class AffixEntry{
 	 * @param dicEntry	The dictionary entry to combine from
 	 * @return	The list of new morphological fields
 	 */
-	public final String[] combineMorphologicalFields(final DictionaryEntry dicEntry){
-		String[] baseMorphFields = (dicEntry.morphologicalFields != null? dicEntry.morphologicalFields: new String[0]);
-		final String[] ruleMorphFields = (morphologicalFields != null? morphologicalFields: new String[0]);
+	public final List<String> combineMorphologicalFields(final DictionaryEntry dicEntry){
+		final List<String> baseMorphFields = (dicEntry.morphologicalFields != null? new ArrayList<>(dicEntry.morphologicalFields):
+			new ArrayList<>(0));
+		final List<String> ruleMorphFields = (morphologicalFields != null? morphologicalFields: new ArrayList<>(0));
 
 		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
 		final boolean containsInflectionalAffix = containsAffixes(ruleMorphFields, MorphologicalTag.INFLECTIONAL_SUFFIX,
@@ -206,19 +209,23 @@ public class AffixEntry{
 //		baseMorphFields = removeIf(baseMorphFields, field ->
 //			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
 //			|| !containsTerminalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
-		baseMorphFields = LoopHelper.removeIf(baseMorphFields, field ->
-			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field)
-				|| MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-			|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field)
-				|| MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
+		final Iterator<String> itr = baseMorphFields.iterator();
+		while(itr.hasNext()){
+			final String field = itr.next();
+			final boolean filter = (containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field)
+					|| MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
+				|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field)
+					|| MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
+			if(filter)
+				itr.remove();
+		}
 
 		//add morphological fields from the applied affix
-		return (parent.getType() == AffixType.SUFFIX
-			? ArrayUtils.addAll(baseMorphFields, ruleMorphFields)
-			: ArrayUtils.addAll(ruleMorphFields, baseMorphFields));
+		baseMorphFields.addAll((parent.getType() == AffixType.SUFFIX? baseMorphFields.size(): 0), ruleMorphFields);
+		return baseMorphFields;
 	}
 
-	private static boolean containsAffixes(final String[] amf, final MorphologicalTag... tags){
+	private static boolean containsAffixes(final List<String> amf, final MorphologicalTag... tags){
 		for(final MorphologicalTag tag : tags)
 			for(final String elem : amf)
 				if(tag.isSupertypeOf(elem))
@@ -226,19 +233,18 @@ public class AffixEntry{
 		return false;
 	}
 
-	public static String[] extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
+	public static List<String> extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		int size = 0;
 		for(int i = 0; i < compoundEntries.size(); i ++)
-			size += compoundEntries.get(i).morphologicalFields.length + 1;
+			size += compoundEntries.get(i).morphologicalFields.size() + 1;
 
-		int offset = 0;
-		final String[] mf = new String[size];
+		final List<String> mf = new ArrayList<>(size);
 		for(int i = 0; i < compoundEntries.size(); i ++){
 			final DictionaryEntry compoundEntry = compoundEntries.get(i);
 			final String compound = compoundEntry.getWord();
-			mf[offset ++] = MorphologicalTag.PART.attachValue(compound);
+			mf.add(MorphologicalTag.PART.attachValue(compound));
 			for(final String cemf : compoundEntry.morphologicalFields)
-				mf[offset ++] = cemf;
+				mf.add(cemf);
 		}
 		return mf;
 	}
@@ -258,7 +264,7 @@ public class AffixEntry{
 	}
 
 	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
-		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.length: 0);
+		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.size(): 0);
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();
 			final int purgeTag = tag.length();
@@ -364,7 +370,7 @@ public class AffixEntry{
 		if(continuationFlags != null && !continuationFlags.isEmpty())
 			sb.append(SLASH)
 				.append(strategy.joinFlags(continuationFlags));
-		if(morphologicalFields != null && morphologicalFields.length > 0)
+		if(morphologicalFields != null && !morphologicalFields.isEmpty())
 			sb.append(TAB)
 				.append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
@@ -381,7 +387,7 @@ public class AffixEntry{
 					? SLASH + String.join(StringUtils.EMPTY, continuationFlags)
 					: StringUtils.EMPTY))
 			.add(condition);
-		if(morphologicalFields != null && morphologicalFields.length > 0)
+		if(morphologicalFields != null && !morphologicalFields.isEmpty())
 			sj.add(String.join(StringUtils.SPACE, morphologicalFields));
 		return sj.toString();
 	}
@@ -399,7 +405,7 @@ public class AffixEntry{
 			&& appending.equals(rhs.appending)
 			&& Objects.equals(continuationFlags, rhs.continuationFlags)
 			&& condition.equals(rhs.condition)
-			&& Arrays.equals(morphologicalFields, rhs.morphologicalFields));
+			&& morphologicalFields.equals(rhs.morphologicalFields));
 	}
 
 	@Override
@@ -409,7 +415,7 @@ public class AffixEntry{
 		result = 31 * result + (appending == null? 0: appending.hashCode());
 		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
 		result = 31 * result + (condition == null? 0: condition.hashCode());
-		result = 31 * result + Arrays.hashCode(morphologicalFields);
+		result = 31 * result + morphologicalFields.hashCode();
 		return result;
 	}
 

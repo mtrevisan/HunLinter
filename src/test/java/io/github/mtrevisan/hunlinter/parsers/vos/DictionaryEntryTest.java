@@ -55,7 +55,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abcdef", entry.getWord());
 		Assertions.assertNull(entry.continuationFlags);
-		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abcdef/ABC";
@@ -63,7 +63,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags.toArray(String[]::new));
-		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abcdef	po:noun";
@@ -71,7 +71,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertNull(entry.continuationFlags);
-		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abcdef/ABC	po:noun";
@@ -79,7 +79,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abcdef", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags.toArray(String[]::new));
-		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abcdef", "po:noun"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abc\\/def";
@@ -87,7 +87,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abc/def", entry.getWord());
 		Assertions.assertNull(entry.continuationFlags);
-		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abc\\/def/ABC";
@@ -95,7 +95,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags.toArray(String[]::new));
-		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abc\\/def	po:noun";
@@ -103,7 +103,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertNull(entry.continuationFlags);
-		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields.toArray(String[]::new));
 
 
 		line = "abc\\/def/ABC	po:noun";
@@ -111,7 +111,7 @@ class DictionaryEntryTest{
 
 		Assertions.assertEquals("abc/def", entry.word);
 		Assertions.assertArrayEquals(new String[]{"A", "B", "C"}, entry.continuationFlags.toArray(String[]::new));
-		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields);
+		Assertions.assertArrayEquals(new String[]{"st:abc/def", "po:noun"}, entry.morphologicalFields.toArray(String[]::new));
 	}
 
 }

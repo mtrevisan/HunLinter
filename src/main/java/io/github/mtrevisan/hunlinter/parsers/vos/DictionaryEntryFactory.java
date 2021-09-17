@@ -30,10 +30,10 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -88,7 +88,7 @@ public class DictionaryEntryFactory{
 
 		final String word = extractWord(m.group(PARAM_WORD));
 		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));
-		final String[] morphologicalFields = extractMorphologicalFields(m.group(PARAM_MORPHOLOGICAL_FIELDS), addStemTag, word);
+		final List<String> morphologicalFields = extractMorphologicalFields(m.group(PARAM_MORPHOLOGICAL_FIELDS), addStemTag, word);
 
 		final String convertedWord = affixData.applyInputConversionTable(word);
 		final boolean combinable = true;
@@ -105,11 +105,12 @@ public class DictionaryEntryFactory{
 		return (result != null? Arrays.asList(result): null);
 	}
 
-	private String[] extractMorphologicalFields(final String dicMorphologicalFields, final boolean addStemTag, final String word){
-		final String[] mfs = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
-		return (!addStemTag || containsStem(mfs)
-			? mfs
-			: ArrayUtils.addAll(new String[]{MorphologicalTag.STEM.attachValue(word)}, mfs));
+	private List<String> extractMorphologicalFields(final String dicMorphologicalFields, final boolean addStemTag, final String word){
+		final String[] split = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
+		final List<String> mfs = (split != null? new ArrayList<>(Arrays.asList(split)): new ArrayList<>(0));
+		if(addStemTag && !containsStem(mfs))
+			mfs.add(0, MorphologicalTag.STEM.attachValue(word));
+		return mfs;
 	}
 
 	private static String expandAliases(final String part, final List<String> aliases){
@@ -118,10 +119,10 @@ public class DictionaryEntryFactory{
 			: part);
 	}
 
-	private static boolean containsStem(final String[] mfs){
-		final int size = (mfs != null? mfs.length: 0);
+	private static boolean containsStem(final List<String> mfs){
+		final int size = (mfs != null? mfs.size(): 0);
 		for(int i = 0; i < size; i ++)
-			if(mfs[i].startsWith(MorphologicalTag.STEM.getCode()))
+			if(mfs.get(i).startsWith(MorphologicalTag.STEM.getCode()))
 				return true;
 		return false;
 	}

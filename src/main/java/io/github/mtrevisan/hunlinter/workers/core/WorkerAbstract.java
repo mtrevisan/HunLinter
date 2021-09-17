@@ -89,8 +89,15 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		catch(final RuntimeException re){
 			if(workerData.isCancelOnException() && JavaHelper.isInterruptedException(re))
 				cancel(re);
+			else
+				logExceptionError(re);
 		}
 		return null;
+	}
+
+	private static void logExceptionError(final Exception e){
+		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
 	}
 
 	@SuppressWarnings("SameReturnValue")

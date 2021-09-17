@@ -55,7 +55,7 @@ public class DictionaryEntry{
 
 	protected String word;
 	protected List<String> continuationFlags;
-	protected final String[] morphologicalFields;
+	protected final List<String> morphologicalFields;
 	private final boolean combinable;
 
 
@@ -68,7 +68,8 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	DictionaryEntry(final String word, final List<String> continuationFlags, final String[] morphologicalFields, final boolean combinable){
+	DictionaryEntry(final String word, final List<String> continuationFlags, final List<String> morphologicalFields,
+			final boolean combinable){
 		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.word = word;
@@ -186,9 +187,9 @@ public class DictionaryEntry{
 	}
 
 	public final boolean hasPartOfSpeech(){
-		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		final int size = (morphologicalFields != null? morphologicalFields.size(): 0);
 		for(int i = 0; i < size; i ++)
-			if(MorphologicalTag.PART_OF_SPEECH.isSupertypeOf(morphologicalFields[i]))
+			if(MorphologicalTag.PART_OF_SPEECH.isSupertypeOf(morphologicalFields.get(i)))
 				return true;
 		return false;
 	}
@@ -202,7 +203,7 @@ public class DictionaryEntry{
 	}
 
 	private boolean hasMorphologicalField(final String morphologicalField){
-		return (morphologicalFields != null && ArrayUtils.contains(morphologicalFields, morphologicalField));
+		return (morphologicalFields != null && morphologicalFields.contains(morphologicalField));
 	}
 
 	public final String getMorphologicalFieldStem(){
@@ -220,7 +221,7 @@ public class DictionaryEntry{
 			return Collections.emptyList();
 
 		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
-		final List<String> list = new ArrayList<>(morphologicalFields.length);
+		final List<String> list = new ArrayList<>(morphologicalFields.size());
 		for(final String mf : morphologicalFields)
 			if(mf.startsWith(tag))
 				list.add(mf);
@@ -299,7 +300,7 @@ public class DictionaryEntry{
 			sb.append(SLASH);
 			sb.append(strategy != null? strategy.joinFlags(continuationFlags): StringUtils.join(continuationFlags, COMMA));
 		}
-		if(morphologicalFields != null && morphologicalFields.length > 0)
+		if(morphologicalFields != null && !morphologicalFields.isEmpty())
 			sb.append(TAB).append(StringUtils.join(morphologicalFields, StringUtils.SPACE));
 		return sb.toString();
 	}
@@ -314,14 +315,14 @@ public class DictionaryEntry{
 		final DictionaryEntry rhs = (DictionaryEntry)obj;
 		return (word.equals(rhs.word)
 			&& Objects.equals(continuationFlags, rhs.continuationFlags)
-			&& Arrays.equals(morphologicalFields, rhs.morphologicalFields));
+			&& morphologicalFields.equals(rhs.morphologicalFields));
 	}
 
 	@Override
 	public final int hashCode(){
 		int result = (word == null? 0: word.hashCode());
 		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
-		result = 31 * result + Arrays.hashCode(morphologicalFields);
+		result = 31 * result + morphologicalFields.hashCode();
 		return result;
 	}
 

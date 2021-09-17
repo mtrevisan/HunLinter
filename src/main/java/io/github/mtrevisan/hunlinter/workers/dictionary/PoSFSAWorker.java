@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
@@ -59,7 +58,9 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -283,8 +284,14 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 	private static Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
-		return SetHelper.bucket(inflection.getMorphologicalFieldsAsArray(), MorphologicalTag::createFromCode,
-			MorphologicalTag.class);
+		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
+		for(final String entry : inflection.getMorphologicalFieldsAsList()){
+			final MorphologicalTag key = MorphologicalTag.createFromCode(entry);
+			if(key != null)
+				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
+					.add(entry);
+		}
+		return bucket;
 	}
 
 

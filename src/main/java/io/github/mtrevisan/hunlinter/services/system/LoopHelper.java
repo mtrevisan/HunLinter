@@ -24,11 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 
@@ -54,28 +52,6 @@ public final class LoopHelper{
 			if(best == null || comparator.compare(elem, best) > 0)
 				best = elem;
 		return best;
-	}
-
-
-	public static <T> T[] removeIf(final T[] array, final Predicate<T> filter){
-		int index = indexOf(array, filter, 0);
-		if(index == -1)
-			return ArrayUtils.clone(array);
-
-		final int[] indices = new int[array.length - index];
-		indices[0] = index;
-
-		int count;
-		for(count = 1; (index = indexOf(array, filter, indices[count - 1] + 1)) != -1; indices[count ++] = index){}
-
-		return ArrayUtils.removeAll(array, Arrays.copyOf(indices, count));
-	}
-
-	private static <T> int indexOf(final T[] array, final Predicate<T> filter, final int startIndex){
-		for(int i = startIndex; i < array.length; i ++)
-			if(filter.test(array[i]))
-				return i;
-		return -1;
 	}
 
 }

@@ -78,8 +78,9 @@ public class LineEntry implements Serializable{
 
 	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
 		final List<String> words = new ArrayList<>(parentRulesFrom.size());
+		final Pattern conditionPattern = RegexHelper.pattern(condition + PATTERN_END_OF_WORD);
 		for(int i = 0; i < parentRulesFrom.size(); i ++)
-			words.addAll(parentRulesFrom.get(i).extractFromEndingWith(condition));
+			words.addAll(parentRulesFrom.get(i).extractFromEndingWith(conditionPattern));
 		return createFromWithWords(entry, condition, words);
 	}
 
@@ -107,8 +108,12 @@ public class LineEntry implements Serializable{
 		from = (words != null? new HashSet<>(words): new HashSet<>(0));
 	}
 
-	public final List<String> extractFromEndingWith(final String suffix){
-		final Pattern conditionPattern = RegexHelper.pattern(suffix + PATTERN_END_OF_WORD);
+	final List<String> extractFromEndingWith(final String condition){
+		final Pattern conditionPattern = RegexHelper.pattern(condition + PATTERN_END_OF_WORD);
+		return extractFromEndingWith(conditionPattern);
+	}
+
+	private List<String> extractFromEndingWith(final Pattern conditionPattern){
 		final ArrayList<String> list = new ArrayList<>(from.size());
 		for(final String word : from)
 			if(RegexHelper.find(word, conditionPattern))

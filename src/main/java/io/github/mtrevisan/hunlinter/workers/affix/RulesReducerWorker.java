@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -113,11 +114,18 @@ public class RulesReducerWorker extends WorkerDictionary{
 			resetProcessing("Extracting minimal rules (step 2/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
-			return rulesReducer.reduceRules(originalRules, percent -> {
-				setWorkerProgress(percent);
+			try{
+				return rulesReducer.reduceRules(originalRules, percent -> {
+					setWorkerProgress(percent);
 
-				sleepOnPause();
-			});
+					sleepOnPause();
+				});
+			}
+			catch(final Exception e){
+				logExceptionError(e);
+
+				throw e;
+			}
 		};
 		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
 			resetProcessing("Verifying correctness (step 3/3)");
@@ -140,6 +148,12 @@ public class RulesReducerWorker extends WorkerDictionary{
 			return null;
 		};
 		setProcessor(step1.andThen(step2).andThen(step3));
+	}
+
+	private static void logExceptionError(final Exception e){
+		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+		final int newLineIndex = errorMessage.indexOf("\r\n");
+		LOGGER.error(ParserManager.MARKER_RULE_REDUCER_STATUS, (newLineIndex >= 0? errorMessage.substring(0, newLineIndex): errorMessage));
 	}
 
 }

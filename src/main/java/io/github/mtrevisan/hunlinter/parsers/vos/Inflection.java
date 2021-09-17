@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -55,7 +56,7 @@ public class Inflection extends DictionaryEntry{
 
 	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
 			final List<DictionaryEntry> compoundEntries){
-		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
+		final List<String> morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
 	}
 
@@ -67,7 +68,7 @@ public class Inflection extends DictionaryEntry{
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
 			final DictionaryEntry dicEntry, final Collection<String> remainingContinuationFlags, final boolean combinable){
 		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
+		final List<String> morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
 		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
 		return new Inflection(word, continuationFlags, morphologicalFields, combinable, appliedRules, compoundEntries);
@@ -83,7 +84,7 @@ public class Inflection extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Inflection(final String word, final List<String> continuationFlags, final String[] morphologicalFields,
+	private Inflection(final String word, final List<String> continuationFlags, final List<String> morphologicalFields,
 			final boolean combinable, final AffixEntry[] appliedRules, final List<DictionaryEntry> compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
@@ -97,7 +98,7 @@ public class Inflection extends DictionaryEntry{
 		super(word, (strategy != null && StringUtils.isNotBlank(continuationFlags)
 				? Arrays.asList(strategy.parseFlags(continuationFlags))
 				: null),
-			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
+			(morphologicalFields != null? new ArrayList<>(Arrays.asList(StringUtils.split(morphologicalFields))): null), true);
 
 		this.compoundEntries = compoundEntries;
 	}
@@ -144,7 +145,7 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public final boolean hasMorphologicalFields(){
-		return (morphologicalFields != null && morphologicalFields.length > 0);
+		return (morphologicalFields != null && !morphologicalFields.isEmpty());
 	}
 
 	public final void prependAppliedRules(final AffixEntry[] appliedRules){
@@ -194,7 +195,7 @@ public class Inflection extends DictionaryEntry{
 		return (morphologicalFields != null? StringUtils.join(morphologicalFields, StringUtils.SPACE): StringUtils.EMPTY);
 	}
 
-	public final String[] getMorphologicalFieldsAsArray(){
+	public final List<String> getMorphologicalFieldsAsList(){
 		return morphologicalFields;
 	}
 

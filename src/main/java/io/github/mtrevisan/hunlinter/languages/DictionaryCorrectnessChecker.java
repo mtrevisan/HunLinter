@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -90,10 +91,10 @@ public class DictionaryCorrectnessChecker{
 			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD, inflection.getWord())
 				.withIndex(index));
 
-		final String[] morphologicalFields = inflection.getMorphologicalFieldsAsArray();
-		final int size = (morphologicalFields != null? morphologicalFields.length: 0);
+		final List<String> morphologicalFields = inflection.getMorphologicalFieldsAsList();
+		final int size = (morphologicalFields != null? morphologicalFields.size(): 0);
 		for(int i = 0; i < size; i ++){
-			final String morphologicalField = morphologicalFields[i];
+			final String morphologicalField = morphologicalFields.get(i);
 			if(morphologicalField.length() < 4)
 				EventBusService.publish(new LinterWarning(INVALID_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
 					.withIndex(index));
