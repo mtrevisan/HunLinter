@@ -266,7 +266,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					for(final Duplicate duplicate : entries)
 						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 							(duplicate.getInflection().hasInflectionRules()?
-							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
+							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")")));
 					writer.write(sj.toString());
 					writer.newLine();
 

@@ -27,9 +27,9 @@ package io.github.mtrevisan.hunlinter.parsers.affix;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 
 public class ParsingContext{
@@ -82,7 +82,10 @@ public class ParsingContext{
 	}
 
 	public final String getAllButFirstParameter(){
-		return StringUtils.join(Arrays.asList(lineParts).subList(1, lineParts.length), StringUtils.SPACE);
+		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		for(int i = 1; i < lineParts.length; i ++)
+			sj.add(lineParts[i]);
+		return sj.toString();
 	}
 
 	@Override

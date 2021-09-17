@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.services;
 
 import io.github.mtrevisan.hunlinter.services.system.Memoizer;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -178,7 +177,10 @@ public final class RegexSequencer{
 	}
 
 	public static String toString(final String[] sequence){
-		return StringUtils.join(sequence, StringUtils.EMPTY);
+		final StringBuilder sb = new StringBuilder();
+		for(final String seq : sequence)
+			sb.append(seq);
+		return sb.toString();
 	}
 
 }

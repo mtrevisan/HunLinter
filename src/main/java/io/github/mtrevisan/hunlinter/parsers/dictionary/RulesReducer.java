@@ -322,10 +322,15 @@ public class RulesReducer{
 	private void disjoinSameConditions(final Collection<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups,
 			final String condition, final List<LineEntry> sameCondition, final List<LineEntry> finalRules){
 		//extract children
-		final List<LineEntry> children = new ArrayList<>(rules.size());
-		for(final LineEntry rule : rules)
-			if(rule.condition.endsWith(condition))
-				children.add(rule);
+		final List<LineEntry> children;
+		if(condition.isEmpty())
+			children = new ArrayList<>(rules);
+		else{
+			children = new ArrayList<>(rules.size());
+			for(final LineEntry rule : rules)
+				if(rule.condition.endsWith(condition))
+					children.add(rule);
+		}
 
 		final Map<LineEntry, Set<Character>> groups = new HashMap<>(0);
 		for(int i = 0; i < children.size(); i ++){
@@ -343,15 +348,11 @@ public class RulesReducer{
 		for(int i = 0; i < sameCondition.size(); i ++){
 			final LineEntry parent = sameCondition.get(i);
 			//extract ratifying group
-			final Set<Character> parentGroup = groups.get(parent);
+			final Set<Character> parentGroup = new HashSet<>(groups.get(parent));
 
 			//extract negated group
-			final List<LineEntry> childrenNotParent = new ArrayList<>(children.size());
-			for(int j = 0; j < children.size(); j ++){
-				final LineEntry child = children.get(j);
-				if(child != parent)
-					childrenNotParent.add(child);
-			}
+			final List<LineEntry> childrenNotParent = new ArrayList<>(children);
+			childrenNotParent.remove(parent);
 			childrenGroup.clear();
 			for(int j = 0; j < childrenNotParent.size(); j ++)
 				childrenGroup.addAll(groups.get(childrenNotParent.get(j)));
@@ -383,15 +384,15 @@ public class RulesReducer{
 
 			final Set<Character> characters = overallLastGroups.get(parent.condition.length());
 			if(!notPresentConditions.isEmpty() && characters != null){
-				final String notCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
+				final String negativeCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
 				final Collection<Character> overallLastGroup = new HashSet<>(characters);
 				overallLastGroup.removeAll(notPresentConditions);
-				final String yesCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
+				final String positiveCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 
 				LineEntry notRule = null;
 				for(int j = 0; j < finalRules.size(); j ++){
 					final LineEntry rule = finalRules.get(j);
-					if(rule.condition.equals(notCondition) || rule.condition.equals(yesCondition)){
+					if(rule.condition.equals(negativeCondition) || rule.condition.equals(positiveCondition)){
 						notRule = rule;
 						break;
 					}
@@ -663,6 +664,7 @@ public class RulesReducer{
 				+ RegexSequencer.splitSequence(entry.condition).length
 			: null));
 		final Collection<Character> group = new HashSet<>(0);
+		final StringBuilder condition = new StringBuilder();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
 				final LineEntry anEntry = similarities.iterator().next();
@@ -673,9 +675,16 @@ public class RulesReducer{
 				group.clear();
 				for(int i = 0; i < similarities.size(); i ++)
 					group.add(RegexSequencer.splitSequence(similarities.get(i).condition)[1].charAt(0));
-				final String condition = StringUtils.join(commonPreCondition) + RegexHelper.makeGroup(group, comparator)
-					+ StringUtils.join(commonPostCondition);
-				entries.add(LineEntry.createFrom(anEntry, condition));
+
+				condition.setLength(0);
+				for(final String cpc : commonPreCondition)
+					condition.append(cpc);
+				condition.append(RegexHelper.makeGroup(group, comparator));
+				for(final String cpc : commonPostCondition)
+					condition.append(cpc);
+				condition.toString();
+
+				entries.add(LineEntry.createFrom(anEntry, condition.toString()));
 
 				for(int i = 0; i < similarities.size(); i ++)
 					entries.remove(similarities.get(i));
