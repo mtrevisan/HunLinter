@@ -118,7 +118,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		addListenerOnClose();
 
 
-		futureSaveTextFileFileChooser = JavaHelper.createFuture(() -> {
+		futureSaveTextFileFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveTextFileFileChooser = new JFileChooser();
 			saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 			final File currentDir = new File(".");

@@ -65,7 +65,7 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
 
-		futureSaveResultFileChooser = JavaHelper.createFuture(() -> {
+		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
 			saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
 			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

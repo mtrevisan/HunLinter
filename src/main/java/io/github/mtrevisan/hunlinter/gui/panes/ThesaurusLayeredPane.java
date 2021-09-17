@@ -114,7 +114,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		initComponents();
 
 
-		futureOpenDictionaryFSAFileChooser = JavaHelper.createFuture(() -> {
+		futureOpenDictionaryFSAFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
 			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
 			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);

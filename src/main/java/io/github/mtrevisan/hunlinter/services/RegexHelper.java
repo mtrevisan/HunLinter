@@ -41,6 +41,7 @@ public final class RegexHelper{
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	public static final String GROUP_END = "]";
+	private static final String DOT = ".";
 
 
 	private RegexHelper(){}
@@ -149,8 +150,15 @@ public final class RegexHelper{
 	}
 
 	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
-		final String merge = sortAndMergeSet(group, comparator);
-		return NOT_GROUP_START + merge + GROUP_END;
+		final String notGroup;
+		if(group.isEmpty())
+			//the negation of an empty set is everything
+			notGroup = DOT;
+		else{
+			final String merge = sortAndMergeSet(group, comparator);
+			notGroup = NOT_GROUP_START + merge + GROUP_END;
+		}
+		return notGroup;
 	}
 
 	public static <V> String sortAndMergeSet(final Collection<V> set, final Comparator<String> comparator){

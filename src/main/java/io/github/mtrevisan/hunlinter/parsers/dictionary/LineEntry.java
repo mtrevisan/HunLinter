@@ -118,7 +118,6 @@ public class LineEntry implements Serializable{
 		for(final String word : from)
 			if(RegexHelper.find(word, conditionPattern))
 				list.add(word);
-		list.trimToSize();
 		return list;
 	}
 

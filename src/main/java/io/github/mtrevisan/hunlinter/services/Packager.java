@@ -506,7 +506,6 @@ public class Packager{
 			if(mediaType != null && MANIFEST_MEDIA_TYPE_CONFIGURATION_DATA.equals(mediaType.getNodeValue()))
 				configurationPaths.add(XMLManager.extractAttributeValue(child, MANIFEST_FILE_ENTRY_FULL_PATH));
 		}
-		configurationPaths.trimToSize();
 		return configurationPaths;
 	}
 

@@ -67,7 +67,7 @@ public class RulesReducer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
 	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
-	private static final String VERY_BAD_ERROR = "Something very bad occurs while producing from `{}`, expected {}, obtained {}";
+	private static final String VERY_BAD_ERROR = "Something very bad occurs while inflecting from `{}`, expected {}, obtained {}";
 
 	private static final String PIPE = "|";
 
@@ -105,24 +105,6 @@ public class RulesReducer{
 	}
 
 
-	public final List<LineEntry> collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
-		if(!inflections.isEmpty())
-			//remove base inflection
-			inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
-		//collect all inflections that generates from the given flag
-		final List<LineEntry> filteredRules = new ArrayList<>(inflections.size());
-		for(int i = 0; i < inflections.size(); i ++){
-			final Inflection inflection = inflections.get(i);
-			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
-			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
-				final String word = lastAppliedRule.undoRule(inflection.getWord());
-				final LineEntry newEntry = createAffixEntry(inflection, word, type);
-				filteredRules.add(newEntry);
-			}
-		}
-		return compactInflections(filteredRules);
-	}
-
 	private LineEntry createAffixEntry(final Inflection inflection, String word, final AffixType type){
 		String producedWord = inflection.getWord();
 		if(type ==AffixType.PREFIX){
@@ -140,39 +122,6 @@ public class RulesReducer{
 			addition += lastAppliedRule.toString(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
 		return new LineEntry(removal, addition, condition, word);
-	}
-
-	private static List<LineEntry> compactInflections(final List<LineEntry> rules){
-		final ArrayList<LineEntry> compactedRules = new ArrayList<>(rules.size());
-		if(rules.size() > 1){
-			//retrieve rule with the longest condition (all the other conditions must be this long)
-			final LineEntry compactedRule = LoopHelper.max(rules, Comparator.comparingInt(rule -> rule.condition.length()));
-			expandAddition(rules, compactedRule);
-
-			compactedRules.add(compactedRule);
-			compactedRules.trimToSize();
-		}
-		else
-			compactedRules.addAll(rules);
-		return compactedRules;
-	}
-
-	private static void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
-		final String from = rules.get(0).from.iterator().next();
-		final int longestConditionLength = compactedRule.condition.length();
-		for(int i = 0; i < rules.size(); i ++){
-			final LineEntry rule = rules.get(i);
-			//recover the missing characters for the current condition to become of length the maximum found earlier
-			final int startIndex = from.length() - longestConditionLength;
-			//if a condition is not long enough, keep it separate
-			if(startIndex >= 0){
-				final int delta = longestConditionLength - rule.condition.length();
-				final String deltaAddition = from.substring(startIndex, startIndex + delta);
-				//add addition
-				for(final String addition : rule.addition)
-					compactedRule.addition.add(deltaAddition + addition);
-			}
-		}
 	}
 
 	final List<LineEntry> reduceRules(final List<LineEntry> plainRules){
@@ -466,7 +415,7 @@ public class RulesReducer{
 						overallLastGroup.removeAll(parentGroup);
 					}
 
-					//if intersection between notPresentConditions and overallLastGroup is not empty
+					//if intersection between `notPresentConditions` and `overallLastGroup` is not empty
 					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()
 						? RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition
 						: RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
@@ -533,7 +482,6 @@ public class RulesReducer{
 			else
 				finalRules.addAll(disjoinSameEndingConditionsBush(bush, overallLastGroups));
 		}
-		finalRules.trimToSize();
 		return finalRules;
 	}
 
@@ -814,13 +762,62 @@ public class RulesReducer{
 			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
 
-			final List<LineEntry> filteredOriginalRules = collectInflectionsByFlag(originalInflections, flag, type);
-			final List<LineEntry> filteredRules = collectInflectionsByFlag(inflections, flag, type);
-			if(!filteredOriginalRules.equals(filteredRules))
-				throw new LinterException(VERY_BAD_ERROR, line, filteredOriginalRules, filteredRules);
+			final LineEntry filteredOriginalRule = collectInflectionsByFlag(originalInflections, flag, type);
+			final LineEntry filteredRule = collectInflectionsByFlag(inflections, flag, type);
+			if(!filteredOriginalRule.equals(filteredRule))
+				throw new LinterException(VERY_BAD_ERROR, line, filteredOriginalRule, filteredRule);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
+		}
+	}
+
+	public final LineEntry collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
+		//collect all inflections that generates from the given flag
+		if(inflections.isEmpty())
+			return null;
+
+		final List<LineEntry> filteredRules = new ArrayList<>(inflections.size() - 1);
+		//skip base inflection
+		for(int i = WordGenerator.BASE_INFLECTION_INDEX + 1; i < inflections.size(); i ++){
+			final Inflection inflection = inflections.get(i);
+			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
+			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
+				final String word = lastAppliedRule.undoRule(inflection.getWord());
+				final LineEntry newEntry = createAffixEntry(inflection, word, type);
+				filteredRules.add(newEntry);
+			}
+		}
+		return compactInflections(filteredRules);
+	}
+
+	private static LineEntry compactInflections(final List<LineEntry> rules){
+		if(rules.size() > 1){
+			//retrieve rule with the longest condition (all the other conditions must be this long)
+			final LineEntry compactedRule = LoopHelper.max(rules, Comparator.comparingInt(rule -> rule.condition.length()));
+			expandAddition(rules, compactedRule);
+
+			return compactedRule;
+		}
+		else
+			return (!rules.isEmpty()? rules.get(0): null);
+	}
+
+	private static void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
+		final String from = rules.get(0).from.iterator().next();
+		final int longestConditionLength = compactedRule.condition.length();
+		for(int i = 0; i < rules.size(); i ++){
+			final LineEntry rule = rules.get(i);
+			//recover the missing characters for the current condition to become of length the maximum found earlier
+			final int startIndex = from.length() - longestConditionLength;
+			//if a condition is not long enough, keep it separate
+			if(startIndex >= 0){
+				final int delta = longestConditionLength - rule.condition.length();
+				final String deltaAddition = from.substring(startIndex, startIndex + delta);
+				//add addition
+				for(final String addition : rule.addition)
+					compactedRule.addition.add(deltaAddition + addition);
+			}
 		}
 	}
 

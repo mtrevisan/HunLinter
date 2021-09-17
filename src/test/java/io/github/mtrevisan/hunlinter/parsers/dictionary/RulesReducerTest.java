@@ -92,7 +92,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -164,7 +164,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -249,7 +249,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -341,7 +341,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -490,7 +490,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -623,7 +623,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -673,7 +673,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -735,7 +735,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -820,7 +820,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -904,7 +904,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -965,7 +965,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1023,7 +1023,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1099,7 +1099,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1186,7 +1186,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1258,7 +1258,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1307,7 +1307,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1373,7 +1373,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1497,7 +1497,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1659,7 +1659,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1727,7 +1727,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1795,7 +1795,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1871,7 +1871,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1940,7 +1940,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1983,7 +1983,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -2029,7 +2029,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -2074,7 +2074,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -2118,7 +2118,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 

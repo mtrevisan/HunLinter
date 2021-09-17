@@ -93,10 +93,9 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	private List<int[]> extractAllKPermutations(final int kk, final int currentCount, final int limit){
 		final PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplicates);
 
-		final ArrayList<int[]> all = new ArrayList<>(limit);
+		final List<int[]> all = new ArrayList<>(limit);
 		while(pr.hasNext() && all.size() + currentCount < limit)
 			all.add(pr.next());
-		all.trimToSize();
 		return all;
 	}
 

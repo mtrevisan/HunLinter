@@ -97,7 +97,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		initComponents();
 
 
-		futureOpenPoSFSAFileChooser = JavaHelper.createFuture(() -> {
+		futureOpenPoSFSAFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
 			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
 			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
