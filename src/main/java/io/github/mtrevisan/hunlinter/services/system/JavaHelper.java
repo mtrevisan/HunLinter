@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 
@@ -44,7 +45,6 @@ public final class JavaHelper{
 	private static final char QUOTATION_MARK = '"';
 
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(10);
-//	private static final ExecutorService EXECUTOR_SERVICE = PriorityExecutors.newFixedThreadPool(10);
 
 
 	private JavaHelper(){}
@@ -60,28 +60,20 @@ public final class JavaHelper{
 	}
 
 
-	public static <T> FutureTask<T> executeFuture(final Callable<T> callable){
-		final FutureTask<T> futureTask = new FutureTask<>(callable);
-		EXECUTOR_SERVICE.execute(futureTask);
-		return futureTask;
-//		return executeFuture(callable, 0);
+	public static <T> Future<T> executeFuture(final Callable<T> callable){
+		final FutureTask<T> future = new FutureTask<>(callable);
+		EXECUTOR_SERVICE.execute(future);
+		return future;
 	}
 
-	public static <T> FutureTask<T> executeFuture(final Callable<T> callable, final int priority){
-//		final FutureTask<T> futureTask = new FutureTask<>(PriorityExecutors.PriorityCallable.of(callable, priority));
-//		EXECUTOR_SERVICE.execute(futureTask);
-//		return futureTask;
-		return executeFuture(callable);
-	}
-
-	public static <T> T waitForFuture(final FutureTask<T> futureTask){
+	public static <T> T waitForFuture(final Future<T> future){
 		while(true){
 			try{
-				if(futureTask.isDone()){
+				if(future.isDone()){
 					//shut down executor service
 					EXECUTOR_SERVICE.shutdown();
 
-					return futureTask.get();
+					return future.get();
 				}
 			}
 			catch(final InterruptedException | ExecutionException ignored){}

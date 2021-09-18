@@ -79,7 +79,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
@@ -94,7 +94,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private final DictionaryStatistics statistics;
 
-	private final FutureTask<JFileChooser> futureSaveTextFileFileChooser;
+	private final Future<JFileChooser> futureSaveTextFileFileChooser;
 
 
 	public DictionaryStatisticsDialog(final DictionaryStatistics statistics, final Frame parent){

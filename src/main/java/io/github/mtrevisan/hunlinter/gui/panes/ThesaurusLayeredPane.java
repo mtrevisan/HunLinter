@@ -80,7 +80,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
 
 
@@ -100,7 +100,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private final FutureTask<JFileChooser> futureOpenDictionaryFSAFileChooser;
+	private final Future<JFileChooser> futureOpenDictionaryFSAFileChooser;
 	private DictionaryLookup dictionaryLookup;
 	private String formerFilterThesaurusText;
 

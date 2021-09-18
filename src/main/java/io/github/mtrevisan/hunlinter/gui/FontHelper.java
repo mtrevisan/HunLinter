@@ -44,7 +44,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 
 public final class FontHelper{
@@ -63,7 +63,7 @@ public final class FontHelper{
 
 
 	@SuppressWarnings("StaticVariableMayNotBeInitialized")
-	private static FutureTask<List<Font>> futureAllFonts;
+	private static Future<List<Font>> futureAllFonts;
 	private static final ArrayList<Font> FAMILY_NAMES_ALL = new ArrayList<>(0);
 	private static final ArrayList<Font> FAMILY_NAMES_MONOSPACED = new ArrayList<>(0);
 
@@ -81,7 +81,7 @@ public final class FontHelper{
 				.getAvailableFontFamilyNames();
 
 			LOGGER.info("System fonts loaded");
-			final ArrayList<Font> allFonts = new ArrayList<>(familyNames.length);
+			final List<Font> allFonts = new ArrayList<>(familyNames.length);
 			for(final String familyName : familyNames){
 				final Font font = new Font(familyName, Font.PLAIN, 20);
 				//filter out non-plain fonts
@@ -96,7 +96,7 @@ public final class FontHelper{
 			LOGGER.info("System fonts filtered");
 
 			return allFonts;
-		}, 1);
+		});
 	}
 
 	public static Font chooseBestFont(final String languageSample){

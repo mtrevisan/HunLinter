@@ -42,7 +42,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 
 public class DictionaryExtractWordlistFSAAction extends AbstractAction{
@@ -55,7 +55,7 @@ public class DictionaryExtractWordlistFSAAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
+	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	public DictionaryExtractWordlistFSAAction(final ParserManager parserManager, final WorkerManager workerManager,

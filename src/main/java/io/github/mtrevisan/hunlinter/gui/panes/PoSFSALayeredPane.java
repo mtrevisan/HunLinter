@@ -62,7 +62,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 
 public class PoSFSALayeredPane extends JLayeredPane{
@@ -80,7 +80,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private final FutureTask<JFileChooser> futureOpenPoSFSAFileChooser;
+	private final Future<JFileChooser> futureOpenPoSFSAFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 

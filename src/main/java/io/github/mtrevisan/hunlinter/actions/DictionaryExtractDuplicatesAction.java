@@ -42,7 +42,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 
 
 public class DictionaryExtractDuplicatesAction extends AbstractAction{
@@ -54,7 +54,7 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private final FutureTask<JFileChooser> futureSaveResultFileChooser;
+	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	@SuppressWarnings("ConstantConditions")

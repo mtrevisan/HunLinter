@@ -126,7 +126,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
@@ -183,7 +183,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final String PROPERTY_NAME_PAUSED = "paused";
 
 
-	private final FutureTask<JFileChooser> futureOpenProjectPathFileChooser;
+	private final Future<JFileChooser> futureOpenProjectPathFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 	private final ParserManager parserManager;
