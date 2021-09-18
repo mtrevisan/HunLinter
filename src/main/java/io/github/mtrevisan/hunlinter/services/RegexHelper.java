@@ -144,6 +144,9 @@ public final class RegexHelper{
 		return replaceAll(text, pattern, StringUtils.EMPTY);
 	}
 
+	/**
+	 * NOTE: the empty set produce an empty result.
+	 */
 	public static String makeGroup(final Collection<Character> group, final Comparator<String> comparator){
 		final String merge = sortAndMergeSet(group, comparator);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);

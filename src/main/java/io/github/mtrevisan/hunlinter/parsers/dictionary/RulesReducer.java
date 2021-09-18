@@ -398,9 +398,7 @@ public class RulesReducer{
 					}
 				}
 
-				if(notRule != null)
-					notRule.condition = parent.condition;
-				else{
+				if(notRule == null){
 					//find already present rule
 					final List<LineEntry> alreadyPresentRules = new ArrayList<>(finalRules.size());
 					for(int j = 0; j < finalRules.size(); j ++){
@@ -418,9 +416,21 @@ public class RulesReducer{
 
 					//if intersection between `notPresentConditions` and `overallLastGroup` is not empty
 					final String newCondition = (notPresentConditions.size() < overallLastGroup.size()
-						? RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition
-						: RegexHelper.makeNotGroup(overallLastGroup, comparator) + parent.condition);
-					final LineEntry newEntry = LineEntry.createFrom(parent, newCondition);
+						? RegexHelper.makeGroup(notPresentConditions, comparator)
+						: RegexHelper.makeNotGroup(overallLastGroup, comparator));
+					if(!newCondition.isEmpty()){
+						final LineEntry newEntry = LineEntry.createFrom(parent, newCondition + parent.condition);
+						finalRules.add(newEntry);
+					}
+				}
+				else if(notRule.condition.contains("["))
+					notRule.condition = parent.condition;
+				else{
+					//add rule with parent.condition? see caseSuffix19
+					final Collection<Character> negatedConditions = new HashSet<>(notRule.condition.length());
+					for(int k = 0; k < notRule.condition.length(); k ++)
+						negatedConditions.add(notRule.condition.charAt(k));
+					final LineEntry newEntry = LineEntry.createFrom(parent, RegexHelper.makeNotGroup(negatedConditions, comparator));
 					finalRules.add(newEntry);
 				}
 			}

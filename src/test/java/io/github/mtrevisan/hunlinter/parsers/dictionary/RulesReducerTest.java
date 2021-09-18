@@ -2170,18 +2170,18 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "trï", "à", Arrays.asList("lognà", "lugnà", "oƚognà", "oƚugnà")),
-			new LineEntry("0", "tri", "[^à]", Arrays.asList("éip", "ogeŧílx", "èp", "abalís", "èip", "abaƚís", "ogesílx")),
-			new LineEntry("0", "tre", ".", Arrays.asList("éip", "lognà", "ogeŧílx", "èp", "lugnà", "oƚognà", "abalís", "èip", "oƚugnà", "abaƚís", "ogesílx"))
+			new LineEntry("0", "ïrt", "à", Arrays.asList("lognà", "lugnà", "oƚognà", "oƚugnà")),
+			new LineEntry("0", "irt", "[^à]", Arrays.asList("éip", "ogeŧílx", "èp", "abalís", "èip", "abaƚís", "ogesílx")),
+			new LineEntry("0", "ert", ".", Arrays.asList("éip", "lognà", "ogeŧílx", "èp", "lugnà", "oƚognà", "abalís", "èip", "oƚugnà", "abaƚís", "ogesílx"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX +0 Y 3",
-			"PFX +0 0 in– n",
-			"PFX +0 0 i [^k]",
-			"PFX +0 0 in [^n]"
+			"PFX p3 Y 3",
+			"PFX p3 0 trï à",
+			"PFX p3 0 tre .",
+			"PFX p3 0 tri [^à]"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
