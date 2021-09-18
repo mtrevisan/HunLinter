@@ -212,7 +212,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
 
 
-		futureOpenProjectPathFileChooser = JavaHelper.createFuture(() -> {
+		futureOpenProjectPathFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser openProjectPathFileChooser = new JFileChooser();
 			openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
 			openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);

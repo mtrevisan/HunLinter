@@ -67,10 +67,14 @@ public abstract class FlagParsingStrategy{
 		if(flags == null || flags.isEmpty())
 			return StringUtils.EMPTY;
 
-		for(int i = 0; i < flags.size(); i ++)
+		final int size = flags.size();
+		for(int i = 0; i < size; i ++)
 			validate(flags.get(i));
 
-		return StringUtils.join(flags, StringUtils.EMPTY);
+		final StringBuilder sb = new StringBuilder(flags.get(0).length() * size);
+		for(int i = 0; i < size; i ++)
+			sb.append(flags.get(i));
+		return sb.toString();
 	}
 
 	/**

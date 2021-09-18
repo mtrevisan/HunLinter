@@ -135,9 +135,11 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
       optimizeClosedGroupCheckBox.setText("Optimize for closed group");
       optimizeClosedGroupCheckBox.addActionListener(this::optimizeClosedGroupCheckBoxActionPerformed);
+		optimizeClosedGroupCheckBox.setEnabled(false);
 
       reduceButton.setText("Reduce");
       reduceButton.addActionListener(this::reduceButtonActionPerformed);
+		reduceButton.setEnabled(false);
 
       currentSetLabel.setText("Current set:");
 
@@ -267,7 +269,11 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
    private void ruleComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
-		if(flag != null){
+
+		final boolean selected = (flag != null);
+		optimizeClosedGroupCheckBox.setEnabled(selected);
+		reduceButton.setEnabled(selected);
+		if(selected){
 			mainProgressBar.setValue(0);
 
 			final RuleEntry rule = parserManager.getAffixData().getData(flag);
@@ -338,8 +344,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			try{
 				final String flag = getSelectedFlag();
 				final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
-				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(), parserManager.getDicParser(),
-					parserManager.getWordGenerator());
+				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(),
+					parserManager.getDicParser(), parserManager.getWordGenerator());
 				rulesReducerWorker.addPropertyChangeListener(this);
 				rulesReducerWorker.execute();
 			}

@@ -263,7 +263,10 @@ public class HyphenationParser{
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
-		return StringUtils.join(components);
+		final StringBuilder sb = new StringBuilder(line.length());
+		for(final String component : components)
+			sb.append(component);
+		return sb.toString();
 	}
 
 	private void parseCustomRule(final String line, final Level level){
@@ -293,7 +296,12 @@ public class HyphenationParser{
 			? Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(MODIFIER_LETTER_APOSTROPHE), EN_DASH)
 			: Arrays.asList(APOSTROPHE, MINUS_SIGN));
 
-		patternNoHyphen = RegexHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
+		final StringBuilder sb = new StringBuilder(6);
+		sb.append('[');
+		for(final String rcnh : retroCompatibilityNoHyphen)
+			sb.append(rcnh);
+		sb.append(']');
+		patternNoHyphen = RegexHelper.pattern(sb.toString());
 
 		options.getNoHyphen()
 			.addAll(retroCompatibilityNoHyphen);

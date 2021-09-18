@@ -118,7 +118,6 @@ public class LineEntry implements Serializable{
 		for(final String word : from)
 			if(RegexHelper.find(word, conditionPattern))
 				list.add(word);
-		list.trimToSize();
 		return list;
 	}
 
@@ -133,10 +132,16 @@ public class LineEntry implements Serializable{
 	public final LineEntry createReverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
 		final Set<String> reversedAddition = new HashSet<>(addition.size());
+		final StringBuilder sb = new StringBuilder();
 		for(final String add : addition){
 			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
-			additions[0] = StringUtils.reverse(additions[0]);
-			reversedAddition.add(StringUtils.join(additions, StringUtils.EMPTY));
+			sb.setLength(0);
+			sb.append(additions[0]);
+			sb.reverse();
+			for(int i = 1; i < additions.length; i ++)
+				sb.append(additions[i]);
+
+			reversedAddition.add(sb.toString());
 		}
 		final String reversedCondition = RegexSequencer
 			.toString(RegexSequencer.reverse(RegexSequencer.splitSequence(condition)));

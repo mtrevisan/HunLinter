@@ -91,10 +91,10 @@ public class RulesReducerWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final List<LineEntry> filteredRules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
-			if(!filteredRules.isEmpty()){
+			final LineEntry filteredRule = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
+			if(filteredRule != null){
 				originalLines.add(indexData.getData());
-				originalRules.addAll(filteredRules);
+				originalRules.add(filteredRule);
 			}
 		};
 
@@ -133,11 +133,18 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 			final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
-			rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines, percent -> {
-				setWorkerProgress(percent);
+			try{
+				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines, percent -> {
+					setWorkerProgress(percent);
 
-				sleepOnPause();
-			});
+					sleepOnPause();
+				});
+			}
+			catch(final Exception e){
+				logExceptionError(e);
+
+				throw e;
+			}
 
 			for(final String rule : reducedRules)
 				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, rule);

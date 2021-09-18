@@ -75,7 +75,7 @@ public final class FontHelper{
 	private FontHelper(){}
 
 	public static void loadAllFonts(){
-		futureAllFonts = JavaHelper.createFuture(() -> {
+		futureAllFonts = JavaHelper.executeFuture(() -> {
 			LOGGER.info("Load system fonts");
 			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getAvailableFontFamilyNames();
@@ -95,9 +95,8 @@ public final class FontHelper{
 			}
 			LOGGER.info("System fonts filtered");
 
-			allFonts.trimToSize();
 			return allFonts;
-		});
+		}, 1);
 	}
 
 	public static Font chooseBestFont(final String languageSample){
@@ -142,8 +141,6 @@ public final class FontHelper{
 					if(isMonospaced(font))
 						FAMILY_NAMES_MONOSPACED.add(font);
 				}
-			FAMILY_NAMES_ALL.trimToSize();
-			FAMILY_NAMES_MONOSPACED.trimToSize();
 		}
 	}
 
