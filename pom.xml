@@ -84,6 +84,8 @@
 		<!-- jFreeChart -->
 		<jfree.jfreechart.version>1.5.3</jfree.jfreechart.version>
 
+		<github.vsonnier.hppcrt.version>0.7.5</github.vsonnier.hppcrt.version>
+
 		<!-- JSON -->
 		<googlecode.json-simple.version>1.1.1</googlecode.json-simple.version>
 
@@ -554,7 +556,7 @@
 		<dependency>
 			<groupId>com.github.vsonnier</groupId>
 			<artifactId>hppcrt</artifactId>
-			<version>0.7.5</version>
+			<version>${github.vsonnier.hppcrt.version}</version>
 		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>com.koloboke</groupId>-->

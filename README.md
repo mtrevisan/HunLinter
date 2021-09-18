@@ -326,6 +326,7 @@ It is possible to right-click on a row to bring up the popup menu and select whe
 ## Changelog
 <a name="changelog-2.1.1"></a>
 ### version 2.1.1 - 202109??
+- rules reducer fixes and enhancements
 - considered different formats for part-of-speech in thesaurus file
 - fixed early creation of thesaurus parser (language was not available yet)
 - delayed creation of file chooser (faster startup)
