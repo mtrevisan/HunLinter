@@ -36,6 +36,7 @@ import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.affix.RulesReducerWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -63,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -73,17 +75,20 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
 
 
+//	private final WorkerManager workerManager;
 	private final ParserManager parserManager;
 
 	private RulesReducerWorker rulesReducerWorker;
 	private final ActionListener actionListener;
 
 
-	public RulesReducerDialog(final ParserManager parserManager, final Frame parent){
+	public RulesReducerDialog(/*final WorkerManager workerManager,*/ final ParserManager parserManager, final Frame parent){
 		super(parent, "Rules Reducer", true);
 
+//		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
+//		this.workerManager = workerManager;
 		this.parserManager = parserManager;
 		actionListener = this::ruleComboBoxActionPerformed;
 
@@ -328,34 +333,25 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			final int progress = (Integer)evt.getNewValue();
 			mainProgressBar.setValue(progress);
 		}
-		else if(MainFrame.PROPERTY_NAME_STATE.equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
-			reducedSetTextArea.setCaretPosition(0);
-
-			ruleComboBox.setEnabled(true);
-			optimizeClosedGroupCheckBox.setEnabled(true);
-			reduceButton.setEnabled(true);
-		}
 	}
 
 	private void reduceRules(){
 		if(rulesReducerWorker == null || rulesReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
-			try{
-				final String flag = getSelectedFlag();
-				final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
-				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(),
-					parserManager.getDicParser(), parserManager.getWordGenerator());
-				rulesReducerWorker.addPropertyChangeListener(this);
-				rulesReducerWorker.execute();
-			}
-			catch(final RuntimeException re){
+			final String flag = getSelectedFlag();
+			final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
+			final Runnable onEnd = () -> {
+				reducedSetTextArea.setCaretPosition(0);
+
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
-
-				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, re.getMessage());
-			}
+			};
+			rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(),
+				parserManager.getDicParser(), parserManager.getWordGenerator(), onEnd);
+			rulesReducerWorker.addPropertyChangeListener(this);
+			rulesReducerWorker.execute();
 		}
 	}
 

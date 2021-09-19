@@ -97,6 +97,7 @@ public class WorkerManager{
 		final Consumer<WorkerAbstract<?>> onEnding = ON_ENDS.remove(workerName);
 		if(onEnding != null)
 			onEnding.accept(WORKERS.get(workerName));
+
 		//release memory
 		WORKERS.remove(workerName);
 	}

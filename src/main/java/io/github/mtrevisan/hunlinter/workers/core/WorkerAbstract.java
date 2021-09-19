@@ -89,8 +89,11 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		catch(final RuntimeException re){
 			if(workerData.isCancelOnException() && JavaHelper.isInterruptedException(re))
 				cancel(re);
-			else
+			else{
 				logExceptionError(re);
+
+				workerData.callCancelledCallback(re);
+			}
 		}
 		return null;
 	}
