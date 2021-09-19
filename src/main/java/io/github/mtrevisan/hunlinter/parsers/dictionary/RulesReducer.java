@@ -60,6 +60,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 
 public class RulesReducer{
@@ -272,23 +273,25 @@ public class RulesReducer{
 	}
 
 	private static IntObjectMap<Set<Character>> collectOverallLastGroups(final List<LineEntry> plainRules){
-		final IntObjectMap<Set<Character>> overallLastGroups = new IntObjectHashMap<>(0);
+		final IntObjectMap<Set<Character>> overallLastGroups;
 		if(!plainRules.isEmpty()){
-			//FIXME is a `try` block useful? is `maxLength` correctly calculated?
-			try{
-				final Collection<String> overallFrom = new HashSet<>(plainRules.size());
-				for(int i = 0; i < plainRules.size(); i ++)
-					overallFrom.addAll(plainRules.get(i).from);
-				int maxLength = 0;
-				for(final String from : overallFrom)
-					maxLength = Math.max(maxLength, from.length());
-				for(int index = 0; index < maxLength; index ++){
-					final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
-					overallLastGroups.put(index, overallLastGroup);
-				}
+			final Collection<String> overallFrom = new HashSet<>(plainRules.size());
+			for(int i = 0; i < plainRules.size(); i ++)
+				overallFrom.addAll(plainRules.get(i).from);
+
+			int maxLength = -1;
+			for(final String from : overallFrom)
+				if(maxLength < 0 || from.length() < maxLength)
+					maxLength = from.length();
+
+			overallLastGroups = new IntObjectHashMap<>(maxLength);
+			for(int index = 0; index < maxLength; index ++){
+				final Set<Character> overallLastGroup = LineEntry.extractGroup(index, overallFrom);
+				overallLastGroups.put(index, overallLastGroup);
 			}
-			catch(final RuntimeException ignored){}
 		}
+		else
+			overallLastGroups = new IntObjectHashMap<>(0);
 		return overallLastGroups;
 	}
 
@@ -332,7 +335,7 @@ public class RulesReducer{
 					children.add(rule);
 		}
 
-		final Map<LineEntry, Set<Character>> groups = new HashMap<>(0);
+		final Map<LineEntry, Set<Character>> groups = new HashMap<>(children.size());
 		for(int i = 0; i < children.size(); i ++){
 			final LineEntry child = children.get(i);
 			if(groups.put(child, child.extractGroup(condition.length())) != null)
@@ -351,11 +354,11 @@ public class RulesReducer{
 			final Set<Character> parentGroup = new HashSet<>(groups.get(parent));
 
 			//extract negated group
-			final List<LineEntry> childrenNotParent = new ArrayList<>(children);
-			childrenNotParent.remove(parent);
+			final List<LineEntry> childrenWithoutParent = new ArrayList<>(children);
+			childrenWithoutParent.remove(parent);
 			childrenGroup.clear();
-			for(int j = 0; j < childrenNotParent.size(); j ++)
-				childrenGroup.addAll(groups.get(childrenNotParent.get(j)));
+			for(int j = 0; j < childrenWithoutParent.size(); j ++)
+				childrenGroup.addAll(groups.get(childrenWithoutParent.get(j)));
 
 			final Set<Character> groupsIntersection = SetHelper.intersection(parentGroup, childrenGroup);
 			parentGroup.removeAll(groupsIntersection);
@@ -373,9 +376,9 @@ public class RulesReducer{
 				final Character chr = itr.next();
 
 				final String cond = chr + parent.condition;
-				final LineEntry newEntryFromChildrenNotParent = LineEntry.createFromWithRules(parent, cond, childrenNotParent);
-				final LineEntry newEntryFromParent = LineEntry.createFrom(parent, cond);
-				if(newEntryFromChildrenNotParent.from.equals(newEntryFromParent.from)){
+				final Set<String> newEntryFromChildrenNotParentFrom = createFromWithRules(cond, childrenWithoutParent);
+				final Set<String> newEntryFromParentFrom = parent.extractFromEndingWith(cond);
+				if(newEntryFromChildrenNotParentFrom.equals(newEntryFromParentFrom)){
 					notPresentConditions.add(chr);
 
 					itr.remove();
@@ -387,10 +390,11 @@ public class RulesReducer{
 				final String negativeCondition = RegexHelper.makeNotGroup(notPresentConditions, comparator) + parent.condition;
 				final Collection<Character> overallLastGroup = new HashSet<>(characters);
 				overallLastGroup.removeAll(notPresentConditions);
-				final String positiveCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
+				String positiveCondition = RegexHelper.makeGroup(overallLastGroup, comparator) + parent.condition;
 
 				LineEntry notRule = null;
-				for(int j = 0; j < finalRules.size(); j ++){
+				final int finalRulesCount = finalRules.size();
+				for(int j = 0; j < finalRulesCount; j ++){
 					final LineEntry rule = finalRules.get(j);
 					if(rule.condition.equals(negativeCondition) || rule.condition.equals(positiveCondition)){
 						notRule = rule;
@@ -399,19 +403,21 @@ public class RulesReducer{
 				}
 
 				if(notRule == null){
-					//find already present rule
-					final List<LineEntry> alreadyPresentRules = new ArrayList<>(finalRules.size());
-					for(int j = 0; j < finalRules.size(); j ++){
-						final LineEntry r = finalRules.get(j);
-						if(r.removal.equals(parent.removal) && r.addition.equals(parent.addition) && r.condition.endsWith(parent.condition))
-							alreadyPresentRules.add(r);
-					}
-					for(int j = 0; j < alreadyPresentRules.size(); j ++){
-						finalRules.remove(alreadyPresentRules.get(j));
+					if(finalRulesCount > 0){
+						//find already present rule
+						final List<LineEntry> alreadyPresentRules = new ArrayList<>(finalRulesCount);
+						for(int j = 0; j < finalRulesCount; j ++){
+							final LineEntry r = finalRules.get(j);
+							if(r.removal.equals(parent.removal) && r.addition.equals(parent.addition) && r.condition.endsWith(parent.condition))
+								alreadyPresentRules.add(r);
+						}
+						for(int j = 0; j < alreadyPresentRules.size(); j ++){
+							finalRules.remove(alreadyPresentRules.get(j));
 
-						notPresentConditions.addAll(parentGroup);
-						//keep the two sets disjoint
-						overallLastGroup.removeAll(parentGroup);
+							notPresentConditions.addAll(parentGroup);
+							//keep the two sets disjoint
+							overallLastGroup.removeAll(parentGroup);
+						}
 					}
 
 					//if intersection between `notPresentConditions` and `overallLastGroup` is not empty
@@ -422,6 +428,11 @@ public class RulesReducer{
 						final LineEntry newEntry = LineEntry.createFrom(parent, newCondition + parent.condition);
 						finalRules.add(newEntry);
 					}
+				}
+				else if(notRule.condition.contains("[^")){
+					positiveCondition = RegexHelper.makeGroup(notPresentConditions, comparator) + parent.condition;
+					final LineEntry newEntry = LineEntry.createFrom(parent, positiveCondition);
+					finalRules.add(newEntry);
 				}
 				else if(notRule.condition.contains("["))
 					notRule.condition = parent.condition;
@@ -437,6 +448,14 @@ public class RulesReducer{
 			for(final Character chr : groupsIntersection)
 				rules.add(LineEntry.createFrom(parent, chr + parent.condition));
 		}
+	}
+
+	private static Set<String> createFromWithRules(final String condition, final List<LineEntry> parentRulesFrom){
+		final Pattern conditionPattern = RegexHelper.pattern(condition + LineEntry.PATTERN_END_OF_WORD);
+		final Set<String> words = new HashSet<>(parentRulesFrom.size());
+		for(int i = 0; i < parentRulesFrom.size(); i ++)
+			words.addAll(parentRulesFrom.get(i).extractFromEndingWith(conditionPattern));
+		return words;
 	}
 
 	private String chooseCondition(final String parentCondition, final Set<Character> parentGroup,
@@ -670,9 +689,9 @@ public class RulesReducer{
 	private void mergeSimilarRules(final Collection<LineEntry> entries){
 		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
 			entry -> (entry.condition.contains(RegexHelper.GROUP_END)
-			? entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
-				+ RegexSequencer.splitSequence(entry.condition).length
-			: null));
+				? entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
+					+ RegexSequencer.splitSequence(entry.condition).length
+				: null));
 		final Collection<Character> group = new HashSet<>(0);
 		final StringBuilder condition = new StringBuilder();
 		for(final List<LineEntry> similarities : similarityBucket.values())
@@ -708,8 +727,7 @@ public class RulesReducer{
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(),
-			prettyPrintRules.size()));
+		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(), prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
 
@@ -720,7 +738,7 @@ public class RulesReducer{
 		if(entries != null)
 			for(int i = 0; i < entries.size(); i ++){
 				final LineEntry rule = entries.get(i);
-				restoredRules.ensureCapacity(restoredRules.size() + rule.addition.size());
+				restoredRules.ensureCapacity(rule.addition.size());
 				for(final String addition : rule.addition){
 					final int lcp = StringHelper.longestCommonPrefix(rule.removal, addition).length();
 					final String removal = rule.removal.substring(lcp);
@@ -783,7 +801,7 @@ public class RulesReducer{
 
 			final LineEntry filteredOriginalRule = collectInflectionsByFlag(originalInflections, flag, type);
 			final LineEntry filteredRule = collectInflectionsByFlag(inflections, flag, type);
-			if(!filteredOriginalRule.equals(filteredRule))
+			if(!Objects.equals(filteredOriginalRule, filteredRule))
 				throw new LinterException(VERY_BAD_ERROR, line, filteredOriginalRule, filteredRule);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)

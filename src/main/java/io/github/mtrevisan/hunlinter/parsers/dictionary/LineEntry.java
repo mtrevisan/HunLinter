@@ -39,12 +39,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -59,7 +57,7 @@ public class LineEntry implements Serializable{
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
-	private static final String PATTERN_END_OF_WORD = "$";
+	static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
 	private static final String DOT = ".";
 
@@ -72,19 +70,11 @@ public class LineEntry implements Serializable{
 
 
 	public static LineEntry createFrom(final LineEntry entry, final String condition){
-		final List<String> words = entry.extractFromEndingWith(condition);
+		final Set<String> words = entry.extractFromEndingWith(condition);
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithRules(final LineEntry entry, final String condition, final List<LineEntry> parentRulesFrom){
-		final List<String> words = new ArrayList<>(parentRulesFrom.size());
-		final Pattern conditionPattern = RegexHelper.pattern(condition + PATTERN_END_OF_WORD);
-		for(int i = 0; i < parentRulesFrom.size(); i ++)
-			words.addAll(parentRulesFrom.get(i).extractFromEndingWith(conditionPattern));
-		return createFromWithWords(entry, condition, words);
-	}
-
-	public static LineEntry createFromWithWords(final LineEntry entry, final String condition, final List<String> words){
+	public static LineEntry createFromWithWords(final LineEntry entry, final String condition, final Collection<String> words){
 		return new LineEntry(entry.removal, entry.addition, condition, words);
 	}
 
@@ -108,13 +98,13 @@ public class LineEntry implements Serializable{
 		from = (words != null? new HashSet<>(words): new HashSet<>(0));
 	}
 
-	final List<String> extractFromEndingWith(final String condition){
+	final Set<String> extractFromEndingWith(final String condition){
 		final Pattern conditionPattern = RegexHelper.pattern(condition + PATTERN_END_OF_WORD);
 		return extractFromEndingWith(conditionPattern);
 	}
 
-	private List<String> extractFromEndingWith(final Pattern conditionPattern){
-		final ArrayList<String> list = new ArrayList<>(from.size());
+	Set<String> extractFromEndingWith(final Pattern conditionPattern){
+		final Set<String> list = new HashSet<>(from.size());
 		for(final String word : from)
 			if(RegexHelper.find(word, conditionPattern))
 				list.add(word);

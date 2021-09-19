@@ -128,8 +128,11 @@ public class Inflection extends DictionaryEntry{
 	public final AffixEntry getLastAppliedRule(final AffixType type){
 		AffixEntry result = null;
 		if(appliedRules != null)
-			for(final AffixEntry rule : appliedRules)
+			for(final AffixEntry rule : appliedRules){
 				result = rule;
+				if(rule.getType() == type)
+					break;
+			}
 		return result;
 	}
 
