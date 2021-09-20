@@ -36,17 +36,13 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.JFileChooser;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;

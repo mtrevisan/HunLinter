@@ -36,7 +36,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.affix.RulesReducerWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,7 +63,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.function.Consumer;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
