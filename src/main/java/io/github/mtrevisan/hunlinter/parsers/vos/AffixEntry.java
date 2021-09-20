@@ -122,10 +122,12 @@ public class AffixEntry{
 		checkValidity(parentType, type, parentFlag, flag, removal, line, index);
 	}
 
-	public final void setParent(final RuleEntry parent){
+	public final AffixEntry setParent(final RuleEntry parent){
 		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		this.parent = parent;
+
+		return this;
 	}
 
 	private void checkValidity(final AffixType parentType, final AffixType type, final String parentFlag, final String flag,

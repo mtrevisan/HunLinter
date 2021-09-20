@@ -57,7 +57,7 @@ public class DictionaryEntry{
 	private final boolean combinable;
 
 
-	DictionaryEntry(final DictionaryEntry dicEntry){
+	public DictionaryEntry(final DictionaryEntry dicEntry){
 		Objects.requireNonNull(dicEntry, "Dictionary entry cannot be null");
 
 		word = dicEntry.word;

@@ -60,7 +60,8 @@ public class RuleEntry{
 
 		final int size = (entries != null? entries.size(): 0);
 		for(int i = 0; i < size; i ++)
-			entries.get(i).setParent(this);
+			entries.get(i)
+				.setParent(this);
 	}
 
 //public RuleEntry(boolean isSuffix, char combinable, List<AffixEntry> entries, List<AffixEntry> prefixEntries, List<AffixEntry> suffixEntries){

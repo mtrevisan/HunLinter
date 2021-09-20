@@ -222,6 +222,7 @@ public class Inflection extends DictionaryEntry{
 		word = outputConversionTable.apply(word);
 	}
 
+
 	@Override
 	public final String toString(){
 		return toString(null);

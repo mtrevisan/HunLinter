@@ -99,8 +99,8 @@ public class AffixHandler implements Handler{
 
 			line = scanner.nextLine();
 			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
-				aliasesMorphologicalField);
-			entry.setParent(parent);
+					aliasesMorphologicalField)
+				.setParent(parent);
 
 
 			checkValidity(parentType, parentFlag, context, entry);
