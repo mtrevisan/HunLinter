@@ -1795,9 +1795,7 @@ class RulesReducerTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("ète", "etena/F0", "ète", Arrays.asList("sète")),
-			new LineEntry("ète", "eteneta/F0", "ète", Arrays.asList("sète")),
-			new LineEntry("ète", "etèna/F0", "ète", Arrays.asList("sète"))
+			new LineEntry("ète", SetHelper.setOf("etèna/F0", "eteneta/F0\tds:eto", "etena/F0"), "ète", Arrays.asList("sète"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
@@ -1805,8 +1803,8 @@ class RulesReducerTest{
 		List<String> expectedRules = Arrays.asList(
 			"SFX %0 Y 3",
 			"SFX %0 ète etena/F0 ète",
-			"SFX %0 ète eteneta/F0 ète	ds:eto",
-			"SFX %0 ète etèna/F0 ète"
+			"SFX %0 ète etèna/F0 ète",
+			"SFX %0 ète eteneta/F0 ète	ds:eto"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
