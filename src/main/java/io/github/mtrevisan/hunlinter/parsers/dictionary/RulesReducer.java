@@ -803,7 +803,7 @@ public class RulesReducer{
 			for(int j = 0; j < inflections.size(); j ++)
 				inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
 			if(!originalInflectionsWhole.equals(inflectionsWhole))
-				throw new LinterException(VERY_BAD_ERROR, line, originalInflections, inflections);
+				throw new LinterException(VERY_BAD_ERROR, line, originalInflectionsWhole, inflectionsWhole);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);

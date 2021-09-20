@@ -1764,6 +1764,55 @@ class RulesReducerTest{
 		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
+	@Test
+	void caseSuffix21() throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			"SFX F0 Y 1",
+			"SFX F0 a e a",
+			"SFX %0 Y 3",
+			"SFX %0 ète etena/F0 ète",
+			"SFX %0 ète eteneta/F0 ète	ds:eto",
+			"SFX %0 ète etèna/F0 ète"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "%0";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("sète");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("ète", "etena/F0", "ète", Arrays.asList("sète")),
+			new LineEntry("ète", "eteneta/F0", "ète", Arrays.asList("sète")),
+			new LineEntry("ète", "etèna/F0", "ète", Arrays.asList("sète"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX %0 Y 3",
+			"SFX %0 ète etena/F0 ète",
+			"SFX %0 ète eteneta/F0 ète	ds:eto",
+			"SFX %0 ète etèna/F0 ète"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
+	}
+
 
 	@Test
 	void casePrefix1() throws IOException{
