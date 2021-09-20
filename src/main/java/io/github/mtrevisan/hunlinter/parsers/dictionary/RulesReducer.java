@@ -403,16 +403,12 @@ public class RulesReducer{
 				}
 
 				if(notRule == null || notRule.condition.charAt(0) == '['){
-					if(finalRulesCount > 0){
-						//find already present rule
-						final List<LineEntry> alreadyPresentRules = new ArrayList<>(finalRulesCount);
-						for(int j = 0; j < finalRulesCount; j ++){
-							final LineEntry r = finalRules.get(j);
-							if(r.removal.equals(parent.removal) && r.addition.equals(parent.addition) && r.condition.endsWith(parent.condition))
-								alreadyPresentRules.add(r);
-						}
-						for(int j = 0; j < alreadyPresentRules.size(); j ++){
-							finalRules.remove(alreadyPresentRules.get(j));
+					//find already present rule
+					for(int j = 0; j < finalRulesCount; j ++){
+						final LineEntry fr = finalRules.get(j);
+						if(fr.removal.equals(parent.removal) && fr.addition.equals(parent.addition) && fr.condition.endsWith(parent.condition)){
+							//rule already present, remove from final rules' list
+							finalRules.remove(fr);
 
 							notPresentConditions.addAll(parentGroup);
 							//keep the two sets disjoint
@@ -779,28 +775,35 @@ public class RulesReducer{
 
 		final AffixType type = ruleToBeReduced.getType();
 
+		//read the header
+		final RuleEntry overriddenParent = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
 		//extract rules (skip the header)
 		final List<AffixEntry> entries = new ArrayList<>(reducedRules.size() - 1);
 		for(int i = 1; i < reducedRules.size(); i ++){
 			final String reducedRule = reducedRules.get(i);
-			entries.add(new AffixEntry(reducedRule, i - 1, type, flag, strategy, null, null));
+			final AffixEntry entry = new AffixEntry(reducedRule, i - 1, type, flag, strategy, null, null)
+				.setParent(overriddenParent);
+			entries.add(entry);
 		}
+		overriddenParent.setEntries(entries);
 
 		int progress = 0;
 		int progressIndex = 0;
 		final int progressStep = (int)Math.ceil(originalLines.size() / 100.f);
-		final RuleEntry overriddenRule = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
-		overriddenRule.setEntries(entries);
 		for(int i = 0; i < originalLines.size(); i ++){
 			final String line = originalLines.get(i);
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
-			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenRule);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenParent);
 
-			final LineEntry filteredOriginalRule = collectInflectionsByFlag(originalInflections, flag, type);
-			final LineEntry filteredRule = collectInflectionsByFlag(inflections, flag, type);
-			if(!Objects.equals(filteredOriginalRule, filteredRule))
-				throw new LinterException(VERY_BAD_ERROR, line, filteredOriginalRule, filteredRule);
+			final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(originalInflections.size());
+			for(int j = 0; j < originalInflections.size(); j ++)
+				originalInflectionsWhole.add(new DictionaryEntry(originalInflections.get(j)));
+			final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(originalInflections.size());
+			for(int j = 0; j < inflections.size(); j ++)
+				inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
+			if(!originalInflectionsWhole.equals(inflectionsWhole))
+				throw new LinterException(VERY_BAD_ERROR, line, originalInflections, inflections);
 
 			if(progressCallback != null && ++ progress % progressStep == 0)
 				progressCallback.accept(++ progressIndex);
