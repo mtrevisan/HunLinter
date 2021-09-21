@@ -1810,6 +1810,68 @@ class RulesReducerSuffixTest{
 		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
+	@Test
+	void caseSuffix22() throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			"SFX %2 Y 10",
+			"SFX %2 0 i [ivxlcdm]",
+			"SFX %2 0 ii [ivxlcdm]",
+			"SFX %2 0 iii [ivxlcdm]",
+			"SFX %2 0 iv [xlcdm]",
+			"SFX %2 0 v [ixlcdm]",
+			"SFX %2 0 vi [xlcdm]",
+			"SFX %2 0 vii [xlcdm]",
+			"SFX %2 0 viii [xlcdm]",
+			"SFX %2 0 ix [xlcdm]",
+			"SFX %2 0 x i"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "%2";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("i", "v", "x", "xx", "xxx", "l", "c", "d", "m");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("0", "x", "i", Arrays.asList("i")),
+			new LineEntry("0", Set.of("i", "ii", "iii"), ".", Arrays.asList("i", "x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", Set.of("iv", "vi", "vii", "viii", "ix"), "[^iv]", Arrays.asList("x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", "v", "[^v]", Arrays.asList("i", "x", "xx", "xxx", "d", "c", "l", "m"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX %2 Y 10",
+			"SFX %2 0 x i",
+			"SFX %2 0 i .",
+			"SFX %2 0 ii .",
+			"SFX %2 0 iii .",
+			"SFX %2 0 iv [^iv]",
+			"SFX %2 0 ix [^iv]",
+			"SFX %2 0 vi [^iv]",
+			"SFX %2 0 vii [^iv]",
+			"SFX %2 0 viii [^iv]",
+			"SFX %2 0 v [^v]"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
+	}
+
 
 	static Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();
