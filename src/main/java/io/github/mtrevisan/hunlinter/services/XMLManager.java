@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -118,8 +117,13 @@ public final class XMLManager{
 		final ArrayList<Node> children = new ArrayList<>(0);
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
-			children.ensureCapacity(nodes.getLength());
-			LoopHelper.applyIf(nodes, extractionCondition, children::add);
+			final int length = nodes.getLength();
+			children.ensureCapacity(length);
+			for(int i = 0; i < length; i ++){
+				final Node node = nodes.item(i);
+				if(extractionCondition.test(node))
+					children.add(node);
+			}
 		}
 		return children;
 	}

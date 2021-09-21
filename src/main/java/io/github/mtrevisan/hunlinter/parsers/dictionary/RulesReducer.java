@@ -40,7 +40,6 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
@@ -577,8 +576,16 @@ public class RulesReducer{
 				LOGGER.debug("skip unused rule: {} {} {}", newEntry.removal, StringUtils.join(newEntry.addition, PIPE),
 					(newEntry.condition.isEmpty()? DOT: newEntry.condition));
 
-			final LineEntry maxConditionEntry = LoopHelper.max(queue, Comparator.comparingInt(e -> e.condition.length()));
-			final int maxConditionLength = (maxConditionEntry != null? maxConditionEntry.condition.length(): 0);
+			LineEntry maxConditionEntry = null;
+			int maxConditionLength = 0;
+			for(int i = 0; i < bubbles.size(); i ++){
+				final LineEntry child = bubbles.get(i);
+				if(maxConditionEntry == null || child.condition.length() > maxConditionLength){
+					maxConditionEntry = child;
+					maxConditionLength = child.condition.length();
+				}
+			}
+
 			if(parentConditionLength + 1 >= maxConditionLength){
 				queue.removeAll(bubbles);
 
@@ -889,7 +896,14 @@ public class RulesReducer{
 	private static LineEntry compactInflections(final List<LineEntry> rules){
 		if(rules.size() > 1){
 			//retrieve rule with the longest condition (all the other conditions must be this long)
-			final LineEntry compactedRule = LoopHelper.max(rules, Comparator.comparingInt(rule -> rule.condition.length()));
+			LineEntry compactedRule = null;
+			int compactedRuleConditionLength = 0;
+			for(final LineEntry elem : rules)
+				if(compactedRule == null || elem.condition.length() > compactedRuleConditionLength){
+					compactedRule = elem;
+					compactedRuleConditionLength = compactedRule.condition.length();
+				}
+
 			expandAddition(rules, compactedRule);
 
 			return compactedRule;

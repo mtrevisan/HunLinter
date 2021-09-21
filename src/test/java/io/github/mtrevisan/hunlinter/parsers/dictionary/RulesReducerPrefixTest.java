@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
+@SuppressWarnings("ALL")
 class RulesReducerPrefixTest{
 
 	@Test
