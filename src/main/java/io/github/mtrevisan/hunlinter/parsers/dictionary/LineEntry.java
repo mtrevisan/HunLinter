@@ -39,6 +39,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -154,9 +155,26 @@ public class LineEntry implements Serializable{
 		return parentBones;
 	}
 
+//	public final char[] extractGroup(final int indexFromLast){
+//		return extractGroup(indexFromLast, from);
+//	}
+
 	public final Set<Character> extractGroup(final int indexFromLast){
 		return extractGroup(indexFromLast, from);
 	}
+
+//	public static char[] extractGroup(final int indexFromLast, final Collection<String> words){
+//		final char[] group = new char[words.size()];
+//		int i = 0;
+//		for(final String word : words){
+//			final int index = word.length() - indexFromLast - 1;
+//			if(index < 0)
+//				throw new LinterException(CANNOT_EXTRACT_GROUP, StringUtils.join(words, ","), indexFromLast, word);
+//
+//			group[i ++] = word.charAt(index);
+//		}
+//		return group;
+//	}
 
 	public static Set<Character> extractGroup(final int indexFromLast, final Collection<String> words){
 		final Set<Character> group = new HashSet<>(words.size());

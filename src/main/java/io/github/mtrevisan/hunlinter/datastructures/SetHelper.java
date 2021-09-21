@@ -116,6 +116,35 @@ public final class SetHelper{
 	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
 	 * The iteration order of the returned set is undefined.
 	 *
+	 * @param set1	First set
+	 * @param set2	Second set
+	 * @return	The intersection of {@code set1} and {@code set2}
+	 */
+	public static char[] intersection(final char[] set1, final char[] set2){
+		final char[] list = new char[Math.min(set1.length, set2.length)];
+		Arrays.sort(set1);
+		Arrays.sort(set2);
+		int size = 0;
+		int i = 0;
+		int j = 0;
+		while(i < set1.length && j < set2.length)
+			switch(Character.compare(set1[i], set2[j])){
+				case -1 -> i ++;
+				case 1 -> j ++;
+				default -> {
+					list[size ++] = set1[i ++];
+					j ++;
+				}
+			}
+		return Arrays.copyOf(list, size);
+	}
+
+	/**
+	 * Returns a set with the intersection between two sets (A ∩ B).
+	 * <p>
+	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
+	 * The iteration order of the returned set is undefined.
+	 *
 	 * @param <T>	The type of the values contained into the sets
 	 * @param set1	First set
 	 * @param set2	Second set

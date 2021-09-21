@@ -147,9 +147,29 @@ public final class RegexHelper{
 	/**
 	 * NOTE: the empty set produce an empty result.
 	 */
+	public static String makeGroup(final char[] group, final Comparator<String> comparator){
+		final String merge = sortAndMergeSet(group, comparator);
+		return (group.length > 1? GROUP_START + merge + GROUP_END: merge);
+	}
+
+	/**
+	 * NOTE: the empty set produce an empty result.
+	 */
 	public static String makeGroup(final Collection<Character> group, final Comparator<String> comparator){
 		final String merge = sortAndMergeSet(group, comparator);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
+	}
+
+	public static String makeNotGroup(final char[] group, final Comparator<String> comparator){
+		final String notGroup;
+		if(group.length == 0)
+			//the negation of an empty set is everything
+			notGroup = DOT;
+		else{
+			final String merge = sortAndMergeSet(group, comparator);
+			notGroup = NOT_GROUP_START + merge + GROUP_END;
+		}
+		return notGroup;
 	}
 
 	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
@@ -162,6 +182,18 @@ public final class RegexHelper{
 			notGroup = NOT_GROUP_START + merge + GROUP_END;
 		}
 		return notGroup;
+	}
+
+	public static String sortAndMergeSet(final char[] set, final Comparator<String> comparator){
+		final List<String> list = new ArrayList<>(set.length);
+		for(int i = 0; i < set.length; i ++)
+			list.add(String.valueOf(set[i]));
+		list.sort(comparator);
+
+		final StringBuilder sb = new StringBuilder();
+		for(final String elem : list)
+			sb.append(elem);
+		return sb.toString();
 	}
 
 	public static <V> String sortAndMergeSet(final Collection<V> set, final Comparator<String> comparator){
