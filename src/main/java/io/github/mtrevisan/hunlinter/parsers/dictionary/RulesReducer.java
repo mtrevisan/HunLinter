@@ -436,7 +436,24 @@ public class RulesReducer{
 					for(int k = 0; k < notRule.condition.length(); k ++)
 						negatedConditions.add(notRule.condition.charAt(k));
 					final LineEntry newEntry = LineEntry.createFrom(parent, RegexHelper.makeNotGroup(negatedConditions, comparator));
-					finalRules.add(newEntry);
+					//if rem/add are same, and cond is RegexHelper.makeGroup(negatedConditions, comparator)
+					//then add from to the found rule
+					boolean found = false;
+					final String notNegatedCondition = RegexHelper.makeGroup(negatedConditions, comparator);
+					for(int j = 0; j < finalRulesCount; j ++){
+						final LineEntry fr = finalRules.get(j);
+						if(fr.removal.equals(parent.removal) && fr.addition.equals(parent.addition)
+								&& fr.condition.startsWith(notNegatedCondition)){
+							fr.from.addAll(parent.from);
+							fr.condition = (fr.condition.length() > notNegatedCondition.length()
+								? fr.condition.substring(notNegatedCondition.length())
+								: DOT);
+							found = true;
+							break;
+						}
+					}
+					if(!found)
+						finalRules.add(newEntry);
 				}
 			}
 			for(final Character chr : groupsIntersection)
