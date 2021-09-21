@@ -1872,6 +1872,58 @@ class RulesReducerSuffixTest{
 		reducer.checkReductionCorrectness(flag, rules, originalLines);
 	}
 
+	@Test
+	void caseSuffix23() throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			"SFX '9 Y 5",
+			"SFX '9 do ʼ do",
+			"SFX '9 ko ʼ ko",
+			"SFX '9 to ʼ nto",
+			"SFX '9 o ʼ [^n]to",
+			"SFX '9 o ʼ [^dkt]o"
+		);
+		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "'9";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("komòdo", "kuando", "no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto", "santo", "tanto", "pòko", "puòko", "poko");
+		List<String> originalLines = words.stream()
+			.map(word -> word + "/" + flag)
+			.collect(Collectors.toList());
+		List<LineEntry> originalRules = originalLines.stream()
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
+			.collect(Collectors.toList());
+		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+
+		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("do", "ʼ", "do", Arrays.asList("komòdo", "kuando")),
+			new LineEntry("o", "ʼ", "[^dkt]o", Arrays.asList("no", "òño", "tèrso", "tèrŧo", "so")),
+			new LineEntry("to", "ʼ", "to", Arrays.asList("kuarto", "sèsto", "santo", "tuto", "tanto", "sto")),
+			new LineEntry("ko", "ʼ", "ko", Arrays.asList("pòko", "puòko", "poko"))
+		);
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+
+		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
+		List<String> expectedRules = Arrays.asList(
+			"SFX '9 Y 5",
+			"SFX '9 do ʼ do",
+			"SFX '9 ko ʼ ko",
+			"SFX '9 to ʼ nto",
+			"SFX '9 o ʼ [^n]to",
+			"SFX '9 o ʼ [^dkt]o"
+		);
+		Assertions.assertEquals(expectedRules, rules);
+
+		reducer.checkReductionCorrectness(flag, rules, originalLines);
+	}
+
 
 	static Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();

@@ -347,7 +347,7 @@ public class RulesReducer{
 		//separate conditions:
 		final Set<Character> childrenGroup = new HashSet<>(children.size());
 		final Collection<Character> notPresentConditions = new HashSet<>(0);
-		final StringBuilder newCondition = new StringBuilder(0);
+		final StringBuilder newCondition = new StringBuilder();
 		//for each rule with same condition
 		for(int i = 0; i < sameCondition.size(); i ++){
 			final LineEntry parent = sameCondition.get(i);
@@ -533,6 +533,7 @@ public class RulesReducer{
 		final Queue<LineEntry> queue = new PriorityQueue<>(shortestConditionComparator);
 		queue.addAll(bush);
 		final Set<Character> childrenGroup = new HashSet<>(0);
+		final StringBuilder preCondition = new StringBuilder();
 		while(!queue.isEmpty()){
 			final LineEntry parent = queue.remove();
 
@@ -560,9 +561,12 @@ public class RulesReducer{
 			//calculate new condition
 			final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
 				childrenGroup);
-			final String preCondition = (chooseRatifyingOverNegated? RegexHelper.makeGroup(parentGroup, comparator):
-				RegexHelper.makeNotGroup(childrenGroup, comparator));
-			LineEntry newEntry = LineEntry.createFrom(parent, preCondition + parent.condition);
+			preCondition.setLength(0);
+			preCondition.append(chooseRatifyingOverNegated
+					? RegexHelper.makeGroup(parentGroup, comparator)
+					: RegexHelper.makeNotGroup(childrenGroup, comparator))
+				.append(parent.condition);
+			LineEntry newEntry = LineEntry.createFrom(parent, preCondition.toString());
 
 			//keep only rules that matches some existent words
 			if(newEntry.isProductive())
@@ -577,6 +581,25 @@ public class RulesReducer{
 			final int maxConditionLength = (maxConditionEntry != null? maxConditionEntry.condition.length(): 0);
 			if(parentConditionLength + 1 >= maxConditionLength){
 				queue.removeAll(bubbles);
+
+				//TODO what should be done?
+//				//add the remaining part of the parent
+//				final StringBuilder condition = new StringBuilder(parent.condition.length() + 4);
+//				condition.append(parent.condition);
+//				if(chooseRatifyingOverNegated){
+//					condition.insert(0, "[^ ]");
+//					for(final Character chr : childrenGroup){
+//						condition.replace(2, 3, String.valueOf(chr));
+//						addWordsToBubble(bubbles, parent, condition);
+//					}
+//				}
+//				else{
+//					condition.insert(0, ' ');
+//					for(final Character chr : childrenGroup){
+//						condition.replace(0, 1, String.valueOf(chr));
+//						addWordsToBubble(bubbles, parent, condition);
+//					}
+//				}
 
 				finalRules.addAll(bubbles);
 			}
@@ -599,6 +622,16 @@ public class RulesReducer{
 		}
 
 		return finalRules;
+	}
+
+	private void addWordsToBubble(final List<LineEntry> bubbles, final LineEntry parent, final StringBuilder condition){
+		final String subCondition = condition.toString();
+		final Set<String> words = parent.extractFromEndingWith(subCondition);
+		for(final LineEntry bubble : bubbles)
+			if(bubble.condition.equals(subCondition)){
+				bubble.from.addAll(words);
+				break;
+			}
 	}
 
 	private static boolean matchesAll(final Iterable<LineEntry> queue, final int maxLength){
@@ -668,6 +701,13 @@ public class RulesReducer{
 		return children;
 	}
 
+	/**
+	 * Extract all the rules that have the condition in common with the one given.
+	 *
+	 * @param bush	Collection from which to extract the bubbles.
+	 * @param parent	The parent rule whose condition is used to extract the bubbles that ends with the very same condition.
+	 * @return	The list of bubbles.
+	 */
 	private static List<LineEntry> extractBubbles(final Collection<LineEntry> bush, final LineEntry parent){
 		final int parentConditionLength = parent.condition.length();
 		final List<LineEntry> bubbles = new ArrayList<>(bush.size());
@@ -675,7 +715,7 @@ public class RulesReducer{
 			if(child.condition.length() > parentConditionLength && child.condition.endsWith(parent.condition))
 				bubbles.add(child);
 
-		//if the bush contains a rule whose `from` is contained into this bubble, then remove the bubble
+		//if the words that generates a bubble is fully contained within the parent, then remove the bubble
 		final Iterator<LineEntry> itr = bubbles.iterator();
 		while(itr.hasNext()){
 			final LineEntry bubble = itr.next();
@@ -816,7 +856,7 @@ public class RulesReducer{
 			final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(originalInflections.size());
 			for(int j = 0; j < originalInflections.size(); j ++)
 				originalInflectionsWhole.add(new DictionaryEntry(originalInflections.get(j)));
-			final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(originalInflections.size());
+			final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(inflections.size());
 			for(int j = 0; j < inflections.size(); j ++)
 				inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
 			if(!originalInflectionsWhole.equals(inflectionsWhole))
