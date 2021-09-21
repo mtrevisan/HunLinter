@@ -68,7 +68,7 @@ public class RulesReducer{
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
 	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
-	private static final String VERY_BAD_ERROR = "Something very bad occurs while inflecting from `{}`, expected {}, obtained {}";
+	private static final String VERY_BAD_ERROR = "Something very bad happened while inflecting from `{}`, expected {}, obtained {}";
 
 	private static final String PIPE = "|";
 

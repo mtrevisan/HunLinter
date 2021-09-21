@@ -125,7 +125,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 				});
 			}
 			catch(final Exception e){
-				logExceptionError(e);
+				LOGGER.error(ParserManager.MARKER_RULE_REDUCER_STATUS, "Something very bad happened");
 
 				throw e;
 			}
@@ -144,7 +144,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 				});
 			}
 			catch(final Exception e){
-				logExceptionError(e);
+				LOGGER.error(ParserManager.MARKER_RULE_REDUCER_STATUS, "Something very bad happened");
 
 				throw e;
 			}
@@ -158,12 +158,6 @@ public class RulesReducerWorker extends WorkerDictionary{
 			return null;
 		};
 		setProcessor(step1.andThen(step2).andThen(step3));
-	}
-
-	private static void logExceptionError(final Exception e){
-		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-		final int newLineIndex = errorMessage.indexOf("\r\n");
-		LOGGER.error(ParserManager.MARKER_RULE_REDUCER_STATUS, (newLineIndex >= 0? errorMessage.substring(0, newLineIndex): errorMessage));
 	}
 
 }
