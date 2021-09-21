@@ -896,17 +896,17 @@ public class RulesReducer{
 	private static LineEntry compactInflections(final List<LineEntry> rules){
 		if(rules.size() > 1){
 			//retrieve rule with the longest condition (all the other conditions must be this long)
-			LineEntry compactedRule = null;
-			int compactedRuleConditionLength = 0;
+			LineEntry maxConditionEntry = null;
+			int maxConditionLength = 0;
 			for(final LineEntry elem : rules)
-				if(compactedRule == null || elem.condition.length() > compactedRuleConditionLength){
-					compactedRule = elem;
-					compactedRuleConditionLength = compactedRule.condition.length();
+				if(maxConditionEntry == null || elem.condition.length() > maxConditionLength){
+					maxConditionEntry = elem;
+					maxConditionLength = elem.condition.length();
 				}
 
-			expandAddition(rules, compactedRule);
+			expandAddition(rules, maxConditionEntry);
 
-			return compactedRule;
+			return maxConditionEntry;
 		}
 		else
 			return (!rules.isEmpty()? rules.get(0): null);
