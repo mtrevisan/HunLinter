@@ -538,15 +538,16 @@ public class RulesReducer{
 
 			final List<LineEntry> bubbles = extractBubbles(queue, parent);
 			if(bubbles.isEmpty()){
+				//no other rules exist that end with `parent.condition`, therefore add it to the final rules
 				finalRules.add(parent);
 				continue;
 			}
 
-			//extract ratifying group
+			//extract (parent) ratifying group
 			final int parentConditionLength = parent.condition.length();
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-			//extract negated group
+			//extract (bubbles) negated group
 			childrenGroup.clear();
 			for(int i = 0; i < bubbles.size(); i ++){
 				final LineEntry child = bubbles.get(i);
@@ -566,6 +567,13 @@ public class RulesReducer{
 					: RegexHelper.makeNotGroup(childrenGroup, comparator))
 				.append(parent.condition);
 			LineEntry newEntry = LineEntry.createFrom(parent, preCondition.toString());
+
+			LineEntry newParentEntry = LineEntry.createFrom(parent, preCondition.toString());
+			LineEntry newNotParentEntry = LineEntry.createFrom(parent,
+				(chooseRatifyingOverNegated
+					? RegexHelper.makeNotGroup(childrenGroup, comparator)
+					: RegexHelper.makeGroup(childrenGroup, comparator)) + parent.condition);
+			LineEntry newIntersectionEntry = LineEntry.createFrom(parent, RegexHelper.makeGroup(groupsIntersection, comparator) + parent.condition);
 
 			//keep only rules that matches some existent words
 			if(newEntry.isProductive())
