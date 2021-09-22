@@ -297,8 +297,9 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 	}
 
 	private List<LineEntry> disjoinConditions2(final List<LineEntry> rules){
+		restart:
 		//order by condition length
-		rules.sort(Comparator.comparingInt(rule -> rule.condition.length()));
+		rules.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
 		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
 		//the first item, the (limb) parent, so to say)
@@ -366,8 +367,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 										? RegexHelper.makeGroup(intersection, comparator)
 										: RegexHelper.makeNotGroup(childrenGroup, comparator));
 									condition.setLength(0);
-									condition
-										.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
+									condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
 										.append(augment)
 										.append(parent.condition);
 									Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
@@ -407,17 +407,19 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 										branch.add(newRule);
 									}
 
+									//augment child condition
+									condition.setLength(0);
+									condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
+										.append(affectedChild.condition);
+									affectedChild.condition = condition.toString();
+
 									condition.setLength(0);
 									condition.append(RegexHelper.makeNotGroup(childrenGroup, comparator))
 										.append(parent.condition);
 									parent = LineEntry.createFrom(parent, condition.toString());
 									branch.set(j, parent);
 
-									//augment child condition
-									condition.setLength(0);
-									condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
-										.append(affectedChild.condition);
-									affectedChild.condition = condition.toString();
+									continue restart;
 								}
 							}
 							else if(!newParentCondition.isEmpty())
@@ -440,7 +442,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 							parent = LineEntry.createFrom(parent, augment + parent.condition);
 							branch.set(j, parent);
 
-							break;
+							goto restart;
 						}
 						else if(!newParentCondition.isEmpty()){
 							condition.setLength(0);
@@ -451,13 +453,13 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 							if(newParentFrom.equals(parent.from)){
 								parent.condition = condition.toString();
 
-								break;
+								continue restart;
 							}
 							else if(!newParentFrom.isEmpty()){
 								parent = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
 								branch.set(j, parent);
 
-								break;
+								continue restart;
 							}
 						}
 					}
