@@ -54,6 +54,23 @@ public final class RegexHelper{
 		return Pattern.compile(pattern, flags);
 	}
 
+	public static int conditionLength(final String pattern){
+		int length = 0;
+		boolean insideGroup = false;
+		for(int i = 0; i < pattern.length(); i ++){
+			final char chr = pattern.charAt(i);
+			if(chr == '[')
+				insideGroup = true;
+			else if(chr == ']'){
+				insideGroup = false;
+				length ++;
+			}
+			else if(!insideGroup)
+				length ++;
+		}
+		return length;
+	}
+
 	/**
 	 * Returns the delimiters along with the split elements
 	 *

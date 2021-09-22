@@ -309,13 +309,41 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		}
 
 		//TODO for each limb, level up the conditions so there is no intersection between the limb and the branches
+		final StringBuilder newParentCondition = new StringBuilder();
 		for(int i = 0; i < branches.size(); i ++){
 			final List<LineEntry> branch = branches.get(i);
-			for(int j = 0; j < branch.size(); j ++)
-				for(int k = j + 1; k < branch.size(); k ++)
-					if(hasNonEmptyIntersection(branch.get(j), branch.get(k))){
-						//TODO augment branch j condition
+			for(int j = 0; j < branch.size(); j ++){
+				final LineEntry parent = branch.get(j);
+				for(int k = j + 1; k < branch.size(); k ++){
+					final LineEntry child = branch.get(k);
+					if(hasNonEmptyIntersection(parent, child)){
+						final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
+						final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
+
+						final Set<Character> childrenGroup = new HashSet<>();
+						for(int m = k; m < branch.size(); m ++)
+							childrenGroup.addAll(branch.get(m).extractGroup(parentConditionLength));
+
+						final Set<Character> intersection = SetHelper.intersection(parentGroup, childrenGroup);
+						//if parent and child has not intersection:
+						if(intersection.isEmpty()){
+							final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
+								childrenGroup);
+							newParentCondition.setLength(0);
+							if(chooseRatifyingOverNegated)
+								newParentCondition.append(RegexHelper.makeGroup(parentGroup, comparator));
+							else
+								newParentCondition.append(RegexHelper.makeNotGroup(childrenGroup, comparator));
+							newParentCondition.append(parent.condition);
+							parent.condition = newParentCondition.toString();
+						}
+						//if parent and child has a non-empty intersection:
+						else{
+							//TODO augment branch j condition
+						}
 					}
+				}
+			}
 			final int shortestConditionLength = branch.get(0).condition.length();
 			final int longestConditionLength = branch.get(branch.size() - 1).condition.length();
 			if(shortestConditionLength < longestConditionLength){
@@ -359,6 +387,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 				return true;
 		return false;
 	}
+
 
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
