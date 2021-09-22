@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -146,6 +147,7 @@ public class RulesReducer{
 			progressCallback.accept(50);
 
 		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
+disjoinConditions2(compactedRules);
 		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
 
 		if(progressCallback != null)
@@ -292,6 +294,56 @@ public class RulesReducer{
 		else
 			overallLastGroups = new IntObjectHashMap<>(0);
 		return overallLastGroups;
+	}
+
+	private List<LineEntry> disjoinConditions2(final List<LineEntry> rules){
+		//order by condition length
+		rules.sort(Comparator.comparingInt(rule -> rule.condition.length()));
+
+		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
+		//the first item, the parent, or limb, so to say)
+		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
+		while(!rules.isEmpty()){
+			final List<LineEntry> branch = extractBranch(rules);
+			branches.add(branch);
+		}
+
+		//for each limb, level up the conditions so there is no intersection between the limb and the branches
+		for(int i = 0; i < branches.size(); i ++){
+			final List<LineEntry> branch = branches.get(i);
+			final int shortestConditionLength = branch.get(0).condition.length();
+			final int longestConditionLength = branch.get(branch.size() - 1).condition.length();
+			if(shortestConditionLength < longestConditionLength){
+				//augment conditions' lengths
+				//TODO
+			}
+		}
+
+		//TODO
+
+		return Collections.emptyList();
+	}
+
+
+	/**
+	 * Extract all the rules that have the condition in common with the one given.
+	 *
+	 * @param rules   Collection from which to extract the branch, based on a parent rule (the first item, the limb), whose condition is
+	 * 	used to extract all the branches that ends with the very same condition.
+	 * @return	The list of branches. The first element being the limb.
+	 */
+	private static List<LineEntry> extractBranch(final List<LineEntry> rules){
+		final LineEntry parent = rules.get(0);
+		final List<LineEntry> branches = new ArrayList<>(rules.size());
+		final Iterator<LineEntry> itr = rules.iterator();
+		while(itr.hasNext()){
+			final LineEntry rule = itr.next();
+			if(rule.condition.endsWith(parent.condition)){
+				branches.add(rule);
+				itr.remove();
+			}
+		}
+		return branches;
 	}
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
