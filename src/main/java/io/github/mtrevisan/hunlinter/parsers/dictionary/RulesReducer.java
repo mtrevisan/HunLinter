@@ -410,13 +410,13 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		return false;
 	}
 
-	private void augmentCondition(final LineEntry parent, final int parentConditionLength, final Collection<Character> parentGroup,
+	private void augmentCondition(final LineEntry rule, final int parentConditionLength, final Collection<Character> parentGroup,
 			final Collection<Character> childGroup){
 		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childGroup);
 		final String augment = (chooseRatifyingOverNegated
 			? RegexHelper.makeGroup(parentGroup, comparator)
 			: RegexHelper.makeNotGroup(childGroup, comparator));
-		parent.condition = augment + parent.condition;
+		rule.condition = augment + rule.condition;
 	}
 
 
@@ -630,8 +630,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
 		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
-			&& parentGroupSize <= childrenGroupSize && parentGroupSize != 0);
-		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
+			&& parentGroupSize <= childrenGroupSize);
+		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize != 0);
 	}
 
 	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
@@ -873,9 +873,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 			final Collection<Character> childrenGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
-		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1)
-			&& parentGroupSize != 0);
-		return (chooseRatifyingOverNegated || parentGroupSize != 0 && childrenGroupSize == 0);
+		final boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
+		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize != 0);
 	}
 
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
