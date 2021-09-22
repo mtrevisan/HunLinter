@@ -354,15 +354,15 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 							final Set<Character> nextChildIntersection = SetHelper.intersection(nextParentGroup, nextChildGroup);
 							if(nextChildIntersection.isEmpty()){
 								if(!nextParentGroup.isEmpty()){
-									//TODO add rule to branch as in the `else` condition below
+									//TODO add rule to branch as in the `else` condition below?
 									//augment parent condition
-									augmentCondition(parent, parentConditionLength + 1, nextChildGroup, nextParentGroup);
+									augmentCondition(parent, parentConditionLength + 1, nextParentGroup, nextChildGroup);
 								}
 								else{
-									parent.condition = RegexHelper.makeNotGroup(childrenGroup, comparator) + parent.condition;
-									branch.add(LineEntry.createFrom(affectedChild, RegexHelper.makeNotGroup(nextChildGroup, comparator) + affectedChild.condition));
+									branch.add(LineEntry.createFrom(parent, RegexHelper.makeNotGroup(nextChildGroup, comparator) + affectedChild.condition));
+									branch.set(0, LineEntry.createFrom(parent, RegexHelper.makeNotGroup(childrenGroup, comparator) + parent.condition));
 									//augment child condition
-									augmentCondition(affectedChild, parentConditionLength + 1, nextChildGroup, nextParentGroup);
+									affectedChild.condition = RegexHelper.makeGroup(nextChildGroup, comparator) + affectedChild.condition;
 								}
 							}
 							else{
@@ -631,7 +631,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		final int childrenGroupSize = childrenGroup.size();
 		final boolean chooseRatifyingOverNegated = ((parentConditionLength == 0 || intersectionGroup.isEmpty())
 			&& parentGroupSize <= childrenGroupSize);
-		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize != 0);
+		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize > 0);
 	}
 
 	private List<LineEntry> disjoinSameEndingConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
@@ -874,7 +874,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
 		final boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
-		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize != 0);
+		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize > 0);
 	}
 
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
