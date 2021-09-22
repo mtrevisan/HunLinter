@@ -310,6 +310,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 
 		//for each limb, level up the conditions so there is no intersection between the limb and the branches
 		final StringBuilder condition = new StringBuilder();
+		final Set<Character> newParentCondition = new HashSet<>(0);
 		for(int i = 0; i < branches.size(); i ++){
 			final List<LineEntry> branch = branches.get(i);
 			final int branchSize = branch.size();
@@ -352,47 +353,65 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 								affectedChildren.add(affectedChild);
 						}
 
+						final Set<Character> nextParentGroup = parent.extractGroup(parentConditionLength + 1);
+						newParentCondition.clear();
 						for(final LineEntry affectedChild : affectedChildren){
-							final Set<Character> nextParentGroup = parent.extractGroup(parentConditionLength + 1);
 							final Set<Character> nextChildGroup = affectedChild.extractGroup(parentConditionLength + 1);
 							final Set<Character> nextChildIntersection = SetHelper.intersection(nextParentGroup, nextChildGroup);
 							if(nextChildIntersection.isEmpty()){
 								if(!nextParentGroup.isEmpty()){
 									//augment parent condition
+									final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, childrenGroup, intersection);
+									final String augment = (chooseRatifyingOverNegated || !nextChildGroup.isEmpty()
+										? RegexHelper.makeGroup(intersection, comparator)
+										: RegexHelper.makeNotGroup(childrenGroup, comparator));
 									condition.setLength(0);
-									condition.append(RegexHelper.makeNotGroup(intersection, comparator))
+									condition
+										.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
+										.append(augment)
 										.append(parent.condition);
-									LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
-									if(!newRule.from.isEmpty())
+									Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
+									if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
+										final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
+										parent.from.removeAll(newRule.from);
 										branch.add(newRule);
+									}
+									else
+										newParentCondition.addAll(nextChildGroup);
 
 									condition.setLength(0);
 									condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
 										.append(RegexHelper.makeGroup(intersection, comparator))
 										.append(parent.condition);
-									newRule = LineEntry.createFrom(parent, condition.toString());
-									if(!newRule.from.isEmpty())
+									newParentFrom = parent.extractFromEndingWith(condition.toString());
+									if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
+										final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+										parent.from.removeAll(newRule.from);
 										branch.add(newRule);
-
-									condition.setLength(0);
-									condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
-										.append(RegexHelper.makeGroup(intersection, comparator))
-										.append(parent.condition);
-									parent = LineEntry.createFrom(parent, condition.toString());
-									branch.set(j, parent);
+									}
 								}
 								else{
+									if(nextChildGroup.isEmpty())
+										//TODO
+										System.out.println();
+									if(!newParentCondition.isEmpty())
+										//TODO
+										System.out.println();
+
 									condition.setLength(0);
 									condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
 										.append(affectedChild.condition);
 									final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
-									if(!newRule.from.isEmpty())
+									if(!newRule.from.isEmpty()){
+										parent.from.removeAll(newRule.from);
 										branch.add(newRule);
+									}
 
 									condition.setLength(0);
 									condition.append(RegexHelper.makeNotGroup(childrenGroup, comparator))
 										.append(parent.condition);
-									branch.set(j, LineEntry.createFrom(parent, condition.toString()));
+									parent = LineEntry.createFrom(parent, condition.toString());
+									branch.set(j, parent);
 
 									//augment child condition
 									condition.setLength(0);
@@ -401,9 +420,44 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 									affectedChild.condition = condition.toString();
 								}
 							}
+							else if(!newParentCondition.isEmpty())
+								//TODO
+								System.out.println();
 							else{
 								//TODO
 								System.out.println();
+							}
+						}
+
+						//TODO what if !parentGroup.isEmpty() and !newParentCondition.isEmpty() are both true?
+
+						parentGroup.removeAll(intersection);
+						if(!parentGroup.isEmpty()){
+							final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, intersection);
+							final String augment = (chooseRatifyingOverNegated
+								? RegexHelper.makeGroup(parentGroup, comparator)
+								: RegexHelper.makeNotGroup(intersection, comparator));
+							parent = LineEntry.createFrom(parent, augment + parent.condition);
+							branch.set(j, parent);
+
+							break;
+						}
+						else if(!newParentCondition.isEmpty()){
+							condition.setLength(0);
+							condition.append(RegexHelper.makeNotGroup(newParentCondition, comparator))
+								.append(RegexHelper.makeGroup(intersection, comparator))
+								.append(parent.condition);
+							final Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
+							if(newParentFrom.equals(parent.from)){
+								parent.condition = condition.toString();
+
+								break;
+							}
+							else if(!newParentFrom.isEmpty()){
+								parent = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
+								branch.set(j, parent);
+
+								break;
 							}
 						}
 					}
@@ -909,7 +963,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 			final Collection<Character> childrenGroup){
 		final int parentGroupSize = parentGroup.size();
 		final int childrenGroupSize = childrenGroup.size();
-		final boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize == 1 && childrenGroupSize > 1);
+		final boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize <= 2 && childrenGroupSize > 1);
 		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize > 0);
 	}
 
