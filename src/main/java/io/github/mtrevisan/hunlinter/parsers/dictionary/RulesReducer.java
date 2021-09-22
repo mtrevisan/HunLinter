@@ -308,7 +308,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 			branches.add(branch);
 		}
 
-		//TODO for each limb, level up the conditions so there is no intersection between the limb and the branches
+		//for each limb, level up the conditions so there is no intersection between the limb and the branches
 		final StringBuilder newParentCondition = new StringBuilder();
 		for(int i = 0; i < branches.size(); i ++){
 			final List<LineEntry> branch = branches.get(i);
@@ -316,43 +316,42 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 				final LineEntry parent = branch.get(j);
 				for(int k = j + 1; k < branch.size(); k ++){
 					final LineEntry child = branch.get(k);
+
 					if(hasNonEmptyIntersection(parent, child)){
+						//augment parent condition to avoid any intersection:
+
 						final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
 						final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-						final Set<Character> childrenGroup = new HashSet<>();
+						final Set<Character> childrenGroup = new HashSet<>(branch.size() - k + 1);
 						for(int m = k; m < branch.size(); m ++)
 							childrenGroup.addAll(branch.get(m).extractGroup(parentConditionLength));
 
 						final Set<Character> intersection = SetHelper.intersection(parentGroup, childrenGroup);
-						//if parent and child has not intersection:
+						//if parent (with the augmented condition) and children has no intersection:
 						if(intersection.isEmpty()){
+							//augment parent condition
 							final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
 								childrenGroup);
 							newParentCondition.setLength(0);
-							if(chooseRatifyingOverNegated)
-								newParentCondition.append(RegexHelper.makeGroup(parentGroup, comparator));
-							else
-								newParentCondition.append(RegexHelper.makeNotGroup(childrenGroup, comparator));
-							newParentCondition.append(parent.condition);
+							newParentCondition.append(chooseRatifyingOverNegated
+									? RegexHelper.makeGroup(parentGroup, comparator)
+									: RegexHelper.makeNotGroup(childrenGroup, comparator))
+								.append(parent.condition);
 							parent.condition = newParentCondition.toString();
+
+							break;
 						}
+
+
 						//if parent and child has a non-empty intersection:
-						else{
-							//TODO augment branch j condition
-						}
+
+						continue;
+						//TODO augment branch j condition
 					}
 				}
 			}
-			final int shortestConditionLength = branch.get(0).condition.length();
-			final int longestConditionLength = branch.get(branch.size() - 1).condition.length();
-			if(shortestConditionLength < longestConditionLength){
-				//augment conditions' lengths
-				//TODO
-			}
 		}
-
-		//TODO
 
 		return Collections.emptyList();
 	}
@@ -380,11 +379,13 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 	}
 
 	private static boolean hasNonEmptyIntersection(final LineEntry rule1, final LineEntry rule2){
-		//FIXME select ^ or $ based on rule type
-		final Pattern pattern1 = RegexHelper.pattern(rule1.condition + "$");
-		for(final String f : rule2.from)
-			if(RegexHelper.find(f, pattern1))
-				return true;
+		if(RegexHelper.conditionLength(rule1.condition) < RegexHelper.conditionLength(rule2.condition)){
+			//FIXME select ^ or $ based on rule type
+			final Pattern pattern1 = RegexHelper.pattern(rule1.condition + "$");
+			for(final String f : rule2.from)
+				if(RegexHelper.find(f, pattern1))
+					return true;
+		}
 		return false;
 	}
 
