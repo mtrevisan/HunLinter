@@ -309,11 +309,15 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 		}
 
 		//for each limb, level up the conditions so there is no intersection between the limb and the branches
+		final StringBuilder condition = new StringBuilder();
 		for(int i = 0; i < branches.size(); i ++){
 			final List<LineEntry> branch = branches.get(i);
-			for(int j = 0; j < branch.size(); j ++){
-				final LineEntry parent = branch.get(j);
-				for(int k = j + 1; k < branch.size(); k ++){
+			final int branchSize = branch.size();
+			for(int j = 0; j < branchSize; j ++){
+				//extract limb
+				LineEntry parent = branch.get(j);
+				for(int k = j + 1; k < branchSize; k ++){
+					//extract branch of limb
 					final LineEntry child = branch.get(k);
 
 					if(hasNonEmptyIntersection(parent, child)){
@@ -322,8 +326,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 						final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
 						final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-						final Set<Character> childrenGroup = new HashSet<>(branch.size() - k + 1);
-						for(int m = k; m < branch.size(); m ++)
+						final Set<Character> childrenGroup = new HashSet<>(branchSize - k + 1);
+						for(int m = k; m < branchSize; m ++)
 							childrenGroup.addAll(branch.get(m).extractGroup(parentConditionLength));
 
 						final Set<Character> intersection = SetHelper.intersection(parentGroup, childrenGroup);
@@ -339,8 +343,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 						//if parent and child has a non-empty intersection:
 
 						//extract all the children whose condition matches the intersection
-						final Collection<LineEntry> affectedChildren = new HashSet<>(branch.size() - k + 1);
-						for(int m = k; m < branch.size(); m ++){
+						final Collection<LineEntry> affectedChildren = new HashSet<>(branchSize - k + 1);
+						for(int m = k; m < branchSize; m ++){
 							final LineEntry affectedChild = branch.get(m);
 							final Set<Character> childGroup = affectedChild.extractGroup(parentConditionLength);
 							final Set<Character> childIntersection = SetHelper.intersection(intersection, childGroup);
@@ -354,15 +358,47 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 							final Set<Character> nextChildIntersection = SetHelper.intersection(nextParentGroup, nextChildGroup);
 							if(nextChildIntersection.isEmpty()){
 								if(!nextParentGroup.isEmpty()){
-									//TODO add rule to branch as in the `else` condition below?
 									//augment parent condition
-									augmentCondition(parent, parentConditionLength + 1, nextParentGroup, nextChildGroup);
+									condition.setLength(0);
+									condition.append(RegexHelper.makeNotGroup(intersection, comparator))
+										.append(parent.condition);
+									LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+									if(!newRule.from.isEmpty())
+										branch.add(newRule);
+
+									condition.setLength(0);
+									condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
+										.append(RegexHelper.makeGroup(intersection, comparator))
+										.append(parent.condition);
+									newRule = LineEntry.createFrom(parent, condition.toString());
+									if(!newRule.from.isEmpty())
+										branch.add(newRule);
+
+									condition.setLength(0);
+									condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
+										.append(RegexHelper.makeGroup(intersection, comparator))
+										.append(parent.condition);
+									parent = LineEntry.createFrom(parent, condition.toString());
+									branch.set(j, parent);
 								}
 								else{
-									branch.add(LineEntry.createFrom(parent, RegexHelper.makeNotGroup(nextChildGroup, comparator) + affectedChild.condition));
-									branch.set(0, LineEntry.createFrom(parent, RegexHelper.makeNotGroup(childrenGroup, comparator) + parent.condition));
+									condition.setLength(0);
+									condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
+										.append(affectedChild.condition);
+									final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+									if(!newRule.from.isEmpty())
+										branch.add(newRule);
+
+									condition.setLength(0);
+									condition.append(RegexHelper.makeNotGroup(childrenGroup, comparator))
+										.append(parent.condition);
+									branch.set(j, LineEntry.createFrom(parent, condition.toString()));
+
 									//augment child condition
-									affectedChild.condition = RegexHelper.makeGroup(nextChildGroup, comparator) + affectedChild.condition;
+									condition.setLength(0);
+									condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
+										.append(affectedChild.condition);
+									affectedChild.condition = condition.toString();
 								}
 							}
 							else{
