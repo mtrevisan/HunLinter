@@ -147,7 +147,7 @@ public class RulesReducer{
 			progressCallback.accept(50);
 
 		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
-disjoinConditions2(compactedRules);
+disjoinConditions2(new ArrayList<>(compactedRules));
 		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
 
 		if(progressCallback != null)
@@ -301,16 +301,21 @@ disjoinConditions2(compactedRules);
 		rules.sort(Comparator.comparingInt(rule -> rule.condition.length()));
 
 		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
-		//the first item, the parent, or limb, so to say)
+		//the first item, the (limb) parent, so to say)
 		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
 		while(!rules.isEmpty()){
 			final List<LineEntry> branch = extractBranch(rules);
 			branches.add(branch);
 		}
 
-		//for each limb, level up the conditions so there is no intersection between the limb and the branches
+		//TODO for each limb, level up the conditions so there is no intersection between the limb and the branches
 		for(int i = 0; i < branches.size(); i ++){
 			final List<LineEntry> branch = branches.get(i);
+			for(int j = 0; j < branch.size(); j ++)
+				for(int k = j + 1; k < branch.size(); k ++)
+					if(hasNonEmptyIntersection(branch.get(j), branch.get(k))){
+						//TODO augment branch j condition
+					}
 			final int shortestConditionLength = branch.get(0).condition.length();
 			final int longestConditionLength = branch.get(branch.size() - 1).condition.length();
 			if(shortestConditionLength < longestConditionLength){
@@ -345,6 +350,16 @@ disjoinConditions2(compactedRules);
 		}
 		return branches;
 	}
+
+	private static boolean hasNonEmptyIntersection(final LineEntry rule1, final LineEntry rule2){
+		//FIXME select ^ or $ based on rule type
+		final Pattern pattern1 = RegexHelper.pattern(rule1.condition + "$");
+		for(final String f : rule2.from)
+			if(RegexHelper.find(f, pattern1))
+				return true;
+		return false;
+	}
+
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		//expand same conditions (if any); store surely disjoint rules
