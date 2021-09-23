@@ -98,10 +98,10 @@ public final class WordVEC{
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:"
 			+ "(?:dex|re)?d"
 			+ "|"
-			+ "(?:asue|de(s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
+			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
 			+ "(?:m(al|ove)|soto)?st"
-		+ ")à(?:g[oaie]?|[lƚ][oaie])?$";
+		+ ")à(?:g[oaie]?|[lƚ][oaie]|stu|t[ou])?$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|[lƚ][oiea]|ne?|stu|t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:[lƚ][oiea]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
 	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[gmstv]e|ne?|r)$";
