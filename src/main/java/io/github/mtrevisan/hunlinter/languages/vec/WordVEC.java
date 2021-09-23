@@ -82,18 +82,18 @@ public final class WordVEC{
 
 	//https://www.rexegg.com/regex-optimizations.html
 	private static final String NO_STRESS_AVER = "^(?:re)?(?:"
-		+ "g(?:à(?:b[ei]|(?:[bp]i[ae]?|[gmv]e|s(?:tu|e)|t[euo]||[lƚ][aeio]|ne?))|é(?:mo|(?:b(?:ia|e)|de)))"
+		+ "g(?:à(?:b[ei]|(?:[bp]i[ae]?|[gmv]e|l[aeio]?|ƚ[oaie]|s(?:tu|e)|t[euo]|ne?))|é(?:mo|(?:b(?:ia|e)|de)))"
 		+ "|"
-		+ "à(?:b(?:[ei]|i[ae]?)|[gmv]e|s(?:tu|e)|t[euo]|[lƚ][aeio]|ne?|pi[ae]?)"
+		+ "à(?:b(?:[ei]|i[ae]?)|[gmv]e|s(?:tu|e)|t[euo]|l[aeio]?|ƚ[oaie]|ne?|pi[ae]?)"
 		+ "|"
 		+ "é(?:b(?:ia|e)|de)"
 		+ ")$";
 	private static final String NO_STRESS_ESER = "^(?:r[ei])?(?:" +
-		"s(?:er(?:à[lƚ][aeio]|é(?:stu|t[ou]))|aré(?:stu|t[ou])|ión(?:[ei]|[jɉ]o|mi|t[ei])|ó(?:[jɉ]o|n(?:[ei]|[jɉ]o|mi|t[ei]))|é(?:[lƚ][aeio]|n[ei]|stu|t[ou])|í(?:stu|t[ou]))"
+		"s(?:er(?:à(?:l[aeio]?|ƚ[oaie])|é(?:stu|t[ou]))|aré(?:stu|t[ou])|ión(?:[ei]|[jɉ]o|mi|t[ei])|ó(?:[jɉ]o|n(?:[ei]|[jɉ]o|mi|t[ei]))|é(?:l[aeio]?|ƚ[oaie]|n[ei]|stu|t[ou])|í(?:stu|t[ou]))"
 		+ "|"
-		+ "xé(?:[lƚ][aeio]|stu|t[ou])"
+		+ "xé(?:l[aeio]?|ƚ[oaie]|stu|t[ou])"
 		+ "|"
-		+ "é(?:[lƚ][aeio]|stu|t[ou]|r[aei])"
+		+ "é(?:l[aeio]?|ƚ[oaie]|stu|t[ou]|r[aei])"
 		+ ")$";
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:"
 			+ "(?:dex|re)?d"
@@ -101,9 +101,9 @@ public final class WordVEC{
 			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
 			+ "(?:m(al|ove)|soto)?st"
-		+ ")à(?:g[oaie]?|[lƚ][oaie]|stu|t[ou])?$";
-	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|[lƚ][oiea]|ne?|stu|t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:[lƚ][oiea]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
+		+ ")à(?:g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
+	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|l[aeio]?|ƚ[oaie]|ne?|stu|t[ou])$";
+	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:l[aeio]?|ƚ[oaie]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
 	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[gmstv]e|ne?|r)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
