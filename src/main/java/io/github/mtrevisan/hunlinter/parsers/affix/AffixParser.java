@@ -194,7 +194,7 @@ public class AffixParser{
 		boolean encodingRead = false;
 		final Path affPath = affFile.toPath();
 		final Charset charset = FileHelper.determineCharset(affPath, -1);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Affix file charset is {}", charset.name());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the affix file is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
 			final ParsingContext context = new ParsingContext();
 			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;

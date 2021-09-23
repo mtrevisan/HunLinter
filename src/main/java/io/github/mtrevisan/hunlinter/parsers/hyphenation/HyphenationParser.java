@@ -207,7 +207,7 @@ public class HyphenationParser{
 		final Path hypPath = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
 		charset = FileHelper.determineCharset(hypPath, -1);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Hyphenation file charset is {}", charset.name());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the Hyphenation file is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(hypPath, charset)){
 			//skip charset
 			scanner.nextLine();
