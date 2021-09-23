@@ -100,7 +100,7 @@ public final class WordVEC{
 			+ "|"
 			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
-			+ "(?:m(al|ove)|soto)?st"
+			+ "(?:m(?:al|ove)|soto)?st"
 		+ ")à(?:g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|l[aeio]?|ƚ[oaie]|ne?|stu|t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:l[aeio]?|ƚ[oaie]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
