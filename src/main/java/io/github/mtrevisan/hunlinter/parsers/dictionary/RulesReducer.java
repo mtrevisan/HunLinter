@@ -466,7 +466,7 @@ public class RulesReducer{
 							else if(!newParentCondition.isEmpty()){
 								final Set<Character> group = parent.extractGroup(parentConditionLength + 1);
 								final boolean chooseRatifyingOverNegated = (SetHelper.intersection(group, newParentCondition).isEmpty()
-									&& chooseRatifyingOverNegated(parentConditionLength, group, newParentCondition));
+									&& group.size() < newParentCondition.size());
 								final String augment = (chooseRatifyingOverNegated
 									? RegexHelper.makeGroup(group, comparator)
 									: RegexHelper.makeNotGroup(newParentCondition, comparator));
