@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -370,7 +369,7 @@ public class RulesReducer{
 								if(nextChildIntersection.isEmpty()){
 									if(!nextParentGroup.isEmpty()){
 										//augment parent condition
-										final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, childrenGroup, intersection);
+										final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, childrenGroup, intersection);
 										final String augment = (chooseRatifyingOverNegated || !nextChildGroup.isEmpty()
 											? RegexHelper.makeGroup(intersection, comparator)
 											: RegexHelper.makeNotGroup(childrenGroup, comparator));
@@ -435,17 +434,19 @@ public class RulesReducer{
 									//TODO
 									System.out.println();
 								else{
-									//TODO
-									System.out.println();
+									parentGroup.removeAll(intersection);
+									final LineEntry newRule = LineEntry.createFrom(parent, RegexHelper.makeGroup(parentGroup, comparator) + parent.condition);
+									parent.from.removeAll(newRule.from);
+									branch.add(newRule);
+
+									restoreRules(rules, branches);
+									continue restart;
 								}
 							}
 
 
 							parentGroup.removeAll(intersection);
 							if(!parentGroup.isEmpty()){
-								if(!newParentCondition.isEmpty())
-									//TODO what if !parentGroup.isEmpty() and !newParentCondition.isEmpty() are both true?
-									System.out.println();
 								if(affectedChildren.size() < branchSize){
 									//add the remaining groups
 									//FIXME or intersection should have been childrenGroup?
@@ -536,7 +537,7 @@ public class RulesReducer{
 
 	private void augmentCondition(final LineEntry rule, final int parentConditionLength, final Collection<Character> parentGroup,
 			final Collection<Character> childGroup){
-		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, childGroup);
+		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, parentGroup, childGroup);
 		final String augment = (chooseRatifyingOverNegated
 			? RegexHelper.makeGroup(parentGroup, comparator)
 			: RegexHelper.makeNotGroup(childGroup, comparator));
@@ -810,7 +811,7 @@ public class RulesReducer{
 			parentGroup.removeAll(groupsIntersection);
 
 			//calculate new condition
-			final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup,
+			final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, parentGroup,
 				childrenGroup);
 			preCondition.setLength(0);
 			preCondition.append(chooseRatifyingOverNegated
@@ -991,6 +992,14 @@ public class RulesReducer{
 		}
 
 		return bubbles;
+	}
+
+	private static boolean chooseRatifyingOverNegatedEquals(final int parentConditionLength, final Collection<Character> parentGroup,
+			final Collection<Character> childrenGroup){
+		final int parentGroupSize = parentGroup.size();
+		final int childrenGroupSize = childrenGroup.size();
+		final boolean chooseRatifyingOverNegated = (parentConditionLength == 0 || parentGroupSize <= 2 && childrenGroupSize >= 1);
+		return ((chooseRatifyingOverNegated || childrenGroupSize == 0) && parentGroupSize > 0);
 	}
 
 	private static boolean chooseRatifyingOverNegated(final int parentConditionLength, final Collection<Character> parentGroup,
