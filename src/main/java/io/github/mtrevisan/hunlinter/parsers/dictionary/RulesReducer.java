@@ -440,10 +440,12 @@ public class RulesReducer{
 								}
 							}
 
-							//TODO what if !parentGroup.isEmpty() and !newParentCondition.isEmpty() are both true?
 
 							parentGroup.removeAll(intersection);
 							if(!parentGroup.isEmpty()){
+								if(!newParentCondition.isEmpty())
+									//TODO what if !parentGroup.isEmpty() and !newParentCondition.isEmpty() are both true?
+									System.out.println();
 								if(affectedChildren.size() < branchSize){
 									//add the remaining groups
 									//FIXME or intersection should have been childrenGroup?
