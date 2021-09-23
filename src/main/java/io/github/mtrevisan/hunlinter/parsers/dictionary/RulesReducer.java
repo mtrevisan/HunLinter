@@ -146,14 +146,16 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(50);
 
-		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
-disjoinConditions2(new ArrayList<>(compactedRules));
-		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
+		compactedRules = disjoinConditions2(compactedRules);
 
-		if(progressCallback != null)
-			progressCallback.accept(60);
-
-		mergeSimilarRules(compactedRules);
+//		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
+//disjoinConditions2(new ArrayList<>(compactedRules));
+//		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
+//
+//		if(progressCallback != null)
+//			progressCallback.accept(60);
+//
+//		mergeSimilarRules(compactedRules);
 
 		return compactedRules;
 	}
@@ -320,7 +322,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 				if(branchSize == 1)
 					continue;
 
-				for(int j = 0; j < branchSize; j ++){
+				for(int j = 0; j < branchSize - 1; j ++){
 					//extract limb
 					LineEntry parent = branch.get(j);
 					for(int k = j + 1; k < branchSize; k ++){
@@ -343,7 +345,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 								//augment parent condition
 								augmentCondition(parent, parentConditionLength, parentGroup, childrenGroup);
 
-								break;
+								restoreRules(rules, branches);
+								continue restart;
 							}
 
 
@@ -443,8 +446,8 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 							if(!parentGroup.isEmpty()){
 								if(affectedChildren.size() < branchSize){
 									//add the remaining groups
-									intersection.addAll(childrenGroup);
 									//FIXME or intersection should have been childrenGroup?
+									intersection.addAll(childrenGroup);
 								}
 
 								final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentConditionLength, parentGroup, intersection);
@@ -519,7 +522,7 @@ disjoinConditions2(new ArrayList<>(compactedRules));
 	}
 
 	private static boolean hasNonEmptyIntersection(final LineEntry rule1, final LineEntry rule2){
-		if(RegexHelper.conditionLength(rule1.condition) < RegexHelper.conditionLength(rule2.condition)){
+		if(RegexHelper.conditionLength(rule1.condition) <= RegexHelper.conditionLength(rule2.condition)){
 			//FIXME select ^ or $ based on rule type
 			final Pattern pattern1 = RegexHelper.pattern(rule1.condition + "$");
 			for(final String f : rule2.from)
