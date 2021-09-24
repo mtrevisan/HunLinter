@@ -120,6 +120,11 @@ public class DictionaryCorrectnessChecker{
 	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
 	@SuppressWarnings("DesignForExtension")
+	public boolean canHaveNoInflections(final String flag){
+		return rulesLoader.containsCanHaveNoInflections(flag);
+	}
+
+	@SuppressWarnings("DesignForExtension")
 	public boolean shouldNotCheckProductiveness(final String flag){
 		return false;
 	}

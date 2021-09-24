@@ -106,7 +106,7 @@ public class ThesaurusParser{
 
 		final Path thePath = theFile.toPath();
 		charset = FileHelper.determineCharset(thePath, 20);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Thesaurus file charset is {}", charset.name());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the thesaurus file is {}", charset.name());
 		final Map<String, ThesaurusEntry> entries = new HashMap<>(0);
 		try(final Scanner scanner = FileHelper.createScanner(thePath, charset)){
 			//skip charset

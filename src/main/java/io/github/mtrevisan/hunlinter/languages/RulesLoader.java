@@ -62,6 +62,7 @@ public class RulesLoader{
 	private final Set<String> multipleStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
+	private final Collection<String> canHaveNoInflections = new HashSet<>(0);
 	private Character[] letterAndRulesNotCombinableKeys;
 	private Map<Character, LetterMatcherEntry[]> letterAndRulesNotCombinable;
 	private String[] ruleAndRulesNotCombinableKeys;
@@ -99,6 +100,9 @@ public class RulesLoader{
 			flags = strategy.parseFlags(readProperty("cannotContainStress"));
 			if(flags != null)
 				cannotContainStress.addAll(Arrays.asList(flags));
+			flags = strategy.parseFlags(readProperty("canHaveNoInflections"));
+			if(flags != null)
+				canHaveNoInflections.addAll(Arrays.asList(flags));
 
 			final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 			List<String> rules = readPropertyAsList("notCombinableRules", '/');
@@ -208,6 +212,10 @@ public class RulesLoader{
 
 	public final boolean containsCannotContainStress(final String flag){
 		return cannotContainStress.contains(flag);
+	}
+
+	public final boolean containsCanHaveNoInflections(final String flag){
+		return canHaveNoInflections.contains(flag);
 	}
 
 	public final void letterToFlagIncompatibilityCheck(final Inflection inflection){

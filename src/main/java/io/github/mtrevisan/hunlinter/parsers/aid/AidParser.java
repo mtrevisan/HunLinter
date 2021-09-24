@@ -57,7 +57,7 @@ public class AidParser{
 
 		final Path aidPath = aidFile.toPath();
 		final Charset charset = FileHelper.determineCharset(aidPath, -1);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Aid file charset is {}", charset.name());
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the aid file is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(aidPath, charset)){
 			//skip charset
 			scanner.nextLine();
