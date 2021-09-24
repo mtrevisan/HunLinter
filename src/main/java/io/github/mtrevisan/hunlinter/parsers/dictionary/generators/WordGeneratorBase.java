@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
+import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
@@ -33,7 +34,9 @@ import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,7 @@ class WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorBase.class);
 
+	private static final String NO_INFLECTIONS = "Flag {} produces no inflections for input {}";
 	private static final String TWOFOLD_RULE_VIOLATED = "Twofold rule violated for `{} from {}` ({} still has rules {})";
 	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`{}";
 
@@ -287,6 +291,9 @@ class WordGeneratorBase{
 					currentPostponedAffixes.remove(circumfixFlag);
 				}
 				final List<Inflection> prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
+				if(prods.isEmpty() && !checker.canHaveNoInflections(affix))
+					EventBusService.publish(new LinterWarning(NO_INFLECTIONS, affix, dicEntry));
+
 				inflections.addAll(prods);
 			}
 		return inflections;
