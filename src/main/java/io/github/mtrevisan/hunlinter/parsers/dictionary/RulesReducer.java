@@ -132,29 +132,20 @@ public class RulesReducer{
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(20);
+			progressCallback.accept(25);
 
 		compactedRules = compactRules(compactedRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(40);
+			progressCallback.accept(50);
 
 		//reshuffle originating list to place the correct inflections in the correct rule
 		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(50);
+			progressCallback.accept(75);
 
-		compactedRules = disjoinConditions2(compactedRules);
-
-//		final IntObjectMap<Set<Character>> overallLastGroups = collectOverallLastGroups(plainRules);
-//disjoinConditions2(new ArrayList<>(compactedRules));
-//		compactedRules = disjoinConditions(compactedRules, overallLastGroups);
-//
-//		if(progressCallback != null)
-//			progressCallback.accept(60);
-//
-//		mergeSimilarRules(compactedRules);
+		compactedRules = disjoinConditions(compactedRules);
 
 		return compactedRules;
 	}
@@ -297,7 +288,7 @@ public class RulesReducer{
 		return overallLastGroups;
 	}
 
-	private List<LineEntry> disjoinConditions2(final List<LineEntry> rules){
+	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		restart:
 		while(true){
 			//order by condition length
@@ -361,6 +352,29 @@ public class RulesReducer{
 									affectedChildren.add(affectedChild);
 							}
 
+//							//extract non-common part from parent
+//							final Set<Character> uncommonParentGroup = new HashSet<>(parentGroup);
+//							uncommonParentGroup.removeAll(intersection);
+//							if(!uncommonParentGroup.isEmpty()){
+//								final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, childrenGroup, uncommonParentGroup);
+//								final String augment = (chooseRatifyingOverNegated
+//									? RegexHelper.makeGroup(uncommonParentGroup, comparator)
+//									: RegexHelper.makeNotGroup(childrenGroup, comparator));
+//								condition.setLength(0);
+//								condition.append(augment)
+//									.append(parent.condition);
+//								Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
+//								if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
+//									final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
+//									parent.from.removeAll(newRule.from);
+//									branch.add(newRule);
+//
+//									restoreRules(rules, branches);
+//									continue restart;
+//								}
+//							}
+
+
 							final Set<Character> nextParentGroup = parent.extractGroup(parentConditionLength + 1);
 							newParentCondition.clear();
 							for(final LineEntry affectedChild : affectedChildren){
@@ -368,33 +382,32 @@ public class RulesReducer{
 								final Set<Character> nextChildIntersection = SetHelper.intersection(nextParentGroup, nextChildGroup);
 								if(nextChildIntersection.isEmpty()){
 									if(!nextParentGroup.isEmpty()){
-										//augment parent condition
-										final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, childrenGroup, intersection);
-										final String augment = (chooseRatifyingOverNegated || !nextChildGroup.isEmpty()
-											? RegexHelper.makeGroup(intersection, comparator)
-											: RegexHelper.makeNotGroup(childrenGroup, comparator));
-										condition.setLength(0);
-										condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
-											.append(augment)
-											.append(parent.condition);
-										Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
-										if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
-											final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
-											parent.from.removeAll(newRule.from);
-											branch.add(newRule);
-										}
-										else
-											newParentCondition.addAll(nextChildGroup);
+										//TODO must proceed with the converse: for every `intersection`, determine which children are affected...
+										for(final char chr : intersection){
+											//augment parent condition
+											condition.setLength(0);
+											condition.append(RegexHelper.makeNotGroup(nextChildGroup, comparator))
+												.append(chr)
+												.append(parent.condition);
+											Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
+											if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
+												final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
+												parent.from.removeAll(newRule.from);
+												branch.add(newRule);
+											}
+											else
+												newParentCondition.addAll(nextChildGroup);
 
-										condition.setLength(0);
-										condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
-											.append(RegexHelper.makeGroup(intersection, comparator))
-											.append(parent.condition);
-										newParentFrom = parent.extractFromEndingWith(condition.toString());
-										if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
-											final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
-											parent.from.removeAll(newRule.from);
-											branch.add(newRule);
+											condition.setLength(0);
+											condition.append(RegexHelper.makeGroup(nextChildGroup, comparator))
+												.append(chr)
+												.append(parent.condition);
+											newParentFrom = parent.extractFromEndingWith(condition.toString());
+											if(!newParentFrom.equals(parent.from) && !newParentFrom.isEmpty()){
+												final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+												parent.from.removeAll(newRule.from);
+												branch.add(newRule);
+											}
 										}
 									}
 									else{
@@ -552,7 +565,7 @@ public class RulesReducer{
 
 
 
-	private List<LineEntry> disjoinConditions(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
+	private List<LineEntry> disjoinConditionsOld(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		//expand same conditions (if any); store surely disjoint rules
 		final List<LineEntry> nonOverlappingRules = disjoinSameConditions(rules, overallLastGroups);
 
