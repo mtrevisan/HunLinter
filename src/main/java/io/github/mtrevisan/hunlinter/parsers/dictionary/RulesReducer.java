@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -132,20 +133,25 @@ public class RulesReducer{
 		List<LineEntry> compactedRules = redistributeAdditions(plainRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(25);
+			progressCallback.accept(20);
 
 		compactedRules = compactRules(compactedRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(50);
+			progressCallback.accept(40);
 
 		//reshuffle originating list to place the correct inflections in the correct rule
 		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(75);
+			progressCallback.accept(60);
 
 		compactedRules = disjoinConditions(compactedRules);
+
+		if(progressCallback != null)
+			progressCallback.accept(80);
+
+		mergeSimilarRules(compactedRules);
 
 		return compactedRules;
 	}
@@ -289,6 +295,8 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
+		final List<LineEntry> newRules = new ArrayList<>(0);
+
 		restart:
 		while(true){
 			//order by condition length
@@ -306,6 +314,7 @@ public class RulesReducer{
 			int i = 0;
 			final StringBuilder condition = new StringBuilder();
 			final Set<Character> newParentCondition = new HashSet<>(0);
+			innerRestart:
 			for(; i < branches.size(); i ++){
 				final List<LineEntry> branch = branches.get(i);
 				final int branchSize = branch.size();
@@ -333,7 +342,8 @@ public class RulesReducer{
 							//if parent (with the augmented condition) and children has no intersection:
 							if(intersection.isEmpty()){
 								//augment parent condition
-								final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(parentGroup, childrenGroup);
+								final boolean chooseRatifyingOverNegated = (parentGroup.size() < childrenGroup.size()
+									+ Math.max(parentConditionLength - 3, 0));
 								final String augment = (chooseRatifyingOverNegated
 									? RegexHelper.makeGroup(parentGroup, comparator)
 									: RegexHelper.makeNotGroup(childrenGroup, comparator));
@@ -347,7 +357,7 @@ public class RulesReducer{
 							}
 
 
-							//if parent and child has a non-empty intersection:
+//if parent and child has a non-empty intersection:
 
 //							//extract all the children whose condition matches the intersection
 //							final Collection<LineEntry> affectedChildren = new HashSet<>(branchSize - k + 1);
@@ -386,17 +396,19 @@ public class RulesReducer{
 								//extract all the children whose condition matches the character in the intersection
 								final Collection<LineEntry> affectedChildren = new HashSet<>(branchSize - k + 1);
 								final Set<Character> affectedChildrenGroup = new HashSet<>(branchSize - k + 1);
+								final Set<String> affectedChildrenFrom = new HashSet<>(branchSize - k + 1);
 								for(int m = k; m < branchSize; m ++){
 									final LineEntry affectedChild = branch.get(m);
 									final Set<Character> childGroup = affectedChild.extractGroup(parentConditionLength);
 									if(childGroup.contains(chr)){
 										affectedChildren.add(affectedChild);
 										affectedChildrenGroup.addAll(affectedChild.extractGroup(parentConditionLength + 1));
+										affectedChildrenFrom.addAll(affectedChild.from);
 									}
 								}
 
 								final Set<Character> nextParentGroup = parent.extractGroup(parentConditionLength + 1);
-								final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegated(nextParentGroup, affectedChildrenGroup);
+								final boolean chooseRatifyingOverNegated = (nextParentGroup.size() < affectedChildrenGroup.size());
 								final String augment = (chooseRatifyingOverNegated
 									? RegexHelper.makeGroup(nextParentGroup, comparator)
 									: RegexHelper.makeNotGroup(affectedChildrenGroup, comparator));
@@ -405,17 +417,21 @@ public class RulesReducer{
 									.append(chr)
 									.append(parent.condition);
 								final Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
-								if(!newParentFrom.equals(parent.from)){
-									final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
-									parent.from.removeAll(newRule.from);
-									branch.add(newRule);
-								}
-								else
-									parent.condition = condition.toString();
+								if(!newParentFrom.isEmpty()){
+									if(affectedChildrenFrom.containsAll(newParentFrom))
+										continue innerRestart;
+									else if(!newParentFrom.equals(parent.from)){
+										final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
+										parent.from.removeAll(newRule.from);
+										branch.add(newRule);
+									}
+									else
+										parent.condition = condition.toString();
 
-								restoreRules(rules, branches);
-								continue restart;
-//---
+									restoreRules(rules, branches);
+									continue restart;
+								}
+								//---
 
 
 
@@ -596,16 +612,55 @@ public class RulesReducer{
 		return false;
 	}
 
+	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
+	private void mergeSimilarRules(final Collection<LineEntry> rules){
+		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(rules,
+			rule -> (rule.condition.contains(RegexHelper.GROUP_END)
+				? rule.removal + TAB + rule.addition + TAB + RegexSequencer.splitSequence(rule.condition)[0] + TAB
+				+ RegexSequencer.splitSequence(rule.condition).length
+				: null));
+		final Collection<Character> group = new HashSet<>(0);
+		final StringBuilder condition = new StringBuilder();
+		for(final List<LineEntry> similarities : similarityBucket.values())
+			if(similarities.size() > 1){
+				final LineEntry anEntry = similarities.get(0);
+				final String[] aCondition = RegexSequencer.splitSequence(anEntry.condition);
+				final String[] commonPreCondition = RegexSequencer.subSequence(aCondition, 0, 1);
+				final String[] commonPostCondition = RegexSequencer.subSequence(aCondition, 2);
+				//extract all the rules from `similarities` that has the condition compatible with `firstEntry.condition`
+				group.clear();
+				for(int i = 0; i < similarities.size(); i ++)
+					group.add(RegexSequencer.splitSequence(similarities.get(i).condition)[1].charAt(0));
+
+				condition.setLength(0);
+				for(final String cpc : commonPreCondition)
+					condition.append(cpc);
+				condition.append(RegexHelper.makeGroup(group, comparator));
+				for(final String cpc : commonPostCondition)
+					condition.append(cpc);
+				condition.toString();
+
+				final LineEntry newRule = LineEntry.createFrom(anEntry, condition.toString());
+				for(int i = 1; i < similarities.size(); i ++)
+					newRule.from.addAll(similarities.get(i).from);
+				rules.add(newRule);
+
+				for(int i = 0; i < similarities.size(); i ++)
+					rules.remove(similarities.get(i));
+			}
+	}
+
+
+
+
 	private void augmentCondition(final LineEntry rule, final int parentConditionLength, final Collection<Character> parentGroup,
-			final Collection<Character> childGroup){
+		final Collection<Character> childGroup){
 		final boolean chooseRatifyingOverNegated = chooseRatifyingOverNegatedEquals(parentConditionLength, parentGroup, childGroup);
 		final String augment = (chooseRatifyingOverNegated
 			? RegexHelper.makeGroup(parentGroup, comparator)
 			: RegexHelper.makeNotGroup(childGroup, comparator));
 		rule.condition = augment + rule.condition;
 	}
-
-
 
 	private List<LineEntry> disjoinConditionsOld(final List<LineEntry> rules, final IntObjectMap<Set<Character>> overallLastGroups){
 		//expand same conditions (if any); store surely disjoint rules
@@ -864,7 +919,7 @@ public class RulesReducer{
 			childrenGroup.clear();
 			for(int i = 0; i < bubbles.size(); i ++){
 				final LineEntry child = bubbles.get(i);
-				childrenGroup.add(child.condition.charAt(child.condition.length() - parentConditionLength - 1));
+				childrenGroup.add(StringHelper.lastChar(child.condition, parentConditionLength));
 			}
 
 			//if intersection(parent-group, children-group) is empty
@@ -910,7 +965,7 @@ public class RulesReducer{
 			if(parentConditionLength + 1 >= maxConditionLength){
 				queue.removeAll(bubbles);
 
-				//TODO what should be done?
+//TODO what should be done?
 //				//add the remaining part of the parent
 //				final StringBuilder condition = new StringBuilder(parent.condition.length() + 4);
 //				condition.append(parent.condition);
@@ -1061,47 +1116,6 @@ public class RulesReducer{
 		final int childrenGroupSize = childrenGroup.size();
 		return (parentGroupSize > 0
 			&& (parentConditionLength == 0 || parentGroupSize <= 2 && childrenGroupSize >= 1 || childrenGroupSize == 0));
-	}
-
-	private static boolean chooseRatifyingOverNegated(final Collection<Character> ratifyingGroup, final Collection<Character> negatedGroup){
-		final int ratifyingGroupSize = ratifyingGroup.size();
-		final int negatedGroupSize = negatedGroup.size();
-		return (ratifyingGroupSize < negatedGroupSize);
-	}
-
-	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
-	private void mergeSimilarRules(final Collection<LineEntry> entries){
-		final Map<String, List<LineEntry>> similarityBucket = SetHelper.bucket(entries,
-			entry -> (entry.condition.contains(RegexHelper.GROUP_END)
-				? entry.removal + TAB + entry.addition + TAB + RegexSequencer.splitSequence(entry.condition)[0] + TAB
-					+ RegexSequencer.splitSequence(entry.condition).length
-				: null));
-		final Collection<Character> group = new HashSet<>(0);
-		final StringBuilder condition = new StringBuilder();
-		for(final List<LineEntry> similarities : similarityBucket.values())
-			if(similarities.size() > 1){
-				final LineEntry anEntry = similarities.iterator().next();
-				final String[] aCondition = RegexSequencer.splitSequence(anEntry.condition);
-				final String[] commonPreCondition = RegexSequencer.subSequence(aCondition, 0, 1);
-				final String[] commonPostCondition = RegexSequencer.subSequence(aCondition, 2);
-				//extract all the rules from `similarities` that has the condition compatible with firstEntry.condition
-				group.clear();
-				for(int i = 0; i < similarities.size(); i ++)
-					group.add(RegexSequencer.splitSequence(similarities.get(i).condition)[1].charAt(0));
-
-				condition.setLength(0);
-				for(final String cpc : commonPreCondition)
-					condition.append(cpc);
-				condition.append(RegexHelper.makeGroup(group, comparator));
-				for(final String cpc : commonPostCondition)
-					condition.append(cpc);
-				condition.toString();
-
-				entries.add(LineEntry.createFrom(anEntry, condition.toString()));
-
-				for(int i = 0; i < similarities.size(); i ++)
-					entries.remove(similarities.get(i));
-			}
 	}
 
 	public final List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){

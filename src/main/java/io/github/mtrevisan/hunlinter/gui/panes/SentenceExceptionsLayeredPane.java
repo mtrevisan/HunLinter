@@ -35,7 +35,7 @@ import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,7 +259,7 @@ public class SentenceExceptionsLayeredPane extends JLayeredPane{
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getSexParser().contains(unmodifiedException);
 		addButton.setEnabled(StringUtils.isNotBlank(unmodifiedException)
-			&& JavaHelper.lastChar(unmodifiedException) == '.' && !alreadyContained);
+			&& StringHelper.lastChar(unmodifiedException) == '.' && !alreadyContained);
 
 
 		tagPanel.applyFilter(StringUtils.isNotBlank(unmodifiedException)? unmodifiedException: null);

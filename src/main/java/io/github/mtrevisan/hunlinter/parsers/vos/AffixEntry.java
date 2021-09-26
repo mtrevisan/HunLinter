@@ -30,7 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
@@ -149,7 +149,7 @@ public class AffixEntry{
 			else{
 				if(!condition.startsWith(removal))
 					throw new LinterException(WRONG_CONDITION_START, line);
-				if(appending.length() > 1 && JavaHelper.lastChar(removal) == JavaHelper.lastChar(appending))
+				if(appending.length() > 1 && StringHelper.lastChar(removal) == StringHelper.lastChar(appending))
 					EventBusService.publish(new LinterWarning(CHARACTERS_IN_COMMON, line)
 						.withIndex(index));
 			}

@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
-import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;

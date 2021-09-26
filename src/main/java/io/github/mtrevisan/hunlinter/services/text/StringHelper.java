@@ -273,4 +273,13 @@ public final class StringHelper{
 		return sb.toString();
 	}
 
+
+	public static char lastChar(final CharSequence text){
+		return lastChar(text, 0);
+	}
+
+	public static char lastChar(final CharSequence text, final int charsFromEnd){
+		return text.charAt(text.length() - charsFromEnd - 1);
+	}
+
 }

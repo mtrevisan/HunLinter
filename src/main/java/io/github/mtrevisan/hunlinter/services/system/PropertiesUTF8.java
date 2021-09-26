@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -143,7 +145,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @return	Whether the property continues on the following line.
 	 */
 	private static boolean isLineContinuing(final CharSequence line){
-		return (line != null && !line.isEmpty() && JavaHelper.lastChar(line) == '\\');
+		return (line != null && !line.isEmpty() && StringHelper.lastChar(line) == '\\');
 	}
 
 	/**
