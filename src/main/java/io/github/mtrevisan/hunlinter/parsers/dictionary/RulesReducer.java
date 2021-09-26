@@ -418,7 +418,7 @@ public class RulesReducer{
 									.append(parent.condition);
 								final Set<String> newParentFrom = parent.extractFromEndingWith(condition.toString());
 								if(!newParentFrom.isEmpty()){
-									if(affectedChildrenFrom.containsAll(newParentFrom))
+									if(affectedChildrenFrom.containsAll(newParentFrom) || augment.isEmpty() && newParentFrom.containsAll(affectedChildrenFrom))
 										continue innerRestart;
 									else if(!newParentFrom.equals(parent.from)){
 										final LineEntry newRule = LineEntry.createFromWithWords(parent, condition.toString(), newParentFrom);
