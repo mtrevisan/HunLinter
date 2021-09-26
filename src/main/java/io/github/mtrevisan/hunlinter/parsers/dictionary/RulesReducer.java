@@ -318,15 +318,14 @@ public class RulesReducer{
 			for(; i < branches.size(); i ++){
 				final List<LineEntry> branch = branches.get(i);
 				final int branchSize = branch.size();
-				if(branchSize == 1)
-					continue;
-
 				for(int j = 0; j < branchSize - 1; j ++){
 					//extract limb
 					LineEntry parent = branch.get(j);
-					for(int k = j + 1; k < branchSize; k ++){
+					for(int k = 0; k < branchSize; k ++){
 						//extract branch of limb
 						final LineEntry child = branch.get(k);
+						if(child == parent || !child.condition.endsWith(parent.condition))
+							continue;
 
 						if(hasNonEmptyIntersection(parent, child)){
 							//augment parent condition to avoid any intersection:
@@ -335,8 +334,11 @@ public class RulesReducer{
 							final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 							final Set<Character> childrenGroup = new HashSet<>(branchSize - k + 1);
-							for(int m = k; m < branchSize; m ++)
-								childrenGroup.addAll(branch.get(m).extractGroup(parentConditionLength));
+							for(int m = 0; m < branchSize; m ++){
+								final LineEntry lineEntry = branch.get(m);
+								if(lineEntry != parent && lineEntry.condition.endsWith(parent.condition))
+									childrenGroup.addAll(lineEntry.extractGroup(parentConditionLength));
+							}
 
 							final Set<Character> intersection = SetHelper.intersection(parentGroup, childrenGroup);
 							//if parent (with the augmented condition) and children has no intersection:
@@ -397,8 +399,11 @@ public class RulesReducer{
 								final Collection<LineEntry> affectedChildren = new HashSet<>(branchSize - k + 1);
 								final Set<Character> affectedChildrenGroup = new HashSet<>(branchSize - k + 1);
 								final Set<String> affectedChildrenFrom = new HashSet<>(branchSize - k + 1);
-								for(int m = k; m < branchSize; m ++){
+								for(int m = 0; m < branchSize; m ++){
 									final LineEntry affectedChild = branch.get(m);
+									if(affectedChild == parent || !affectedChild.condition.endsWith(parent.condition))
+										continue;
+
 									final Set<Character> childGroup = affectedChild.extractGroup(parentConditionLength);
 									if(childGroup.contains(chr)){
 										affectedChildren.add(affectedChild);
