@@ -39,10 +39,10 @@ public class CRC32HashFunction implements HashFunction{
 	}
 
 	@Override
-	public final long hash(final byte[] bytes){
+	public final int hash(final byte[] bytes){
 		final Checksum crc32 = new CRC32();
 		crc32.update(bytes);
-		return crc32.getValue();
+		return (int)crc32.getValue();
 	}
 
 	@Override

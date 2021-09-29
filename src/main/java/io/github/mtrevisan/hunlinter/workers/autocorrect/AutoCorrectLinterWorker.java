@@ -114,7 +114,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
+			resetProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
