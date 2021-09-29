@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.Memoizer;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.ArrayUtils;
@@ -60,7 +61,7 @@ public class AffixData{
 	private static final Function<String, FlagParsingStrategy> FLAG_PARSING_STRATEGY
 		= Memoizer.memoize(ParsingStrategyFactory::createFromFlag);
 
-	/*, AffixOption.SUB_STANDARD_FLAG*/
+	/*AffixOption.SUB_STANDARD_FLAG*/
 	private static final List<AffixOption> SINGLE_FLAG_TAGS = List.of(AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG,
 		AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG, AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG,
 		AffixOption.PERMIT_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG, /*AffixOption.COMPOUND_ROOT,*/
@@ -71,25 +72,34 @@ public class AffixData{
 	private final Map<String, Object> data = new HashMap<>(0);
 	private final Collection<String> terminalAffixes = new HashSet<>(0);
 	private final Set<String> productableFlags = new HashSet<>(0);
+	private final Set<String> unproductableFlags = new HashSet<>(13);
 	private boolean closed;
 
 
 	final void close(){
 		terminalAffixes.addAll(getStringData(SINGLE_FLAG_TAGS));
 
+		//FIXME store this information (unproductable, options, etc) in the enum itself
+		final List<AffixOption> unproductableAffixOptions = Arrays.asList(
+			AffixOption.NO_SUGGEST_FLAG, AffixOption.COMPOUND_FLAG, AffixOption.COMPOUND_BEGIN_FLAG, AffixOption.COMPOUND_MIDDLE_FLAG,
+			AffixOption.COMPOUND_END_FLAG, AffixOption.ONLY_IN_COMPOUND_FLAG, AffixOption.PERMIT_COMPOUND_FLAG,
+			AffixOption.FORBID_COMPOUND_FLAG, AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG, AffixOption.CIRCUMFIX_FLAG,
+			AffixOption.FORBIDDEN_WORD_FLAG, AffixOption.KEEP_CASE_FLAG, AffixOption.NEED_AFFIX_FLAG);
+
 		productableFlags.addAll(data.keySet());
-		Arrays.asList(AffixOption.CHARACTER_SET.getCode(), AffixOption.FLAG.getCode(),
-			AffixOption.COMPLEX_PREFIXES.getCode(), AffixOption.LANGUAGE.getCode(), AffixOption.ALIASES_FLAG.getCode(),
-			AffixOption.ALIASES_MORPHOLOGICAL_FIELD.getCode(), AffixOption.TRY.getCode(), AffixOption.NO_SUGGEST_FLAG.getCode(),
-			AffixOption.REPLACEMENT_TABLE.getCode(), AffixOption.RELATION_TABLE.getCode(), AffixOption.WORD_BREAK_CHARACTERS.getCode(),
-			AffixOption.COMPOUND_RULE.getCode(), AffixOption.COMPOUND_MINIMUM_LENGTH.getCode(),
-			AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND.getCode(), AffixOption.COMPOUND_MAX_WORD_COUNT.getCode(),
-			AffixOption.FORBID_DUPLICATES_IN_COMPOUND.getCode(), AffixOption.CHECK_COMPOUND_REPLACEMENT.getCode(),
-			AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND.getCode(), AffixOption.FORBID_TRIPLES_IN_COMPOUND.getCode(),
-			AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND.getCode(), AffixOption.FORCE_COMPOUND_UPPERCASE_FLAG.getCode(),
-			AffixOption.FULLSTRIP.getCode(), AffixOption.KEEP_CASE_FLAG.getCode(), AffixOption.NEED_AFFIX_FLAG.getCode(),
-			AffixOption.INPUT_CONVERSION_TABLE.getCode(), AffixOption.OUTPUT_CONVERSION_TABLE.getCode()
-		).forEach(productableFlags::remove);
+		Arrays.asList(
+			//options flags:
+			AffixOption.CHARACTER_SET, AffixOption.FLAG, AffixOption.COMPLEX_PREFIXES, AffixOption.LANGUAGE, AffixOption.ALIASES_FLAG,
+			AffixOption.ALIASES_MORPHOLOGICAL_FIELD, AffixOption.TRY, AffixOption.REPLACEMENT_TABLE, AffixOption.RELATION_TABLE,
+			AffixOption.WORD_BREAK_CHARACTERS, AffixOption.COMPOUND_RULE, AffixOption.COMPOUND_MINIMUM_LENGTH,
+			AffixOption.ALLOW_TWOFOLD_AFFIXES_IN_COMPOUND, AffixOption.COMPOUND_MAX_WORD_COUNT, AffixOption.FORBID_DUPLICATES_IN_COMPOUND,
+			AffixOption.CHECK_COMPOUND_REPLACEMENT, AffixOption.FORBID_DIFFERENT_CASES_IN_COMPOUND, AffixOption.FORBID_TRIPLES_IN_COMPOUND,
+			AffixOption.SIMPLIFIED_TRIPLES_IN_COMPOUND, AffixOption.FULLSTRIP, AffixOption.INPUT_CONVERSION_TABLE,
+			AffixOption.OUTPUT_CONVERSION_TABLE
+		).forEach(option -> productableFlags.remove(option.getCode()));
+		unproductableAffixOptions.forEach(option -> productableFlags.remove(option.getCode()));
+
+		unproductableAffixOptions.forEach(option -> JavaHelper.addIfNotNull(unproductableFlags, (String)data.get(option.getCode())));
 
 		closed = true;
 	}
@@ -98,6 +108,7 @@ public class AffixData{
 		data.clear();
 		terminalAffixes.clear();
 		productableFlags.clear();
+		unproductableFlags.clear();
 		closed = false;
 	}
 
@@ -383,6 +394,10 @@ public class AffixData{
 
 	public final Set<String> getProductableFlags(){
 		return productableFlags;
+	}
+
+	public final Set<String> getUnproductableFlags(){
+		return unproductableFlags;
 	}
 
 	public final List<RuleEntry> getRuleEntries(){
