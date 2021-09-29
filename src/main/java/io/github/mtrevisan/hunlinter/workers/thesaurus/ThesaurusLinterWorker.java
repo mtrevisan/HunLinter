@@ -119,7 +119,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step2 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
+			resetProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
