@@ -88,12 +88,10 @@ public class Murmur3HashFunction implements HashFunction{
 	private static int hash32(final byte[] data, final int length, final int seed){
 		int hash = seed;
 
-		for(int i = length >> 2; i > 0; i --){
-			final int i4 = i << 2;
-			int k = (data[i4] & UNSIGNED_MASK);
-			k |= (data[i4 + 1] & UNSIGNED_MASK) << 8;
-			k |= (data[i4 + 2] & UNSIGNED_MASK) << 16;
-			k |= (data[i4 + 3] & UNSIGNED_MASK) << 24;
+		final ByteBuffer buffer = ByteBuffer.wrap(data);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		while(buffer.remaining() >= 4){
+			int k = buffer.getInt();
 
 			hash ^= murmur3Scramble(k);
 			hash = Integer.rotateLeft(hash, 13) * 5 + N_32;
