@@ -32,6 +32,7 @@ import javax.swing.SwingUtilities;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.channels.ClosedChannelException;
+import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -48,6 +49,12 @@ public final class JavaHelper{
 
 
 	private JavaHelper(){}
+
+
+	public static <T> void addIfNotNull(final Collection<T> set, final T data){
+		if(data != null)
+			set.add(data);
+	}
 
 
 	public static String textFormat(final String message, final Object... parameters){

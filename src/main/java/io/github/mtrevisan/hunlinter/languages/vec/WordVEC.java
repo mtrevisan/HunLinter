@@ -98,7 +98,7 @@ public final class WordVEC{
 	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:"
 			+ "(?:dex|re)?d"
 			+ "|"
-			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|mal|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
+			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|ma(l|nsue)|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
 			+ "(?:m(?:al|ove)|soto)?st"
 		+ ")à(?:g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
