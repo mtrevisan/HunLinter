@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -126,11 +127,19 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
-			final Set<String> unusedFlags = affParser.getAffixData().getProductableFlags();
-			unusedFlags.removeAll(flags);
-			if(!unusedFlags.isEmpty())
-				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "))
+			final AffixData affixData = affParser.getAffixData();
+			final Set<String> unusedProductableFlags = affixData.getProductableFlags();
+			unusedProductableFlags.removeAll(flags);
+			if(!unusedProductableFlags.isEmpty())
+				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedProductableFlags, ", "))
 					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
+
+			//FIXME
+//			final Set<String> unusedUnproductableFlags = affixData.getUnproductableFlags();
+//			unusedUnproductableFlags.removeAll(unproductableFlags);
+//			if(!unusedUnproductableFlags.isEmpty())
+//				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedUnproductableFlags, ", "))
+//					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 
 			return null;
 		};
