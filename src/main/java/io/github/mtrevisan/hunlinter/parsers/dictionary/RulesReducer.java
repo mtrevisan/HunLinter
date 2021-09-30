@@ -261,6 +261,12 @@ public class RulesReducer{
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
+		final Collection<Character> parentRatifyingCondition = new HashSet<>(0);
+		final Collection<Character> parentNegatedCondition = new HashSet<>(0);
+		final Map<LineEntry, Set<Character>> collisions = new HashMap<>(0);
+		final List<LineEntry> childrenRules = new ArrayList<>(0);
+		final Collection<Character> childrenGroup = new HashSet<>(0);
+		final Collection<Character> commonChildrenGroup = new HashSet<>(0);
 		final List<LineEntry> finalRules = new ArrayList<>(0);
 
 		boolean restart = true;
@@ -284,11 +290,10 @@ public class RulesReducer{
 				final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
 				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-				final Collection<Character> parentNegatedCondition = new HashSet<>(0);
-				final Collection<Character> parentRatifyingCondition = new HashSet<>(0);
+				parentRatifyingCondition.clear();
 
-				//for every character, if it collides with a children, put into `parentNegatedCondition`, otherwise put in `parentRatifyingCondition`
-				final Map<LineEntry, Set<Character>> collisions = new HashMap<>(0);
+				//for every character, if it collides with a children, put into `parentNegatedCondition`, otherwise put in
+				//`parentRatifyingCondition`
 				for(final Character chr : parentGroup){
 					collisions.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
@@ -300,20 +305,26 @@ public class RulesReducer{
 					if(collisions.isEmpty())
 						parentRatifyingCondition.add(chr);
 					else{
-						final List<LineEntry> childrenRules = new ArrayList<>(branchSize - 1);
-						final Collection<Character> childrenGroup = new HashSet<>(branchSize - 1);
-						final Collection<Character> commonChildrenGroup = new HashSet<>(branchSize - 1);
-						for(final LineEntry rule : collisions.keySet())
-							if(rule != parent){
-								final Set<Character> childGroup = collisions.get(rule);
-								if(!rule.from.containsAll(parent.from)){
-									childrenRules.add(rule);
-									childrenGroup.addAll(childGroup);
-								}
-								else
-									commonChildrenGroup.addAll(childGroup);
+						childrenRules.clear();
+						childrenGroup.clear();
+						commonChildrenGroup.clear();
+						for(final LineEntry rule : collisions.keySet()){
+							final Set<Character> childGroup = collisions.get(rule);
+							if(!rule.from.containsAll(parent.from)){
+								childrenRules.add(rule);
+								childrenGroup.addAll(childGroup);
 							}
+							else
+								commonChildrenGroup.addAll(childGroup);
+						}
 						commonChildrenGroup.removeAll(parentGroup);
+
+						if(childrenGroup.isEmpty()){
+							//TODO
+							System.out.println();
+						}
+						if(childrenGroup.isEmpty())
+							throw new IllegalStateException("`childrenGroup` is empty, please report this case to the developer, thank you");
 
 						condition.setLength(0);
 						if(childrenGroup.contains(chr)){
@@ -359,11 +370,18 @@ public class RulesReducer{
 				}
 
 				if(!parentRatifyingCondition.isEmpty()){
+					parentNegatedCondition.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
 						final LineEntry child = branch.get(m);
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
 						parentNegatedCondition.addAll(childGroup);
 					}
+					for(int m = 0; m < finalRules.size(); m ++){
+						final LineEntry child = finalRules.get(m);
+						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+						parentNegatedCondition.addAll(childGroup);
+					}
+					parentNegatedCondition.removeAll(parentRatifyingCondition);
 
 					final int ratifyingSize = parentRatifyingCondition.size();
 					final int negatedSize = parentNegatedCondition.size();
@@ -408,11 +426,12 @@ public class RulesReducer{
 
 		//start expanding the condition (until the maximum length is reached):
 		LineEntry shadowParent = parent;
+		final Set<Character> shadowChildrenGroup = new HashSet<>(childrenRules.size());
 		int k;
 		for(k = parentConditionLength + 1; k <= minLength; k ++){
 			shadowParent = LineEntry.createFrom(shadowParent, chr + shadowParent.condition);
 			final Set<Character> shadowParentGroup = shadowParent.extractGroup(k);
-			final Set<Character> shadowChildrenGroup = new HashSet<>(childrenRules.size());
+			shadowChildrenGroup.clear();
 			for(int m = 0; m < childrenRules.size(); m ++){
 				final LineEntry child = childrenRules.get(m);
 				final Set<Character> childGroup = child.extractGroup(k);
@@ -605,16 +624,18 @@ public class RulesReducer{
 		int progress = 0;
 		int progressIndex = 0;
 		final int progressStep = (int)Math.ceil(originalLines.size() / 100.f);
+		final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(0);
+		final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(0);
 		for(int i = 0; i < originalLines.size(); i ++){
 			final String line = originalLines.get(i);
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenParent);
 
-			final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(originalInflections.size());
+			originalInflectionsWhole.clear();
 			for(int j = 0; j < originalInflections.size(); j ++)
 				originalInflectionsWhole.add(new DictionaryEntry(originalInflections.get(j)));
-			final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(inflections.size());
+			inflectionsWhole.clear();
 			for(int j = 0; j < inflections.size(); j ++)
 				inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
 			if(!originalInflectionsWhole.equals(inflectionsWhole))

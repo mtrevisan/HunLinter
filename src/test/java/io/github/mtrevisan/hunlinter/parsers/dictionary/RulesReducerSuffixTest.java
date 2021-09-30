@@ -1903,9 +1903,10 @@ class RulesReducerSuffixTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
+			new LineEntry("to", "ʼ", "nto", Arrays.asList("santo", "tanto")),
+			new LineEntry("o", "ʼ", "[^n]to", Arrays.asList("kuarto", "sèsto", "tuto", "sto")),
 			new LineEntry("do", "ʼ", "do", Arrays.asList("komòdo", "kuando")),
-			new LineEntry("o", "ʼ", "[^dkt]o", Arrays.asList("no", "òño", "tèrso", "tèrŧo", "so")),
-			new LineEntry("to", "ʼ", "to", Arrays.asList("kuarto", "sèsto", "santo", "tuto", "tanto", "sto")),
+			new LineEntry("o", "ʼ", "[^dkt]o", Arrays.asList("no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
 			new LineEntry("ko", "ʼ", "ko", Arrays.asList("pòko", "puòko", "poko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
@@ -1915,9 +1916,9 @@ class RulesReducerSuffixTest{
 			"SFX '9 Y 5",
 			"SFX '9 do ʼ do",
 			"SFX '9 ko ʼ ko",
+			"SFX '9 o ʼ [^dkt]o",
 			"SFX '9 to ʼ nto",
-			"SFX '9 o ʼ [^n]to",
-			"SFX '9 o ʼ [^dkt]o"
+			"SFX '9 o ʼ [^n]to"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
