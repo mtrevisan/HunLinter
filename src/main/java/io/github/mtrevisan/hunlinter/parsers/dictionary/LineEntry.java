@@ -187,6 +187,20 @@ public class LineEntry implements Serializable{
 		return group;
 	}
 
+	public final int getMinimumFromLength(){
+		int minLength = -1;
+		for(final String f : from){
+			final int length = f.length();
+			if(length < minLength || minLength < 0){
+				minLength = length;
+
+				if(minLength == 1)
+					break;
+			}
+		}
+		return minLength;
+	}
+
 	public final void expandConditionToMaxLength(final Comparator<String> comparator){
 		final String lcs = StringHelper.longestCommonSuffix(from.toArray(new String[0]));
 		if(lcs != null){
