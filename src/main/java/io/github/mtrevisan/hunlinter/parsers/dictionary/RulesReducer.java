@@ -261,6 +261,8 @@ public class RulesReducer{
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
+		final List<LineEntry> finalRules = new ArrayList<>(0);
+
 		boolean restart = true;
 		while(restart){
 			restart = false;
@@ -315,6 +317,24 @@ public class RulesReducer{
 
 						condition.setLength(0);
 						if(childrenGroup.contains(chr)){
+							//if parent contains one of its children, then it has to remain in the final rule set
+							boolean contained = false;
+							for(final LineEntry child : childrenRules)
+								if(parent.from.containsAll(child.from)){
+									contained = true;
+									break;
+								}
+							if(contained){
+								//remove parent (it will be reinserted before exiting this method)
+								finalRules.add(parent);
+								branch.remove(parentIndex);
+
+								parentRatifyingCondition.clear();
+
+								restart = true;
+								break;
+							}
+
 							final String preCondition = bubbleUpCondition(parent, parentConditionLength, branch, chr, childrenRules);
 							if(preCondition == null)
 								throw new IllegalStateException("Cannot `bubble-up` condition, please report this case to the developer, thank you");
@@ -366,13 +386,14 @@ public class RulesReducer{
 			restoreRules(rules, branches);
 		}
 
+		rules.addAll(finalRules);
+
 		return rules;
 	}
 
+	//resolve o+elo that must be [^e]lo+[^l]o+elo:
 	private String bubbleUpCondition(final LineEntry parent, final int parentConditionLength, final List<LineEntry> branch,
-			final Character chr, final List<LineEntry> childrenRules){
-		//resolve o+elo > lo+elo, that must be [^e]lo+[^l]o+elo:
-
+			Character chr, final List<LineEntry> childrenRules){
 		//calculate maximum condition length:
 		int minLength = -1;
 		for(final LineEntry rule : branch){
@@ -386,9 +407,10 @@ public class RulesReducer{
 		}
 
 		//start expanding the condition (until the maximum length is reached):
+		LineEntry shadowParent = parent;
 		int k;
-		for(k = parentConditionLength + 1; k < minLength; k ++){
-			final LineEntry shadowParent = LineEntry.createFrom(parent, chr + parent.condition);
+		for(k = parentConditionLength + 1; k <= minLength; k ++){
+			shadowParent = LineEntry.createFrom(shadowParent, chr + shadowParent.condition);
 			final Set<Character> shadowParentGroup = shadowParent.extractGroup(k);
 			final Set<Character> shadowChildrenGroup = new HashSet<>(childrenRules.size());
 			for(int m = 0; m < childrenRules.size(); m ++){
@@ -397,7 +419,8 @@ public class RulesReducer{
 				shadowChildrenGroup.addAll(childGroup);
 			}
 			final Set<Character> shadowIntersection = SetHelper.intersection(shadowParentGroup, shadowChildrenGroup);
-			if(shadowIntersection.isEmpty()){
+			final int shadowIntersectionSize = shadowIntersection.size();
+			if(shadowIntersectionSize == 0){
 				final int ratifyingSize = shadowParentGroup.size();
 				final int negatedSize = shadowChildrenGroup.size();
 				final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
@@ -407,6 +430,12 @@ public class RulesReducer{
 				return (chooseRatifyingOverNegated
 					? RegexHelper.makeGroup(shadowParentGroup, comparator)
 					: RegexHelper.makeNotGroup(shadowChildrenGroup, comparator));
+			}
+			else if(shadowIntersectionSize == 1){
+				//restart cycle adding a character to the shadow parent
+				chr = shadowIntersection.iterator().next();
+				k --;
+				continue;
 			}
 
 			//otherwise, add one character to both shadowParent and shadowChildren, and restart
