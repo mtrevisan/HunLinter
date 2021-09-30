@@ -261,15 +261,14 @@ public class RulesReducer{
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
-		boolean restart = false;
+		boolean restart = true;
+		while(restart){
+			restart = false;
 
-		restart:
-		while(true){
 			final List<List<LineEntry>> branches = extractTree(rules);
 
 			//for each limb, level up the conditions so there is no intersection between the limb and the branches
-			int i;
-			for(i = 0; i < branches.size(); i ++){
+			for(int i = 0; !restart && i < branches.size(); i ++){
 				final List<LineEntry> branch = branches.get(i);
 				final int branchSize = branch.size();
 				if(branchSize == 1)
@@ -362,19 +361,9 @@ public class RulesReducer{
 
 					restart = true;
 				}
-
-				if(restart){
-					restart = false;
-
-					restoreRules(rules, branches);
-					continue restart;
-				}
 			}
 
-			if(i == branches.size()){
-				restoreRules(rules, branches);
-				break;
-			}
+			restoreRules(rules, branches);
 		}
 
 		return rules;
