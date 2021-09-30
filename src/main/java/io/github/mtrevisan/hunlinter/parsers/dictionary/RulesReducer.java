@@ -295,30 +295,120 @@ public class RulesReducer{
 	}
 
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
-		final List<LineEntry> newRules = new ArrayList<>(0);
+		final StringBuilder condition = new StringBuilder();
+		final Set<Character> parentNegatedCondition = new HashSet<>();
+		final Set<Character> parentRatifyingCondition = new HashSet<>();
 
 		restart:
 		while(true){
-			//order by condition length
-			rules.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
+			final List<List<LineEntry>> branches = extractTree(rules);
 
-			//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
-			//the first item, the (limb) parent, so to say)
-			final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
-			while(!rules.isEmpty()){
-				final List<LineEntry> branch = extractBranch(rules);
-				branches.add(branch);
-			}
+			parentNegatedCondition.clear();
+			parentRatifyingCondition.clear();
 
 			//for each limb, level up the conditions so there is no intersection between the limb and the branches
 			int i = 0;
-			final StringBuilder condition = new StringBuilder();
+			for(; i < branches.size(); i ++){
+				final List<LineEntry> branch = branches.get(i);
+				final int branchSize = branch.size();
+				if(branchSize == 1)
+					continue;
+
+				//extract limb
+				final int parentIndex = 0;
+				final LineEntry parent = branch.get(parentIndex);
+
+				//augment parent condition to avoid any intersection:
+				final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
+				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
+
+				for(int m = 0; m < branchSize; m ++){
+					if(m != parentIndex){
+						final LineEntry child = branch.get(m);
+						if(!child.from.containsAll(parent.from)){
+							final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+							final Set<Character> intersection = SetHelper.intersection(parentGroup, childGroup);
+							if(intersection.isEmpty())
+								parentNegatedCondition.addAll(childGroup);
+							else if(parentGroup.equals(intersection)){
+								branch.remove(parent);
+								for(final Character chr : intersection){
+									condition.setLength(0);
+									condition.append(chr)
+										.append(parent.condition);
+									final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+									parent.from.removeAll(newRule.from);
+									branch.add(newRule);
+								}
+
+								restoreRules(rules, branches);
+								continue restart;
+							}
+							else{
+								parentNegatedCondition.addAll(intersection);
+								parentGroup.removeAll(intersection);
+								parentRatifyingCondition.addAll(parentGroup);
+							}
+						}
+						else{
+							//TODO
+							System.out.println();
+						}
+					}
+				}
+
+				final int ratifyingSize = parentRatifyingCondition.size();
+				final int negatedSize = parentNegatedCondition.size();
+				if(ratifyingSize > 0 || negatedSize > 0){
+					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
+						&& ratifyingSize > 0
+						|| negatedSize == 0
+					);
+					final String augment = (chooseRatifyingOverNegated
+						? RegexHelper.makeGroup(parentRatifyingCondition, comparator)
+						: RegexHelper.makeNotGroup(parentNegatedCondition, comparator));
+					condition.setLength(0);
+					condition.append(augment)
+						.append(parent.condition);
+					final LineEntry newRule = LineEntry.createFrom(parent, condition.toString());
+					if(ratifyingSize > 0 && negatedSize > 0){
+						parent.from.removeAll(newRule.from);
+						branch.add(newRule);
+					}
+					else
+						parent.condition = condition.toString();
+
+					restoreRules(rules, branches);
+					continue restart;
+				}
+
+//				if(!parentNegatedCondition.isEmpty()){
+//					final boolean chooseRatifyingOverNegated = (parentGroup.size() < parentNegatedCondition.size()
+//						+ Math.max(parentConditionLength - 3, 0));
+//					final String augment = (chooseRatifyingOverNegated
+//						? RegexHelper.makeGroup(parentGroup, comparator)
+//						: RegexHelper.makeNotGroup(parentNegatedCondition, comparator));
+//					condition.setLength(0);
+//					condition.append(augment)
+//						.append(parent.condition);
+//					parent.condition = condition.toString();
+//
+//					restoreRules(rules, branches);
+//					continue restart;
+//				}
+
+				//TODO
+				System.out.println();
+			}
+//------
+
+/*			int i = 0;
 			for(; i < branches.size(); i ++){
 				final List<LineEntry> branch = branches.get(i);
 				final int branchSize = branch.size();
 				for(int j = 0; j < branchSize - 1; j ++){
 					//extract limb
-					LineEntry parent = branch.get(j);
+					final LineEntry parent = branch.get(j);
 					for(int k = 0; k < branchSize; k ++){
 						//extract branch of limb
 						final LineEntry child = branch.get(k);
@@ -404,7 +494,8 @@ public class RulesReducer{
 							final Set<String> affectedChildrenFrom = new HashSet<>(branchSize - 1);
 							for(int m = 0; m < branchSize; m ++){
 								final LineEntry affectedChild = branch.get(m);
-								if(affectedChild == parent || !affectedChild.condition.endsWith(parent.condition))
+								if(affectedChild == parent || !affectedChild.condition.endsWith(parent.condition)
+										|| affectedChild.from.containsAll(parent.from))
 									continue;
 
 								final Set<Character> childGroup = affectedChild.extractGroup(parentConditionLength);
@@ -416,7 +507,8 @@ public class RulesReducer{
 							}
 
 							final Set<Character> nextParentGroup = parent.extractGroup(parentConditionLength + 1);
-							final boolean chooseRatifyingOverNegated = (nextParentGroup.size() < affectedChildrenGroup.size());
+							final boolean chooseRatifyingOverNegated = (nextParentGroup.size() < affectedChildrenGroup.size()
+								|| affectedChildrenGroup.isEmpty());
 							final String augment = (chooseRatifyingOverNegated
 								? RegexHelper.makeGroup(nextParentGroup, comparator)
 								: RegexHelper.makeNotGroup(affectedChildrenGroup, comparator));
@@ -569,32 +661,32 @@ public class RulesReducer{
 //								}
 						}
 
-//						final Set<Character> childrenGroup2 = new HashSet<>(branchSize - j);
-//						for(int m = j + 1; m < branchSize; m ++){
-//							final LineEntry lineEntry = branch.get(m);
-//							if(lineEntry.condition.endsWith(parent.condition))
-//								childrenGroup2.addAll(lineEntry.extractGroup(parentConditionLength));
-//						}
-//						final Set<Character> intersection2 = SetHelper.intersection(parentGroup, childrenGroup2);
-//						if(!intersection2.isEmpty()){
-//							final String augment = RegexHelper.makeNotGroup(intersection2, comparator);
-//							condition.setLength(0);
-//							condition.append(augment)
-//								.append(parent.condition);
-//							if(parent.extractFromEndingWith(condition.toString()).isEmpty()){
-//								parent.condition = condition.toString();
-//
-//								restoreRules(rules, branches);
-//								continue restart;
-//							}
-//						}
-//						else{
-//							//TODO
-//							System.out.println();
-//						}
+						final Set<Character> childrenGroup2 = new HashSet<>(branchSize - j);
+						for(int m = j + 1; m < branchSize; m ++){
+							final LineEntry lineEntry = branch.get(m);
+							if(lineEntry.condition.endsWith(parent.condition))
+								childrenGroup2.addAll(lineEntry.extractGroup(parentConditionLength));
+						}
+						final Set<Character> intersection2 = SetHelper.intersection(parentGroup, childrenGroup2);
+						if(!intersection2.isEmpty()){
+							final String augment = RegexHelper.makeNotGroup(intersection2, comparator);
+							condition.setLength(0);
+							condition.append(augment)
+								.append(parent.condition);
+							if(parent.extractFromEndingWith(condition.toString()).isEmpty()){
+								parent.condition = condition.toString();
+
+								restoreRules(rules, branches);
+								continue restart;
+							}
+						}
+						else{
+							//TODO
+							System.out.println();
+						}
 					}
 				}
-			}
+			}*/
 
 			if(i == branches.size()){
 				restoreRules(rules, branches);
@@ -603,6 +695,21 @@ public class RulesReducer{
 		}
 
 		return rules;
+	}
+
+	//NOTE: `rules` will be emptied.
+	private List<List<LineEntry>> extractTree(final List<LineEntry> rules){
+		//order by condition length
+		rules.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
+
+		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
+		//the first item, the (limb) parent, so to say)
+		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
+		while(!rules.isEmpty()){
+			final List<LineEntry> branch = extractBranch(rules);
+			branches.add(branch);
+		}
+		return branches;
 	}
 
 	private void restoreRules(final List<LineEntry> rules, final List<List<LineEntry>> branches){

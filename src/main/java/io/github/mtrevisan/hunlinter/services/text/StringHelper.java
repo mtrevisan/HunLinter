@@ -108,7 +108,7 @@ public final class StringHelper{
 		return longestCommonAffix(StringHelper::commonSuffix, texts);
 	}
 
-	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String... texts){
+	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String[] texts){
 		String lcs = null;
 		if(texts.length > 0){
 			int offset = 0;

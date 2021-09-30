@@ -105,7 +105,7 @@ class RulesReducerSuffixTest{
 			new LineEntry("te", "‘", "te", "frate"),
 			new LineEntry("do", "‘", "do", Arrays.asList("nudo", "komòdo", "kuando")),
 			new LineEntry("a", "‘", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
-			new LineEntry("e", "‘", "[dg]e", Arrays.asList("de", "ge")),
+			new LineEntry("e", "‘", "[^mtv]e", Arrays.asList("de", "ge")),
 			new LineEntry("o", "‘", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
 			new LineEntry("ove", "ó‘", "ove", Arrays.asList("indove", "adove"))
 		);
@@ -122,7 +122,7 @@ class RulesReducerSuffixTest{
 			"SFX '0 te ‘ te",
 			"SFX '0 do ‘ do",
 			"SFX '0 a ‘ [^rx]a",
-			"SFX '0 e ‘ [dg]e",
+			"SFX '0 e ‘ [^mtv]e",
 			"SFX '0 o ‘ [^d]o",
 			"SFX '0 ove ó‘ ove"
 		);
@@ -1856,10 +1856,10 @@ class RulesReducerSuffixTest{
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX %2 Y 10",
-			"SFX %2 0 x i",
 			"SFX %2 0 i .",
 			"SFX %2 0 ii .",
 			"SFX %2 0 iii .",
+			"SFX %2 0 x i",
 			"SFX %2 0 iv [^iv]",
 			"SFX %2 0 ix [^iv]",
 			"SFX %2 0 vi [^iv]",
