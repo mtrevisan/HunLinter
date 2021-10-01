@@ -259,11 +259,11 @@ public class RulesReducer{
 		}
 	}
 
-	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
+	private synchronized List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
-		final Collection<Character> parentRatifyingCondition = new HashSet<>(0);
-		final Collection<Character> parentNegatedCondition = new HashSet<>(0);
+		final Collection<Character> parentRatifyingGroup = new HashSet<>(0);
+		final Collection<Character> parentNegatedGroup = new HashSet<>(0);
 		final Map<LineEntry, Set<Character>> collisions = new HashMap<>(0);
 		final List<LineEntry> childrenRules = new ArrayList<>(0);
 		final Collection<Character> childrenGroup = new HashSet<>(0);
@@ -279,7 +279,7 @@ public class RulesReducer{
 			//for each limb, level up the conditions so there is no intersection between the limb and the branches
 			for(int i = 0; !restart && i < branches.size(); i ++){
 				final List<LineEntry> branch = branches.get(i);
-				final int branchSize = branch.size();
+				int branchSize = branch.size();
 				if(branchSize == 1)
 					continue;
 
@@ -291,7 +291,7 @@ public class RulesReducer{
 				final int parentConditionLength = RegexHelper.conditionLength(parent.condition);
 				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-				parentRatifyingCondition.clear();
+				parentRatifyingGroup.clear();
 
 				//for every character, if it collides with a children, put into `parentNegatedCondition`, otherwise put in
 				//`parentRatifyingCondition`
@@ -304,7 +304,7 @@ public class RulesReducer{
 							collisions.put(child, childGroup);
 					}
 					if(collisions.isEmpty())
-						parentRatifyingCondition.add(chr);
+						parentRatifyingGroup.add(chr);
 					else{
 						childrenRules.clear();
 						childrenGroup.clear();
@@ -321,7 +321,7 @@ public class RulesReducer{
 						commonChildrenGroup.removeAll(parentGroup);
 
 						if(childrenGroup.isEmpty()){
-							parentNegatedCondition.add(chr);
+							parentNegatedGroup.add(chr);
 							continue;
 						}
 
@@ -338,8 +338,9 @@ public class RulesReducer{
 								//remove parent (it will be reinserted before exiting this method)
 								finalRules.add(parent);
 								branch.remove(parentIndex);
+								branchSize --;
 
-								parentRatifyingCondition.clear();
+								parentRatifyingGroup.clear();
 
 								restart = true;
 								break;
@@ -368,29 +369,29 @@ public class RulesReducer{
 					}
 				}
 
-				if(!parentRatifyingCondition.isEmpty()){
-					parentNegatedCondition.clear();
+				if(!parentRatifyingGroup.isEmpty()){
+					parentNegatedGroup.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
 						final LineEntry child = branch.get(m);
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
-						parentNegatedCondition.addAll(childGroup);
+						parentNegatedGroup.addAll(childGroup);
 					}
 					for(int m = 0; m < finalRules.size(); m ++){
 						final LineEntry child = finalRules.get(m);
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
-						parentNegatedCondition.addAll(childGroup);
+						parentNegatedGroup.addAll(childGroup);
 					}
-					parentNegatedCondition.removeAll(parentRatifyingCondition);
+					parentNegatedGroup.removeAll(parentRatifyingGroup);
 
-					final int ratifyingSize = parentRatifyingCondition.size();
-					final int negatedSize = parentNegatedCondition.size();
+					final int ratifyingSize = parentRatifyingGroup.size();
+					final int negatedSize = parentNegatedGroup.size();
 					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
 						/*&& ratifyingSize > 0 this is already implied by the previous condition*/
 						|| negatedSize == 0
 					);
 					final String augment = (chooseRatifyingOverNegated
-						? RegexHelper.makeGroup(parentRatifyingCondition, comparator)
-						: RegexHelper.makeNotGroup(parentNegatedCondition, comparator));
+						? RegexHelper.makeGroup(parentRatifyingGroup, comparator)
+						: RegexHelper.makeNotGroup(parentNegatedGroup, comparator));
 					condition.setLength(0);
 					condition.append(augment)
 						.append(parent.condition);
@@ -398,9 +399,32 @@ public class RulesReducer{
 
 					restart = true;
 				}
-				else if(!parentNegatedCondition.isEmpty() && !parent.condition.contains("[^")){
+				else if(!parentNegatedGroup.isEmpty() && !parent.condition.contains("[^")){
+					parentRatifyingGroup.clear();
+					for(int m = parentIndex + 1; m < branchSize; m ++){
+						final LineEntry child = branch.get(m);
+						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+						parentRatifyingGroup.addAll(childGroup);
+					}
+					for(int m = 0; m < finalRules.size(); m ++){
+						final LineEntry child = finalRules.get(m);
+						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+						parentRatifyingGroup.addAll(childGroup);
+					}
+					parentRatifyingGroup.removeAll(parentGroup);
+
+					//NOTE: here `parentRatifyingGroup` and `parentNegatedGroup` are swapped!!
+					final int ratifyingSize = parentNegatedGroup.size();
+					final int negatedSize = parentRatifyingGroup.size();
+					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
+						/*&& ratifyingSize > 0 this is already implied by the previous condition*/
+						|| negatedSize == 0
+					);
+					final String augment = (chooseRatifyingOverNegated
+						? RegexHelper.makeGroup(parentNegatedGroup, comparator)
+						: RegexHelper.makeNotGroup(parentRatifyingGroup, comparator));
 					condition.setLength(0);
-					condition.append(RegexHelper.makeGroup(parentNegatedCondition, comparator))
+					condition.append(augment)
 						.append(parent.condition);
 					parent.condition = condition.toString();
 

@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -78,7 +79,7 @@ class HeapSortTest{
 		for(int i = 0; i < len; i ++)
 			data[i] = i;
 		for(int i = 0; i < 3; i ++)
-			swap(data, RND.nextInt(data.length), RND.nextInt(data.length));
+			ArrayUtils.swap(data, RND.nextInt(data.length), RND.nextInt(data.length));
 
 		HeapSort.sort(data, NATURAL_ORDER);
 
@@ -171,12 +172,6 @@ class HeapSortTest{
 	private void assertSort(String[] data){
 		for(int i = 1; i < data.length; i ++)
 			Assertions.assertTrue(data[i - 1].compareTo(data[i]) <= 0);
-	}
-
-	private static void swap(Object[] a, int i, int j){
-		Object t = a[i];
-		a[i] = a[j];
-		a[j] = t;
 	}
 
 }

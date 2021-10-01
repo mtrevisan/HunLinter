@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.services.sorters;
 
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -79,7 +80,7 @@ public final class HeapSort{
 		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
-			SorterHelper.swap(data, low, heapsize);
+			ArrayUtils.swap(data, low, heapsize);
 
 			//sift down:
 			siftDown(data, low, heapsize, comparator);
@@ -104,7 +105,7 @@ public final class HeapSort{
 				while(node > 0){
 					final int parent = parent(node);
 					if(comparator.compare(data[node], data[parent]) > 0)
-						SorterHelper.swap(data, node, parent);
+						ArrayUtils.swap(data, node, parent);
 					node = parent;
 				}
 			}
@@ -128,7 +129,7 @@ public final class HeapSort{
 
 			//if parent is smaller than left child, then swapping parent with left child
 			if(leftChild < heapsize && comparator.compare(data[parent], data[leftChild]) < 0)
-				SorterHelper.swap(data, parent, leftChild);
+				ArrayUtils.swap(data, parent, leftChild);
 
 			parent = leftChild;
 		}while(leftChild < heapsize);
