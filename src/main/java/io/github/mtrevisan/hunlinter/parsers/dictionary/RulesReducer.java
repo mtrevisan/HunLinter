@@ -329,8 +329,8 @@ public class RulesReducer{
 						if(childrenGroup.contains(chr)){
 							//if parent contains one of its children, then it has to remain in the final rule set
 							boolean contained = false;
-							for(final LineEntry child : childrenRules)
-								if(parent.from.containsAll(child.from)){
+							for(int j = 0; j < childrenRules.size(); j ++)
+								if(parent.from.containsAll(childrenRules.get(j).from)){
 									contained = true;
 									break;
 								}
@@ -400,7 +400,7 @@ public class RulesReducer{
 					restart = true;
 				}
 				else if(!parentNegatedGroup.isEmpty() && !parent.condition.contains("[^")){
-					parentRatifyingGroup.clear();
+					//parentRatifyingGroup.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
 						final LineEntry child = branch.get(m);
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
@@ -445,8 +445,8 @@ public class RulesReducer{
 			Character chr, final List<LineEntry> childrenRules){
 		//calculate maximum condition length:
 		int minLength = -1;
-		for(final LineEntry rule : branch){
-			final int minimumFromLength = rule.getMinimumFromLength();
+		for(int i = 0; i < branch.size(); i ++){
+			final int minimumFromLength = branch.get(i).getMinimumFromLength();
 			if(minimumFromLength < minLength || minLength < 0){
 				minLength = minimumFromLength;
 
@@ -511,10 +511,10 @@ public class RulesReducer{
 		return branches;
 	}
 
-	private void restoreRules(final List<LineEntry> rules, final List<List<LineEntry>> branches){
+	private void restoreRules(final Collection<LineEntry> rules, final List<List<LineEntry>> branches){
 		rules.clear();
-		for(final List<LineEntry> branch : branches)
-			rules.addAll(branch);
+		for(int i = 0; i < branches.size(); i ++)
+			rules.addAll(branches.get(i));
 	}
 
 	/**
@@ -699,11 +699,13 @@ public class RulesReducer{
 			//retrieve rule with the longest condition (all the other conditions must be this long)
 			LineEntry maxConditionEntry = null;
 			int maxConditionLength = 0;
-			for(final LineEntry elem : rules)
+			for(int i = 0; i < rules.size(); i ++){
+				final LineEntry elem = rules.get(i);
 				if(maxConditionEntry == null || elem.condition.length() > maxConditionLength){
 					maxConditionEntry = elem;
 					maxConditionLength = elem.condition.length();
 				}
+			}
 
 			expandAddition(rules, maxConditionEntry);
 
