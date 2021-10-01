@@ -292,6 +292,7 @@ public class RulesReducer{
 				final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 				parentRatifyingGroup.clear();
+				parentNegatedGroup.clear();
 
 				//for every character, if it collides with a children, put into `parentNegatedCondition`, otherwise put in
 				//`parentRatifyingCondition`
@@ -329,18 +330,65 @@ public class RulesReducer{
 						if(childrenGroup.contains(chr)){
 							//if parent contains one of its children, then it has to remain in the final rule set
 							boolean contained = false;
-							for(int j = 0; j < childrenRules.size(); j ++)
-								if(parent.from.containsAll(childrenRules.get(j).from)){
+							for(int j = 0; j < childrenRules.size(); j ++){
+								final LineEntry child = childrenRules.get(j);
+								if(parent.from.containsAll(child.from)){
+									//extend `parent.condition` and `child.condition` to their maximum length
+//									final String newParentCondition = StringHelper.longestCommonSuffix(parent.from.toArray(String[]::new));
+//									final String newChildCondition = StringHelper.longestCommonSuffix(child.from.toArray(String[]::new));
+//									if(newParentCondition.equals(newChildCondition)){
+//										parent.condition = newParentCondition;
+//										child.condition = newChildCondition;
+//										final int newParentConditionLength = newParentCondition.length();
+//										final Set<Character> newParentGroup = parent.extractGroup(newParentConditionLength);
+//										final Set<Character> newChildGroup = child.extractGroup(newParentConditionLength);
+//										final Set<Character> newIntersectionGroup = SetHelper.intersection(newParentGroup, newChildGroup);
+//										if(newIntersectionGroup.isEmpty()){
+//											final int ratifyingSize = newParentGroup.size();
+//											final int negatedSize = newChildGroup.size();
+//											boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(newParentConditionLength - 3, 0)
+//												&& ratifyingSize > 0
+//												|| negatedSize == 0
+//											);
+//											String augment = (chooseRatifyingOverNegated
+//												? RegexHelper.makeGroup(newParentGroup, comparator)
+//												: RegexHelper.makeNotGroup(newChildGroup, comparator));
+//											condition.setLength(0);
+//											condition.append(augment)
+//												.append(parent.condition);
+//											parent.condition = condition.toString();
+//
+//											//NOTE: here `parentRatifyingGroup` and `parentNegatedGroup` are swapped!!
+//											chooseRatifyingOverNegated = (negatedSize < ratifyingSize + Math.max(newParentConditionLength - 3, 0)
+//												&& negatedSize > 0
+//												|| ratifyingSize == 0
+//											);
+//											augment = (chooseRatifyingOverNegated
+//												? RegexHelper.makeGroup(newChildGroup, comparator)
+//												: RegexHelper.makeNotGroup(newParentGroup, comparator));
+//											condition.setLength(0);
+//											condition.append(augment)
+//												.append(child.condition);
+//											child.condition = condition.toString();
+//										}
+//										else if(!parent.from.containsAll(child.from))
+//											throw new IllegalStateException("Cannot `child.from` is not fully contained into `parent.from`, please report this case to the developer, thank you");
+//									}
+
 									contained = true;
 									break;
 								}
+							}
 							if(contained){
 								//remove parent (it will be reinserted before exiting this method)
 								finalRules.add(parent);
 								branch.remove(parentIndex);
-								branchSize --;
+//								branchSize --;
 
+								//FIXME: SFX
 								parentRatifyingGroup.clear();
+								//FIXME: PFX
+//								parentNegatedGroup.clear();
 
 								restart = true;
 								break;
@@ -386,7 +434,7 @@ public class RulesReducer{
 					final int ratifyingSize = parentRatifyingGroup.size();
 					final int negatedSize = parentNegatedGroup.size();
 					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
-						/*&& ratifyingSize > 0 this is already implied by the previous condition*/
+						&& ratifyingSize > 0
 						|| negatedSize == 0
 					);
 					final String augment = (chooseRatifyingOverNegated
@@ -399,8 +447,8 @@ public class RulesReducer{
 
 					restart = true;
 				}
-				else if(!parentNegatedGroup.isEmpty() && !parent.condition.contains("[^")){
-					//parentRatifyingGroup.clear();
+				else if(!parentNegatedGroup.isEmpty()){
+					parentRatifyingGroup.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
 						final LineEntry child = branch.get(m);
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
@@ -411,13 +459,13 @@ public class RulesReducer{
 						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
 						parentRatifyingGroup.addAll(childGroup);
 					}
-					parentRatifyingGroup.removeAll(parentGroup);
+					parentRatifyingGroup.removeAll(parentNegatedGroup);
 
 					//NOTE: here `parentRatifyingGroup` and `parentNegatedGroup` are swapped!!
 					final int ratifyingSize = parentNegatedGroup.size();
 					final int negatedSize = parentRatifyingGroup.size();
 					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
-						/*&& ratifyingSize > 0 this is already implied by the previous condition*/
+						&& ratifyingSize > 0
 						|| negatedSize == 0
 					);
 					final String augment = (chooseRatifyingOverNegated
@@ -430,6 +478,37 @@ public class RulesReducer{
 
 					restart = true;
 				}
+//				else if(!parent.condition.contains("[^")){
+//					parentNegatedGroup.clear();
+//					for(int m = parentIndex + 1; m < branchSize; m ++){
+//						final LineEntry child = branch.get(m);
+//						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+//						parentNegatedGroup.addAll(childGroup);
+//					}
+//					for(int m = 0; m < finalRules.size(); m ++){
+//						final LineEntry child = finalRules.get(m);
+//						final Set<Character> childGroup = child.extractGroup(parentConditionLength);
+//						parentNegatedGroup.addAll(childGroup);
+//					}
+//					parentNegatedGroup.removeAll(parentGroup);
+//
+//					//NOTE: here `parentRatifyingGroup` and `parentNegatedGroup` are swapped!!
+//					final int ratifyingSize = parentNegatedGroup.size();
+//					final int negatedSize = parentRatifyingGroup.size();
+//					final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
+//						&& ratifyingSize > 0
+//						|| negatedSize == 0
+//					);
+//					final String augment = (chooseRatifyingOverNegated
+//						? RegexHelper.makeGroup(parentNegatedGroup, comparator)
+//						: RegexHelper.makeNotGroup(parentRatifyingGroup, comparator));
+//					condition.setLength(0);
+//					condition.append(augment)
+//						.append(parent.condition);
+//					parent.condition = condition.toString();
+//
+//					restart = true;
+//				}
 			}
 
 			restoreRules(rules, branches);
@@ -468,13 +547,13 @@ public class RulesReducer{
 				final Set<Character> childGroup = child.extractGroup(k);
 				shadowChildrenGroup.addAll(childGroup);
 			}
-			final Set<Character> shadowIntersection = SetHelper.intersection(shadowParentGroup, shadowChildrenGroup);
-			final int shadowIntersectionSize = shadowIntersection.size();
+			final Set<Character> shadowIntersectionGroup = SetHelper.intersection(shadowParentGroup, shadowChildrenGroup);
+			final int shadowIntersectionSize = shadowIntersectionGroup.size();
 			if(shadowIntersectionSize == 0){
 				final int ratifyingSize = shadowParentGroup.size();
 				final int negatedSize = shadowChildrenGroup.size();
 				final boolean chooseRatifyingOverNegated = (ratifyingSize < negatedSize + Math.max(parentConditionLength - 3, 0)
-					/*&& ratifyingSize > 0 this is already implied by the previous condition*/
+					&& ratifyingSize > 0
 					|| negatedSize == 0
 				);
 				return (chooseRatifyingOverNegated
@@ -483,7 +562,7 @@ public class RulesReducer{
 			}
 			else if(shadowIntersectionSize == 1){
 				//restart cycle adding a character to the shadow parent
-				chr = shadowIntersection.iterator().next();
+				chr = shadowIntersectionGroup.iterator().next();
 				k --;
 			}
 

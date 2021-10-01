@@ -1845,7 +1845,7 @@ class RulesReducerSuffixTest{
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "x", "i", Arrays.asList("i")),
-			new LineEntry("0", Set.of("i", "ii", "iii"), ".", Arrays.asList("i", "v", "x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", Set.of("i", "ii", "iii"), "", Arrays.asList("i", "v", "x", "xx", "xxx", "d", "c", "l", "m")),
 			new LineEntry("0", Set.of("iv", "vi", "vii", "viii", "ix"), "[^iv]", Arrays.asList("x", "xx", "xxx", "d", "c", "l", "m")),
 			new LineEntry("0", "v", "[^v]", Arrays.asList("i", "x", "xx", "xxx", "d", "c", "l", "m"))
 		);
