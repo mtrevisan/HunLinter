@@ -262,7 +262,6 @@ public class RulesReducer{
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
-		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
 		final Collection<Character> parentRatifyingCondition = new HashSet<>(0);
 		final Collection<Character> parentNegatedCondition = new HashSet<>(0);
 		final Map<LineEntry, Set<Character>> collisions = new HashMap<>(0);
@@ -275,7 +274,7 @@ public class RulesReducer{
 		while(restart){
 			restart = false;
 
-			extractTree(branches, rules);
+			final List<List<LineEntry>> branches = extractTree(rules);
 
 			//for each limb, level up the conditions so there is no intersection between the limb and the branches
 			for(int i = 0; !restart && i < branches.size(); i ++){
@@ -369,14 +368,6 @@ public class RulesReducer{
 					}
 				}
 
-				if(!parentNegatedCondition.isEmpty()){
-					condition.setLength(0);
-					condition.append(RegexHelper.makeGroup(parentNegatedCondition, comparator))
-						.append(parent.condition);
-					parent.condition = condition.toString();
-
-					restart = true;
-				}
 				if(!parentRatifyingCondition.isEmpty()){
 					parentNegatedCondition.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
@@ -402,6 +393,14 @@ public class RulesReducer{
 						: RegexHelper.makeNotGroup(parentNegatedCondition, comparator));
 					condition.setLength(0);
 					condition.append(augment)
+						.append(parent.condition);
+					parent.condition = condition.toString();
+
+					restart = true;
+				}
+				else if(!parentNegatedCondition.isEmpty() && !parent.condition.contains("[^")){
+					condition.setLength(0);
+					condition.append(RegexHelper.makeGroup(parentNegatedCondition, comparator))
 						.append(parent.condition);
 					parent.condition = condition.toString();
 
@@ -474,12 +473,13 @@ public class RulesReducer{
 	}
 
 	//NOTE: `rules` will be emptied.
-	private List<List<LineEntry>> extractTree(final List<List<LineEntry>> branches, final List<LineEntry> rules){
+	private List<List<LineEntry>> extractTree(final List<LineEntry> rules){
 		//order by condition length
 		rules.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
 		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
 		//the first item, the (limb) parent, so to say)
+		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
 		while(!rules.isEmpty()){
 			final List<LineEntry> branch = extractBranch(rules);
 			branches.add(branch);
