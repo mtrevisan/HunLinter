@@ -63,7 +63,7 @@ class RulesReducerPrefixTest{
 			"PFX '0 l ‘ l",
 			"PFX '0 v ‘ v"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
@@ -107,7 +107,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -139,7 +139,7 @@ class RulesReducerPrefixTest{
 			"PFX vs té tà té",
 			"PFX vs ve va ver"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "vs";
@@ -195,7 +195,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -208,7 +208,7 @@ class RulesReducerPrefixTest{
 			"PFX ^0 Y 1",
 			"PFX ^0 0 anti ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "^0";
@@ -236,7 +236,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -251,7 +251,7 @@ class RulesReducerPrefixTest{
 			"PFX .0 0 ra [^a]",
 			"PFX .0 0 ar [^ƚ]"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = ".0";
@@ -283,7 +283,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -297,7 +297,7 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in [^n]",
 			"PFX +0 0 i n"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
@@ -327,7 +327,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -342,7 +342,7 @@ class RulesReducerPrefixTest{
 			"PFX $1 0 h/Z0 .",
 			"PFX $1 0 da/Z0 ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "$1";
@@ -371,7 +371,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -386,7 +386,7 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in– n",
 			"PFX +0 0 i [lƚmnñrs]"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
@@ -418,7 +418,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
@@ -433,7 +433,7 @@ class RulesReducerPrefixTest{
 			"PFX p3 0 trï [aeiouàèéíòóú]",
 			"PFX p3 0 tre ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerSuffixTest.createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "p3";
@@ -465,7 +465,7 @@ class RulesReducerPrefixTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 }

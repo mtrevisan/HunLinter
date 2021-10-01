@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -261,6 +262,7 @@ public class RulesReducer{
 	private List<LineEntry> disjoinConditions(final List<LineEntry> rules){
 		final StringBuilder condition = new StringBuilder();
 
+		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
 		final Collection<Character> parentRatifyingCondition = new HashSet<>(0);
 		final Collection<Character> parentNegatedCondition = new HashSet<>(0);
 		final Map<LineEntry, Set<Character>> collisions = new HashMap<>(0);
@@ -273,7 +275,7 @@ public class RulesReducer{
 		while(restart){
 			restart = false;
 
-			final List<List<LineEntry>> branches = extractTree(rules);
+			extractTree(branches, rules);
 
 			//for each limb, level up the conditions so there is no intersection between the limb and the branches
 			for(int i = 0; !restart && i < branches.size(); i ++){
@@ -320,11 +322,9 @@ public class RulesReducer{
 						commonChildrenGroup.removeAll(parentGroup);
 
 						if(childrenGroup.isEmpty()){
-							//TODO
-							System.out.println();
+							parentNegatedCondition.add(chr);
+							continue;
 						}
-						if(childrenGroup.isEmpty())
-							throw new IllegalStateException("`childrenGroup` is empty, please report this case to the developer, thank you");
 
 						condition.setLength(0);
 						if(childrenGroup.contains(chr)){
@@ -369,6 +369,14 @@ public class RulesReducer{
 					}
 				}
 
+				if(!parentNegatedCondition.isEmpty()){
+					condition.setLength(0);
+					condition.append(RegexHelper.makeGroup(parentNegatedCondition, comparator))
+						.append(parent.condition);
+					parent.condition = condition.toString();
+
+					restart = true;
+				}
 				if(!parentRatifyingCondition.isEmpty()){
 					parentNegatedCondition.clear();
 					for(int m = parentIndex + 1; m < branchSize; m ++){
@@ -454,25 +462,24 @@ public class RulesReducer{
 				//restart cycle adding a character to the shadow parent
 				chr = shadowIntersection.iterator().next();
 				k --;
-				continue;
 			}
 
 			//otherwise, add one character to both shadowParent and shadowChildren, and restart
 			//FIXME (to be removed after the bubbling-up works)
-			break;
+			else
+				throw new IllegalStateException("cannot `bubble-up`, please report this case to the developer, thank you");
 		}
 
 		return null;
 	}
 
 	//NOTE: `rules` will be emptied.
-	private List<List<LineEntry>> extractTree(final List<LineEntry> rules){
+	private List<List<LineEntry>> extractTree(final List<List<LineEntry>> branches, final List<LineEntry> rules){
 		//order by condition length
 		rules.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
 		//extract branches whose conditions are disjoint, each branch contains all the rules that share the same ending condition (given by
 		//the first item, the (limb) parent, so to say)
-		final List<List<LineEntry>> branches = new ArrayList<>(rules.size());
 		while(!rules.isEmpty()){
 			final List<LineEntry> branch = extractBranch(rules);
 			branches.add(branch);
@@ -495,16 +502,16 @@ public class RulesReducer{
 	 */
 	private static List<LineEntry> extractBranch(final List<LineEntry> rules){
 		final LineEntry parent = rules.get(0);
-		final List<LineEntry> branches = new ArrayList<>(rules.size());
+		final List<LineEntry> branch = new ArrayList<>(rules.size());
 		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
 			final LineEntry rule = itr.next();
 			if(rule.condition.endsWith(parent.condition)){
-				branches.add(rule);
+				branch.add(rule);
 				itr.remove();
 			}
 		}
-		return branches;
+		return branch;
 	}
 
 	/** Merge common conditions (ex. `[^a]bc` and `[^a]dc` will become `[^a][bd]c`). */
@@ -546,8 +553,6 @@ public class RulesReducer{
 	}
 
 
-
-
 	public final List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
@@ -561,9 +566,10 @@ public class RulesReducer{
 
 	private List<String> convertEntriesToRules(final String flag, final AffixType type, final boolean keepLongestCommonAffix,
 			final List<LineEntry> entries){
-		//restore original rules
-		final ArrayList<LineEntry> restoredRules = new ArrayList<>(0);
-		if(entries != null)
+		List<LineEntry> sortedEntries = Collections.emptyList();
+		if(!entries.isEmpty()){
+			//restore original rules
+			final ArrayList<LineEntry> restoredRules = new ArrayList<>(0);
 			for(int i = 0; i < entries.size(); i ++){
 				final LineEntry rule = entries.get(i);
 				restoredRules.ensureCapacity(rule.addition.size());
@@ -575,13 +581,14 @@ public class RulesReducer{
 					restoredRules.add(type == AffixType.SUFFIX? entry: entry.createReverse());
 				}
 			}
-		final List<LineEntry> sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);
+			sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);
+		}
 
 		return composeAffixRules(flag, type, sortedEntries);
 	}
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final List<LineEntry> entries){
-		if(keepLongestCommonAffix && entries != null)
+		if(keepLongestCommonAffix)
 			for(int i = 0; i < entries.size(); i ++)
 				entries.get(i).expandConditionToMaxLength(comparator);
 
@@ -597,9 +604,6 @@ public class RulesReducer{
 		return list;
 	}
 
-	final void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines){
-		checkReductionCorrectness(flag, reducedRules, originalLines, null);
-	}
 
 	public final void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines,
 			final ProgressCallback progressCallback){
@@ -645,6 +649,7 @@ public class RulesReducer{
 				progressCallback.accept(++ progressIndex);
 		}
 	}
+
 
 	public final LineEntry collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
 		//collect all inflections that generates from the given flag
