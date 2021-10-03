@@ -1845,19 +1845,19 @@ class RulesReducerSuffixTest{
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "x", "i", Arrays.asList("i")),
-			new LineEntry("0", Set.of("i", "ii", "iii"), "", Arrays.asList("i", "v", "x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", Set.of("i", "ii", "iii"), ".", Arrays.asList("i", "v", "x", "xx", "xxx", "d", "c", "l", "m")),
 			new LineEntry("0", Set.of("iv", "vi", "vii", "viii", "ix"), "[^iv]", Arrays.asList("x", "xx", "xxx", "d", "c", "l", "m")),
 			new LineEntry("0", "v", "[^v]", Arrays.asList("i", "x", "xx", "xxx", "d", "c", "l", "m"))
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX %2 Y 10",
+			"SFX %2 0 x i",
 			"SFX %2 0 i .",
 			"SFX %2 0 ii .",
 			"SFX %2 0 iii .",
-			"SFX %2 0 x i",
 			"SFX %2 0 iv [^iv]",
 			"SFX %2 0 ix [^iv]",
 			"SFX %2 0 vi [^iv]",
