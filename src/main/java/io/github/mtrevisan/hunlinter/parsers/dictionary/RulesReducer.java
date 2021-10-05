@@ -42,7 +42,6 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.sound.sampled.Line;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -313,6 +312,22 @@ public class RulesReducer{
 				final List<LineEntry> properChildren = getProperChildren(branch);
 				final int properChildrenSize = properChildren.size();
 				if(properChildrenSize == branchSize){
+					//TODO separate the children as long as child.condition matches parent.from
+					final LineEntry parent = properChildren.get(0);
+					for(int j = 1; j < properChildren.size(); j ++){
+						final LineEntry child = properChildren.get(j);
+						if(!parent.extractFromEndingWith(child.condition).isEmpty()){
+							//TODO separate parent from child
+							if(parent.condition.length() < child.condition.length()){
+								//TODO
+								System.out.println();
+							}
+							else{
+								//TODO
+								System.out.println();
+							}
+						}
+					}
 					finalRules.addAll(properChildren);
 					branch.clear();
 					continue;
@@ -496,6 +511,7 @@ public class RulesReducer{
 			final int parentConditionLength = parent.condition.length();
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
+			//FIXME useful?
 //			childrenGroup.clear();
 			for(int j = 1; j < branch.size(); j ++){
 				final LineEntry child = branch.get(j);
