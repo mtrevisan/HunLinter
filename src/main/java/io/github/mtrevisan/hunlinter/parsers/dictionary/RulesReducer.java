@@ -141,10 +141,8 @@ public class RulesReducer{
 		for(int i = 0; i < plainRules.size(); i ++)
 			redistributeRule(plainRules.get(i), map);
 
-		//redistribute:
 		final List<LineEntry> redistributedRules = redistributeRules(map, comparator);
 
-		//compact:
 		return compactRules(redistributedRules, comparator);
 	}
 
@@ -282,7 +280,7 @@ public class RulesReducer{
 	}
 
 	private synchronized List<LineEntry> disjoinConditions(final List<LineEntry> rules){
-		final ArrayList<List<LineEntry>> branches = new ArrayList<>();
+		final ArrayList<List<LineEntry>> branches = new ArrayList<>(0);
 		final List<LineEntry> finalRules = new ArrayList<>(0);
 		final StringBuilder condition = new StringBuilder();
 		boolean restart = true;
@@ -365,8 +363,8 @@ public class RulesReducer{
 					final int parentConditionLength = parent.condition.length();
 					final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
-					final Set<Character> childrenGroup = new HashSet<>();
-					final Set<Character> properChildrenGroup = new HashSet<>();
+					final Set<Character> childrenGroup = new HashSet<>(0);
+					final Set<Character> properChildrenGroup = new HashSet<>(0);
 					for(int j = 1; j < branch.size(); j ++){
 						final LineEntry child = branch.get(j);
 						if(!properChildren.contains(child))
@@ -492,11 +490,12 @@ public class RulesReducer{
 			alphabetGroup.addAll(ruleGroup);
 
 		final StringBuilder condition = new StringBuilder();
+		final Collection<Character> negatedGroup = new HashSet<>(0);
 		for(int i = 0; i < branch.size(); i ++){
 			final LineEntry entry = branch.get(i);
 
 			final Set<Character> ratifyingGroup = branchGroup.get(entry);
-			final Collection<Character> negatedGroup = new HashSet<>(alphabetGroup);
+			negatedGroup.addAll(alphabetGroup);
 			negatedGroup.removeAll(ratifyingGroup);
 
 			final int ratifyingSize = ratifyingGroup.size();
@@ -531,7 +530,7 @@ public class RulesReducer{
 		final List<LineEntry> branch = branches.get(branchIndex);
 		final LineEntry parent = branch.get(0);
 
-		final Set<Character> childrenGroup = new HashSet<>();
+		final Set<Character> childrenGroup = new HashSet<>(0);
 		final StringBuilder condition = new StringBuilder();
 		for(int i = 1; i < branch.size(); i ++){
 			//augment parent condition to avoid any intersection:
@@ -702,7 +701,7 @@ public class RulesReducer{
 					final String removal = rule.removal.substring(lcp);
 					final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
 						rule.condition, rule.from);
-					restoredRules.add(type == AffixType.SUFFIX? entry: entry.createReverse());
+					restoredRules.add(type == AffixType.SUFFIX? entry: entry.reverse());
 				}
 			}
 			sortedEntries = prepareRules(keepLongestCommonAffix, restoredRules);

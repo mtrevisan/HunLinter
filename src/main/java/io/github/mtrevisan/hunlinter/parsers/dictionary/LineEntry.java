@@ -56,14 +56,14 @@ public class LineEntry implements Serializable{
 
 	private static final Pattern SPLITTER_ADDITION = RegexHelper.pattern("(?=[/\\t])");
 
-	static final String PATTERN_END_OF_WORD = "$";
+	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
 	private static final String DOT = ".";
 
 
 	final Set<String> from;
 
-	final String removal;
+	String removal;
 	final Set<String> addition;
 	String condition;
 
@@ -118,9 +118,10 @@ public class LineEntry implements Serializable{
 		return addition.iterator().next();
 	}
 
-	public final LineEntry createReverse(){
+	public final LineEntry reverse(){
 		final String reversedRemoval = StringUtils.reverse(removal);
-		final Set<String> reversedAddition = new HashSet<>(addition.size());
+		final Collection<String> reversedAddition = new HashSet<>(addition.size());
+		final Collection<String> reversedFrom = new HashSet<>(from.size());
 		final StringBuilder sb = new StringBuilder();
 		for(final String add : addition){
 			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
@@ -134,7 +135,17 @@ public class LineEntry implements Serializable{
 		}
 		final String reversedCondition = RegexSequencer
 			.toString(RegexSequencer.reverse(RegexSequencer.splitSequence(condition)));
-		return new LineEntry(reversedRemoval, reversedAddition, reversedCondition, Collections.emptyList());
+		for(final String f : from)
+			reversedFrom.add(StringUtils.reverse(f));
+
+		removal = reversedRemoval;
+		addition.clear();
+		addition.addAll(reversedAddition);
+		condition = reversedCondition;
+		from.clear();
+		from.addAll(reversedFrom);
+
+		return this;
 	}
 
 	public final boolean isContainedInto(final LineEntry rule){
