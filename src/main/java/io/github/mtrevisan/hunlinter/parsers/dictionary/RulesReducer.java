@@ -312,17 +312,43 @@ public class RulesReducer{
 				final List<LineEntry> properChildren = getProperChildren(branch);
 				final int properChildrenSize = properChildren.size();
 				if(properChildrenSize == branchSize){
-					//TODO separate the children as long as child.condition matches parent.from
+					//separate the children as long as child.condition matches parent.from
 					final LineEntry parent = properChildren.get(0);
-					for(int j = 1; j < properChildren.size(); j ++){
+					for(int j = 1; !restart && j < properChildren.size(); j ++){
 						final LineEntry child = properChildren.get(j);
-						if(!parent.extractFromEndingWith(child.condition).isEmpty()){
+						final Set<String> intersectionFrom = parent.extractFromEndingWith(child.condition);
+						intersectionFrom.removeAll(child.from);
+						if(!intersectionFrom.isEmpty()){
 							//TODO separate parent from child
 							if(parent.condition.length() < child.condition.length()){
-								//TODO
-								System.out.println();
+								final Set<Character> parentGroup = parent.extractGroup(parent.condition.length());
+								final Set<Character> childGroup = child.extractGroup(parent.condition.length());
+								final Set<Character> intersectionGroup = SetHelper.intersection(parentGroup, childGroup);
+								parentGroup.removeAll(intersectionGroup);
+								childGroup.removeAll(intersectionGroup);
+								if(!intersectionGroup.isEmpty()){
+									if(!parentGroup.isEmpty()){
+										final String parentCondition = RegexHelper.makeGroup(parentGroup, comparator);
+										final LineEntry newParent = LineEntry.createFrom(parent, parentCondition + parent.condition);
+										branch.set(0, newParent);
+									}
+									else
+										branch.remove(0);
+									for(final Character chr : intersectionGroup){
+										final LineEntry newRule = LineEntry.createFrom(parent, chr + parent.condition);
+										branch.add(newRule);
+									}
+									properChildren.clear();
+									extractRules(rules, branches);
+									restart = true;
+								}
+								else{
+									//TODO
+									System.out.println();
+								}
 							}
 							else{
+								//conditions have the same length
 								//TODO
 								System.out.println();
 							}
@@ -452,6 +478,7 @@ public class RulesReducer{
 		return conditionLength;
 	}
 
+	//TODO if parent group has a non-empty intersection with one of its children, then parent.from must contain child.from (for child with condition as parent.condition?)
 	private static void disjoinSameConditionLength(final List<LineEntry> branch, final Comparator<String> comparator){
 		final Map<LineEntry, Set<Character>> branchGroup = new HashMap<>(branch.size());
 		final int conditionLength = branch.get(0).condition.length();
