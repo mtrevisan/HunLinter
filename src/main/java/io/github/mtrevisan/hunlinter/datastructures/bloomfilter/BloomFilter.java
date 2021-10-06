@@ -176,7 +176,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @return the optimal size in bits for the filter, or {@code m}.
 	 */
 	public static int optimalBitSize(final double expectedNumberOfElements, final double falsePositiveProbability){
-		return (int)Math.round(-expectedNumberOfElements * Math.log(falsePositiveProbability) / LN2_SQUARE);
+		final int bitSize = (int)Math.round(-expectedNumberOfElements * Math.log(falsePositiveProbability) / LN2_SQUARE);
+		return (bitSize >= 0? bitSize: Integer.MAX_VALUE);
 	}
 
 	/**

@@ -29,9 +29,9 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParam
 
 public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 
-	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 30_000_000;
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 35_000_000;
 	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
-	private static final double GROWTH_RATE_WHEN_FULL = 1.3;
+	private static final double GROWTH_RATE_WHEN_FULL = 0.2;
 
 
 	private static class SingletonHelper{
