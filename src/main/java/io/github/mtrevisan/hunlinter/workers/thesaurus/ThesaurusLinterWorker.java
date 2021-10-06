@@ -90,12 +90,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
 
-			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
-			for(final String word : words)
-				if(!bloomFilter.contains(word))
-					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, originalDefinition));
-
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
 			for(final SynonymsEntry syn : syns){
@@ -110,24 +104,40 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				}
 			}
 		};
+		final Consumer<ThesaurusEntry> dictionaryProcessor = data -> {
+			final String originalDefinition = data.getDefinition();
+
+			//check if the word is present in the dictionary
+			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
+			for(final String word : words)
+				if(!bloomFilter.contains(word))
+					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, originalDefinition));
+		};
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 1/3)");
+
+			processLines(dataProcessor);
+
+			return null;
+		};
+		final Function<Void, Void> step2 = ignored -> {
+			resetProcessing("Reading dictionary file (step 2/3)");
 
 			collectWords(dicParser, wordGenerator);
 
 			return null;
 		};
-		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step2 = ignored -> {
-			resetProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
+		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step3 = ignored -> {
+			resetProcessing("Execute " + workerData.getWorkerName() + " (step 3/3)");
 
-			processLines(dataProcessor);
+			processLines(dictionaryProcessor);
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
-		setProcessor(step1.andThen(step2));
+		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
 	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
