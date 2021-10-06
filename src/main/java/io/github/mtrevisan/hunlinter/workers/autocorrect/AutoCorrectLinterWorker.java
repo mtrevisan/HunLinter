@@ -107,7 +107,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName());
+			resetProcessing("Reading dictionary file (step 1/2)");
 
 			collectWords(dicParser, wordGenerator);
 
