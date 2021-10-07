@@ -364,7 +364,7 @@ public class RulesReducer{
 					final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 					final Set<Character> childrenGroup = new HashSet<>(0);
-					final Set<Character> properChildrenGroup = new HashSet<>(0);
+					final Collection<Character> properChildrenGroup = new HashSet<>(0);
 					for(int j = 1; j < branch.size(); j ++){
 						final LineEntry child = branch.get(j);
 						if(!properChildren.contains(child))
@@ -485,7 +485,7 @@ public class RulesReducer{
 			branchGroup.put(rule, rule.extractGroup(conditionLength));
 		}
 
-		final Set<Character> alphabetGroup = new HashSet<>(branchGroup.size());
+		final Collection<Character> alphabetGroup = new HashSet<>(branchGroup.size());
 		for(final Set<Character> ruleGroup : branchGroup.values())
 			alphabetGroup.addAll(ruleGroup);
 
