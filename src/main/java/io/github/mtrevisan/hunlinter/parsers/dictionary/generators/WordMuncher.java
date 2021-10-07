@@ -105,7 +105,7 @@ public class WordMuncher{
 			final RuleEntry ruleEntry = ruleEntries.get(i);
 			//for each affix entry in rule
 			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
-			for(int j = 0; j < affixEntries.size(); j++){
+			for(int j = 0; j < affixEntries.size(); j ++){
 				final AffixEntry affixEntry = affixEntries.get(j);
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
