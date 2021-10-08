@@ -30,7 +30,7 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParam
 public final class DictionaryBaseData extends BloomFilterParameters{
 
 	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 40_000_000;
-	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
+	private static final double FALSE_POSITIVE_PROBABILITY = 0.5 / EXPECTED_NUMBER_OF_ELEMENTS;
 	private static final double GROWTH_RATE_WHEN_FULL = 0.2;
 
 

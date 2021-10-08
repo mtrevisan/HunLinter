@@ -141,7 +141,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
