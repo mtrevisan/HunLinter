@@ -83,6 +83,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{
@@ -251,7 +252,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
    private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the synonyms
-         final String synonyms = synonymsTextField.getText();
+			final String synonyms = synonymsTextField.getText();
          final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part-of-speech and definition(s) '" + message
@@ -360,7 +361,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		final TableRowSorter<ThesaurusTableModel> sorter = (TableRowSorter<ThesaurusTableModel>)table.getRowSorter();
 		if(StringUtils.isNotBlank(unmodifiedSearchText)){
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
-			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
+			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(Pattern.quote(searchText.getRight()))));
 		}
 		else
 			sorter.setRowFilter(null);

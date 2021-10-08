@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.gui.models;
 
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.table.AbstractTableModel;
 import java.io.NotSerializableException;
@@ -41,6 +42,10 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final long serialVersionUID = -2584004821296780108L;
 
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
+
+	private static final String COMMA = ",";
+	/** Adds a zero-width space to let wrapping occurs after commas. */
+	private static final String WRAPPABLE_COMMA = COMMA + "&#8203;";
 
 	public static final String TAG_NEW_LINE = "<br>";
 //	private static final String TAG = "<html><body style=\"'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'\">{}</body></html>";
@@ -78,7 +83,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		return switch(columnIndex){
 			case 0 -> thesaurus.getDefinition();
-			case 1 -> JavaHelper.textFormat(TAG, thesaurus.joinSynonyms(TAG_NEW_LINE));
+			case 1 -> JavaHelper.textFormat(TAG, StringUtils.replace(thesaurus.joinSynonyms(TAG_NEW_LINE), COMMA, WRAPPABLE_COMMA));
 			default -> null;
 		};
 	}
