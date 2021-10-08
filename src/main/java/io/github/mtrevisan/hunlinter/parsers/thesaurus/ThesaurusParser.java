@@ -234,9 +234,13 @@ public class ThesaurusParser{
 		final String posFilter = (partOfSpeeches != null && partOfSpeeches.length > 0
 			? "[\\(\\s](" + StringUtils.join(partOfSpeeches, PIPE) + ")[\\),]"
 			: ".+");
-		final String synonymsFilter = (synonyms != null && synonyms.length > 0
-			? "(" + StringUtils.join(synonyms, PIPE) + ")"
-			: ".+");
+		String[] quotedSynonyms = null;
+		if(synonyms != null && synonyms.length > 0){
+			quotedSynonyms = new String[synonyms.length];
+			for(int i = 0; i < synonyms.length; i ++)
+				quotedSynonyms[i] = Pattern.quote(synonyms[i]);
+		}
+		final String synonymsFilter = (quotedSynonyms != null? "(" + StringUtils.join(quotedSynonyms, PIPE) + ")" : ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);
