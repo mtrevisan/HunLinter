@@ -26,6 +26,9 @@ package io.github.mtrevisan.hunlinter.gui.renderers;
 
 import com.carrotsearch.hppcrt.IntSet;
 import com.carrotsearch.hppcrt.sets.IntHashSet;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
+import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
@@ -69,9 +72,12 @@ public class TableRenderer extends DefaultTableCellRenderer{
 		return this;
 	}
 
-	public final void adjustRowHeight(final JTable table, final int rowIndex){
-		final int rowHeight = getPreferredSize().height + 4;
-		if(rowHeight > table.getRowHeight(rowIndex))
+	private void adjustRowHeight(final JTable table, final int rowIndex){
+		final int fontHeight = getFontMetrics(FontHelper.getCurrentFont()).getHeight();
+		final int cellLines = StringUtils.countMatches(table.getValueAt(rowIndex, 1).toString(), ThesaurusTableModel.TAG_NEW_LINE)
+			+ 1;
+		final int rowHeight = fontHeight * cellLines + 4;
+		if(rowHeight != table.getRowHeight(rowIndex))
 			table.setRowHeight(rowIndex, rowHeight);
 	}
 

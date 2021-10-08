@@ -176,7 +176,6 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
       table.setFont(currentFont);
       table.setModel(new ThesaurusTableModel());
-      table.setRowHeight(24);
       table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       table.setShowHorizontalLines(false);

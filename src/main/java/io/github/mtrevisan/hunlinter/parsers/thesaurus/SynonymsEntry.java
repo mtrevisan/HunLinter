@@ -45,6 +45,8 @@ public class SynonymsEntry{
 
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
+	/** Adds a zero-width space to let wrapping occurs after commas. */
+	private static final String WRAPPABLE_COMMA = COMMA + "&#8203;";
 
 	private static final String WRONG_FORMAT = "Wrong format for thesaurus entry: `{}`";
 	private static final String POS_NOT_IN_PARENTHESIS = "Part-of-speech is not in parenthesis: `{}`";
@@ -141,7 +143,7 @@ public class SynonymsEntry{
 	public final String toString(){
 		return (new StringJoiner(COLUMN))
 			.add(String.join(COMMA, partOfSpeeches))
-			.add(StringUtils.join(synonyms, COMMA))
+			.add(StringUtils.join(synonyms, WRAPPABLE_COMMA))
 			.toString();
 	}
 

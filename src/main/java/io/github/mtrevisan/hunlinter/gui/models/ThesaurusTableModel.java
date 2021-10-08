@@ -43,7 +43,8 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
 
 	public static final String TAG_NEW_LINE = "<br>";
-	private static final String TAG = "<html><body style=\"'white-space:nowrap'\">{}</body></html>";
+//	private static final String TAG = "<html><body style=\"'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'\">{}</body></html>";
+	private static final String TAG = "<html>{}</html>";
 
 
 	private List<ThesaurusEntry> synonyms;
