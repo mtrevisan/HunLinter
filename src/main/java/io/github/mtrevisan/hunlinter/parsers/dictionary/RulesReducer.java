@@ -363,7 +363,7 @@ public class RulesReducer{
 					properChildren.clear();
 					final LineEntry parent = branch.get(0);
 					properChildren.add(parent);
-					for(int j = 1; j < branch.size(); j ++){
+					for(int j = 1; j < branchSize; j ++){
 						final LineEntry child = branch.get(j);
 						if(child.from.size() < parent.from.size() && parent.condition.length() == child.condition.length()
 								&& parent.from.containsAll(child.from))
@@ -371,30 +371,54 @@ public class RulesReducer{
 					}
 					properChildrenSize = properChildren.size();
 
-					if(properChildrenSize == 1)
-						//TODO
-						throw new IllegalStateException("No proper children found, please report this case to the developer, thank you");
-
-					final int parentConditionLength = parent.condition.length();
-					final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
+					int parentConditionLength = parent.condition.length();
+					Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 					//assert each child is disjointed:
-					final Map<LineEntry, Set<Character>> childrenGroup = new HashMap<>(properChildrenSize);
-					for(int j = 1; j < properChildrenSize; j ++){
-						final LineEntry child = properChildren.get(j);
+					final Map<LineEntry, Set<Character>> childrenGroup = new HashMap<>(branchSize);
+					for(int j = 1; j < branchSize; j ++){
+						final LineEntry child = branch.get(j);
 						childrenGroup.put(child, child.extractGroup(parentConditionLength));
 					}
-					boolean groupsAreDisjointed = true;
-					disjointed:
 					for(int j = 1; j < properChildrenSize; j ++)
 						for(int k = j + 1; k < properChildrenSize; k ++)
-							if(!SetHelper.intersection(childrenGroup.get(properChildren.get(j)), childrenGroup.get(properChildren.get(k))).isEmpty()){
-								groupsAreDisjointed = false;
-								break disjointed;
+							if(!SetHelper.intersection(childrenGroup.get(properChildren.get(j)), childrenGroup.get(properChildren.get(k))).isEmpty())
+								//TODO
+								throw new IllegalStateException("Children are not disjointed, please report this case to the developer, thank you");
+
+					if(properChildrenSize == 1){
+						for(int j = 1; j < branchSize; j ++){
+							final LineEntry child = branch.get(j);
+							if(!parent.from.containsAll(child.from))
+								//TODO
+								throw new IllegalStateException("No proper children found, please report this case to the developer, thank you");
+
+							//TODO separate child if the intersection is the child
+							//assert each child is disjointed:
+							final Set<Character> childGroup = childrenGroup.get(child);
+
+							final Set<Character> intersection = SetHelper.intersection(parentGroup, childGroup);
+							if(intersection.equals(childGroup))
+								continue;
+
+							if(!intersection.isEmpty() && parent.condition.length() < child.condition.length()){
+								parent.condition = RegexHelper.makeGroup(parentGroup, comparator) + parent.condition;
+
+								parentConditionLength ++;
+								parentGroup = parent.extractGroup(parentConditionLength);
+								j --;
 							}
-					if(!groupsAreDisjointed)
-						//TODO
-						throw new IllegalStateException("Children are not disjointed, please report this case to the developer, thank you");
+							else
+								//TODO
+								throw new IllegalStateException("Case 1, please report this case to the developer, thank you");
+						}
+
+						finalRules.addAll(branch);
+						branch.clear();
+						extractRules(rules, branches);
+						restart = true;
+						continue;
+					}
 
 					for(int j = 1; j < properChildrenSize; j ++){
 						final LineEntry child = properChildren.get(j);
