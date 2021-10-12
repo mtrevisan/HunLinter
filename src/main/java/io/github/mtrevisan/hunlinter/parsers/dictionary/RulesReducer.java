@@ -309,55 +309,6 @@ public class RulesReducer{
 
 				final List<LineEntry> properChildren = getProperChildren(branch);
 				int properChildrenSize = properChildren.size();
-//				if(properChildrenSize == branchSize){
-//					//separate the children as long as child.condition matches parent.from
-//					final LineEntry parent = properChildren.get(0);
-//					for(int j = 1; !restart && j < properChildrenSize; j ++){
-//						final LineEntry child = properChildren.get(j);
-//						final Set<String> intersectionFrom = parent.extractFromEndingWith(child.condition);
-//						intersectionFrom.removeAll(child.from);
-//						if(!intersectionFrom.isEmpty()){
-//							//TODO separate parent from child
-//							if(parent.condition.length() < child.condition.length()){
-//								final Set<Character> parentGroup = parent.extractGroup(parent.condition.length());
-//								final Set<Character> childGroup = child.extractGroup(parent.condition.length());
-//								final Set<Character> intersectionGroup = SetHelper.intersection(parentGroup, childGroup);
-//								parentGroup.removeAll(intersectionGroup);
-//								childGroup.removeAll(intersectionGroup);
-//								if(!intersectionGroup.isEmpty()){
-//									if(!parentGroup.isEmpty()){
-//										final String parentCondition = RegexHelper.makeGroup(parentGroup, comparator);
-//										final LineEntry newParent = LineEntry.createFrom(parent, parentCondition + parent.condition);
-//										branch.set(0, newParent);
-//									}
-//									else
-//										branch.remove(0);
-//									for(final Character chr : intersectionGroup){
-//										final LineEntry newRule = LineEntry.createFrom(parent, chr + parent.condition);
-//										branch.add(newRule);
-//									}
-//									properChildren.clear();
-//									extractRules(rules, branches);
-//									restart = true;
-//								}
-//								else{
-//									//TODO
-//									throw new IllegalStateException("Case 1, please report this case to the developer, thank you");
-//								}
-//							}
-//							else{
-//								//conditions have the same length
-//								//TODO
-//								throw new IllegalStateException("Conditions have the same length, please report this case to the developer, thank you");
-//							}
-//						}
-//					}
-//					finalRules.addAll(properChildren);
-//					branch.clear();
-//					continue;
-//				}
-
-//				if(properChildrenSize > 1 && properChildrenSize < branchSize){
 				if(properChildrenSize > 1 && properChildrenSize <= branchSize){
 					//must separate each element of the `properChildren` list
 					properChildren.clear();
@@ -387,22 +338,28 @@ public class RulesReducer{
 								throw new IllegalStateException("Children are not disjointed, please report this case to the developer, thank you");
 
 					if(properChildrenSize == 1){
-						for(int j = 1; j < branchSize; j ++){
+						for(int j = 1; !restart && j < branchSize; j ++){
 							final LineEntry child = branch.get(j);
 							if(!parent.from.containsAll(child.from))
 								//TODO
 								throw new IllegalStateException("No proper children found, please report this case to the developer, thank you");
 
 							//assert each child is disjointed:
-							final Set<Character> childGroup = childrenGroup.get(child);
+							Set<Character> childGroup = childrenGroup.get(child);
 
 							final Set<Character> intersection = SetHelper.intersection(parentGroup, childGroup);
 							if(intersection.equals(childGroup)){
 								if(parent.extractFromEndingWith(child.condition).equals(child.from))
 									continue;
 
-								//TODO
-								throw new IllegalStateException("Case 2, please report this case to the developer, thank you");
+								//FIXME revise the following piece of code
+								//try to separate the child
+								childGroup = child.extractGroup(child.condition.length());
+								child.condition = RegexHelper.makeGroup(childGroup, comparator) + child.condition;
+
+								extractRules(rules, branches);
+								restart = true;
+								continue;
 							}
 
 							if(!intersection.isEmpty() && parent.condition.length() < child.condition.length()){
@@ -416,6 +373,9 @@ public class RulesReducer{
 								//TODO
 								throw new IllegalStateException("Case 1, please report this case to the developer, thank you");
 						}
+
+						if(restart)
+							continue;
 
 						finalRules.addAll(branch);
 						branch.clear();

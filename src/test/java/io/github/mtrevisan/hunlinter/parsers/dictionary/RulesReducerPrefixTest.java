@@ -90,7 +90,7 @@ class RulesReducerPrefixTest{
 			new LineEntry("d", "‘", "d", "otid"),
 			new LineEntry("òk", "‘", "òk", "asòk")
 		);
-//		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
+		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
