@@ -393,7 +393,6 @@ public class RulesReducer{
 								//TODO
 								throw new IllegalStateException("No proper children found, please report this case to the developer, thank you");
 
-							//TODO separate child if the intersection is the child
 							//assert each child is disjointed:
 							final Set<Character> childGroup = childrenGroup.get(child);
 
