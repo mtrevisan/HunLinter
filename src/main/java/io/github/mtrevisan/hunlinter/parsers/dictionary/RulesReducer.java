@@ -308,56 +308,57 @@ public class RulesReducer{
 				}
 
 				final List<LineEntry> properChildren = getProperChildren(branch);
-				final int properChildrenSize = properChildren.size();
-				if(properChildrenSize == branchSize){
-					//separate the children as long as child.condition matches parent.from
-					final LineEntry parent = properChildren.get(0);
-					for(int j = 1; !restart && j < properChildrenSize; j ++){
-						final LineEntry child = properChildren.get(j);
-						final Set<String> intersectionFrom = parent.extractFromEndingWith(child.condition);
-						intersectionFrom.removeAll(child.from);
-						if(!intersectionFrom.isEmpty()){
-							//TODO separate parent from child
-							if(parent.condition.length() < child.condition.length()){
-								final Set<Character> parentGroup = parent.extractGroup(parent.condition.length());
-								final Set<Character> childGroup = child.extractGroup(parent.condition.length());
-								final Set<Character> intersectionGroup = SetHelper.intersection(parentGroup, childGroup);
-								parentGroup.removeAll(intersectionGroup);
-								childGroup.removeAll(intersectionGroup);
-								if(!intersectionGroup.isEmpty()){
-									if(!parentGroup.isEmpty()){
-										final String parentCondition = RegexHelper.makeGroup(parentGroup, comparator);
-										final LineEntry newParent = LineEntry.createFrom(parent, parentCondition + parent.condition);
-										branch.set(0, newParent);
-									}
-									else
-										branch.remove(0);
-									for(final Character chr : intersectionGroup){
-										final LineEntry newRule = LineEntry.createFrom(parent, chr + parent.condition);
-										branch.add(newRule);
-									}
-									properChildren.clear();
-									extractRules(rules, branches);
-									restart = true;
-								}
-								else{
-									//TODO
-									throw new IllegalStateException("Case 1, please report this case to the developer, thank you");
-								}
-							}
-							else{
-								//conditions have the same length
-								//TODO
-								throw new IllegalStateException("Conditions have the same length, please report this case to the developer, thank you");
-							}
-						}
-					}
-					finalRules.addAll(properChildren);
-					branch.clear();
-					continue;
-				}
+				int properChildrenSize = properChildren.size();
+//				if(properChildrenSize == branchSize){
+//					//separate the children as long as child.condition matches parent.from
+//					final LineEntry parent = properChildren.get(0);
+//					for(int j = 1; !restart && j < properChildrenSize; j ++){
+//						final LineEntry child = properChildren.get(j);
+//						final Set<String> intersectionFrom = parent.extractFromEndingWith(child.condition);
+//						intersectionFrom.removeAll(child.from);
+//						if(!intersectionFrom.isEmpty()){
+//							//TODO separate parent from child
+//							if(parent.condition.length() < child.condition.length()){
+//								final Set<Character> parentGroup = parent.extractGroup(parent.condition.length());
+//								final Set<Character> childGroup = child.extractGroup(parent.condition.length());
+//								final Set<Character> intersectionGroup = SetHelper.intersection(parentGroup, childGroup);
+//								parentGroup.removeAll(intersectionGroup);
+//								childGroup.removeAll(intersectionGroup);
+//								if(!intersectionGroup.isEmpty()){
+//									if(!parentGroup.isEmpty()){
+//										final String parentCondition = RegexHelper.makeGroup(parentGroup, comparator);
+//										final LineEntry newParent = LineEntry.createFrom(parent, parentCondition + parent.condition);
+//										branch.set(0, newParent);
+//									}
+//									else
+//										branch.remove(0);
+//									for(final Character chr : intersectionGroup){
+//										final LineEntry newRule = LineEntry.createFrom(parent, chr + parent.condition);
+//										branch.add(newRule);
+//									}
+//									properChildren.clear();
+//									extractRules(rules, branches);
+//									restart = true;
+//								}
+//								else{
+//									//TODO
+//									throw new IllegalStateException("Case 1, please report this case to the developer, thank you");
+//								}
+//							}
+//							else{
+//								//conditions have the same length
+//								//TODO
+//								throw new IllegalStateException("Conditions have the same length, please report this case to the developer, thank you");
+//							}
+//						}
+//					}
+//					finalRules.addAll(properChildren);
+//					branch.clear();
+//					continue;
+//				}
 
-				if(properChildrenSize > 1 && properChildrenSize < branchSize){
+//				if(properChildrenSize > 1 && properChildrenSize < branchSize){
+				if(properChildrenSize > 1 && properChildrenSize <= branchSize){
 					//must separate each element of the `properChildren` list
 					properChildren.clear();
 					final LineEntry parent = branch.get(0);
@@ -368,6 +369,11 @@ public class RulesReducer{
 								&& parent.from.containsAll(child.from))
 							properChildren.add(child);
 					}
+					properChildrenSize = properChildren.size();
+
+					if(properChildrenSize == 1)
+						//TODO
+						throw new IllegalStateException("No proper children found, please report this case to the developer, thank you");
 
 					final int parentConditionLength = parent.condition.length();
 					final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
@@ -403,8 +409,8 @@ public class RulesReducer{
 						child.condition = condition.toString();
 					}
 
-					finalRules.addAll(branch);
-					branch.clear();
+					finalRules.addAll(properChildren);
+					branch.removeAll(properChildren);
 					extractRules(rules, branches);
 					restart = true;
 					continue;
