@@ -398,8 +398,13 @@ public class RulesReducer{
 							final Set<Character> childGroup = childrenGroup.get(child);
 
 							final Set<Character> intersection = SetHelper.intersection(parentGroup, childGroup);
-							if(intersection.equals(childGroup))
-								continue;
+							if(intersection.equals(childGroup)){
+								if(parent.extractFromEndingWith(child.condition).equals(child.from))
+									continue;
+
+								//TODO
+								throw new IllegalStateException("Case 2, please report this case to the developer, thank you");
+							}
 
 							if(!intersection.isEmpty() && parent.condition.length() < child.condition.length()){
 								parent.condition = RegexHelper.makeGroup(parentGroup, comparator) + parent.condition;

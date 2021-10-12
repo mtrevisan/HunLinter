@@ -452,7 +452,7 @@ class RulesReducerPrefixTest{
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("0", "ïrt", "à", Arrays.asList("lognà", "lugnà", "oƚognà", "oƚugnà")),
 			new LineEntry("0", "irt", "[^à]", Arrays.asList("éip", "ogeŧílx", "èp", "abalís", "èip", "abaƚís", "ogesílx")),
-			new LineEntry("0", "ert", "", Arrays.asList("éip", "lognà", "ogeŧílx", "èp", "lugnà", "oƚognà", "abalís", "èip", "oƚugnà", "abaƚís", "ogesílx"))
+			new LineEntry("0", "ert", ".", Arrays.asList("éip", "lognà", "ogeŧílx", "èp", "lugnà", "oƚognà", "abalís", "èip", "oƚugnà", "abaƚís", "ogesílx"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
