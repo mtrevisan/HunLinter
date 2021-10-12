@@ -290,7 +290,7 @@ class WordGeneratorBase{
 					currentPostponedAffixes.remove(circumfixFlag);
 				}
 				final List<Inflection> prods = applyAffixRule(dicEntry, affix, currentPostponedAffixes, isCompound, overriddenRule);
-				if(prods.isEmpty() && !checker.canHaveNoInflections(affix))
+				if(prods.isEmpty() && checker != null && !checker.canHaveNoInflections(affix))
 					EventBusService.publish(new LinterWarning(NO_INFLECTIONS, affix, dicEntry));
 
 				inflections.addAll(prods);
