@@ -1877,19 +1877,34 @@ class RulesReducerSuffixTest{
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"SFX '9 Y 5",
+			"FULLSTRIP",
+			"SFX '9 Y 19",
+			"SFX '9 r ʼ r",
+			"SFX '9 u ʼ u",
+			"SFX '9 ra ʼ ra",
+			"SFX '9 axa àʼ axa",
+			"SFX '9 èđa àʼ èđa",
+			"SFX '9 èxa àʼ èxa",
+			"SFX '9 de ʼ .de",
+			"SFX '9 me ʼ me",
+			"SFX '9 te ʼ te",
 			"SFX '9 do ʼ do",
 			"SFX '9 ko ʼ ko",
 			"SFX '9 to ʼ nto",
+			"SFX '9 to ʼ tuto",
+			"SFX '9 to ʼ sto",
 			"SFX '9 o ʼ [^n]to",
-			"SFX '9 o ʼ [^dkt]o"
+			"SFX '9 a ʼ [^rx]a",
+			"SFX '9 e ʼ [^mt]e",
+			"SFX '9 o ʼ [^dkt]o",
+			"SFX '9 ove óʼ ove"
 		);
 		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'9";
 		AffixType affixType = AffixType.SUFFIX;
-		List<String> words = Arrays.asList("komòdo", "kuando", "no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto", "santo", "tanto", "pòko", "puòko", "poko");
+		List<String> words = Arrays.asList("komòdo", "kuando", "sta", "tèrsa", "kuinta", "sènŧa", "sensa", "pòka", "bona", "anka", "santa", "senŧa", "na", "sèsta", "la", "tèrŧa", "tuta", "sènsa", "kuarta", "mèđa", "mèđa", "kaxa", "no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto", "mèxa", "dexe", "de", "pede", "kuatòrdexe", "dièxe", "trédexe", "andove", "dódexe", "óndexe", "fede", "se", "dove", "indove", "ne", "trèdexe", "kuíndexe", "úndexe", "sédexe", "adove", "ge", "diexe", "nu", "vu", "kome", "sèsto", "santo", "tuto", "tanto", "sto", "andove", "dove", "indove", "adove", "sèsto", "tuto", "sto", "pòko", "puòko", "poko", "par", "de", "pede", "fede", "sora", "intendènte", "brasènte", "reŧènte", "sufiŧiènte", "rovènte", "sapiènte", "filperdènte", "evidènte", "dogorènte", "desfidènte", "stuŧegadènte", "sexènte", "ponxènte", "brigènte", "valènte", "kuradènte", "viŧe–rexènte", "stekadènte", "splendènte", "kliènte", "studènte", "fasiènte", "vivènte", "onipotènte", "defidènte", "tenènte", "raxènte", "takènte", "franjènte", "dènte", "maxenènte", "ruđènte", "pikènte", "eŧedènte", "strenxènte", "insolènte", "atinènte", "susintamènte", "pesènte", "ñènte", "okorènte", "molènte", "interveniènte", "korènte", "stènte", "stusegadènte", "nosènte", "asolutamènte", "bivalènte", "resipiènte", "semènte", "ponđènte", "soradènte", "intreveniènte", "solvènte", "pusolènte", "aparesènte", "rexènte", "languènte", "taɉènte", "tajènte", "novènte", "ekuivalènte", "monovalènte", "pestilènte", "pixnènte", "pendènte", "maldisènte", "rexidènte", "axènte", "kiesènte", "pixinènte", "sofiŧiènte", "intelijènte", "logotenènte", "strafotènte", "deferènte", "pertinènte", "noŧènte", "reŧipiènte", "tientamènte", "inŧidènte", "diliɉènte", "ruxènte", "sokonbènte", "komitènte", "preminènte", "sorintendènte", "tanjènte", "maldiŧènte", "osidènte", "referènte", "servènte", "difarènte", "ajènte", "kura–dènte", "asendènte", "sofisiènte", "inponènte", "intraprendènte", "saŧènte", "prexidènte", "radènte", "ruđenènte", "polivalènte", "asistènte", "mađorènte", "paŧiènte", "speriènte", "serxènte", "bondañènte", "intarveniènte", "mañolènte", "dormiènte", "sfadigènte", "trivalènte", "asidènte", "perdènte", "faŧiènte", "semovènte", "ènte", "kostitüènte", "torènte", "brovènte", "broènte", "puŧolènte", "straluxènte", "trasparènte", "eselènte", "konosènte", "logarènte", "parisènte", "boɉènte", "benvoɉènte", "eminènte", "dexènte", "neglijènte", "maxorènte", "redènte", "prexènte", "negliɉènte", "distintamènte", "inkontenènte", "dependènte", "esedènte", "sarjènte", "atendènte", "aparènte", "ruxenènte", "ŧelènte", "sarɉènte", "rasènte", "evenènte", "aɉènte", "obediènte", "residènte", "sufisiènte", "parènte", "sasènte", "oŧidènte", "benvojènte", "asalènte", "bojènte", "permanènte", "đènte", "batènte", "reverènte", "posidènte", "braŧènte", "fendènte", "kavadènte", "ingrediènte", "soferènte", "resènte", "ŧenarènte", "vise–rexènte", "koñosènte", "dolènte", "sorxènte", "bixnènte", "prudènte", "viŧerexènte", "patènte", "ridènte", "serpènte", "evanesènte", "nasènte", "malfidènte", "tanɉènte", "eŧelènte", "seguènte", "skotènte", "viserexènte", "plurivalènte", "presidènte", "sfredolènte", "diferènte", "potènte", "lènte", "pretendènte", "desposènte", "klemènte", "luxènte", "peŧènte", "suŧintamènte", "pasiènte", "ubediènte", "penitènte", "insidènte", "konfidènte", "aŧalènte", "sensiènte", "kontinènte", "parvènte", "mordènte", "senŧiènte", "ređènte", "defarènte", "kadènte", "frekuènte", "strenđènte", "inteliɉènte", "ŧevènte", "aŧidènte", "spiandorènte", "exènte", "konveniènte", "dilijènte", "korespondènte", "ardènte", "franɉènte");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
@@ -1911,12 +1926,26 @@ class RulesReducerSuffixTest{
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"SFX '9 Y 5",
+			"SFX '9 Y 19",
+			"SFX '9 r ʼ r",
+			"SFX '9 u ʼ u",
+			"SFX '9 ra ʼ ra",
+			"SFX '9 axa àʼ axa",
+			"SFX '9 èđa àʼ èđa",
+			"SFX '9 èxa àʼ èxa",
+			"SFX '9 de ʼ .de",
+			"SFX '9 me ʼ me",
+			"SFX '9 te ʼ te",
 			"SFX '9 do ʼ do",
 			"SFX '9 ko ʼ ko",
-			"SFX '9 o ʼ [^dkt]o",
 			"SFX '9 to ʼ nto",
-			"SFX '9 o ʼ [^n]to"
+			"SFX '9 to ʼ tuto",
+			"SFX '9 to ʼ sto",
+			"SFX '9 o ʼ [^n]to",
+			"SFX '9 a ʼ [^rx]a",
+			"SFX '9 e ʼ [^mt]e",
+			"SFX '9 o ʼ [^dkt]o",
+			"SFX '9 ove óʼ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
