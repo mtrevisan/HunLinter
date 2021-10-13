@@ -32,47 +32,44 @@ class WordVECTest{
 
 	@Test
 	void stressOnLast(){
-		Assertions.assertEquals("pí", WordVEC.markDefaultStress("pi"));
+		Assertions.assertEquals("pi", WordVEC.markDefaultStress("pi"));
+
 		Assertions.assertEquals("pí", WordVEC.markDefaultStress("pí"));
-		Assertions.assertEquals("pí", WordVEC.unmarkDefaultStress("pí"));
 	}
 
 	@Test
 	void stressOnPenultimate1(){
 		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaraa"));
-		Assertions.assertEquals("buxaraa", WordVEC.unmarkDefaultStress("buxaraa"));
+		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaràa"));
 	}
 
 	@Test
 	void stressOnPenultimate2(){
-		Assertions.assertEquals("fenío", WordVEC.markDefaultStress("fenio"));
+		Assertions.assertEquals("fenio", WordVEC.markDefaultStress("fenio"));
+
+		Assertions.assertEquals("fenío", WordVEC.markDefaultStress("fenïo"));
 		Assertions.assertEquals("fenío", WordVEC.markDefaultStress("fenío"));
-		Assertions.assertEquals("fenío", WordVEC.unmarkDefaultStress("fenío"));
 	}
 
 	@Test
 	void stressOnPenultimate3(){
 		Assertions.assertEquals("frève", WordVEC.markDefaultStress("frève"));
-		Assertions.assertEquals("frève", WordVEC.unmarkDefaultStress("frève"));
 	}
 
 	@Test
 	void stressOnAntepenultimate1(){
-		Assertions.assertEquals("gràvïo", WordVEC.markDefaultStress("gravïo"));
-		Assertions.assertEquals("gràvïo", WordVEC.unmarkDefaultStress("gràvïo"));
+		Assertions.assertEquals("gràvïo", WordVEC.markDefaultStress("gràvïo"));
 	}
 
 	@Test
 	void stressOnAntepenultimate2(){
 		Assertions.assertEquals("ankúđen", WordVEC.markDefaultStress("ankúđen"));
-		Assertions.assertEquals("ankúđen", WordVEC.unmarkDefaultStress("ankúđen"));
 	}
 
 	@Test
 	void stressOnAntepenultimateCompoundWord(){
-		Assertions.assertEquals("gràvï-io", WordVEC.markDefaultStress("gravï-io"));
-		Assertions.assertEquals("gràvï-io", WordVEC.markDefaultStress("gràvï-io"));
-		Assertions.assertEquals("gravï-io", WordVEC.unmarkDefaultStress("gràvï-io"));
+		Assertions.assertEquals("gravï-io", WordVEC.markDefaultStress("gravï-io"));
+		Assertions.assertEquals("gravï-io", WordVEC.markDefaultStress("gràvï-io"));
 	}
 
 }

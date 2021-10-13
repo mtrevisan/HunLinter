@@ -93,7 +93,7 @@ public final class OrthographyVEC extends Orthography{
 
 	@Override
 	public String correctOrthography(String word){
-		word = WordVEC.unmarkDefaultStress(word);
+		word = WordVEC.markDefaultStress(word);
 
 		//correct stress
 		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);

@@ -147,8 +147,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		for(final String subword : subwords){
 			stressCheck(subword, inflection);
 
-			final String unmarkedDefaultStressWord = WordVEC.unmarkDefaultStress(subword);
-			if(!subword.equals(unmarkedDefaultStressWord))
+			final String markedDefaultStressWord = WordVEC.markDefaultStress(subword);
+			if(!subword.equals(markedDefaultStressWord))
 				throw new LinterException(UNNECESSARY_STRESS, inflection.getWord());
 		}
 	}
