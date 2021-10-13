@@ -223,6 +223,12 @@ public final class WordVEC{
 	}
 
 
+	private static String resetAcuteStressAtIndex(final String word, final int idx){
+		final StringBuilder sb = new StringBuilder(word);
+		sb.setCharAt(idx, removeStressAcute(word.charAt(idx)));
+		return sb.toString();
+	}
+
 	private static String setAcuteStressAtIndex(final String word, final int idx){
 		final StringBuilder sb = new StringBuilder(word);
 		sb.setCharAt(idx, addStressAcute(word.charAt(idx)));
@@ -240,15 +246,34 @@ public final class WordVEC{
 		return sb.toString();
 	}
 
+	private static char removeStressAcute(final char chr){
+		final int stressedIndex = Arrays.binarySearch(ACUTE_STRESSED_VOWELS_ARRAY, chr);
+		return (stressedIndex >= 0? SIMPLE_VOWELS_ARRAY[stressedIndex]: chr);
+	}
+
 	private static char addStressAcute(final char chr){
 		final int stressedIndex = Arrays.binarySearch(SIMPLE_VOWELS_ARRAY, chr);
-		return ACUTE_STRESSED_VOWELS_ARRAY[stressedIndex];
+		return (stressedIndex >= 0? ACUTE_STRESSED_VOWELS_ARRAY[stressedIndex]: chr);
 	}
 
 	public static String markDefaultStress(final String word){
-		int higherIndex = StringUtils.indexOf(word, '-') - 1;
+		final StringJoiner sj = new StringJoiner("-");
+		int offset = 0;
+		int subwordIndex = 0;
+		while((subwordIndex = word.indexOf('-', offset)) >= 0){
+			sj.add(innerMarkDefaultStress(word.substring(offset, subwordIndex)));
+			offset = subwordIndex + 1;
+		}
+		if(offset < word.length())
+			sj.add(innerMarkDefaultStress(word.substring(offset)));
+		return sj.toString();
+	}
+
+	private static String innerMarkDefaultStress(final String word){
+		int higherIndex = StringUtils.indexOf(word, 'ʼ') - 1;
 		if(higherIndex < 0)
 			higherIndex = word.length() - 1;
+		final int trueWordLength = higherIndex;
 
 		//if last character is stressed, then it's ok
 		final int stressIndex = getIndexOfStress(word);
@@ -257,16 +282,18 @@ public final class WordVEC{
 
 		if(!RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
 			//count vowels, record the penultimate one
-			final int lowerIndex = Math.max(stressIndex, 0);
-			for(int vowelCount = 0; vowelCount < 2 && higherIndex >= lowerIndex; higherIndex --)
+			for(int vowelCount = 0; vowelCount < 2 && higherIndex >= 0; higherIndex --)
 				if(isVenetanVowel(word, higherIndex)){
 					vowelCount ++;
 
-					if(vowelCount == 2 && (stressIndex < 0 || higherIndex == stressIndex)){
+					final boolean closedLastSyllable = (vowelCount == 1 && higherIndex < trueWordLength);
+					if(closedLastSyllable)
+						return resetAcuteStressAtIndex(word, higherIndex);
+					else if(vowelCount == 2){
 						//suppress default stress
 						final char chr = word.charAt(higherIndex);
 						if(Arrays.binarySearch(VOWELS_UMLAUT_ARRAY, chr) >= 0)
-							return setAcuteStressAtIndex(word, higherIndex);
+							return (higherIndex > stressIndex? word: setAcuteStressAtIndex(word, higherIndex));
 						if(Arrays.binarySearch(VOWELS_UNNECESSARY_STRESSED, chr) >= 0)
 							return suppressStress(word);
 					}
