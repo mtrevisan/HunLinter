@@ -83,9 +83,9 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 			if(!containsSpecialChars){
 				//check if the word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
-				for(final String word : words)
-					if(dictionaryLookup.lookup(word).isEmpty())
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, correctForm));
+				for(int i = 0; i < words.length; i ++)
+					if(dictionaryLookup.lookup(words[i]).isEmpty())
+						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 

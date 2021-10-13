@@ -76,17 +76,18 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 
 			//check if the word is present in the dictionary
 			final String[] words = StringUtils.split(originalDefinition, " –");
-			for(final String word : words)
-				if(dictionaryLookup.lookup(word).isEmpty())
-					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, originalDefinition));
+			for(int i = 0; i < words.length; i ++)
+				if(dictionaryLookup.lookup(words[i]).isEmpty())
+					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
-			for(final SynonymsEntry syn : syns){
+			for(int i = 0; i < syns.size(); i ++){
+				final SynonymsEntry syn = syns.get(i);
 				final List<String> definitions = syn.getSynonyms();
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
-				for(String definition : definitions){
-					definition = ThesaurusDictionary.removeSynonymUse(definition);
+				for(int j = 0; j < definitions.size(); j ++){
+					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,

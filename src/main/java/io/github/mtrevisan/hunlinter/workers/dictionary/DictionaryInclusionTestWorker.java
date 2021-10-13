@@ -79,8 +79,8 @@ public class DictionaryInclusionTestWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGeneratorAffixRules.applyAffixRules(dicEntry);
 
-			for(final Inflection prod : inflections)
-				dictionary.add(prod.getWord());
+			for(int i = 0; i < inflections.size(); i ++)
+				dictionary.add(inflections.get(i).getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 

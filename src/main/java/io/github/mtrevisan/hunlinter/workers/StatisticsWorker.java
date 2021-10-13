@@ -91,15 +91,15 @@ public class StatisticsWorker extends WorkerDictionary{
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
+				for(int i = 0; i < inflections.size(); i ++){
 					//collect statistics
-					final String word = inflection.getWord();
+					final String word = inflections.get(i).getWord();
 					final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
 					if(subwords == null || subwords.isEmpty())
 						dicStatistics.addData(word);
 					else
-						for(final String subword : subwords){
-							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
+						for(int j = 0; j < subwords.size(); j ++){
+							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subwords.get(j)));
 							dicStatistics.addData(word, hyph);
 						}
 				}

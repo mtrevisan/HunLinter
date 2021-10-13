@@ -147,9 +147,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
-				for(final Inflection inflection : inflections)
+				for(int i = 0; i < inflections.size(); i ++){
+					final Inflection inflection = inflections.get(i);
 					if(checker.shouldBeProcessedForMinimalPair(inflection))
 						list.add(inflection.getWord());
+				}
 			}
 			catch(final LinterException e){
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
@@ -166,11 +168,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return list;
 	}
 
-	private void writeSupportFile(final File file, final Iterable<String> list){
+	private void writeSupportFile(final File file, final List<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
-			for(final String line : list)
-				writeLine(writer, line, NEW_LINE);
+			for(int i = 0; i < list.size(); i ++)
+				writeLine(writer, list.get(i), NEW_LINE);
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
 			throw new WriterException(ioe);

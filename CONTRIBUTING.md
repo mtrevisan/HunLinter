@@ -157,7 +157,7 @@ As stated [here](https://www.freecodecamp.org/news/writing-good-commit-messages-
        breaking change: Introduces a breaking API change by refactoring (correlating with MAJOR in semantic versioning).
        test: Everything related to testing.
        docs: Everything related to documentation.
-       chore/refactor: Regular code maintenance.
+       refactor: Regular code maintenance.
 
 2. Separate the subject from the body with a blank line.
    1. Try to keep the subject to be less than 50 characters.

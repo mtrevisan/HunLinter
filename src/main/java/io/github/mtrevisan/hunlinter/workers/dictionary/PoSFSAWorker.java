@@ -200,11 +200,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return MetadataBuilder.read(metadataPath);
 	}
 
-	private static void encode(final ByteArrayList encodings, final Iterable<Inflection> inflections, final byte separator,
+	private static void encode(final ByteArrayList encodings, final List<Inflection> inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		for(final Inflection inflection : inflections){
+		for(int i = 0; i < inflections.size(); i ++){
+			final Inflection inflection = inflections.get(i);
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
 
@@ -229,8 +230,8 @@ public class PoSFSAWorker extends WorkerDictionary{
 			extractInflection(prefixInflection, tag);
 			tag.flip();
 
-			for(final String stem : stems){
-				final byte[] assembled = encode(inflectedWord, tag, stem, separator, sequenceEncoder);
+			for(int j = 0; j < stems.size(); j ++){
+				final byte[] assembled = encode(inflectedWord, tag, stems.get(j), separator, sequenceEncoder);
 				encodings.add(assembled);
 			}
 		}
@@ -272,20 +273,22 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return buffer;
 	}
 
-	private static void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){
+	private static void extractInflection(final List<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
-			for(final String code : suffixInflection){
-				final String[] tags = InflectionTag.createFromCodeAndValue(code).getTags();
-				for(final String tag : tags)
+			for(int i = 0; i < suffixInflection.size(); i ++){
+				final String[] tags = InflectionTag.createFromCodeAndValue(suffixInflection.get(i)).getTags();
+				for(int j = 0; j < tags.length; j ++)
 					output.put(POS_FSA_TAG_SEPARATOR)
-						.put(StringHelper.getRawBytes(tag));
+						.put(StringHelper.getRawBytes(tags[j]));
 			}
 	}
 
 	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 	private static Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
 		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
-		for(final String entry : inflection.getMorphologicalFieldsAsList()){
+		final List<String> morphologicalFieldsAsList = inflection.getMorphologicalFieldsAsList();
+		for(int i = 0; i < morphologicalFieldsAsList.size(); i ++){
+			final String entry = morphologicalFieldsAsList.get(i);
 			final MorphologicalTag key = MorphologicalTag.createFromCode(entry);
 			if(key != null)
 				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))

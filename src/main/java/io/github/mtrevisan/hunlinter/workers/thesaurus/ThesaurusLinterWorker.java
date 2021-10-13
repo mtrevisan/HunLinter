@@ -92,11 +92,12 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
-			for(final SynonymsEntry syn : syns){
+			for(int i = 0; i < syns.size(); i ++){
+				final SynonymsEntry syn = syns.get(i);
 				final List<String> definitions = syn.getSynonyms();
 				final String[] partOfSpeeches = syn.getPartOfSpeeches();
-				for(String definition : definitions){
-					definition = ThesaurusDictionary.removeSynonymUse(definition);
+				for(int j = 0; j < definitions.size(); j ++){
+					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
@@ -109,9 +110,9 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			//check if the word is present in the dictionary
 			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
-			for(final String word : words)
-				if(!bloomFilter.contains(word))
-					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, originalDefinition));
+			for(int i = 0; i < words.length; i ++)
+				if(!bloomFilter.contains(words[i]))
+					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
@@ -149,8 +150,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.getWord().toLowerCase(Locale.ROOT);
+				for(int i = 0; i < inflections.size(); i ++){
+					final String str = inflections.get(i).getWord().toLowerCase(Locale.ROOT);
 					bloomFilter.add(str);
 				}
 			}

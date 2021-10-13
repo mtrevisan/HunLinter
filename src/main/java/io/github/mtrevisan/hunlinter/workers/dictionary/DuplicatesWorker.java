@@ -161,8 +161,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.toStringWithPartOfSpeechAndStem();
+				for(int i = 0; i < inflections.size(); i ++){
+					final String str = inflections.get(i).toStringWithPartOfSpeechAndStem();
 					if(!bloomFilter.add(str))
 						duplicatesBloomFilter.add(str);
 				}
@@ -209,7 +209,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 					if(!inflections.isEmpty()){
 						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();
 						result.ensureCapacity(result.size() + inflections.size());
-						for(final Inflection inflection : inflections){
+						for(int i = 0; i < inflections.size(); i ++){
+							final Inflection inflection = inflections.get(i);
 							final String text = inflection.toStringWithPartOfSpeechAndStem();
 							if(duplicatesBloomFilter.contains(text))
 								result.add(new Duplicate(inflection, word, lineIndex));
@@ -252,7 +253,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				final StringBuilder origin = new StringBuilder();
-				for(final List<Duplicate> entries : mergedDuplicates){
+				for(int i = 0; i < mergedDuplicates.size(); i ++){
+					final List<Duplicate> entries = mergedDuplicates.get(i);
 					final Inflection prod = entries.get(0).getInflection();
 					origin.setLength(0);
 					origin.append(prod.getWord());
@@ -263,10 +265,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 					origin.append(": ");
 					writer.write(origin.toString());
 					final StringJoiner sj = new StringJoiner(", ");
-					for(final Duplicate duplicate : entries)
+					for(int j = 0; j < entries.size(); j ++){
+						final Duplicate duplicate = entries.get(j);
 						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 							(duplicate.getInflection().hasInflectionRules()?
 							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")")));
+					}
 					writer.write(sj.toString());
 					writer.newLine();
 

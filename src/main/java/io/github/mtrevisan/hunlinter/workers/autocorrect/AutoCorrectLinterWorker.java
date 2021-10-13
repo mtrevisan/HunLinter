@@ -100,9 +100,9 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			if(!containsSpecialChars){
 				//check if the word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
-				for(final String word : words)
-					if(!bloomFilter.contains(word))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, word, correctForm));
+				for(int i = 0; i < words.length; i ++)
+					if(!bloomFilter.contains(words[i]))
+						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 
@@ -135,8 +135,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.getWord().toLowerCase(Locale.ROOT);
+				for(int i = 0; i < inflections.size(); i ++){
+					final String str = inflections.get(i).getWord().toLowerCase(Locale.ROOT);
 					bloomFilter.add(str);
 				}
 			}

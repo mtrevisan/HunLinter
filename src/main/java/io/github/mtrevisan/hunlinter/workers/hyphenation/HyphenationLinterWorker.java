@@ -85,7 +85,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Inflection inflection : inflections){
+			for(int i = 0; i < inflections.size(); i ++){
+				final Inflection inflection = inflections.get(i);
 				final String word = inflection.getWord();
 				if(word.length() > 1 && !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
