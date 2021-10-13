@@ -462,9 +462,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 	private static final class MyJCopyableTable extends JCopyableTable{
 		@Override
 		public String getValueAtRow(final int row){
-			final TableModel model = getModel();
-			final String definition = (String)model.getValueAt(row, 0);
-			final String synonyms = (String)model.getValueAt(row, 1);
+			final ThesaurusTableModel model = (ThesaurusTableModel)getModel();
+			final String definition = model.getDefinition(row);
+			final String synonyms = model.getSynonyms(row);
 			final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
 			final StringJoiner sj = new StringJoiner("\r\n");
 			for(final String s : synonymsByDefinition)

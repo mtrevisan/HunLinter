@@ -93,6 +93,13 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		return COLUMN_NAMES[column];
 	}
 
+	public String getDefinition(final int rowIndex){
+		return (String)getValueAt(rowIndex, 0);
+	}
+
+	public String getSynonyms(final int rowIndex){
+		return StringUtils.replace((String)getValueAt(rowIndex, 1), WRAPPABLE_COMMA, COMMA);
+	}
 
 	@SuppressWarnings("unused")
 	@Serial
