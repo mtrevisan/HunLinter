@@ -51,13 +51,19 @@ public final class WordVEC{
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 
-	private static final char[] VOWELS_PLAIN_ARRAY = VOWELS_PLAIN.toCharArray();
+	private static final char[] VOWELS_PLAIN_ARRAY = "aAeEiIoOuU".toCharArray();
+	private static final char[] VOWELS_TRUE = "aAeEoO".toCharArray();
+	private static final char[] VOWELS_PLAIN_ARRAY2 = "aAeEoOíÍïÏúÚüÜ".toCharArray();
+	private static final char[] VOWELS_UMLAUT = "ïÏüÜ".toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
 	static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
+		Arrays.sort(VOWELS_TRUE);
+		Arrays.sort(VOWELS_PLAIN_ARRAY2);
+		Arrays.sort(VOWELS_UMLAUT);
 		Arrays.sort(VOWELS_STRESSED_ARRAY);
 		Arrays.sort(VOWELS_EXTENDED_ARRAY);
 		Arrays.sort(CONSONANTS_ARRAY);
@@ -168,7 +174,23 @@ public final class WordVEC{
 	private static int getLastUnstressedVowelIndex(final CharSequence word, int lastLetterIndex){
 		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
 			final char chr = word.charAt(lastLetterIndex);
-			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0)
+			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0){
+				if(chr != 'i' && chr != 'u')
+					break;
+
+				final int idx = (word.charAt(lastLetterIndex - 1) == '-'? lastLetterIndex - 2: lastLetterIndex - 1);
+				if(idx < 0 || Arrays.binarySearch(VOWELS_UMLAUT, word.charAt(idx)) < 0)
+					break;
+			}
+		}
+		return lastLetterIndex;
+	}
+
+	//[aeiou][^aeiou]*$
+	private static int getLastUnstressedVowelIndex1(final CharSequence word, int lastLetterIndex){
+		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
+			final char chr = word.charAt(lastLetterIndex);
+			if(Arrays.binarySearch(VOWELS_TRUE, chr) >= 0)
 				break;
 		}
 		return lastLetterIndex;
@@ -229,8 +251,14 @@ public final class WordVEC{
 			else if(stressIndex < 0)
 				stressIndex = lastChar;
 
-			if(stressIndex >= 0)
-				word = setAcuteStressAtIndex(word, stressIndex);
+			if(stressIndex >= 0){
+				int vowelsCount = 0;
+				for(int i = stressIndex + 1; vowelsCount < 3 && i < word.length(); i ++)
+					if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY2, word.charAt(i)) >= 0)
+						vowelsCount ++;
+				if(vowelsCount > 1 || (word.charAt(stressIndex) == 'i' || word.charAt(stressIndex) == 'u'))
+					word = setAcuteStressAtIndex(word, stressIndex);
+			}
 		}
 		return word;
 	}
