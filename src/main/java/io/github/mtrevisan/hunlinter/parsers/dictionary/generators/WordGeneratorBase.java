@@ -336,8 +336,10 @@ class WordGeneratorBase{
 
 				//produce the new word
 				final String newWord = entry.applyRule(word, affixData.isFullstrip());
+				final boolean isFullstrip = entry.isFullstripRule(word);
 				final Inflection inflection = Inflection.createFromInflection(newWord, entry, dicEntry, postponedAffixes,
-					rule.isCombinable());
+						rule.isCombinable())
+					.withFullstrip(isFullstrip);
 				if(removeCircumfixFlag)
 					inflection.removeContinuationFlag(circumfixFlag);
 				if(!inflection.hasContinuationFlag(forbiddenWordFlag))

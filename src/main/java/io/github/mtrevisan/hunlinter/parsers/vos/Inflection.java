@@ -52,6 +52,7 @@ public class Inflection extends DictionaryEntry{
 	private AffixEntry[] appliedRules;
 
 	private final List<DictionaryEntry> compoundEntries;
+	private boolean fullstrip;
 
 
 	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
@@ -101,6 +102,16 @@ public class Inflection extends DictionaryEntry{
 			(morphologicalFields != null? new ArrayList<>(Arrays.asList(StringUtils.split(morphologicalFields))): null), true);
 
 		this.compoundEntries = compoundEntries;
+	}
+
+	public Inflection withFullstrip(final boolean fullstrip){
+		this.fullstrip = fullstrip;
+
+		return this;
+	}
+
+	public boolean isFullstrip(){
+		return fullstrip;
 	}
 
 	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){

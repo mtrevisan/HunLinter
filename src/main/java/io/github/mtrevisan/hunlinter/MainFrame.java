@@ -287,6 +287,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
+      dicExtractFullstripWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       dicFSASeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDictionaryFSAMenuItem = new javax.swing.JMenuItem();
@@ -425,6 +426,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS_NO_DUPLICATES, workerManager, this));
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
+
+		dicExtractFullstripWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.FULLSTRIP_WORDS, workerManager, this));
+		dicExtractFullstripWordlistMenuItem.setText("Extract fullstrip wordlist…");
+		dicMenu.add(dicExtractFullstripWordlistMenuItem);
 
       dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
@@ -995,6 +1000,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem dicExtractPoSFSAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
+   private javax.swing.JMenuItem dicExtractFullstripWordlistMenuItem;
    private javax.swing.JPopupMenu.Separator dicFSASeparator;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenuItem dicLinterMenuItem;

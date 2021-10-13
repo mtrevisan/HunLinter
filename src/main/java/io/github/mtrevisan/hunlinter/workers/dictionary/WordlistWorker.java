@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.SorterException;
+import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorter;
@@ -58,8 +59,9 @@ public class WordlistWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Wordlist";
 
 	private static final char[] NEW_LINE = {'\n'};
+	private static final String SLASH = "/";
 
-	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES}
+	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES, FULLSTRIP_WORDS}
 
 
 	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final File outputFile){
@@ -80,14 +82,25 @@ public class WordlistWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 
-		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset)){
-			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
+		try{
+			final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE || type == WorkerType.FULLSTRIP_WORDS
+				? Inflection::toString
+				: Inflection::getWord);
 			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections)
-					writeLine(writer, toString.apply(inflection), NEW_LINE);
+				if(type != WorkerType.FULLSTRIP_WORDS)
+					for(final Inflection inflection : inflections)
+						writeLine(writer, toString.apply(inflection), NEW_LINE);
+				else
+					for(final Inflection inflection : inflections)
+						if(inflection.isFullstrip()){
+							final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
+							final String originatingWord = lastAppliedRule.undoRule(inflection.getWord());
+							writeLine(writer, originatingWord + SLASH + lastAppliedRule.getFlag(), NEW_LINE);
+						}
 			};
 
 			getWorkerData()
@@ -98,11 +111,12 @@ public class WordlistWorker extends WorkerDictionary{
 
 				final File dicFile = dicParser.getDicFile();
 				processLines(dicFile.toPath(), charset, lineProcessor);
-				closeWriter(writer);
 
 				return outputFile;
 			};
 			final Function<File, File> step2 = file -> {
+				closeWriter(writer);
+
 				resetProcessing("Sorting");
 
 				//sort file & remove duplicates

@@ -348,8 +348,12 @@ public class AffixEntry{
 		return (parent.getType() == AffixType.SUFFIX? word.endsWith(appending): word.startsWith(appending));
 	}
 
+	public final boolean isFullstripRule(final String word){
+		return (word.length() == removing.length());
+	}
+
 	public final String applyRule(final String word, final boolean isFullstrip){
-		if(!isFullstrip && word.length() == removing.length())
+		if(!isFullstrip && isFullstripRule(word))
 			throw new LinterException(CANNOT_FULL_STRIP, word);
 
 		return (parent.getType() == AffixType.SUFFIX
