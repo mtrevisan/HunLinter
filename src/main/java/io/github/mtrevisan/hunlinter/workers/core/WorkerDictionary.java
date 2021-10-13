@@ -220,7 +220,9 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		try{
 			writer.close();
 		}
-		catch(final IOException ignored){}
+		catch(final IOException ioe){
+			throw new WriterException(ioe);
+		}
 	}
 
 }

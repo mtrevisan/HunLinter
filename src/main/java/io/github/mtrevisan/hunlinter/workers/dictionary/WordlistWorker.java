@@ -64,6 +64,9 @@ public class WordlistWorker extends WorkerDictionary{
 	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES, FULLSTRIP_WORDS}
 
 
+	private volatile boolean writerClosed;
+
+
 	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final File outputFile){
 		this(parserManager.getDicParser(), parserManager.getWordGenerator(), type, outputFile);
 	}
@@ -91,20 +94,26 @@ public class WordlistWorker extends WorkerDictionary{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
+				final int size = inflections.size();
 				if(type != WorkerType.FULLSTRIP_WORDS)
-					for(final Inflection inflection : inflections)
-						writeLine(writer, toString.apply(inflection), NEW_LINE);
+					for(int i = 0; !writerClosed && i < size; i ++)
+						writeLine(writer, toString.apply(inflections.get(i)), NEW_LINE);
 				else
-					for(final Inflection inflection : inflections)
+					for(int i = 0; !writerClosed && i < size; i ++){
+						final Inflection inflection = inflections.get(i);
 						if(inflection.isFullstrip()){
 							final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
 							final String originatingWord = lastAppliedRule.undoRule(inflection.getWord());
 							writeLine(writer, originatingWord + SLASH + lastAppliedRule.getFlag(), NEW_LINE);
 						}
+					}
 			};
 
 			getWorkerData()
-				.withDataCancelledCallback(e -> closeWriter(writer));
+				.withDataCancelledCallback(e -> {
+					closeWriter(writer);
+					writerClosed = true;
+				});
 
 			final Function<Void, File> step1 = ignored -> {
 				prepareProcessing("Execute " + workerData.getWorkerName());
