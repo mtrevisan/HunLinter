@@ -58,7 +58,7 @@ public final class WordVEC{
 	private static final char[] SURE_VOWELS_GRAVE_STRESSED = "èÈòÒ".toCharArray();
 	private static final char[] VOWELS_PLAIN_ARRAY2 = "aAeEoOíÍïÏúÚüÜ".toCharArray();
 	private static final char[] VOWELS_NOT_UMLAUT_ARRAY = "iIuU".toCharArray();
-	private static final char[] VOWELS_IU_ARRAY = "iIuUíÍúÚ".toCharArray();
+	private static final char[] VOWELS_IU_ARRAY = "iIuUíÍúÚïÏüÜ".toCharArray();
 	private static final char[] VOWELS_UMLAUT_ARRAY = "ïÏüÜ".toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_UNSTRESSED_ARRAY = VOWELS_UNSTRESSED.toCharArray();
@@ -263,7 +263,7 @@ public final class WordVEC{
 	public static String markDefaultStress(final String word){
 		final StringJoiner sj = new StringJoiner("-");
 		int offset = 0;
-		int subwordIndex = 0;
+		int subwordIndex;
 		while((subwordIndex = word.indexOf('-', offset)) >= 0){
 			sj.add(innerMarkDefaultStress(word.substring(offset, subwordIndex)));
 			offset = subwordIndex + 1;
@@ -293,10 +293,12 @@ public final class WordVEC{
 //		return word;
 //	}
 
+	//FIXME clean up this ugliness
 	private static String innerMarkDefaultStress(String word){
 		int higherIndex = StringUtils.indexOf(word, 'ʼ') - 1;
+		final int wordLength = word.length();
 		if(higherIndex < 0)
-			higherIndex = word.length() - 1;
+			higherIndex = wordLength - 1;
 
 		final int stressIndex = getIndexOfStress(word);
 		//if last character is stressed, or the stress has to be present, then it's ok
@@ -308,19 +310,60 @@ public final class WordVEC{
 			int vowelCount = (closedLastSyllable? 1: 2);
 			for(; vowelCount > 0 && higherIndex >= 0; higherIndex --){
 				final char currentChar = word.charAt(higherIndex);
-				final boolean vowel = isVowel(currentChar);
-				final boolean venetanVowel = (Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) < 0 || !isVenetanConsonant(word, higherIndex));
-				if(vowel && venetanVowel)
+				boolean vowel = isVowel(currentChar);
+				if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0){
+					final boolean outsideWord = (higherIndex <= 1 || higherIndex + 1 >= wordLength);
+					if(!outsideWord){
+						final char previousChar = word.charAt(higherIndex - 1);
+						final char nextChar = word.charAt(higherIndex + 1);
+						final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
+						vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
+					}
+				}
+				if(vowel)
 					vowelCount --;
 			}
 			if(vowelCount == 0){
 				higherIndex ++;
 
 				if(stressIndex < 0 || higherIndex == stressIndex){
-					if(!closedLastSyllable && higherIndex == word.length() - 2)
-						word = setAcuteStressAtIndex(word, higherIndex);
-					else if(higherIndex == stressIndex && higherIndex != word.length() - 1)
+					//check that there are no other vowels before higherIndex
+					boolean otherVowelsPresent = false;
+					for(int i = higherIndex - 1; !otherVowelsPresent && i >= 0; i --){
+						final char currentChar = word.charAt(i);
+						boolean vowel = isVowel(currentChar);
+						if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0){
+							final boolean outsideWord = (i <= 1 || i + 1 >= wordLength);
+							if(!outsideWord){
+								final char previousChar = word.charAt(i - 1);
+								final char nextChar = word.charAt(i + 1);
+								final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
+								vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
+							}
+						}
+						if(vowel)
+							otherVowelsPresent = true;
+					}
+
+					if(!otherVowelsPresent || higherIndex == stressIndex && (closedLastSyllable || higherIndex < wordLength - 2))
 						word = suppressStress(word);
+					else if(higherIndex == wordLength - 2 && isVowel(word.charAt(higherIndex + 1))){
+						final char currentChar = word.charAt(higherIndex);
+						boolean vowel = Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0;
+						if(vowel){
+							final boolean outsideWord = (higherIndex <= 1 || higherIndex + 1 >= wordLength);
+							if(!outsideWord){
+								final char previousChar = word.charAt(higherIndex - 1);
+								final char nextChar = word.charAt(higherIndex + 1);
+								final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
+								vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
+							}
+						}
+						if(vowel)
+							word = setAcuteStressAtIndex(word, higherIndex);
+						else
+							word = suppressStress(word);
+					}
 				}
 			}
 		}

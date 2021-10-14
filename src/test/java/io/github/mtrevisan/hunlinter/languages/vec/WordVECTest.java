@@ -51,8 +51,8 @@ class WordVECTest{
 
 	@Test
 	void stressOnPenultimate1(){
-		Assertions.assertEquals("buxaràa", WordVEC.markDefaultStress("buxaraa"));
-		Assertions.assertEquals("buxaràa", WordVEC.markDefaultStress("buxaràa"));
+		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaraa"));
+		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaràa"));
 	}
 
 	@Test
@@ -81,6 +81,14 @@ class WordVECTest{
 	void stressOnAntepenultimate2(){
 		Assertions.assertEquals("ankúđen", WordVEC.markDefaultStress("ankúđen"));
 		Assertions.assertEquals("bégol", WordVEC.markDefaultStress("bégol"));
+		Assertions.assertEquals("bégoi", WordVEC.markDefaultStress("bégoi"));
+	}
+
+	@Test
+	void stressOnFalseVowel(){
+		Assertions.assertEquals("ruo", WordVEC.markDefaultStress("ruo"));
+		Assertions.assertEquals("ruo", WordVEC.markDefaultStress("rúo"));
+		Assertions.assertEquals("ñaui", WordVEC.markDefaultStress("ñaui"));
 	}
 
 	@Test
