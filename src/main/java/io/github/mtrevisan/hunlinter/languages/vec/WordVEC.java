@@ -126,6 +126,7 @@ public final class WordVEC{
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		final StringJoiner sj = (new StringJoiner(PIPE))
+			.add("^(?:àà|bú|c[àí]|íí)$")
 			.add(NO_STRESS_AVER)
 			.add(NO_STRESS_ESER)
 			.add(NO_STRESS_DAR_FAR_STAR)
@@ -261,16 +262,26 @@ public final class WordVEC{
 	}
 
 	public static String markDefaultStress(final String word){
-		final StringJoiner sj = new StringJoiner("-");
-		int offset = 0;
-		int subwordIndex;
-		while((subwordIndex = word.indexOf('-', offset)) >= 0){
-			sj.add(innerMarkDefaultStress(word.substring(offset, subwordIndex)));
-			offset = subwordIndex + 1;
+		String delimiter = StringUtils.EMPTY;
+		if(word.contains("-"))
+			delimiter = "-";
+		else if(word.contains("–"))
+			delimiter = "–";
+
+		if(!delimiter.isEmpty()){
+			final StringJoiner sj = new StringJoiner(delimiter);
+			int offset = 0;
+			int subwordIndex;
+			while((subwordIndex = word.indexOf(delimiter, offset)) >= 0){
+				sj.add(innerMarkDefaultStress(word.substring(offset, subwordIndex)));
+				offset = subwordIndex + 1;
+			}
+			if(offset < word.length())
+				sj.add(innerMarkDefaultStress(word.substring(offset)));
+			return sj.toString();
 		}
-		if(offset < word.length())
-			sj.add(innerMarkDefaultStress(word.substring(offset)));
-		return sj.toString();
+
+		return innerMarkDefaultStress(word);
 	}
 
 //	public static String innerMarkDefaultStress(String word){

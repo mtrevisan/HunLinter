@@ -74,11 +74,13 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	private void adjustRowHeight(final JTable table, final int rowIndex){
 		final int fontHeight = getFontMetrics(FontHelper.getCurrentFont()).getHeight();
-		final int cellLines = StringUtils.countMatches(table.getValueAt(rowIndex, 1).toString(), ThesaurusTableModel.TAG_NEW_LINE)
-			+ 1;
-		final int rowHeight = fontHeight * cellLines + 4;
-		if(rowHeight != table.getRowHeight(rowIndex))
-			table.setRowHeight(rowIndex, rowHeight);
+		final String value = (String)table.getValueAt(rowIndex, 1);
+		if(value != null){
+			final int cellLines = StringUtils.countMatches(value.toString(), ThesaurusTableModel.TAG_NEW_LINE) + 1;
+			final int rowHeight = fontHeight * cellLines + 4;
+			if(rowHeight != table.getRowHeight(rowIndex))
+				table.setRowHeight(rowIndex, rowHeight);
+		}
 	}
 
 }

@@ -404,7 +404,12 @@ public class DictionaryLayeredPane extends JLayeredPane{
 	private void calculateInflections(){
 		final String language = parserManager.getLanguage();
 		final Orthography orthography = BaseBuilder.getOrthography(language);
-		final String text = orthography.correctOrthography(inputTextField.getText().trim());
+		String text = inputTextField.getText().trim();
+		final int rulesIndex = StringUtils.lastIndexOf(text, '/');
+		final String rules = (rulesIndex >= 0? text.substring(rulesIndex): null);
+		text = orthography.correctOrthography(rulesIndex >= 0? text.substring(0, rulesIndex): text);
+		if(rules != null)
+			text += rules;
 
 		if(text.equals(formerInputText))
 			return;
