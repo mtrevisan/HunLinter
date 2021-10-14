@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.gui.dialogs.ThesaurusMergeDialog;
 import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
@@ -252,7 +253,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
    private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the synonyms
-			final String synonyms = synonymsTextField.getText();
+			final String language = parserManager.getLanguage();
+			final Orthography orthography = BaseBuilder.getOrthography(language);
+			final String synonyms = orthography.correctOrthography(synonymsTextField.getText().trim());
          final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part-of-speech and definition(s) '" + message

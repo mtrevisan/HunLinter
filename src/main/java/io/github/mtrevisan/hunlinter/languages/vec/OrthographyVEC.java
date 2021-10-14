@@ -92,11 +92,11 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 	@Override
-	public String correctOrthography(String word){
-		word = WordVEC.markDefaultStress(word);
-
+	public String correctOrthography(final String word){
 		//correct stress
 		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+
+		correctedWord = WordVEC.markDefaultStress(correctedWord);
 
 		//correct h occurrences after d, j, l, n, t
 		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);

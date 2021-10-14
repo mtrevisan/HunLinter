@@ -31,13 +31,16 @@ import org.junit.jupiter.api.Test;
 class WordVECTest{
 
 	@Test
-	void stressOnLast(){
+	void stressOnLast1(){
 		Assertions.assertEquals("pi", WordVEC.markDefaultStress("pi"));
 
 		Assertions.assertEquals("pí", WordVEC.markDefaultStress("pí"));
 
 		Assertions.assertEquals("betolíʼ", WordVEC.markDefaultStress("betolíʼ"));
+	}
 
+	@Test
+	void stressOnLast2(){
 		Assertions.assertEquals("soraman", WordVEC.markDefaultStress("soraman"));
 		Assertions.assertEquals("soraman", WordVEC.markDefaultStress("soramàn"));
 
@@ -48,8 +51,8 @@ class WordVECTest{
 
 	@Test
 	void stressOnPenultimate1(){
-		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaraa"));
-		Assertions.assertEquals("buxaraa", WordVEC.markDefaultStress("buxaràa"));
+		Assertions.assertEquals("buxaràa", WordVEC.markDefaultStress("buxaraa"));
+		Assertions.assertEquals("buxaràa", WordVEC.markDefaultStress("buxaràa"));
 	}
 
 	@Test
@@ -62,6 +65,10 @@ class WordVECTest{
 
 	@Test
 	void stressOnPenultimate3(){
+		Assertions.assertEquals("fenido", WordVEC.markDefaultStress("fenido"));
+
+		Assertions.assertEquals("fenido", WordVEC.markDefaultStress("fenído"));
+
 		Assertions.assertEquals("frève", WordVEC.markDefaultStress("frève"));
 	}
 
