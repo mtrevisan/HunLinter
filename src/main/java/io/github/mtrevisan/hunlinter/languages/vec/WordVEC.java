@@ -347,7 +347,8 @@ public final class WordVEC{
 
 					if(!otherVowelsPresent || higherIndex == stressIndex && (closedLastSyllable || higherIndex < wordLength - 2))
 						word = suppressStress(word);
-					else if(higherIndex == wordLength - 2 && isVowel(word.charAt(higherIndex + 1))){
+					else if(higherIndex == wordLength - 2 && higherIndex > 1
+							&& !isVowel(word.charAt(higherIndex - 1)) && isVowel(word.charAt(higherIndex + 1))){
 						final char currentChar = word.charAt(higherIndex);
 						boolean vowel = Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0;
 						if(vowel){
@@ -364,6 +365,8 @@ public final class WordVEC{
 						else
 							word = suppressStress(word);
 					}
+					else
+						word = suppressStress(word);
 				}
 			}
 		}

@@ -59,7 +59,6 @@ class WordVECTest{
 	void stressOnPenultimate2(){
 		Assertions.assertEquals("fenio", WordVEC.markDefaultStress("fenio"));
 
-		Assertions.assertEquals("fenío", WordVEC.markDefaultStress("fenïo"));
 		Assertions.assertEquals("fenío", WordVEC.markDefaultStress("fenío"));
 	}
 
