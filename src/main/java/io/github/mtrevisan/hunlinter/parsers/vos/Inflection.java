@@ -159,9 +159,8 @@ public class Inflection extends DictionaryEntry{
 	public final boolean hasRuleApplied(final Set<String> flags){
 		if(appliedRules != null)
 			for(final AffixEntry appliedRule : appliedRules)
-				for(final String flag : flags)
-					if(appliedRule.hasContinuationFlag(flag))
-						return true;
+				if(flags.contains(appliedRule.getFlag()))
+					return true;
 		return false;
 	}
 

@@ -150,8 +150,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			stressCheck(subword, inflection);
 
 			final String markedDefaultStressWord = WordVEC.markDefaultStress(subword);
-			if(!subword.equals(markedDefaultStressWord)
-					&& (!inflection.hasPartOfSpeech(POS_VERB) || inflection.getLastAppliedRule() == null || !canAdmitStress(inflection)))
+			if(!subword.equals(markedDefaultStressWord) && (inflection.getLastAppliedRule() == null || !canAdmitStress(inflection)))
 				throw new LinterException(UNNECESSARY_STRESS, inflection.getWord());
 		}
 	}
