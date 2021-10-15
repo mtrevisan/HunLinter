@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 
 public class DictionaryEntry{
@@ -157,6 +158,11 @@ public class DictionaryEntry{
 	@SuppressWarnings("DesignForExtension")
 	public AffixEntry getLastAppliedRule(){
 		return null;
+	}
+
+	@SuppressWarnings("DesignForExtension")
+	public boolean hasRuleApplied(final Set<String> flags){
+		return false;
 	}
 
 	public final Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){

@@ -169,7 +169,7 @@ public class AffixEntry{
 	}
 
 	public final boolean hasContinuationFlag(final String flag){
-		return (hasContinuationFlags() && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
+		return (hasContinuationFlags() && flag != null && continuationFlags.contains(flag));
 	}
 
 	public final List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){

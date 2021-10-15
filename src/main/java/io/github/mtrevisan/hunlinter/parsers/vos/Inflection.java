@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -152,6 +153,16 @@ public class Inflection extends DictionaryEntry{
 	@Override
 	public final AffixEntry getLastAppliedRule(){
 		return (appliedRules != null? appliedRules[appliedRules.length - 1]: null);
+	}
+
+	@Override
+	public final boolean hasRuleApplied(final Set<String> flags){
+		if(appliedRules != null)
+			for(final AffixEntry appliedRule : appliedRules)
+				for(final String flag : flags)
+					if(appliedRule.hasContinuationFlag(flag))
+						return true;
+		return false;
 	}
 
 	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){

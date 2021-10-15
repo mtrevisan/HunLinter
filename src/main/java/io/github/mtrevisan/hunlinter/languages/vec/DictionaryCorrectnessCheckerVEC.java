@@ -82,6 +82,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String northernPluralRule;
 	private String northernPluralStressedRule;
 	private Set<String> dontCheckProductivenessRules;
+	private Set<String> canAdminStressRules;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final String UNNECESSARY_STRESS = "{} have unnecessary stress";
@@ -126,6 +127,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		northernPluralStressedRule = rulesLoader.readProperty("northernPluralStressed");
 
 		dontCheckProductivenessRules = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
+		canAdminStressRules = rulesLoader.readPropertyAsSet("canAdmitStress", ',');
 	}
 
 	@Override
@@ -148,7 +150,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			stressCheck(subword, inflection);
 
 			final String markedDefaultStressWord = WordVEC.markDefaultStress(subword);
-			if(!subword.equals(markedDefaultStressWord))
+			if(!subword.equals(markedDefaultStressWord)
+					&& (!inflection.hasPartOfSpeech(POS_VERB) || inflection.getLastAppliedRule() == null || !canAdmitStress(inflection)))
 				throw new LinterException(UNNECESSARY_STRESS, inflection.getWord());
 		}
 	}
@@ -283,6 +286,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	@Override
 	public final boolean shouldNotCheckProductiveness(final String flag){
 		return dontCheckProductivenessRules.contains(flag);
+	}
+
+	@Override
+	public final boolean canAdmitStress(final Inflection inflection){
+		return inflection.hasRuleApplied(canAdminStressRules);
 	}
 
 	@Override
