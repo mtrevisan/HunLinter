@@ -134,6 +134,11 @@ public class DictionaryCorrectnessChecker{
 		return false;
 	}
 
+	@SuppressWarnings("DesignForExtension")
+	public boolean canAdmitStress(final String stem){
+		return false;
+	}
+
 	//used by the minimal pairs' worker:
 	@SuppressWarnings("DesignForExtension")
 	public boolean isConsonant(final char chr){

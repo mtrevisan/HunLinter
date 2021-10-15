@@ -83,6 +83,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String northernPluralStressedRule;
 	private Set<String> dontCheckProductivenessRules;
 	private Set<String> canAdminStressRules;
+	private Set<String> stemCanAdmitStress;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
 	private static final String UNNECESSARY_STRESS = "{} have unnecessary stress";
@@ -128,6 +129,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		dontCheckProductivenessRules = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
 		canAdminStressRules = rulesLoader.readPropertyAsSet("canAdmitStress", ',');
+		stemCanAdmitStress = rulesLoader.readPropertyAsSet("stemCanAdmitStress", ',');
 	}
 
 	@Override
@@ -144,13 +146,14 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void stressCheck(final Inflection inflection){
+		final boolean canAdmitStress = canAdmitStress(inflection.getMorphologicalFieldStem());
 		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
 		final String[] subwords = StringUtils.split(derivedWord, WORD_SEPARATORS);
 		for(final String subword : subwords){
 			stressCheck(subword, inflection);
 
 			final String markedDefaultStressWord = WordVEC.markDefaultStress(subword);
-			if(!subword.equals(markedDefaultStressWord) && (inflection.getLastAppliedRule() == null || !canAdmitStress(inflection)))
+			if(!subword.equals(markedDefaultStressWord) && !canAdmitStress && !canAdmitStress(inflection))
 				throw new LinterException(UNNECESSARY_STRESS, inflection.getWord());
 		}
 	}
@@ -290,6 +293,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	@Override
 	public final boolean canAdmitStress(final Inflection inflection){
 		return inflection.hasRuleApplied(canAdminStressRules);
+	}
+
+	@Override
+	public final boolean canAdmitStress(final String stem){
+		//NOTE: starting from index 3 removes the prefix `po:`
+		return stemCanAdmitStress.contains(stem.substring(3));
 	}
 
 	@Override
