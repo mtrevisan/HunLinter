@@ -119,10 +119,10 @@ public final class WordVEC{
 			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|ma(l|nsue)|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
 			+ "|"
 			+ "(?:m(?:al|ove)|soto)?st"
-		+ ")à(?:g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
+		+ ")à(?:[aeio]|g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
 	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|l[aeio]?|ƚ[oaie]|ne?|stu|t[ou])$";
 	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:l[aeio]?|ƚ[oaie]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
-	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[gmstv]e|ne?|r)$";
+	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[oie]|[gmstv]e|ne?|r)$";
 	private static final Pattern PREVENT_UNMARK_STRESS;
 	static{
 		final StringJoiner sj = (new StringJoiner(PIPE))

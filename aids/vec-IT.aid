@@ -54,7 +54,7 @@ X0: genderless plural nouns (e>i, [nr]>[nr]i)
 
 B1: feltrin-belumat transformation, plural with transformation '[aeou][ln] > 'Vi (.>i|[èò][ln], a.>ài|a[ln], e.>éi|e[ln], o.>ói|o[ln], u.>úi|u[ln])
 B2: feltrin-belumat transformation, plural with transformation '[aeou][^-]+[aeou][ln] > 'V[^-]+Vi (l>i|[aeouàèéòóú]l, n>i|[aeouàèéòóú]n)
-A5/A6: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, neve > neu / '-[ai]vo > '-Vu ([aiò]vo>[àíò]u|[aeiò]vo, ve>u|neve)
+A5: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, neve > neu / '-[ai]vo > '-Vu ([aiò]vo>[àíò]u|[aeiò]vo, ve>u|neve)
 V3/V4/V7: venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
 Vf/Vm/Vx: venetian transformation for femenine/masculine/neuter words (-l>-ƚe)
 Vp: prefix for venetian transformation (lV->ƚV-, jV->ɉV-, ŧV->sV-, đV->xV-)
