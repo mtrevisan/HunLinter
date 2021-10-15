@@ -317,23 +317,17 @@ public final class WordVEC{
 			return word;
 
 		if(!RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
-			final boolean closedLastSyllable = isConsonant(word.charAt(higherIndex));
+			final boolean closedLastSyllable = !isVowel(word.charAt(higherIndex));
 			int vowelCount = (closedLastSyllable? 1: 2);
 			for(; vowelCount > 0 && higherIndex >= 0; higherIndex --){
 				final char currentChar = word.charAt(higherIndex);
 				boolean vowel = isVowel(currentChar);
-				if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0){
-					final boolean outsideWord = (higherIndex <= 1 || higherIndex + 1 >= wordLength);
-					if(!outsideWord){
-						final char previousChar = word.charAt(higherIndex - 1);
-						final char nextChar = word.charAt(higherIndex + 1);
-						final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
-						vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
-					}
-				}
+				if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+					vowel = isVenetanVowel(word, higherIndex, wordLength, currentChar);
 				if(vowel)
 					vowelCount --;
 			}
+
 			if(vowelCount == 0){
 				higherIndex ++;
 
@@ -342,59 +336,40 @@ public final class WordVEC{
 					boolean otherVowelsPresent = false;
 					for(int i = higherIndex - 1; !otherVowelsPresent && i >= 0; i --){
 						final char currentChar = word.charAt(i);
-						boolean vowel = isVowel(currentChar);
-						if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0){
-							final boolean outsideWord = (i <= 1 || i + 1 >= wordLength);
-							if(!outsideWord){
-								final char previousChar = word.charAt(i - 1);
-								final char nextChar = word.charAt(i + 1);
-								final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
-								vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
-							}
-						}
-						if(vowel)
-							otherVowelsPresent = true;
+						otherVowelsPresent = isVowel(currentChar);
+						if(otherVowelsPresent && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+							otherVowelsPresent = isVenetanVowel(word, i, wordLength, currentChar);
 					}
 
-					if(!otherVowelsPresent || higherIndex == stressIndex && (closedLastSyllable || higherIndex < wordLength - 2))
-						word = suppressStress(word);
-					else if(higherIndex == wordLength - 2 && higherIndex > 1
-							&& !isVowel(word.charAt(higherIndex - 1)) && isVowel(word.charAt(higherIndex + 1))){
+					if(otherVowelsPresent
+							&& (higherIndex != stressIndex || !closedLastSyllable)
+							&& higherIndex > 1
+							&& higherIndex == wordLength - 2
+							&& !isVowel(word.charAt(higherIndex - 1))
+							&& isVowel(word.charAt(higherIndex + 1))
+						){
 						final char currentChar = word.charAt(higherIndex);
-						boolean vowel = Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0;
-						if(vowel){
-							final boolean outsideWord = (higherIndex <= 1 || higherIndex + 1 >= wordLength);
-							if(!outsideWord){
-								final char previousChar = word.charAt(higherIndex - 1);
-								final char nextChar = word.charAt(higherIndex + 1);
-								final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
-								vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
-							}
-						}
-						if(vowel)
-							word = setAcuteStressAtIndex(word, higherIndex);
-						else
-							word = suppressStress(word);
+//						if(isVenetanVowel(word, higherIndex, wordLength, currentChar))
+						if(Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+							return setAcuteStressAtIndex(word, higherIndex);
 					}
-					else
-						word = suppressStress(word);
+					word = suppressStress(word);
 				}
 			}
 		}
 		return word;
 	}
 
-	private static boolean isVenetanConsonant(final CharSequence word, final int index){
-		final boolean outsideWord = (index <= 1 || index + 2 >= word.length());
-		boolean consonant = outsideWord;
-		if(!outsideWord){
-			final char currentChar = word.charAt(index);
+	private static boolean isVenetanVowel(final CharSequence word, final int index, final int wordLength, final char currentChar){
+		boolean vowel = true;
+		final boolean insideWord = (index > 1 && index + 1 < wordLength);
+		if(insideWord){
 			final char previousChar = word.charAt(index - 1);
 			final char nextChar = word.charAt(index + 1);
 			final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
-			consonant = (isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
+			vowel = !(!isVowel(previousChar) && maybeConsonant && isVowel(nextChar));
 		}
-		return consonant;
+		return vowel;
 	}
 
 	static int getIndexOfStress(final CharSequence word){
