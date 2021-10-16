@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.languages.vec;
 
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.StringJoiner;
-import java.util.regex.Pattern;
 
 
 public final class WordVEC{
@@ -96,46 +94,6 @@ public final class WordVEC{
 		}
 	}
 
-	private static final Pattern DEFAULT_STRESS_GROUP = RegexHelper.pattern("^(?:(?:de)?fr|(?:ma|ko|x)?[lƚ]|n|apl|(?:in|re)st)au(?![^aeiou][aeiou].|tj?[aeèi].|fra)");
-
-	//https://www.rexegg.com/regex-optimizations.html
-	private static final String NO_STRESS_AVER = "^(?:re)?(?:"
-		+ "g(?:à(?:b[ei]|(?:[bp]i[ae]?|[gmv]e|l[aeio]?|ƚ[oaie]|s(?:tu|e)|t[euo]|ne?))|é(?:mo|(?:b(?:ia|e)|de)))"
-		+ "|"
-		+ "à(?:b(?:[ei]|i[ae]?)|[gmv]e|s(?:tu|e)|t[euo]|l[aeio]?|ƚ[oaie]|ne?|pi[ae]?)"
-		+ "|"
-		+ "é(?:b(?:ia|e)|de)"
-		+ ")$";
-	private static final String NO_STRESS_ESER = "^(?:r[ei])?(?:" +
-		"s(?:er(?:à(?:l[aeio]?|ƚ[oaie])|é(?:stu|t[ou]))|aré(?:stu|t[ou])|ión(?:[ei]|[jɉ]o|mi|t[ei])|ó(?:[jɉ]o|n(?:[ei]|[jɉ]o|mi|t[ei]))|é(?:l[aeio]?|ƚ[oaie]|n[ei]|stu|t[ou])|í(?:stu|t[ou]))"
-		+ "|"
-		+ "xé(?:l[aeio]?|ƚ[oaie]|stu|t[ou])"
-		+ "|"
-		+ "é(?:l[aeio]?|ƚ[oaie]|stu|t[ou]|r[aei])"
-		+ ")$";
-	private static final String NO_STRESS_DAR_FAR_STAR = "^(?:"
-			+ "(?:dex|re)?d"
-			+ "|"
-			+ "(?:asue|de(?:s|xasue)|kon(?:tra)?|[lƚ]iku[ei]|ma(l|nsue)|putre|rare|re|s(?:a(?:t[iu]s|stu)|o(?:[dt]is|ra|sti)|t(?:[ou]pe|ra))|t(?:(?:or|um)e))?f"
-			+ "|"
-			+ "(?:m(?:al|ove)|soto)?st"
-		+ ")à(?:[aeio]|g[aeio]?|l[aeio]?|ƚ[oaie]|stu|t[ou])?$";
-	private static final String NO_STRESS_SAVER = "^(?:pre|re|stra)?sà(?:[gmstv]e|l[aeio]?|ƚ[oaie]|ne?|stu|t[ou])$";
-	private static final String NO_STRESS_ANDAR = "^(?:re)?và(?:l[aeio]?|ƚ[oaie]|[mstv]e|ne?|stu|t[ou]|g(?:[oea]|io?)?)$";
-	private static final String NO_STRESS_TRAER = "^(?:as?|des?|es|kon|pro|re|s(?:o|ub?))?trà(?:[oie]|[gmstv]e|ne?|r)$";
-	private static final Pattern PREVENT_UNMARK_STRESS;
-	static{
-		final StringJoiner sj = (new StringJoiner(PIPE))
-			.add("^(?:àà|bú|c[àí]|íí)$")
-			.add(NO_STRESS_AVER)
-			.add(NO_STRESS_ESER)
-			.add(NO_STRESS_DAR_FAR_STAR)
-			.add(NO_STRESS_SAVER)
-			.add(NO_STRESS_ANDAR)
-			.add(NO_STRESS_TRAER);
-		PREVENT_UNMARK_STRESS = RegexHelper.pattern(sj.toString());
-	}
-
 	//NOTE: must be sorted!
 	private static final char[] SIMPLE_VOWELS_ARRAY = "AEIOUaeiouÏÜïü".toCharArray();
 	//NOTE: must be sorted!
@@ -163,7 +121,7 @@ public final class WordVEC{
 	}
 
 	public static boolean isConsonant(final char chr){
-		return (Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0);
+		return !isVowel(chr);
 	}
 
 	//^[‘’']?[aeiouàèéíòóú]
@@ -304,9 +262,8 @@ public final class WordVEC{
 //		return word;
 //	}
 
-	//FIXME clean up this ugliness
 	private static String innerMarkDefaultStress(String word){
-		int higherIndex = StringUtils.indexOf(word, 'ʼ') - 1;
+		int higherIndex = StringUtils.lastIndexOf(word, 'ʼ') - 1;
 		final int wordLength = word.length();
 		if(higherIndex < 0)
 			higherIndex = wordLength - 1;
@@ -316,50 +273,44 @@ public final class WordVEC{
 		if(higherIndex == stressIndex || stressIndex >= 0 && Arrays.binarySearch(SURE_VOWELS_GRAVE_STRESSED, word.charAt(stressIndex)) >= 0)
 			return word;
 
-		if(!RegexHelper.find(word, PREVENT_UNMARK_STRESS)){
-			final boolean closedLastSyllable = !isVowel(word.charAt(higherIndex));
-			int vowelCount = (closedLastSyllable? 1: 2);
-			for(; vowelCount > 0 && higherIndex >= 0; higherIndex --){
-				final char currentChar = word.charAt(higherIndex);
-				boolean vowel = isVowel(currentChar);
-				if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
-					vowel = isVenetanVowel(word, higherIndex, wordLength, currentChar);
-				if(vowel)
-					vowelCount --;
-			}
+		final boolean closedLastSyllable = isConsonant(word.charAt(higherIndex));
+		int vowelCount = (closedLastSyllable? 1: 2);
+		for(; vowelCount > 0 && higherIndex >= 0; higherIndex --){
+			final char currentChar = word.charAt(higherIndex);
+			boolean vowel = isVowel(currentChar);
+			if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+				vowel = isVenetanVowel(word, higherIndex, wordLength, currentChar);
+			if(vowel)
+				vowelCount --;
+		}
 
-			if(vowelCount == 0){
-				higherIndex ++;
+		if(vowelCount == 0){
+			higherIndex ++;
 
-				if(stressIndex < 0 || higherIndex == stressIndex){
-					//check that there are no other vowels before higherIndex
-					boolean otherVowelsPresent = false;
-					for(int i = higherIndex - 1; !otherVowelsPresent && i >= 0; i --){
-						final char currentChar = word.charAt(i);
-						otherVowelsPresent = isVowel(currentChar);
-						if(otherVowelsPresent && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
-							otherVowelsPresent = isVenetanVowel(word, i, wordLength, currentChar);
-					}
-
-					if(otherVowelsPresent
-							&& (higherIndex != stressIndex || !closedLastSyllable)
-							&& higherIndex > 1
-							&& higherIndex == wordLength - 2
-							&& !isVowel(word.charAt(higherIndex - 1))
-							&& isVowel(word.charAt(higherIndex + 1))
-						){
-						final char currentChar = word.charAt(higherIndex);
-//						if(isVenetanVowel(word, higherIndex, wordLength, currentChar))
-						if(Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
-							return setAcuteStressAtIndex(word, higherIndex);
-					}
-					word = suppressStress(word);
+			if(stressIndex < 0 || higherIndex == stressIndex){
+				//check that there are no other vowels before higherIndex
+				boolean otherVowelsPresent = false;
+				for(int i = higherIndex - 1; !otherVowelsPresent && i >= 0; i --){
+					final char currentChar = word.charAt(i);
+					otherVowelsPresent = isVowel(currentChar);
+					if(otherVowelsPresent && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+						otherVowelsPresent = isVenetanVowel(word, i, wordLength, currentChar);
 				}
+
+				if(otherVowelsPresent){
+					final boolean stressOnPenultimateSyllabe = (higherIndex == wordLength - 2
+						&& isConsonant(word.charAt(higherIndex - 1))
+						&& isVowel(word.charAt(higherIndex + 1)));
+					if(stressOnPenultimateSyllabe && Arrays.binarySearch(VOWELS_IU_ARRAY, word.charAt(higherIndex)) >= 0)
+						return setAcuteStressAtIndex(word, higherIndex);
+				}
+				word = suppressStress(word);
 			}
 		}
 		return word;
 	}
 
+	//NOTE: `word[index]` must already be a vowel!
 	private static boolean isVenetanVowel(final CharSequence word, final int index, final int wordLength, final char currentChar){
 		boolean vowel = true;
 		final boolean insideWord = (index > 1 && index + 1 < wordLength);
@@ -367,7 +318,7 @@ public final class WordVEC{
 			final char previousChar = word.charAt(index - 1);
 			final char nextChar = word.charAt(index + 1);
 			final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
-			vowel = !(!isVowel(previousChar) && maybeConsonant && isVowel(nextChar));
+			vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
 		}
 		return vowel;
 	}

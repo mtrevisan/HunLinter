@@ -35,6 +35,8 @@ class WordVECTest{
 		Assertions.assertEquals("pi", WordVEC.markDefaultStress("pi"));
 		Assertions.assertEquals("pí", WordVEC.markDefaultStress("pí"));
 
+		Assertions.assertEquals("ʼecóʼ", WordVEC.markDefaultStress("ʼecóʼ"));
+
 		Assertions.assertEquals("betolíʼ", WordVEC.markDefaultStress("betolíʼ"));
 	}
 
@@ -85,6 +87,11 @@ class WordVECTest{
 	void stressOnFalseVowel(){
 		Assertions.assertEquals("ruo", WordVEC.markDefaultStress("ruo"));
 		Assertions.assertEquals("ruo", WordVEC.markDefaultStress("rúo"));
+
+		Assertions.assertEquals("ñaun", WordVEC.markDefaultStress("ñaun"));
+		Assertions.assertEquals("ñaun", WordVEC.markDefaultStress("ñaún"));
+
+		Assertions.assertEquals("fetadin", WordVEC.markDefaultStress("fetadin"));
 
 		Assertions.assertEquals("ñaui", WordVEC.markDefaultStress("ñaui"));
 	}
