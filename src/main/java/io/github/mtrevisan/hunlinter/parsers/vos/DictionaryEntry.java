@@ -120,7 +120,7 @@ public class DictionaryEntry{
 	}
 
 	public final boolean hasContinuationFlag(final String flag){
-		return (continuationFlags != null && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
+		return (continuationFlags != null && flag != null && continuationFlags.contains(flag));
 	}
 
 	public final boolean hasContinuationFlags(final String[] flags){

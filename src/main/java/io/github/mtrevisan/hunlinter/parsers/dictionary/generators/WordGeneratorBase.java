@@ -214,7 +214,7 @@ class WordGeneratorBase{
 			final Iterator<Inflection> itr = inflections.iterator();
 			while(itr.hasNext()){
 				final Inflection inflection = itr.next();
-				if(inflection.hasContinuationFlag(circumfixFlag) && ! inflection.isTwofolded(circumfixFlag))
+				if(!inflection.isCircumfixTwofolded(circumfixFlag))
 					itr.remove();
 			}
 		}

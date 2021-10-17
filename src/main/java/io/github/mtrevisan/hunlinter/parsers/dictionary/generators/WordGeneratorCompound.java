@@ -313,7 +313,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 			final Iterator<Inflection> itr = prods.iterator();
 			while(itr.hasNext()){
 				final Inflection prod = itr.next();
-				if(prod.isTwofolded(circumfixFlag))
+				if(!prod.isCircumfixTwofolded(circumfixFlag))
 					itr.remove();
 			}
 		}

@@ -42,15 +42,12 @@ public final class WordVEC{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordVEC.class);
 
-	private static final String PIPE = "|";
-
 	private static final String VOWELS_PLAIN = "aAeEiIïÏoOuUüÜ";
 	private static final String VOWELS_STRESSED = "àÀéÉèÈíÍóÓòÒúÚ";
 	private static final String VOWELS_UNSTRESSED = "aAeEeEiIoOoOuU";
 	private static final String CONSONANTS = "bBcCdDđĐfFgGhHjJɉɈkKlLƚȽmMnNñÑpPrRsStTŧŦvVxX";
 
 	private static final char[] VOWELS_PLAIN_ARRAY = "aAeEiIoOuU".toCharArray();
-	private static final char[] VOWELS_TRUE = "aAeEoO".toCharArray();
 	private static final char[] VOWELS_UNNECESSARY_STRESSED = "aAàÀeEéÉoOóÓ".toCharArray();
 	private static final char[] VOWELS_UNNECESSARY_STRESS = "aAeEoO".toCharArray();
 	private static final char[] SURE_VOWELS_GRAVE_STRESSED = "èÈòÒ".toCharArray();
@@ -65,7 +62,6 @@ public final class WordVEC{
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
-		Arrays.sort(VOWELS_TRUE);
 		Arrays.sort(VOWELS_UNNECESSARY_STRESSED);
 		Arrays.sort(VOWELS_UNNECESSARY_STRESS);
 		Arrays.sort(SURE_VOWELS_GRAVE_STRESSED);
@@ -102,7 +98,7 @@ public final class WordVEC{
 
 	private WordVEC(){}
 
-	public static int countGraphemes(final String word){
+	public static int countGraphemes(final CharSequence word){
 		int count = 0;
 		for(int i = 0; i < word.length(); i ++){
 			final char chr = word.charAt(i);
@@ -161,7 +157,7 @@ public final class WordVEC{
 	private static int getLastUnstressedVowelIndex1(final CharSequence word, int lastLetterIndex){
 		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
 			final char chr = word.charAt(lastLetterIndex);
-			if(Arrays.binarySearch(VOWELS_TRUE, chr) >= 0)
+			if(Arrays.binarySearch(VOWELS_UNNECESSARY_STRESS, chr) >= 0)
 				break;
 		}
 		return lastLetterIndex;

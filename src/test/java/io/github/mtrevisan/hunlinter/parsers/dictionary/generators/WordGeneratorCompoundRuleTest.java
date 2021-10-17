@@ -35,6 +35,7 @@ import java.io.IOException;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a>. */
+@SuppressWarnings("ALL")
 class WordGeneratorCompoundRuleTest extends TestBase{
 
 	@Test

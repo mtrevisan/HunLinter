@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.List;
 
 
+@SuppressWarnings("ALL")
 class WordMuncherTest{
 
 //	@Test

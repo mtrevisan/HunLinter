@@ -192,21 +192,14 @@ public class Inflection extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
-	@SuppressWarnings("ConstantConditions")
-	public final boolean isTwofolded(final String circumfixFlag){
-		if(appliedRules != null){
-			//find last applied rule with circumfix flag
-			int startIndex = appliedRules.length - 1;
-			while(startIndex >= 0)
-				if(appliedRules[startIndex --].hasContinuationFlag(circumfixFlag))
-					break;
-
-			final int[] suffixesAffixesCount = new int[2];
-			for(int idx = startIndex + 1; idx < appliedRules.length; idx ++)
-				suffixesAffixesCount[appliedRules[idx].getType() == AffixType.SUFFIX? 1: 0] ++;
-			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);
-		}
-		return false;
+	public final boolean isCircumfixTwofolded(final String circumfixFlag){
+		final boolean continuationFlag1 = (appliedRules != null && appliedRules.length > 0
+			&& appliedRules[0].hasContinuationFlag(circumfixFlag));
+		final AffixType ruleType1 = (continuationFlag1? appliedRules[0].getType(): null);
+		final boolean continuationFlag2 = (appliedRules != null && appliedRules.length > 1
+			&& appliedRules[1].hasContinuationFlag(circumfixFlag));
+		final AffixType ruleType2 = (continuationFlag2? appliedRules[1].getType(): null);
+		return (!continuationFlag1 && !continuationFlag2 || continuationFlag1 && continuationFlag2 && ruleType1 != ruleType2);
 	}
 
 	public final String getRulesSequence(){

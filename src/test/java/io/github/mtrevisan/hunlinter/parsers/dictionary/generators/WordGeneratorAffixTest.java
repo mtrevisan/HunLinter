@@ -38,6 +38,7 @@ import java.io.IOException;
 
 
 /** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a>. */
+@SuppressWarnings("ALL")
 class WordGeneratorAffixTest extends TestBase{
 
 	@Test
@@ -750,13 +751,15 @@ class WordGeneratorAffixTest extends TestBase{
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
 			.toArray(Inflection[]::new);
 
-		Assertions.assertEquals(2, words.length);
+		Assertions.assertEquals(4, words.length);
 		//base inflection
+		Assertions.assertEquals(createInflection("nagy", "CX", "st:nagy"), words[0]);
 		//suffix inflections
+		Assertions.assertEquals(createInflection("nagyobb", "X", "st:nagy"), words[1]);
 		//prefix inflections
 		//twofold inflections
-		Assertions.assertEquals(createInflection("legnagyobb", null, "st:nagy"), words[0]);
-		Assertions.assertEquals(createInflection("legeslegnagyobb", null, "st:nagy"), words[1]);
+		Assertions.assertEquals(createInflection("legnagyobb", null, "st:nagy"), words[2]);
+		Assertions.assertEquals(createInflection("legeslegnagyobb", null, "st:nagy"), words[3]);
 	}
 
 	@Test
@@ -790,7 +793,7 @@ class WordGeneratorAffixTest extends TestBase{
 		Inflection[] words = wordGenerator.applyAffixRules(dicEntry)
 			.toArray(Inflection[]::new);
 
-		Assertions.assertEquals(17, words.length);
+		Assertions.assertEquals(16, words.length);
 		//base inflection
 		Assertions.assertEquals(createInflection("bark", "abe", "st:bark"), words[0]);
 		//suffix inflections
@@ -799,18 +802,14 @@ class WordGeneratorAffixTest extends TestBase{
 		Assertions.assertEquals(createInflection("nbark", "be", "st:bark"), words[2]);
 		Assertions.assertEquals(createInflection("tbark", "be", "st:bark"), words[3]);
 		Assertions.assertEquals(createInflection("ybark", "be", "st:bark"), words[4]);
-		Assertions.assertEquals(createInflection("abarki", null, "st:bark"), words[5]);
-		Assertions.assertEquals(createInflection("nbarki", null, "st:bark"), words[6]);
-		Assertions.assertEquals(createInflection("tbarki", null, "st:bark"), words[7]);
-		Assertions.assertEquals(createInflection("ybarki", null, "st:bark"), words[8]);
-		Assertions.assertEquals(createInflection("abarkun", null, "st:bark"), words[9]);
-		Assertions.assertEquals(createInflection("nbarkun", null, "st:bark"), words[10]);
-		Assertions.assertEquals(createInflection("tbarkun", null, "st:bark"), words[11]);
-		Assertions.assertEquals(createInflection("ybarkun", null, "st:bark"), words[12]);
-		Assertions.assertEquals(createInflection("abarkn", null, "st:bark"), words[13]);
-		Assertions.assertEquals(createInflection("nbarkn", null, "st:bark"), words[14]);
-		Assertions.assertEquals(createInflection("tbarkn", null, "st:bark"), words[15]);
-		Assertions.assertEquals(createInflection("ybarkn", null, "st:bark"), words[16]);
+		Assertions.assertEquals(createInflection("tbarki", null, "st:bark"), words[5]);
+		Assertions.assertEquals(createInflection("ltbarki", null, "st:bark"), words[6]);
+		Assertions.assertEquals(createInflection("wltbarki", null, "st:bark"), words[7]);
+		Assertions.assertEquals(createInflection("ybarkun", null, "st:bark"), words[11]);
+		Assertions.assertEquals(createInflection("tbarkn", null, "st:bark"), words[12]);
+		Assertions.assertEquals(createInflection("ltbarkn", null, "st:bark"), words[13]);
+		Assertions.assertEquals(createInflection("wltbarkn", null, "st:bark"), words[14]);
+		Assertions.assertEquals(createInflection("ybarkn", null, "st:bark"), words[15]);
 	}
 
 

@@ -329,6 +329,7 @@ It is possible to right-click on a row to bring up the popup menu and select whe
 - rules reducer fixes and enhancements
 - considered different formats for part-of-speech in thesaurus file
 - fixed early creation of thesaurus parser (language was not available yet)
+- fixed circumfix inflections
 - delayed creation of file chooser (faster startup)
 - eliminated double reloading of dictionary in sort dialog when something changes
 - understood how `ICON` and `OCONV` works
