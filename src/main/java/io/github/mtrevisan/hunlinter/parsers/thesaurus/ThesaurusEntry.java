@@ -115,9 +115,6 @@ public class ThesaurusEntry{
 	}
 
 	public final boolean containsPartOfSpeechesAndSynonym(final String[] partOfSpeeches, final String synonym){
-//		return synonyms.stream()
-//			.filter(entry -> entry.hasSamePartOfSpeeches(partOfSpeeches))
-//			.anyMatch(entry -> entry.containsSynonym(synonym));
 		if(synonyms != null)
 			for(int i = 0; i < synonyms.size(); i ++){
 				final SynonymsEntry entry = synonyms.get(i);
@@ -125,10 +122,6 @@ public class ThesaurusEntry{
 					return true;
 			}
 		return false;
-//		for(final SynonymsEntry entry : synonyms)
-//			if(entry.hasSamePartOfSpeeches(partOfSpeeches))
-//				return entry.containsSynonym(synonym);
-//		return false;
 	}
 
 	public final boolean contains(final Collection<String> partOfSpeeches, final List<String> synonyms){
