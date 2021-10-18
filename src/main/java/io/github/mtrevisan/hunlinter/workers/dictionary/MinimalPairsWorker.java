@@ -220,8 +220,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 					}
 				}
 				catch(final IOException ignored){
-					//FIXME
-					//length varied, consider another line for minimal pair search
+					//FIXME length varied, consider another line for minimal pair search
 				}
 
 				sourceBR.reset();

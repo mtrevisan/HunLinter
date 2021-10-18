@@ -61,10 +61,12 @@ public class ThesaurusDictionary{
 	}
 
 	public final boolean add(final ThesaurusEntry entry){
+		//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
 	public final void addAll(final Map<String, ThesaurusEntry> entries){
+		//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored
 		dictionary.putAll(entries);
 	}
 
@@ -90,6 +92,7 @@ public class ThesaurusDictionary{
 			else{
 				//add to list if definition doesn't exist
 				final ThesaurusEntry entry = ThesaurusEntry.createFromDefinitionAndSynonyms(currentDefinition, synonymsEntry);
+				//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored
 				dictionary.put(currentDefinition, entry);
 
 				result = true;
