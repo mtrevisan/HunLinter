@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -53,11 +54,14 @@ public class ThesaurusDictionary{
 
 	private final Map<String, ThesaurusEntry> dictionary;
 
+	private final Comparator<String> comparator;
+
 
 	public ThesaurusDictionary(final String language){
-		final Comparator<String> comparator = BaseBuilder.getComparator(language);
+		comparator = BaseBuilder.getComparator(language);
+
 		//sort the definitions in language-specific order
-		dictionary = new TreeMap<>(comparator);
+		dictionary = new HashMap<>();
 	}
 
 	public final boolean add(final ThesaurusEntry entry){
@@ -171,10 +175,14 @@ public class ThesaurusDictionary{
 	}
 
 	public final List<ThesaurusEntry> getSynonymsDictionary(){
-		return new ArrayList<>(dictionary.values());
+		//sort for GUI:
+		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
+		synonyms.sort((entry1, entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
+		return synonyms;
 	}
 
 	public final List<ThesaurusEntry> getSortedSynonyms(){
+		//sort for package:
 		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
 		//need to sort the definitions in natural order
 		synonyms.sort((entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
