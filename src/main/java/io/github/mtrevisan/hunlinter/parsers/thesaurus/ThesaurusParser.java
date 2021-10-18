@@ -122,6 +122,9 @@ public class ThesaurusParser{
 					throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
 			}
 		}
+		catch(final Exception e){
+			throw new LinterException(e, e.getMessage());
+		}
 		dictionary.addAll(entries);
 	}
 
