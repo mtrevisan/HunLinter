@@ -95,7 +95,7 @@ public final class RegexHelper{
 
 	public static String[] extract(final CharSequence text, final Pattern pattern){
 		final List<String> result = extract(text, pattern, - 1);
-		return result.toArray(new String[0]);
+		return result.toArray(new String[result.size()]);
 	}
 
 	public static List<String> extract(final CharSequence text, final Pattern pattern, final int limit){

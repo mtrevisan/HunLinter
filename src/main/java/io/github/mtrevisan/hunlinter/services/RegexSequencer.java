@@ -39,7 +39,8 @@ public final class RegexSequencer{
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: RegexHelper.split(seq, PATTERN)));
+	private static final String[] EMPTY_ARRAY = new String[0];
+	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? EMPTY_ARRAY: RegexHelper.split(seq, PATTERN)));
 
 
 	private RegexSequencer(){}
@@ -49,7 +50,7 @@ public final class RegexSequencer{
 	}
 
 	public static String[] getEmptySequence(){
-		return new String[0];
+		return EMPTY_ARRAY;
 	}
 
 	public static int length(final String[] sequence){

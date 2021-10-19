@@ -148,24 +148,23 @@ public class ThesaurusParser{
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 
-		final String partOfSpeech = posAndSyns[0].trim();
-		final int prefix = (StringUtils.startsWithAny(partOfSpeech, PART_OF_SPEECH_START)? 1: 0);
-		final int suffix = (StringUtils.endsWithAny(partOfSpeech, PART_OF_SPEECH_END)? 1: 0);
-		final String[] partOfSpeeches = RegexHelper.split(partOfSpeech.substring(prefix, partOfSpeech.length() - suffix),
-			PART_OF_SPEECH_SPLITTER);
+		final int prefix = (StringUtils.startsWithAny(posAndSyns[0], PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (StringUtils.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
+		final String[] partOfSpeeches = StringUtils.split(posAndSyns[0].substring(prefix, posAndSyns[0].length() - suffix), ',');
+		for(int i = 0; i < partOfSpeeches.length; i ++)
+			partOfSpeeches[i] = partOfSpeeches[i].trim();
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
-		for(final String s : pas){
-			final String trim = s.trim();
+		for(int i = 0; i < pas.length; i ++){
+			final String trim = pas[i].trim();
 			if(StringUtils.isNotBlank(trim) && !list.contains(trim))
 				list.add(trim);
 		}
 		if(list.size() < 2)
 			throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
 
-		final String[] synonyms = list.toArray(new String[0]);
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, synonyms);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, list);
 		boolean forceInsertion = duplicates.isEmpty();
 		if(!forceInsertion){
 			final String duplicatesMessage = duplicates.stream()
@@ -175,13 +174,13 @@ public class ThesaurusParser{
 		}
 
 		if(forceInsertion)
-			dictionary.add(partOfSpeeches, synonyms);
+			dictionary.add(partOfSpeeches, list);
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same Part-of-Speech. */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 

@@ -33,11 +33,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 
@@ -70,19 +68,22 @@ public class ThesaurusDictionary{
 		dictionary.putAll(entries);
 	}
 
-	public final boolean add(final String[] partOfSpeeches, final String[] synonyms){
+	/**
+	 * @param partOfSpeeches	Part-of-speech.
+	 * @param synonyms	Unique list of synonyms.
+	 * @return	Whether the row was added.
+	 */
+	public final boolean add(final String[] partOfSpeeches, final List<String> synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
 		for(int i = 0; i < size; i ++)
 			sj.add(partOfSpeeches[i]);
 		final String wholePartOfSpeeches = sj.toString();
-		final List<String> uniqueSynonyms = uniqueValues(synonyms);
 
 		boolean result = false;
-		for(int i = 0; i < uniqueSynonyms.size(); i ++){
-			String currentDefinition = uniqueSynonyms.get(i);
-			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, uniqueSynonyms,
-				currentDefinition);
+		for(int i = 0; i < synonyms.size(); i ++){
+			String currentDefinition = synonyms.get(i);
+			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
 
 			currentDefinition = removeSynonymUse(currentDefinition);
 			final ThesaurusEntry foundDefinition = dictionary.get(currentDefinition);
@@ -99,13 +100,6 @@ public class ThesaurusDictionary{
 		}
 
 		return result;
-	}
-
-	private static List<String> uniqueValues(final String[] synonyms){
-		final TreeSet<String> uniqueSynonyms = new TreeSet<>();
-		for(int i = 0; i < synonyms.length; i ++)
-			uniqueSynonyms.add(synonyms[i].toLowerCase(Locale.ROOT));
-		return new ArrayList<>(uniqueSynonyms);
 	}
 
 	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
@@ -190,12 +184,11 @@ public class ThesaurusDictionary{
 	}
 
 	/** Find all the entries that have Part-of-Speech and synonyms contained into the given ones. */
-	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
+	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
-		final List<String> syns = Arrays.asList(synonyms);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
 		for(final ThesaurusEntry entry : dictionary.values())
-			if(entry.intersects(pos, syns))
+			if(entry.intersects(pos, synonyms))
 				list.add(entry);
 		return list;
 	}

@@ -286,8 +286,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
             synonymsTextField.requestFocusInWindow();
 
 				final StringJoiner duplicatedWords = new StringJoiner(", ");
-				for(final ThesaurusEntry thesaurusEntry : duplicationResult.getDuplicates())
-					duplicatedWords.add(thesaurusEntry.getDefinition());
+				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+				for(int i = 0; i < duplicates.size(); i ++)
+					duplicatedWords.add(duplicates.get(i).getDefinition());
             LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
@@ -376,9 +377,12 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 		//filter synonyms with same part-of-speech
 		final List<SynonymsEntry> filteredSynonymsEntries = new ArrayList<>(0);
-		for(final SynonymsEntry syns : synonyms.getSynonyms())
-			if(syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
-				filteredSynonymsEntries.add(syns);
+		final List<SynonymsEntry> syns = synonyms.getSynonyms();
+		for(int i = 0; i < syns.size(); i ++){
+			final SynonymsEntry syn = syns.get(i);
+			if(syn.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
+				filteredSynonymsEntries.add(syn);
+		}
 		if(filteredSynonymsEntries.isEmpty())
 			JOptionPane.showMessageDialog(null,
 				"No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
@@ -468,8 +472,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			final String synonyms = model.getSynonyms(row);
 			final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
 			final StringJoiner sj = new StringJoiner("\r\n");
-			for(final String s : synonymsByDefinition)
-				sj.add(definition + ": " + GUIHelper.removeHTMLCode(s));
+			for(int i = 0; i < synonymsByDefinition.length; i ++)
+				sj.add(definition + ": " + GUIHelper.removeHTMLCode(synonymsByDefinition[i]));
 			return sj.toString();
 		}
 	}
