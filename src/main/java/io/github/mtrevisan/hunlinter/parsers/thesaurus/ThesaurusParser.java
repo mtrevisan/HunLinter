@@ -186,7 +186,7 @@ public class ThesaurusParser{
 	}
 
 	/** Find if there is a duplicate with the same definition and same Part-of-Speech (and also a synonym). */
-	public final boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+	public final boolean contains(final String definition, final List<String> partOfSpeeches, final String synonym){
 		return dictionary.contains(definition, partOfSpeeches, synonym);
 	}
 

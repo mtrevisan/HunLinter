@@ -30,16 +30,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 
@@ -65,12 +63,10 @@ public class ThesaurusDictionary{
 	}
 
 	public final boolean add(final ThesaurusEntry entry){
-		//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored (can also occur with `-`)
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
 	public final void addAll(final Map<String, ThesaurusEntry> entries){
-		//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored (can also occur with `-`)
 		dictionary.putAll(entries);
 	}
 
@@ -96,7 +92,6 @@ public class ThesaurusDictionary{
 			else{
 				//add to list if definition doesn't exist
 				final ThesaurusEntry entry = ThesaurusEntry.createFromDefinitionAndSynonyms(currentDefinition, synonymsEntry);
-				//FIXME `mà` gets overwritten by `màʼ` because in the collator the apostrophe is ignored (can also occur with `-`)
 				dictionary.put(currentDefinition, entry);
 
 				result = true;
@@ -107,14 +102,10 @@ public class ThesaurusDictionary{
 	}
 
 	private static List<String> uniqueValues(final String[] synonyms){
-		final List<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Collection<String> uniqueValues = new HashSet<>(synonyms.length);
-		for(int i = 0; i < synonyms.length; i ++){
-			final String s = synonyms[i].toLowerCase(Locale.ROOT);
-			if(uniqueValues.add(s))
-				uniqueSynonyms.add(s);
-		}
-		return uniqueSynonyms;
+		final TreeSet<String> uniqueSynonyms = new TreeSet<>();
+		for(int i = 0; i < synonyms.length; i ++)
+			uniqueSynonyms.add(synonyms[i].toLowerCase(Locale.ROOT));
+		return new ArrayList<>(uniqueSynonyms);
 	}
 
 	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
@@ -130,7 +121,7 @@ public class ThesaurusDictionary{
 	}
 
 	/** Find if there is a duplicate with the same definition and same Part-of-Speech. */
-	public final boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+	public final boolean contains(final String definition, final List<String> partOfSpeeches, final String synonym){
 		final ThesaurusEntry def = dictionary.get(definition);
 		return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
 	}
@@ -175,17 +166,18 @@ public class ThesaurusDictionary{
 	}
 
 	public final List<ThesaurusEntry> getSynonymsDictionary(){
-		//sort for GUI:
-		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
-		synonyms.sort((entry1, entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
-		return synonyms;
+		//sort for GUI
+		return getSortedEntries(comparator);
 	}
 
 	public final List<ThesaurusEntry> getSortedSynonyms(){
-		//sort for package:
+		//sort for package
+		return getSortedEntries(Comparator.naturalOrder());
+	}
+
+	private List<ThesaurusEntry> getSortedEntries(final Comparator<String> comparator){
 		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
-		//need to sort the definitions in natural order
-		synonyms.sort((entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
+		synonyms.sort((ThesaurusEntry entry1, ThesaurusEntry entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
 		return synonyms;
 	}
 

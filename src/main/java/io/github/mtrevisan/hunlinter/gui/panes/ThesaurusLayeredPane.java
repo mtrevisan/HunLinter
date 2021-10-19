@@ -63,7 +63,6 @@ import javax.swing.KeyStroke;
 import javax.swing.RowFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.Component;
 import java.awt.Font;
@@ -84,7 +83,6 @@ import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{

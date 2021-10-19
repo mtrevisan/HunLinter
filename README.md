@@ -337,7 +337,7 @@ It is possible to right-click on a row to bring up the popup menu and select whe
 - added a check on declared charset and real charset of a file
 - adjusted scroll to the bottom of the log text area while changing font
 - decreased the loading time of sorting dialog
-- increased speed by 55% (for dictionary linter: from 2m 13s to 1m)
+- increased speed by 56% (for dictionary linter: from 2m 13s to 58s)
 - decreased start-up time
 - corrected some typos
 

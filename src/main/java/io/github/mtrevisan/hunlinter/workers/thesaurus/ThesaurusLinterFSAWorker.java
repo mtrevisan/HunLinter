@@ -85,13 +85,13 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 			for(int i = 0; i < syns.size(); i ++){
 				final SynonymsEntry syn = syns.get(i);
 				final List<String> definitions = syn.getSynonyms();
-				final String[] partOfSpeeches = syn.getPartOfSpeeches();
+				final List<String> partOfSpeeches = syn.getPartOfSpeeches();
 				for(int j = 0; j < definitions.size(); j ++){
 					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
 						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
-							Arrays.toString(partOfSpeeches), originalDefinition));
+							partOfSpeeches.toString(), originalDefinition));
 				}
 			}
 		};

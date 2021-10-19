@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +52,7 @@ public class SynonymsEntry{
 	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
 
-	private final String[] partOfSpeeches;
+	private final List<String> partOfSpeeches;
 	private final List<String> synonyms;
 
 
@@ -72,9 +73,10 @@ public class SynonymsEntry{
 
 			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
 			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
-			partOfSpeeches = StringUtils.split(pos, ',');
-			for(int i = 0; i < partOfSpeeches.length; i ++)
-				partOfSpeeches[i] = partOfSpeeches[i].trim();
+			partOfSpeeches = Arrays.asList(StringUtils.split(pos, ','));
+			for(int i = 0; i < partOfSpeeches.size(); i ++)
+				partOfSpeeches.set(i, partOfSpeeches.get(i).trim());
+			partOfSpeeches.sort(Comparator.naturalOrder());
 
 			final String[] syns = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 			final Collection<String> uniqueValues = new HashSet<>(syns.length);
@@ -103,12 +105,13 @@ public class SynonymsEntry{
 		return newEntry;
 	}
 
-	public final String[] getPartOfSpeeches(){
+	public final List<String> getPartOfSpeeches(){
 		return partOfSpeeches;
 	}
 
-	public final boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
-		return SetHelper.setOf(this.partOfSpeeches).equals(SetHelper.setOf(partOfSpeeches));
+	public final boolean hasSamePartOfSpeeches(final List<String> partOfSpeeches){
+		partOfSpeeches.sort(Comparator.naturalOrder());
+		return this.partOfSpeeches.equals(partOfSpeeches);
 	}
 
 	public final List<String> getSynonyms(){
@@ -116,7 +119,7 @@ public class SynonymsEntry{
 	}
 
 	public final boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
-		return !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches);
+		return !Collections.disjoint(this.partOfSpeeches, partOfSpeeches);
 	}
 
 	public final boolean containsSynonym(final String synonym){
@@ -128,12 +131,11 @@ public class SynonymsEntry{
 	}
 
 	public final boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
-		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches))
-			&& this.synonyms.containsAll(synonyms));
+		return ((partOfSpeeches == null || this.partOfSpeeches.containsAll(partOfSpeeches)) && this.synonyms.containsAll(synonyms));
 	}
 
 	public final boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
-		return ((partOfSpeeches == null || !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches))
+		return ((partOfSpeeches == null || !Collections.disjoint(this.partOfSpeeches, partOfSpeeches))
 			&& !Collections.disjoint(this.synonyms, synonyms));
 	}
 
@@ -164,14 +166,14 @@ public class SynonymsEntry{
 			return false;
 
 		final SynonymsEntry rhs = (SynonymsEntry)obj;
-		return (Arrays.equals(partOfSpeeches, rhs.partOfSpeeches)
+		return (partOfSpeeches.equals(rhs.partOfSpeeches)
 			&& synonyms.equals(rhs.synonyms));
 	}
 
 	@Override
 	public final int hashCode(){
 		int result = synonyms.hashCode();
-		result = 31 * result + Arrays.hashCode(partOfSpeeches);
+		result = 31 * result + partOfSpeeches.hashCode();
 		return result;
 	}
 

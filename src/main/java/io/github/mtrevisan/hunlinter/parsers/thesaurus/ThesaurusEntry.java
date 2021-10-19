@@ -114,7 +114,7 @@ public class ThesaurusEntry{
 		return synonyms.size();
 	}
 
-	public final boolean containsPartOfSpeechesAndSynonym(final String[] partOfSpeeches, final String synonym){
+	public final boolean containsPartOfSpeechesAndSynonym(final List<String> partOfSpeeches, final String synonym){
 		if(synonyms != null)
 			for(int i = 0; i < synonyms.size(); i ++){
 				final SynonymsEntry entry = synonyms.get(i);
