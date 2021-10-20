@@ -95,6 +95,10 @@ public class DictionarySorterAction extends AbstractAction{
 						worker.execute();
 					},
 					worker -> {
+						//change color of progress bar to reflect an error
+						if(worker.isCancelled())
+							propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
 						dialog.setDictionaryEnabled(true);
 
 						EventBusService.unsubscribe(dialog);

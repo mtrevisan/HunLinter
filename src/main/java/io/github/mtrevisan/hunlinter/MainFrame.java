@@ -51,6 +51,7 @@ import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
 import io.github.mtrevisan.hunlinter.actions.UpdateAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
 import io.github.mtrevisan.hunlinter.gui.ProjectFolderFilter;
 import io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
@@ -144,6 +145,8 @@ import java.util.prefs.Preferences;
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
+ *
+ * TODO? progress bar on taskbar: https://github.com/Dansoftowner/FXTaskbarProgressBar/tree/11/src/main/java/com/nativejavafx/taskbar
  */
 public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener{
 
@@ -249,6 +252,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       parsingResultScrollPane = new javax.swing.JScrollPane();
       parsingResultTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
+mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+mainProgressBar.setUI(new MultiProgressBarUI());
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
 		EventBusService.subscribe(dicLayeredPane);
@@ -931,11 +936,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			}
 			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.DONE){
+				if(stateValue == SwingWorker.StateValue.STARTED)
+					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+				else if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
 					WorkerManager.callOnEnd(workerName);
 				}
 			}
+			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
 		}
 	}
 

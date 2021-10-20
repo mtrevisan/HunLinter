@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+import java.beans.PropertyChangeEvent;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -48,6 +49,10 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
+	public static final String PROPERTY_WORKER_CANCELLED = "worker-cancelled";
+
+
+	public final PropertyChangeEvent propertyChangeEventWorkerCancelled = new PropertyChangeEvent(this, PROPERTY_WORKER_CANCELLED, false, true);
 
 	protected final WD workerData;
 

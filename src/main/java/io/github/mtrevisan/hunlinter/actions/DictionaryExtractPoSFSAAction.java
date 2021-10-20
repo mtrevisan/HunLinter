@@ -95,7 +95,13 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(true)
+			worker -> {
+				//change color of progress bar to reflect an error
+				if(worker.isCancelled())
+					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
+				setEnabled(true);
+			}
 		);
 	}
 

@@ -322,6 +322,10 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             inputTextArea.setCaretPosition(0);
          },
          worker -> {
+            //change color of progress bar to reflect an error
+            if(worker.isCancelled())
+					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
             inputComboBox.setEnabled(true);
             limitComboBox.setEnabled(true);
             inputTextArea.setEnabled(true);

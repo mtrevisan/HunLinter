@@ -64,7 +64,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
-			final DictionaryParser dicParser, final WordGenerator wordGenerator, final Runnable onComplete){
+			final DictionaryParser dicParser, final WordGenerator wordGenerator, final Runnable onCompleted,
+			final Consumer<Exception> onCancelled){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -98,7 +99,8 @@ public class RulesReducerWorker extends WorkerDictionary{
 		};
 
 		getWorkerData()
-			.withDataCompletedCallback(onComplete);
+			.withDataCompletedCallback(onCompleted)
+			.withDataCancelledCallback(onCancelled);
 
 
 		final Function<Void, Void> step1 = ignored -> {

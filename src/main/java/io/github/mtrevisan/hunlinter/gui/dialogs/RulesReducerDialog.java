@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.gui.dialogs;
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
@@ -37,6 +38,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.affix.RulesReducerWorker;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -326,10 +329,18 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 	@Override
 	public final void propertyChange(final PropertyChangeEvent evt){
-		final String propertyName = evt.getPropertyName();
-		if(MainFrame.PROPERTY_NAME_PROGRESS.equals(propertyName)){
-			final int progress = (Integer)evt.getNewValue();
-			mainProgressBar.setValue(progress);
+		switch(evt.getPropertyName()){
+			case MainFrame.PROPERTY_NAME_PROGRESS -> {
+				final int progress = (Integer)evt.getNewValue();
+				mainProgressBar.setValue(progress);
+			}
+			case MainFrame.PROPERTY_NAME_STATE -> {
+				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
+				if(stateValue == SwingWorker.StateValue.STARTED)
+					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+			}
+			//FIXME why the fuck this doesn't become red????
+			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
 		}
 	}
 
@@ -339,15 +350,19 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 			final String flag = getSelectedFlag();
 			final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
-			final Runnable onEnd = () -> {
+			final Runnable onCompleted = () -> {
 				reducedSetTextArea.setCaretPosition(0);
 
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
 			};
+			final Consumer<Exception> onCancelled = exc -> {
+				//change color of progress bar to reflect an error
+				propertyChange(rulesReducerWorker.propertyChangeEventWorkerCancelled);
+			};
 			rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(),
-				parserManager.getDicParser(), parserManager.getWordGenerator(), onEnd);
+				parserManager.getDicParser(), parserManager.getWordGenerator(), onCompleted, onCancelled);
 			rulesReducerWorker.addPropertyChangeListener(this);
 			rulesReducerWorker.execute();
 		}
