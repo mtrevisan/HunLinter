@@ -34,7 +34,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
@@ -134,8 +133,14 @@ public class ThesaurusDictionary{
 	public final void deleteDefinition(final String definition, final String synonyms){
 		//recover all words (definition and synonyms) from given definition
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final Set<String> definitions = entryToBeDeleted.getSynonymsSet();
+		final List<String> definitions = new ArrayList<>(entryToBeDeleted.getSynonymsSet());
 		definitions.add(definition);
+		for(int i = 0; i < definitions.size(); i ++){
+			final int subTypeIndex = StringUtils.indexOfAny(definitions.get(i), '(');
+			if(subTypeIndex >= 0)
+				//NOTE: remove also de space before the open parenthesis (this assumes the subtype be the last thing of the synonym)
+				definitions.set(i, definitions.get(i).substring(0, subTypeIndex - 1));
+		}
 
 		//remove all
 		dictionary.entrySet()

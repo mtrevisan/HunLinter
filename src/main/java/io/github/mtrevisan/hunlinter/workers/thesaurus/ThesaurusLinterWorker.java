@@ -50,7 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;

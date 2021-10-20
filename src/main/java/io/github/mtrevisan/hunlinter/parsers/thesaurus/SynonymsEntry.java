@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;

@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
+import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.gui.dialogs.ThesaurusMergeDialog;
 import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
@@ -42,6 +43,7 @@ import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
@@ -49,6 +51,7 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -317,9 +320,12 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			if(theParser != null && theParser.getSynonymsCount() > 0){
 				GUIHelper.addSorterToTable(table, comparator, null);
 
-				final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
-				dm.setSynonyms(theParser.getSynonymsDictionary());
-				updateSynonymsCounter();
+				//NOTE: this could take a while, so it's done in a separate thread
+				new Thread(() -> {
+					final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
+					dm.setSynonyms(theParser.getSynonymsDictionary());
+					updateSynonymsCounter();
+				}).start();
 			}
 		}
 		catch(final RuntimeException re){
