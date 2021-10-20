@@ -123,6 +123,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       currentSetScrollPane = new javax.swing.JScrollPane();
       currentSetTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
+		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+		mainProgressBar.setUI(new MultiProgressBarUI());
       statusLabel = new javax.swing.JLabel();
       reducedSetLabel = new javax.swing.JLabel();
       reducedSetScrollPane = new javax.swing.JScrollPane();
@@ -339,7 +341,6 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 				if(stateValue == SwingWorker.StateValue.STARTED)
 					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
 			}
-			//FIXME why the fuck this doesn't become red????
 			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
 		}
 	}

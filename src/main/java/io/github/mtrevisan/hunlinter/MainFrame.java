@@ -252,8 +252,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       parsingResultScrollPane = new javax.swing.JScrollPane();
       parsingResultTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
-mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
-mainProgressBar.setUI(new MultiProgressBarUI());
+		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+		mainProgressBar.setUI(new MultiProgressBarUI());
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
 		EventBusService.subscribe(dicLayeredPane);
