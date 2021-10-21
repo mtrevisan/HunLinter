@@ -61,7 +61,7 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉsvrlŧ]))");
 	private static final String FALSE_S_INTO_X = "èsre";
 
-	//a double consonant, not ^inn, not [eo]nne$
+	//a double consonant, not ^[ie]nn, not [eo]nne$
 	private static final Pattern PATTERN_CONSONANT_GEMINATES = RegexHelper.pattern("([^aeiou])\\1+");
 	private static final Function<String, String> GEMINATES_REDUCER = word -> {
 		String strippedWord = word;
@@ -69,6 +69,10 @@ public final class OrthographyVEC extends Orthography{
 		if(strippedWord.startsWith("inn")){
 			strippedWord = strippedWord.substring(3);
 			starting = "inn";
+		}
+		else if(strippedWord.startsWith("enn")){
+			strippedWord = strippedWord.substring(3);
+			starting = "enn";
 		}
 		String ending = "";
 		if(strippedWord.endsWith("onne"))
