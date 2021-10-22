@@ -250,6 +250,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
    private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
+			addButton.setEnabled(false);
+
          //try adding the synonyms
 			final String language = parserManager.getLanguage();
 			final Orthography orthography = BaseBuilder.getOrthography(language);
@@ -368,8 +370,11 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
-		else
+		else{
 			sorter.setRowFilter(null);
+
+			addButton.setEnabled(false);
+		}
 	}
 
 	public final void mergeThesaurusRow(final Component invoker){
