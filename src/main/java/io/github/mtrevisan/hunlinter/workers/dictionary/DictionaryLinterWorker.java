@@ -102,13 +102,14 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 				final Inflection inflection = itr.next();
 				itr.remove();
 
-//				final AffixEntry[] appliedRules = inflection.getAppliedRules();
-//				if(appliedRules != null)
-//					for(int j = 0; j < appliedRules.length; j ++){
-//						final AffixEntry appliedRule = appliedRules[j];
+				final AffixEntry[] appliedRules = inflection.getAppliedRules();
+				if(appliedRules != null)
+					for(int j = 0; j < appliedRules.length; j ++){
+						final AffixEntry appliedRule = appliedRules[j];
+						usedFlags.add(appliedRule.getFlag());
 //						usedFlags.computeIfAbsent(appliedRule.getFlag(), k -> new HashSet<>(1))
 //							.add(appliedRule);
-//					}
+					}
 
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());
@@ -136,11 +137,11 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			final AffixData affixData = affParser.getAffixData();
-			final Set<String> unusedProductableFlags = affixData.getProductableFlags();
-			unusedProductableFlags.removeAll(usedFlags);
-//			unusedProductableFlags.removeAll(usedFlags.keySet());
-			if(!unusedProductableFlags.isEmpty())
-				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedProductableFlags, ", "))
+			final Set<String> unusedFlags = affixData.getProductableFlags();
+			unusedFlags.removeAll(usedFlags);
+//			unusedFlags.removeAll(usedFlags.keySet());
+			if(!unusedFlags.isEmpty())
+				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "))
 					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 //			final StringBuilder originalRuleEntriesLog = new StringBuilder();
 //			for(final Map.Entry<String, Set<AffixEntry>> flagRules : usedFlags.entrySet()){
