@@ -73,13 +73,13 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		//collectors of flags
-		final Set<String> flags = ConcurrentHashMap.newKeySet();
+		final Set<String> usedFlags = ConcurrentHashMap.newKeySet();
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			checker.checkCircumfix(dicEntry);
 			final Collection<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
-//prefixes after suffixes
+//enforce prefixes flags after suffixes
 //boolean prefix = false;
 //io.github.mtrevisan.hunlinter.parsers.affix.AffixData affixData = affParser.getAffixData();
 //if(dicEntry.getContinuationFlags() != null)
@@ -100,7 +100,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 				final Inflection inflection = itr.next();
 				itr.remove();
 				if(inflection.getContinuationFlags() != null)
-					flags.addAll(inflection.getContinuationFlags());
+					usedFlags.addAll(inflection.getContinuationFlags());
 
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());
@@ -129,7 +129,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 			final AffixData affixData = affParser.getAffixData();
 			final Set<String> unusedProductableFlags = affixData.getProductableFlags();
-			unusedProductableFlags.removeAll(flags);
+			unusedProductableFlags.removeAll(usedFlags);
 			if(!unusedProductableFlags.isEmpty())
 				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedProductableFlags, ", "))
 					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
@@ -146,7 +146,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		setProcessor(step1);
 	}
 
-	private static Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Collection<Inflection> inflections){
+	private static Iterator<Inflection> removeDerivedInflections(final String lastAppliedRuleFlag, final Iterable<Inflection> inflections){
 		final Iterator<Inflection> itr = inflections.iterator();
 		while(itr.hasNext())
 			if(itr.next().hasAppliedRule(lastAppliedRuleFlag))
