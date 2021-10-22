@@ -56,6 +56,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Dictionary linter";
 
 	private static final String UNUSED_FLAGS = "Unused flags: {}";
+	private static final String UNUSED_RULES = "Unused rules in flag {}: {}";
 
 
 	public DictionaryLinterWorker(final ParserManager parserManager){
@@ -74,6 +75,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 
 		//collectors of flags
 		final Set<String> usedFlags = ConcurrentHashMap.newKeySet();
+//		final Map<String, Set<AffixEntry>> usedFlags = new ConcurrentHashMap();
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
@@ -99,8 +101,14 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			while(itr.hasNext()){
 				final Inflection inflection = itr.next();
 				itr.remove();
-				if(inflection.getContinuationFlags() != null)
-					usedFlags.addAll(inflection.getContinuationFlags());
+
+//				final AffixEntry[] appliedRules = inflection.getAppliedRules();
+//				if(appliedRules != null)
+//					for(int j = 0; j < appliedRules.length; j ++){
+//						final AffixEntry appliedRule = appliedRules[j];
+//						usedFlags.computeIfAbsent(appliedRule.getFlag(), k -> new HashSet<>(1))
+//							.add(appliedRule);
+//					}
 
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());
@@ -130,9 +138,26 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			final AffixData affixData = affParser.getAffixData();
 			final Set<String> unusedProductableFlags = affixData.getProductableFlags();
 			unusedProductableFlags.removeAll(usedFlags);
+//			unusedProductableFlags.removeAll(usedFlags.keySet());
 			if(!unusedProductableFlags.isEmpty())
 				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedProductableFlags, ", "))
 					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
+//			final StringBuilder originalRuleEntriesLog = new StringBuilder();
+//			for(final Map.Entry<String, Set<AffixEntry>> flagRules : usedFlags.entrySet()){
+//				final String flag = flagRules.getKey();
+//				final Set<AffixEntry> rules = flagRules.getValue();
+//				final RuleEntry originalRule = affixData.getData(flag);
+//				if(originalRule != null && originalRule.getEntries().size() != rules.size()){
+//					final Collection<AffixEntry> originalRuleEntries = new ArrayList<>(originalRule.getEntries());
+//					originalRuleEntries.removeAll(rules);
+//					originalRuleEntriesLog.setLength(0);
+//					originalRuleEntriesLog.append(originalRuleEntries);
+//					originalRuleEntriesLog.insert(1, "\r\n\t");
+//					originalRuleEntriesLog.insert(originalRuleEntriesLog.length() - 1, "\r\n");
+//					manageException(new LinterException(UNUSED_RULES, flag, StringUtils.replace(originalRuleEntriesLog.toString(), ", ", "\r\n\t"))
+//						.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
+//				}
+//			}
 
 			//FIXME
 //			final Set<String> unusedUnproductableFlags = affixData.getUnproductableFlags();
