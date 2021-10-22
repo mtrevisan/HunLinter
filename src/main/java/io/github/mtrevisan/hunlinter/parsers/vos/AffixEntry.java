@@ -419,7 +419,7 @@ public class AffixEntry{
 		result = 31 * result + (appending == null? 0: appending.hashCode());
 		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
 		result = 31 * result + (condition == null? 0: condition.hashCode());
-		result = 31 * result + morphologicalFields.hashCode();
+		result = 31 * result + (morphologicalFields == null? 0: morphologicalFields.hashCode());
 		return result;
 	}
 

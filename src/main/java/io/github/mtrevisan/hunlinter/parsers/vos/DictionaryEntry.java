@@ -326,7 +326,7 @@ public class DictionaryEntry{
 	public final int hashCode(){
 		int result = (word == null? 0: word.hashCode());
 		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
-		result = 31 * result + morphologicalFields.hashCode();
+		result = 31 * result + (morphologicalFields == null? 0: morphologicalFields.hashCode());
 		return result;
 	}
 
