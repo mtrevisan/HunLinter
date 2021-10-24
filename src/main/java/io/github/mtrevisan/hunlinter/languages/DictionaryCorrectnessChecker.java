@@ -104,6 +104,7 @@ public class DictionaryCorrectnessChecker{
 				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_PREFIX, inflection.getWord(), morphologicalField)
 					.withIndex(index));
 			final Set<String> morphologicalFieldTypes = rulesLoader.getDataField(key);
+			//FIXME speed-up `contains`
 			if(morphologicalFieldTypes != null && !morphologicalFieldTypes.contains(morphologicalField))
 				EventBusService.publish(new LinterWarning(UNKNOWN_MORPHOLOGICAL_FIELD_VALUE, inflection.getWord(), morphologicalField)
 					.withIndex(index));

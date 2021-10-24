@@ -41,6 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -129,7 +130,10 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 		dontCheckProductivenessRules = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
 		canAdminStressRules = rulesLoader.readPropertyAsSet("canAdmitStress", ',');
-		stemCanAdmitStress = rulesLoader.readPropertyAsSet("stemCanAdmitStress", ',');
+		final Set<String> canAdmitStress = rulesLoader.readPropertyAsSet("stemCanAdmitStress", ',');
+		stemCanAdmitStress = new HashSet<>(canAdmitStress.size());
+		for(final String cas : canAdmitStress)
+			stemCanAdmitStress.add(MorphologicalTag.STEM.getCode() + cas);
 	}
 
 	@Override
@@ -224,15 +228,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
 				throw new LinterException(MULTIPLE_STRESSES, inflection.getWord());
 
-			final AffixEntry appliedRule = getLastAppliedRule(inflection);
-			if(appliedRule != null){
-				final String appliedRuleFlag = appliedRule.getFlag();
-				//retrieve last applied rule
-				if(stresses == 0 && rulesLoader.containsHasToContainStress(appliedRuleFlag))
-					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
-				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
-					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
-			}
+//			final AffixEntry appliedRule = getLastAppliedRule(inflection);
+//			if(appliedRule != null){
+//				final String appliedRuleFlag = appliedRule.getFlag();
+//				//retrieve last applied rule
+//				if(stresses == 0 && rulesLoader.containsHasToContainStress(appliedRuleFlag))
+//					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
+//				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
+//					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
+//			}
 		}
 	}
 
@@ -298,7 +302,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	@Override
 	public final boolean canAdmitStress(final String stem){
 		//NOTE: starting from index 3 removes the prefix `po:`
-		return stemCanAdmitStress.contains(stem.substring(3));
+		return stemCanAdmitStress.contains(stem);
 	}
 
 	@Override

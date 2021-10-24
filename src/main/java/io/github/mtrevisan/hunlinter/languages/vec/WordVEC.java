@@ -58,7 +58,7 @@ public final class WordVEC{
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_UNSTRESSED_ARRAY = VOWELS_UNSTRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
-	static final String VOWELS = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ";
+	static final char[] VOWELS_ARRAY = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ".toCharArray();
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
 		Arrays.sort(VOWELS_PLAIN_ARRAY);
@@ -72,6 +72,7 @@ public final class WordVEC{
 		Arrays.sort(VOWELS_STRESSED_ARRAY);
 		Arrays.sort(VOWELS_UNSTRESSED_ARRAY);
 		Arrays.sort(VOWELS_EXTENDED_ARRAY);
+		Arrays.sort(VOWELS_ARRAY);
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
@@ -166,20 +167,28 @@ public final class WordVEC{
 
 
 	//[àèéíòóú]
-	public static boolean hasStressedGrapheme(final CharSequence word){
+	public static boolean hasStressedGrapheme(final String word){
 		return (countStresses(word) == 1);
 	}
 
-	public static int countStresses(final CharSequence word){
+	public static int countStresses(final String word){
 		int count = 0;
-		for(int i = 0; i < word.length(); i ++)
-			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, word.charAt(i)) >= 0)
+		final char[] chars = word.toCharArray();
+		for(int i = 0; i < chars.length; i ++)
+			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, chars[i]) >= 0)
 				count ++;
 		return count;
 	}
 
 	private static String suppressStress(final String word){
-		return StringUtils.replaceChars(word, VOWELS_STRESSED, VOWELS_UNSTRESSED);
+		final StringBuilder sb = new StringBuilder(word);
+		final char[] chars = word.toCharArray();
+		for(int i = 0; i < chars.length; i ++){
+			final int index = Arrays.binarySearch(VOWELS_STRESSED_ARRAY, chars[i]);
+			if(index >= 0)
+				sb.setCharAt(i, VOWELS_UNSTRESSED_ARRAY[index]);
+		}
+		return sb.toString();
 	}
 
 
@@ -217,21 +226,23 @@ public final class WordVEC{
 	}
 
 	public static String markDefaultStress(final String word){
-		String delimiter = StringUtils.EMPTY;
-		if(word.contains("-"))
-			delimiter = "-";
-		else if(word.contains("–"))
-			delimiter = "–";
+		char delimiter = ' ';
+		final char[] chars = word.toCharArray();
+		for(int i = 0; delimiter == ' ' && i < chars.length; i ++){
+			final char chr = chars[i];
+			if(chr == '-' || chr == '–')
+				delimiter = chr;
+		}
 
-		if(!delimiter.isEmpty()){
-			final StringJoiner sj = new StringJoiner(delimiter);
+		if(delimiter != ' '){
+			final StringJoiner sj = new StringJoiner(Character.toString(delimiter));
 			int offset = 0;
 			int subwordIndex;
 			while((subwordIndex = word.indexOf(delimiter, offset)) >= 0){
 				sj.add(innerMarkDefaultStress(word.substring(offset, subwordIndex)));
 				offset = subwordIndex + 1;
 			}
-			if(offset < word.length())
+			if(offset < chars.length)
 				sj.add(innerMarkDefaultStress(word.substring(offset)));
 			return sj.toString();
 		}

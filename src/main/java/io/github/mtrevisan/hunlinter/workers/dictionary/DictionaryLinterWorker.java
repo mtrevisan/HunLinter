@@ -184,7 +184,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		String message = e.getMessage();
 		if(inflection.hasInflectionRules())
 			message += " (via " + inflection.getRulesSequence() + ")";
-		return new LinterException(message)
+		return new LinterException(e, message)
 			.withData(data);
 	}
 
