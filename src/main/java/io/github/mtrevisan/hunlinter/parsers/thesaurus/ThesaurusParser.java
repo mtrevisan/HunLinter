@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
+import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
@@ -83,11 +85,13 @@ public class ThesaurusParser{
 	private static final char[] NEW_LINE = {'\n'};
 
 	private final ThesaurusDictionary dictionary;
+	private final Orthography orthography;
 	private Charset charset;
 
 
 	public ThesaurusParser(final String language){
 		dictionary = new ThesaurusDictionary(language);
+		orthography = BaseBuilder.getOrthography(language);
 	}
 
 	public final ThesaurusDictionary getDictionary(){
@@ -157,7 +161,7 @@ public class ThesaurusParser{
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
 		for(int i = 0; i < pas.length; i ++){
-			final String trim = pas[i].trim();
+			final String trim = orthography.correctOrthography(pas[i].trim());
 			if(StringUtils.isNotBlank(trim) && !list.contains(trim))
 				list.add(trim);
 		}
@@ -198,7 +202,7 @@ public class ThesaurusParser{
 		dictionary.deleteDefinition(definition, selectedSynonyms);
 	}
 
-	public static Pair<String[], String[]> extractComponentsForFilter(String text){
+	public static Pair<String[], String[]> extractComponentsForFilter(String text, final Orthography orthography){
 		text = text.toLowerCase(Locale.ROOT);
 
 		//extract Part-of-Speech if present
@@ -210,8 +214,12 @@ public class ThesaurusParser{
 		text = RegexHelper.replaceAll(text, PATTERN_FILTER_OR, PIPE);
 		text = RegexHelper.replaceAll(text, PATTERN_PARENTHESIS, StringUtils.EMPTY);
 
+		final String[] pas = StringUtils.split(text, PIPE);
+		for(int i = 0; i < pas.length; i ++)
+			pas[i] = orthography.correctOrthography(pas[i].trim());
+
 		//compose filter regexp
-		return Pair.of(pos, StringUtils.split(text, PIPE));
+		return Pair.of(pos, pas);
 	}
 
 	private static String[] extractPartOfSpeechFromFilter(String text){
@@ -226,7 +234,9 @@ public class ThesaurusParser{
 			start = 1;
 		}
 		if(idx >= 0){
-			pos = RegexHelper.split(text.substring(start, idx), FILTER_SPLITTER);
+			pos = StringUtils.split(text.substring(start, idx), ',');
+			for(int i = 0; i < pos.length; i ++)
+				pos[i] = pos[i].trim();
 		}
 		return pos;
 	}

@@ -111,7 +111,6 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 		this.parserManager = parserManager;
 
-
 		initComponents();
 
 
@@ -253,9 +252,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			addButton.setEnabled(false);
 
          //try adding the synonyms
-			final String language = parserManager.getLanguage();
-			final Orthography orthography = BaseBuilder.getOrthography(language);
-			final String synonyms = orthography.correctOrthography(synonymsTextField.getText().trim());
+			final String synonyms = synonymsTextField.getText().trim();
          final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part-of-speech and definition(s) '" + message
@@ -359,7 +356,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 		formerFilterThesaurusText = unmodifiedSearchText;
 
-		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+		final String language = parserManager.getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
+		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, orthography);
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
 		addButton.setEnabled(!alreadyContained);
@@ -431,7 +430,9 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			//redo filtering, that is re-set the state of the button (it may have changed)
 			final String unmodifiedSearchText = synonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
-				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				final String language = parserManager.getLanguage();
+				final Orthography orthography = BaseBuilder.getOrthography(language);
+				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, orthography);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 				final boolean alreadyContained = theParser.contains(pair.getLeft(), pair.getRight());
 				addButton.setEnabled(!alreadyContained);
