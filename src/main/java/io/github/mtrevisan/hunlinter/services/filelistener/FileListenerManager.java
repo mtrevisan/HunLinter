@@ -178,7 +178,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private static PathMatcher matcherForExpression(final String pattern){
-		final String syntaxAndPattern = "glob:" + pattern.substring(pattern.lastIndexOf(File.separator) + 1);
+		final String syntaxAndPattern = "glob:" + pattern.substring(StringUtils.lastIndexOf(pattern, File.separator) + 1);
 		return FILE_SYSTEM_DEFAULT.getPathMatcher(syntaxAndPattern);
 	}
 

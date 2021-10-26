@@ -67,7 +67,7 @@ public final class ExceptionHelper{
 	private static String extractExceptionPosition(final Throwable t){
 		final StackTraceElement stackTrace = extractOwnCodeStackTrace(t);
 		String filename = stackTrace.getFileName();
-		filename = filename.substring(0, filename.lastIndexOf('.'));
+		filename = filename.substring(0, StringUtils.lastIndexOf(filename, '.'));
 		return filename + "." + stackTrace.getMethodName() + ":" + stackTrace.getLineNumber();
 	}
 

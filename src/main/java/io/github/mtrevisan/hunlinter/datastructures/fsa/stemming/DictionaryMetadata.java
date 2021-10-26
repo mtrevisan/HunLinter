@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.DictionaryAttribute;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -244,7 +245,7 @@ public class DictionaryMetadata{
 	 * @return	The expected name of the metadata file.
 	 */
 	public static String getExpectedMetadataFileName(final String dictionaryFile){
-		final int dotIndex = dictionaryFile.lastIndexOf('.');
+		final int dotIndex = StringUtils.lastIndexOf(dictionaryFile, '.');
 		return (dotIndex >= 0? dictionaryFile.substring(0, dotIndex): dictionaryFile) + "." + METADATA_FILE_EXTENSION;
 	}
 
