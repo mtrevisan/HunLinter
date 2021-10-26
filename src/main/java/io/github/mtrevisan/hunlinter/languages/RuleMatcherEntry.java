@@ -44,9 +44,10 @@ public class RuleMatcherEntry{
 	}
 
 	public final void match(final Inflection inflection){
-		for(int i = 0; i < wrongFlags.length; i ++)
-			if(inflection.hasContinuationFlag(wrongFlags[i]))
-				throw new LinterException(messagePattern, masterFlag, wrongFlags[i]);
+		if(inflection.getContinuationFlags() != null)
+			for(int i = 0; i < wrongFlags.length; i ++)
+				if(inflection.hasContinuationFlag(wrongFlags[i]))
+					throw new LinterException(messagePattern, masterFlag, wrongFlags[i]);
 	}
 
 	@Override

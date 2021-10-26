@@ -50,24 +50,27 @@ public final class ParserHelper{
 	private static final char COMMENT_MARK_PERCENT = '%';
 	private static final char COMMENT_MARK_TAB = '\t';
 
+	private static final char[] HYPHENATION_COMMENTS = {COMMENT_MARK_SLASH, COMMENT_MARK_PERCENT};
+	private static final char[] DICTIONARY_COMMENTS = {COMMENT_MARK_SHARP, COMMENT_MARK_SLASH, COMMENT_MARK_TAB};
+
 
 	private ParserHelper(){}
 
 	public static boolean isDictionaryComment(final String line){
-		return isComment(line, COMMENT_MARK_SHARP, COMMENT_MARK_SLASH, COMMENT_MARK_TAB);
+		return isComment(line, DICTIONARY_COMMENTS);
 	}
 
 	public static boolean isHyphenationComment(final String line){
-		return isComment(line, COMMENT_MARK_SLASH, COMMENT_MARK_PERCENT);
+		return isComment(line, HYPHENATION_COMMENTS);
 	}
 
-	private static boolean isComment(final String line, final char... comment){
+	private static boolean isComment(final String line, final char[] comments){
 		if(StringUtils.isBlank(line))
 			return true;
 
 		final char chr = StringUtils.trim(line).charAt(0);
-		for(final char commentChar : comment)
-			if(chr == commentChar)
+		for(final char comment : comments)
+			if(chr == comment)
 				return true;
 		return false;
 	}

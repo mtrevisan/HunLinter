@@ -28,6 +28,8 @@ import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +56,7 @@ public abstract class FlagParsingStrategy{
 	public abstract String[] parseFlags(final String rawFlags);
 
 	protected static void checkForDuplicates(final String[] flags){
-		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+		final Set<String> notDuplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);
 			if(!duplicates.isEmpty())

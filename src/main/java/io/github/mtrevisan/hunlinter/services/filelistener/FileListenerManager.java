@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.services.filelistener;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

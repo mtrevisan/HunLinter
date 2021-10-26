@@ -104,7 +104,7 @@ public final class StringHelper{
 		return longestCommonAffix(StringHelper::commonPrefix, texts);
 	}
 
-	public static String longestCommonSuffix(final String... texts){
+	public static String longestCommonSuffix(final String[] texts){
 		return longestCommonAffix(StringHelper::commonSuffix, texts);
 	}
 

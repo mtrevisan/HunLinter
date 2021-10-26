@@ -299,11 +299,10 @@ public final class SetHelper{
 		return new ArrayList<>(compaction.values());
 	}
 
-	@SafeVarargs
-	public static <V> Set<V> getDuplicates(final V... list){
-		final Collection<V> uniques = new HashSet<>(list.length);
-		final Set<V> duplicates = new HashSet<>(list.length);
-		for(final V elem : list)
+	public static <V> Set<V> getDuplicates(final V[] array){
+		final Collection<V> uniques = new HashSet<>(array.length);
+		final Set<V> duplicates = new HashSet<>(array.length);
+		for(final V elem : array)
 			if(!uniques.add(elem))
 				duplicates.add(elem);
 		return duplicates;

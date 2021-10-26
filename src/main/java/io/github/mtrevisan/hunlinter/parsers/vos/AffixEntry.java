@@ -66,6 +66,9 @@ public class AffixEntry{
 	private static final int PARAM_CONTINUATION_CLASSES = 2;
 	private static final Pattern PATTERN_LINE = RegexHelper.pattern("^(?<condition>[^\\s]+?)(?:(?<!\\\\)\\/(?<continuationClasses>[^\\s]+))?$");
 
+	private static final MorphologicalTag[] INFLECTIONAL_AFFIXES = {MorphologicalTag.INFLECTIONAL_SUFFIX, MorphologicalTag.INFLECTIONAL_PREFIX};
+	private static final MorphologicalTag[] DERIVATIONAL_AFFIXES = {MorphologicalTag.DERIVATIONAL_SUFFIX, MorphologicalTag.DERIVATIONAL_PREFIX};
+
 	private static final String TAB = "\t";
 	private static final String SLASH = "/";
 	private static final String SLASH_ESCAPED = "\\/";
@@ -199,12 +202,10 @@ public class AffixEntry{
 		final List<String> ruleMorphFields = (morphologicalFields != null? morphologicalFields: new ArrayList<>(0));
 
 		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		final boolean containsInflectionalAffix = containsAffixes(ruleMorphFields, MorphologicalTag.INFLECTIONAL_SUFFIX,
-			MorphologicalTag.INFLECTIONAL_PREFIX);
+		final boolean containsInflectionalAffix = containsAffixes(ruleMorphFields, INFLECTIONAL_AFFIXES);
 //		final boolean containsTerminalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.TERMINAL_SUFFIX,
 //			MorphologicalTag.TERMINAL_PREFIX);
-		final boolean containsDerivationalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.DERIVATIONAL_SUFFIX,
-			MorphologicalTag.DERIVATIONAL_PREFIX);
+		final boolean containsDerivationalAffixes = containsAffixes(ruleMorphFields, DERIVATIONAL_AFFIXES);
 		//remove inflectional and terminal suffixes
 //		baseMorphFields = removeIf(baseMorphFields, field ->
 //			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
@@ -225,7 +226,7 @@ public class AffixEntry{
 		return baseMorphFields;
 	}
 
-	private static boolean containsAffixes(final List<String> amf, final MorphologicalTag... tags){
+	private static boolean containsAffixes(final List<String> amf, final MorphologicalTag[] tags){
 		for(final MorphologicalTag tag : tags)
 			for(final String elem : amf)
 				if(tag.isSupertypeOf(elem))

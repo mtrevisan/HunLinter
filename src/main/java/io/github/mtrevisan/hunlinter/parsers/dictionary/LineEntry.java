@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.RegexSequencer;
@@ -38,6 +37,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,11 +78,11 @@ public class LineEntry implements Serializable{
 	}
 
 	LineEntry(final String removal, final String addition, final String condition, final String word){
-		this(removal, SetHelper.setOf(addition), condition, word);
+		this(removal, new HashSet<>(Arrays.asList(addition)), condition, word);
 	}
 
 	LineEntry(final String removal, final String addition, final String condition, final Collection<String> words){
-		this(removal, SetHelper.setOf(addition), condition, words);
+		this(removal, new HashSet<>(Arrays.asList(addition)), condition, words);
 	}
 
 	LineEntry(final String removal, final Set<String> addition, final String condition, final String word){

@@ -180,13 +180,12 @@ public final class FontHelper{
 				component.putClientProperty(CLIENT_PROPERTY_KEY_LOGGABLE, Boolean.TRUE);
 	}
 
-	public static void setCurrentFont(final Font font, final Component... parentFrames){
+	public static void setCurrentFont(final Font font, final Component parentFrame){
 		if(!font.equals(currentFont)){
 			currentFont = font;
 
-			if(parentFrames != null)
-				for(final Component parentFrame : parentFrames)
-					updateComponent(parentFrame, font);
+			if(parentFrame != null)
+				updateComponent(parentFrame, font);
 		}
 	}
 
