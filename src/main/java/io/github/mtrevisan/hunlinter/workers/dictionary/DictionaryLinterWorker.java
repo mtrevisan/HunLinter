@@ -127,14 +127,14 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		};
 
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			final AffixData affixData = affParser.getAffixData();
 			final Set<String> unusedFlags = affixData.getProductableFlags();

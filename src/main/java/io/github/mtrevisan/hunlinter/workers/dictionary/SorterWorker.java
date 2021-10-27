@@ -74,7 +74,7 @@ public class SorterWorker extends WorkerDictionary{
 		final int sectionEnd = boundary.getValue() + 1;
 
 		final Function<Void, List<String>> step1 = ignored -> {
-			prepareProcessing("Load dictionary file (step 1/3)");
+			prepareProcessing(WORKER_NAME, "Load dictionary file (step 1/3)");
 
 			final List<String> lines;
 			try{
@@ -84,7 +84,7 @@ public class SorterWorker extends WorkerDictionary{
 				throw new WorkerException(ioe, ioe.getMessage());
 			}
 
-			setProgress(33);
+			setWorkerProgress(WORKER_NAME, 33);
 
 			return lines;
 		};
@@ -95,7 +95,7 @@ public class SorterWorker extends WorkerDictionary{
 			lines.subList(sectionStart, sectionEnd)
 				.sort(comparator);
 
-			setProgress(67);
+			setWorkerProgress(WORKER_NAME, 67);
 
 			return lines;
 		};
@@ -107,7 +107,7 @@ public class SorterWorker extends WorkerDictionary{
 
 				dicParser.removeBoundary(sectionStart);
 
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+				finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 			}
 			catch(final IOException ioe){
 				throw new WriterException(ioe, ioe.getMessage());

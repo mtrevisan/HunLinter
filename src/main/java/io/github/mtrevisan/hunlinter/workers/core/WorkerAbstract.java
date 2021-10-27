@@ -109,8 +109,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected final Void prepareProcessing(final String message){
-		setProgress(0);
+	protected final Void prepareProcessing(final Object workerID, final String message){
+		setWorkerProgress(workerID, 0);
 		if(message != null)
 			LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
@@ -119,17 +119,17 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected final Void resetProcessing(final String message, final Object... params){
-		setProgress(0);
+	protected final Void resetProcessing(final Object workerID, final String message, final Object... params){
+		setWorkerProgress(workerID, 0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
 	}
 
-	protected final void finalizeProcessing(final String message){
+	protected final void finalizeProcessing(final Object workerID, final String message){
 		watch.stop();
 
-		setProgress(100);
+		setWorkerProgress(workerID, 100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
@@ -155,12 +155,14 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 
-	protected final void setWorkerProgress(final long index, final long total){
+	protected final void setWorkerProgress(final Object workerID, final long index, final long total){
 		final int progress = Math.min((int)Math.floor((index * 100.) / total), 100);
-		setWorkerProgress(progress);
+		setWorkerProgress(workerID, progress);
 	}
 
-	protected final void setWorkerProgress(final int progress){
+	protected final void setWorkerProgress(final Object workerID, final int progress){
+		//TODO manage workerID
+
 		setProgress(Math.min(progress, 100));
 	}
 

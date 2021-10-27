@@ -90,11 +90,11 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 		};
 
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 			processLines(dataProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

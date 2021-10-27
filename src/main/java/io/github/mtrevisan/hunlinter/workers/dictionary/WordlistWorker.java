@@ -116,7 +116,7 @@ public class WordlistWorker extends WorkerDictionary{
 				});
 
 			final Function<Void, File> step1 = ignored -> {
-				prepareProcessing("Execute " + workerData.getWorkerName());
+				prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 				final File dicFile = dicParser.getDicFile();
 				processLines(dicFile.toPath(), charset, lineProcessor);
@@ -126,7 +126,7 @@ public class WordlistWorker extends WorkerDictionary{
 			final Function<File, File> step2 = file -> {
 				closeWriter(writer);
 
-				resetProcessing("Sorting");
+				resetProcessing(WORKER_NAME, "Sorting");
 
 				//sort file & remove duplicates
 				final ExternalSorterOptions options = ExternalSorterOptions.builder()
@@ -145,7 +145,7 @@ public class WordlistWorker extends WorkerDictionary{
 
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
 
-				finalizeProcessing("Wordlist extracted successfully");
+				finalizeProcessing(WORKER_NAME, "Wordlist extracted successfully");
 
 				return file;
 			};

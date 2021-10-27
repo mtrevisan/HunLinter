@@ -112,7 +112,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		final FSABuilder builder = new FSABuilder();
 
 		final Function<Void, ByteArrayList> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/4)");
+			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/4)");
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
@@ -121,7 +121,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return encodings;
 		};
 		final Function<ByteArrayList, ByteArrayList> step2 = list -> {
-			resetProcessing("Sorting (step 2/4)");
+			resetProcessing(WORKER_NAME, "Sorting (step 2/4)");
 
 			//sort list
 			list.parallelSort(LexicographicalComparator.lexicographicalComparator());
@@ -129,7 +129,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			return list;
 		};
 		final Function<ByteArrayList, FSAAbstract> step3 = list -> {
-			resetProcessing("Creating FSA (step 3/4)");
+			resetProcessing(WORKER_NAME, "Creating FSA (step 3/4)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -143,7 +143,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 				builder.add(encoding);
 
 				if(++ progress % progressStep == 0)
-					setWorkerProgress(++ progressIndex);
+					setWorkerProgress(WORKER_NAME, ++ progressIndex);
 
 				sleepOnPause();
 			}
@@ -155,19 +155,19 @@ public class WordlistFSAWorker extends WorkerDictionary{
 		};
 		final Path outputPath = outputFile.toPath();
 		final Function<FSAAbstract, File> step4 = fsa -> {
-			resetProcessing("Compressing FSA (step 4/4)");
+			resetProcessing(WORKER_NAME, "Compressing FSA (step 4/4)");
 
 			final FSASerializerInterface serializer = new CFSASerializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
-					setWorkerProgress(percent);
+					setWorkerProgress(WORKER_NAME, percent);
 
 					sleepOnPause();
 				});
 
 				Files.write(outputPath, os.toByteArray());
 
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+				finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
 
 				return outputFile;
 			}

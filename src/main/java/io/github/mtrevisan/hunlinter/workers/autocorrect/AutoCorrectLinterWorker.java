@@ -107,19 +107,19 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
-			resetProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
+			resetProcessing(WORKER_NAME, "Reading dictionary file (step 1/2)");
 
 			collectWords(dicParser, wordGenerator);
 
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
-			resetProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
+			resetProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
@@ -145,7 +145,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(lineIndex);
+			setWorkerProgress(WORKER_NAME, lineIndex);
 
 			sleepOnPause();
 		};

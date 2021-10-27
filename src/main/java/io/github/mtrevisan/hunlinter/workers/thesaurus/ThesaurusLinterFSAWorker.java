@@ -96,11 +96,11 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 		};
 
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 			processLines(dataProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

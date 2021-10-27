@@ -52,6 +52,9 @@ import java.util.function.Consumer;
 
 public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{
 
+	private static final String WORKER_NAME = "Dictionary";
+
+
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
 	}
@@ -166,7 +169,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if(progress.incrementAndGet() % progressStep == 0)
-					setWorkerProgress(progressIndex.incrementAndGet());
+					setWorkerProgress(WORKER_NAME, progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
@@ -191,7 +194,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
-					setWorkerProgress(progressIndex.incrementAndGet());
+					setWorkerProgress(WORKER_NAME, progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}

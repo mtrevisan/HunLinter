@@ -89,14 +89,14 @@ public class WordCountWorker extends WorkerDictionary{
 			.withDataCancelledCallback(cancelled);
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

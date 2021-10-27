@@ -115,25 +115,25 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 1/3)");
+			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 1/3)");
 
 			processLines(dataProcessor);
 
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
-			resetProcessing("Reading dictionary file (step 2/3)");
+			resetProcessing(WORKER_NAME, "Reading dictionary file (step 2/3)");
 
 			collectWords(dicParser, wordGenerator);
 
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step3 = ignored -> {
-			resetProcessing("Execute " + workerData.getWorkerName() + " (step 3/3)");
+			resetProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 3/3)");
 
 			processLines(dictionaryProcessor);
 
-			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};
@@ -159,7 +159,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(lineIndex);
+			setWorkerProgress(WORKER_NAME, lineIndex);
 
 			sleepOnPause();
 		};
