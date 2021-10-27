@@ -110,7 +110,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	@SuppressWarnings("SameReturnValue")
 	protected final Void prepareProcessing(final String message){
-		setProgress(0);
+		setWorkerProgress(0);
 		if(message != null)
 			LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
@@ -120,7 +120,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	@SuppressWarnings("SameReturnValue")
 	protected final Void resetProcessing(final String message, final Object... params){
-		setProgress(0);
+		setWorkerProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
@@ -129,7 +129,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	protected final void finalizeProcessing(final String message){
 		watch.stop();
 
-		setProgress(100);
+		setWorkerProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 

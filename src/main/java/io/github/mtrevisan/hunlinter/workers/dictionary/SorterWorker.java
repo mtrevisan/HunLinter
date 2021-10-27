@@ -84,7 +84,7 @@ public class SorterWorker extends WorkerDictionary{
 				throw new WorkerException(ioe, ioe.getMessage());
 			}
 
-			setProgress(33);
+			setWorkerProgress(33);
 
 			return lines;
 		};
@@ -95,7 +95,7 @@ public class SorterWorker extends WorkerDictionary{
 			lines.subList(sectionStart, sectionEnd)
 				.sort(comparator);
 
-			setProgress(67);
+			setWorkerProgress(67);
 
 			return lines;
 		};
