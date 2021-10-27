@@ -132,7 +132,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 
 		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/3)");
+			prepareProcessing("Reading dictionary file (step 1/3)");
 
 			return collectDuplicates();
 		};
@@ -140,7 +140,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final Function<List<Duplicate>, File> step3 = duplicates -> {
 			writeDuplicates(outputFile, duplicates);
 
-			finalizeProcessing(WORKER_NAME, "Duplicates extracted successfully");
+			finalizeProcessing("Duplicates extracted successfully");
 
 			return outputFile;
 		};
@@ -172,7 +172,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
@@ -197,7 +197,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final ArrayList<Duplicate> result = new ArrayList<>(0);
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
-			resetProcessing(WORKER_NAME, "Extracting duplicates (step 2/3)");
+			resetProcessing("Extracting duplicates (step 2/3)");
 
 			final Charset charset = dicParser.getCharset();
 			final File dicFile = dicParser.getDicFile();
@@ -222,7 +222,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 			};
 			final ProgressCallback progressCallback = lineIndex -> {
-				setWorkerProgress(WORKER_NAME, lineIndex);
+				setWorkerProgress(lineIndex);
 
 				sleepOnPause();
 			};

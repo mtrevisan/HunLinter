@@ -109,7 +109,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		comparator = BaseBuilder.getComparator(language);
 
 		final Function<Void, File> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/3)");
+			prepareProcessing("Reading dictionary file (step 1/3)");
 
 			final List<String> words = extractWords();
 			writeSupportFile(outputFile, words);
@@ -119,18 +119,18 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			return outputFile;
 		};
 		final Function<File, Map<String, List<String>>> step2 = supportFile -> {
-			resetProcessing(WORKER_NAME, "Extracting minimal pairs (step 2/3)");
+			resetProcessing("Extracting minimal pairs (step 2/3)");
 
 			return extractMinimalPairs(outputFile);
 		};
 		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
-			resetProcessing(WORKER_NAME, "Reordering minimal pairs (step 3/3)");
+			resetProcessing("Reordering minimal pairs (step 3/3)");
 
 			createMinimalPairsFile(outputFile, minimalPairs);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-			finalizeProcessing(WORKER_NAME, "Minimal pairs extracted successfully");
+			finalizeProcessing("Minimal pairs extracted successfully");
 
 			return outputFile;
 		};
@@ -158,7 +158,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
@@ -225,7 +225,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				sourceBR.reset();
 
-				setWorkerProgress(WORKER_NAME, readSoFarSource, totalSizeSource);
+				setWorkerProgress(readSoFarSource, totalSizeSource);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));

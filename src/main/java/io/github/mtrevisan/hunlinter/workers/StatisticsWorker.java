@@ -111,14 +111,14 @@ public class StatisticsWorker extends WorkerDictionary{
 			.withDataCancelledCallback(cancelled);
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
+			prepareProcessing("Execute " + workerData.getWorkerName());
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 
-			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

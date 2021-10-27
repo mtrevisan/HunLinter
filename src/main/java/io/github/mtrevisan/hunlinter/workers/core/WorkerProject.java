@@ -44,8 +44,6 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 
-	public static final String WORKER_NAME = "Project";
-
 	@FunctionalInterface
 	interface StageFunction{
 		void execute() throws IOException, SAXException;
@@ -58,7 +56,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	@Override
 	protected final Void doInBackground(){
-		prepareProcessing(WORKER_NAME, null);
+		prepareProcessing(null);
 
 		final Packager packager = workerData.getPackager();
 		try{
@@ -80,7 +78,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 				sleepOnPause();
 			}
 
-			finalizeProcessing(WORKER_NAME, "Project loaded successfully");
+			finalizeProcessing("Project loaded successfully");
 		}
 		catch(final FileNotFoundException e){
 			logExceptionError(e);
