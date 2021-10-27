@@ -37,8 +37,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import java.beans.PropertyChangeEvent;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -65,7 +63,6 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	private final TimeWatch watch = TimeWatch.start();
 
 	private Function<?, ?> processor;
-	private final Map<Object, Integer> progresses = new HashMap<>(0);
 
 
 	WorkerAbstract(final WD workerData){
@@ -164,12 +161,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	protected final void setWorkerProgress(final Object workerID, final int progress){
-		if(progress >= 100)
-			progresses.remove(workerID);
-		else
-			progresses.put(workerID, progress);
-
-		//TODO manage progress from multiple workerIDs
+		//TODO manage workerID
 
 		setProgress(Math.min(progress, 100));
 	}
