@@ -106,20 +106,23 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			}
 		};
 
+		final String[] workerIDs = defineWorkerProgresses(WORKER_NAME, 2);
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
-			resetProcessing(WORKER_NAME, "Reading dictionary file (step 1/2)");
+			prepareProcessing(workerIDs[0], "Execute " + workerData.getWorkerName());
+			resetProcessing(workerIDs[0], "Reading dictionary file (step 1/2)");
 
 			collectWords(dicParser, wordGenerator);
+
+			setWorkerProgress(workerIDs[0], 100);
 
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
-			resetProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 2/2)");
+			resetProcessing(workerIDs[1], "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
-			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(workerIDs[2], "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

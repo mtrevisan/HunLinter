@@ -52,14 +52,12 @@ import java.util.function.Consumer;
 
 public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<DictionaryParser>>{
 
-	private static final String WORKER_NAME = "Dictionary";
-
-
 	protected WorkerDictionary(final WorkerDataParser<DictionaryParser> workerData){
 		super(workerData);
 	}
 
-	protected final void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
+	protected final void processLines(final String workerID, final Path path, final Charset charset,
+			final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		try{
@@ -68,10 +66,10 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				final List<IndexDataPair<String>> entries = loadFile(path, charset);
 
 				//process dictionary
-				processLinesParallel(entries, dataProcessor);
+				processLinesParallel(workerID, entries, dataProcessor);
 			}
 			else
-				processLinesSequential(path, charset, dataProcessor);
+				processLinesSequential(workerID, path, charset, dataProcessor);
 		}
 		catch(final IOException ioe){
 			throw new ParserException(ioe);
@@ -97,34 +95,34 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		return entries;
 	}
 
-	private void processLinesParallel(final Collection<IndexDataPair<String>> entries,
+	private void processLinesParallel(final String workerID, final Collection<IndexDataPair<String>> entries,
 			final Consumer<IndexDataPair<String>> dataProcessor){
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, entries.size());
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(workerID, dataProcessor, entries.size());
 		entries.parallelStream()
 			.forEach(innerProcessor);
 	}
 
-	private void processLinesSequential(final Path path, final Charset charset,
+	private void processLinesSequential(final String workerID, final Path path, final Charset charset,
 			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
 		final long fileSize = path.toFile().length();
 		final long availableMemory = JavaHelper.estimateAvailableMemory();
 
 		//choose between load all file in memory and read one line at a time:
 		if((fileSize << 1) < availableMemory)
-			processLinesSequentialByLine(path, charset, dataProcessor);
+			processLinesSequentialByLine(workerID, path, charset, dataProcessor);
 		else
-			processLinesSequentialBySize(path, charset, dataProcessor, fileSize);
+			processLinesSequentialBySize(workerID, path, charset, dataProcessor, fileSize);
 	}
 
 	@SuppressWarnings("OverlyBroadThrowsClause")
-	private void processLinesSequentialByLine(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor)
-			throws IOException{
+	private void processLinesSequentialByLine(final String workerID, final Path path, final Charset charset,
+			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
 		//read entire file in memory
 		final List<String> lines = FileHelper.readAllLines(path, charset);
 		if(!workerData.isNoHeader())
 			ParserHelper.assertLinesCount(lines);
 
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, lines.size());
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(workerID, dataProcessor, lines.size());
 
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
@@ -135,7 +133,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
-	private void processLinesSequentialBySize(final Path path, final Charset charset,
+	private void processLinesSequentialBySize(final String workerID, final Path path, final Charset charset,
 			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize) throws IOException{
 		//read one line at a time
 		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
@@ -145,7 +143,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				lineSize = StringHelper.rawBytesLength(line);
 			}
 
-			final BiConsumer<IndexDataPair<String>, Long> innerProcessor = createInnerProcessorBySize(dataProcessor, fileSize);
+			final BiConsumer<IndexDataPair<String>, Long> innerProcessor = createInnerProcessorBySize(workerID, dataProcessor, fileSize);
 
 			int lineIndex = (workerData.isNoHeader()? 0: 1);
 			while(scanner.hasNextLine()){
@@ -159,8 +157,8 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		}
 	}
 
-	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final Consumer<IndexDataPair<String>> dataProcessor,
-			final long totalEntries){
+	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final String workerID,
+			final Consumer<IndexDataPair<String>> dataProcessor, final long totalEntries){
 		final AtomicInteger progress = new AtomicInteger(1);
 		final AtomicInteger progressIndex = new AtomicInteger(1);
 		final int progressStep = (int)Math.ceil(totalEntries / 100.f);
@@ -169,7 +167,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if(progress.incrementAndGet() % progressStep == 0)
-					setWorkerProgress(WORKER_NAME, progressIndex.incrementAndGet());
+					setWorkerProgress(workerID, progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
@@ -184,7 +182,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		};
 	}
 
-	private BiConsumer<IndexDataPair<String>, Long> createInnerProcessorBySize(
+	private BiConsumer<IndexDataPair<String>, Long> createInnerProcessorBySize(final String workerID,
 			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize){
 		final AtomicLong progress = new AtomicLong(1);
 		final AtomicInteger progressIndex = new AtomicInteger(1);
@@ -194,7 +192,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
-					setWorkerProgress(WORKER_NAME, progressIndex.incrementAndGet());
+					setWorkerProgress(workerID, progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}

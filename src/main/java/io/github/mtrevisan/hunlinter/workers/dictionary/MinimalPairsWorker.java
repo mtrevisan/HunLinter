@@ -108,29 +108,36 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 		comparator = BaseBuilder.getComparator(language);
 
+		final String[] workerIDs = defineWorkerProgresses(WORKER_NAME, 3);
 		final Function<Void, File> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/3)");
+			prepareProcessing(workerIDs[0], "Reading dictionary file (step 1/3)");
 
 			final List<String> words = extractWords();
 			writeSupportFile(outputFile, words);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
 
+			setWorkerProgress(workerIDs[0], 100);
+
 			return outputFile;
 		};
 		final Function<File, Map<String, List<String>>> step2 = supportFile -> {
-			resetProcessing(WORKER_NAME, "Extracting minimal pairs (step 2/3)");
+			resetProcessing(workerIDs[1], "Extracting minimal pairs (step 2/3)");
 
-			return extractMinimalPairs(outputFile);
+			final Map<String, List<String>> minimalPairs = extractMinimalPairs(outputFile);
+
+			setWorkerProgress(workerIDs[1], 100);
+
+			return minimalPairs;
 		};
 		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
-			resetProcessing(WORKER_NAME, "Reordering minimal pairs (step 3/3)");
+			resetProcessing(workerIDs[2], "Reordering minimal pairs (step 3/3)");
 
 			createMinimalPairsFile(outputFile, minimalPairs);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
-			finalizeProcessing(WORKER_NAME, "Minimal pairs extracted successfully");
+			finalizeProcessing(workerIDs[2], "Minimal pairs extracted successfully");
 
 			return outputFile;
 		};
@@ -249,7 +256,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setWorkerProgress(index ++, size);
+				setWorkerProgress(WORKER_NAME, index ++, size);
 
 				sleepOnPause();
 			}

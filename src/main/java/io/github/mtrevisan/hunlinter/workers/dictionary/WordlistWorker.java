@@ -119,7 +119,7 @@ public class WordlistWorker extends WorkerDictionary{
 				prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName());
 
 				final File dicFile = dicParser.getDicFile();
-				processLines(dicFile.toPath(), charset, lineProcessor);
+				processLines(WORKER_NAME, dicFile.toPath(), charset, lineProcessor);
 
 				return outputFile;
 			};

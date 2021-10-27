@@ -37,6 +37,9 @@ import java.util.stream.Stream;
 
 public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorrectParser>>{
 
+	private static final String WORKER_NAME = "AutoCorrect linter";
+
+
 	protected WorkerAutoCorrect(final WorkerDataParser<AutoCorrectParser> workerData){
 		super(workerData);
 	}
@@ -92,7 +95,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 			try{
 				dataProcessor.accept(data);
 
-				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(WORKER_NAME, processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}

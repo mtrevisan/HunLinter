@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import java.beans.PropertyChangeEvent;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -65,7 +65,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	private final TimeWatch watch = TimeWatch.start();
 
 	private Function<?, ?> processor;
-	private final Map<Object, Integer> progresses = new HashMap<>(0);
+	private static final Map<Object, Integer> PROGRESSES = new ConcurrentHashMap<>(0);
 
 
 	WorkerAbstract(final WD workerData){
@@ -112,7 +112,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected final Void prepareProcessing(final Object workerID, final String message){
+	protected final Void prepareProcessing(final String workerID, final String message){
 		setWorkerProgress(workerID, 0);
 		if(message != null)
 			LOGGER.info(ParserManager.MARKER_APPLICATION, message);
@@ -122,14 +122,14 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected final Void resetProcessing(final Object workerID, final String message, final Object... params){
+	protected final Void resetProcessing(final String workerID, final String message, final Object... params){
 		setWorkerProgress(workerID, 0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
 	}
 
-	protected final void finalizeProcessing(final Object workerID, final String message){
+	protected final void finalizeProcessing(final String workerID, final String message){
 		watch.stop();
 
 		setWorkerProgress(workerID, 100);
@@ -158,20 +158,34 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 
-	protected final void setWorkerProgress(final Object workerID, final long index, final long total){
+	protected final String[] defineWorkerProgresses(final String workerID, final int count){
+		final String[] ids = new String[count];
+		for(int i = 0; i < count; i ++){
+			ids[i] = workerID + (i + 1);
+			PROGRESSES.put(ids[i], 0);
+		}
+		return ids;
+	}
+
+	protected final void setWorkerProgress(final String workerID, final long index, final long total){
 		final int progress = Math.min((int)Math.floor((index * 100.) / total), 100);
 		setWorkerProgress(workerID, progress);
 	}
 
-	protected final void setWorkerProgress(final Object workerID, final int progress){
-		if(progress >= 100)
-			progresses.remove(workerID);
-		else
-			progresses.put(workerID, progress);
+	protected final void setWorkerProgress(final String workerID, final int progress){
+		PROGRESSES.put(workerID, Math.min(progress, 100));
 
 		//TODO manage progress from multiple workerIDs
+		//extract current composite progress
+		int compositeProgress = 0;
+		for(final Integer prog : PROGRESSES.values())
+			compositeProgress += prog;
+		compositeProgress /= PROGRESSES.size();
 
-		setProgress(Math.min(progress, 100));
+		if(progress >= 100)
+			PROGRESSES.remove(workerID);
+
+		setProgress(compositeProgress);
 	}
 
 	@Override

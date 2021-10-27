@@ -103,14 +103,17 @@ public class RulesReducerWorker extends WorkerDictionary{
 			.withDataCancelledCallback(onCancelled);
 
 
+		final String[] workerIDs = defineWorkerProgresses(WORKER_NAME, 3);
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/3)");
+			prepareProcessing(workerIDs[0], "Reading dictionary file (step 1/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Reading dictionary file (step 1/3)…");
 
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
 			final Charset charset = dicParser.getCharset();
-			processLines(dicPath, charset, lineProcessor);
+			processLines(workerIDs[0], dicPath, charset, lineProcessor);
+
+			setWorkerProgress(workerIDs[0], 100);
 
 			return null;
 		};
@@ -119,11 +122,15 @@ public class RulesReducerWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			try{
-				return rulesReducer.reduceRules(originalRules, percent -> {
+				final List<LineEntry> reducedRules = rulesReducer.reduceRules(originalRules, percent -> {
 					setWorkerProgress(WORKER_NAME, percent);
 
 					sleepOnPause();
 				});
+
+				setWorkerProgress(workerIDs[1], 100);
+
+				return reducedRules;
 			}
 			catch(final Exception e){
 				LOGGER.error(ParserManager.MARKER_RULE_REDUCER_STATUS, "Something very bad happened");

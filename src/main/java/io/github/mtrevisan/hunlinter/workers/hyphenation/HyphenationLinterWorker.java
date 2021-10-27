@@ -111,7 +111,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 			final Path dicPath = dicParser.getDicFile()
 				.toPath();
 			final Charset charset = dicParser.getCharset();
-			processLines(dicPath, charset, lineProcessor);
+			processLines(WORKER_NAME, dicPath, charset, lineProcessor);
 
 			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
 

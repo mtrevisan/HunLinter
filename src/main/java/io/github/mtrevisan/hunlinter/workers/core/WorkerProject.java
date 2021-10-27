@@ -75,7 +75,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 				() -> parserManager.openWordExceptionsFile(packager.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
 				stages.get(index).execute();
-				setWorkerProgress(index + 1, stages.size());
+				setWorkerProgress(WORKER_NAME, index + 1, stages.size());
 
 				sleepOnPause();
 			}

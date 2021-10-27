@@ -114,26 +114,31 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 		};
 
+		final String[] workerIDs = defineWorkerProgresses(WORKER_NAME, 3);
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 1/3)");
+			prepareProcessing(workerIDs[0], "Execute " + workerData.getWorkerName() + " (step 1/3)");
 
-			processLines(dataProcessor);
+			processLines(workerIDs[0], dataProcessor);
+
+			setWorkerProgress(workerIDs[0], 100);
 
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
-			resetProcessing(WORKER_NAME, "Reading dictionary file (step 2/3)");
+			resetProcessing(workerIDs[1], "Reading dictionary file (step 2/3)");
 
 			collectWords(dicParser, wordGenerator);
+
+			setWorkerProgress(workerIDs[1], 100);
 
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step3 = ignored -> {
-			resetProcessing(WORKER_NAME, "Execute " + workerData.getWorkerName() + " (step 3/3)");
+			resetProcessing(workerIDs[2], "Execute " + workerData.getWorkerName() + " (step 3/3)");
 
-			processLines(dictionaryProcessor);
+			processLines(workerIDs[2], dictionaryProcessor);
 
-			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(workerIDs[2], "Successfully processed " + workerData.getWorkerName());
 
 			return null;
 		};

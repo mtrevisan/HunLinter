@@ -131,16 +131,27 @@ public class DuplicatesWorker extends WorkerDictionary{
 		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 
+		final String[] workerIDs = defineWorkerProgresses(WORKER_NAME, 3);
 		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
-			prepareProcessing(WORKER_NAME, "Reading dictionary file (step 1/3)");
+			prepareProcessing(workerIDs[0], "Reading dictionary file (step 1/3)");
 
-			return collectDuplicates();
+			final BloomFilterInterface<String> duplicates = collectDuplicates();
+
+			setWorkerProgress(workerIDs[0], 100);
+
+			return duplicates;
 		};
-		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = this::extractDuplicates;
+		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = duplicatesBloomFilter -> {
+			final List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
+
+			setWorkerProgress(workerIDs[1], 100);
+
+			return duplicates;
+		};
 		final Function<List<Duplicate>, File> step3 = duplicates -> {
 			writeDuplicates(outputFile, duplicates);
 
-			finalizeProcessing(WORKER_NAME, "Duplicates extracted successfully");
+			finalizeProcessing(workerIDs[2], "Duplicates extracted successfully");
 
 			return outputFile;
 		};
@@ -274,7 +285,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					writer.write(sj.toString());
 					writer.newLine();
 
-					setWorkerProgress(++ writtenSoFar, totalSize);
+					setWorkerProgress(WORKER_NAME, ++ writtenSoFar, totalSize);
 
 					sleepOnPause();
 				}

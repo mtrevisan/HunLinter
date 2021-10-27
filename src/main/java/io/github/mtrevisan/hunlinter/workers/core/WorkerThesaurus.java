@@ -41,7 +41,7 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		super(workerData);
 	}
 
-	protected final void processLines(final Consumer<ThesaurusEntry> dataProcessor){
+	protected final void processLines(final String workerID, final Consumer<ThesaurusEntry> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load thesaurus
@@ -51,7 +51,7 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		final Stream<ThesaurusEntry> stream = (workerData.isParallelProcessing()
 			? entries.parallelStream()
 			: entries.stream());
-		processThesaurus(stream, entries.size(), dataProcessor);
+		processThesaurus(workerID, stream, entries.size(), dataProcessor);
 
 		ThesaurusEntry data = null;
 		try{
@@ -73,10 +73,10 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		return theParser.getSynonymsDictionary();
 	}
 
-	private void processThesaurus(final Stream<ThesaurusEntry> entries, final int totalEntries,
+	private void processThesaurus(final String workerID, final Stream<ThesaurusEntry> entries, final int totalEntries,
 			final Consumer<ThesaurusEntry> dataProcessor){
 		try{
-			final Consumer<ThesaurusEntry> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+			final Consumer<ThesaurusEntry> innerProcessor = createInnerProcessor(workerID, dataProcessor, totalEntries);
 			entries.forEach(innerProcessor);
 		}
 		catch(final LinterException e){
@@ -86,13 +86,14 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		}
 	}
 
-	private Consumer<ThesaurusEntry> createInnerProcessor(final Consumer<ThesaurusEntry> dataProcessor, final int totalEntries){
+	private Consumer<ThesaurusEntry> createInnerProcessor(final String workerID, final Consumer<ThesaurusEntry> dataProcessor,
+			final int totalEntries){
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 
-				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(workerID, processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}
