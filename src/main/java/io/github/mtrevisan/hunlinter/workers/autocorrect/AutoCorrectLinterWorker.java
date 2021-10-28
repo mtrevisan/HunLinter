@@ -111,7 +111,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			prepareProcessing(workerIDs[0], "Execute " + workerData.getWorkerName());
 			resetProcessing(workerIDs[0], "Reading dictionary file (step 1/2)");
 
-			collectWords(dicParser, wordGenerator);
+			collectWords(workerIDs[0], dicParser, wordGenerator);
 
 			setWorkerProgress(workerIDs[0], 100);
 
@@ -120,7 +120,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
 			resetProcessing(workerIDs[1], "Execute " + workerData.getWorkerName() + " (step 2/2)");
 
-			processLines(dataProcessor);
+			processLines(workerIDs[1], dataProcessor);
 
 			finalizeProcessing(workerIDs[2], "Successfully processed " + workerData.getWorkerName());
 
@@ -129,7 +129,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		setProcessor(step1.andThen(step2));
 	}
 
-	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	private BloomFilterInterface<String> collectWords(final String workerID, final DictionaryParser dicParser,
+			final WordGenerator wordGenerator){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
@@ -148,7 +149,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(workerID, lineIndex);
 
 			sleepOnPause();
 		};

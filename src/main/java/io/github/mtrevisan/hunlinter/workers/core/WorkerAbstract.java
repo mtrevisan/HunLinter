@@ -182,8 +182,8 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			compositeProgress += prog;
 		compositeProgress /= PROGRESSES.size();
 
-		if(progress >= 100)
-			PROGRESSES.remove(workerID);
+		if(compositeProgress == 100)
+			PROGRESSES.clear();
 
 		setProgress(compositeProgress);
 	}

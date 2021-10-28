@@ -112,7 +112,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final Function<Void, File> step1 = ignored -> {
 			prepareProcessing(workerIDs[0], "Reading dictionary file (step 1/3)");
 
-			final List<String> words = extractWords();
+			final List<String> words = extractWords(workerIDs[0]);
 			writeSupportFile(outputFile, words);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Support file written");
@@ -124,7 +124,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final Function<File, Map<String, List<String>>> step2 = supportFile -> {
 			resetProcessing(workerIDs[1], "Extracting minimal pairs (step 2/3)");
 
-			final Map<String, List<String>> minimalPairs = extractMinimalPairs(outputFile);
+			final Map<String, List<String>> minimalPairs = extractMinimalPairs(workerIDs[1], outputFile);
 
 			setWorkerProgress(workerIDs[1], 100);
 
@@ -133,7 +133,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final Function<Map<String, List<String>>, File> step3 = minimalPairs -> {
 			resetProcessing(workerIDs[2], "Reordering minimal pairs (step 3/3)");
 
-			createMinimalPairsFile(outputFile, minimalPairs);
+			createMinimalPairsFile(workerIDs[2], outputFile, minimalPairs);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", outputFile.getAbsolutePath());
 
@@ -145,7 +145,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private List<String> extractWords(){
+	private List<String> extractWords(final String workerID){
 		final List<String> list = new ArrayList<>(0);
 
 		final Charset charset = dicParser.getCharset();
@@ -165,7 +165,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(workerID, lineIndex);
 
 			sleepOnPause();
 		};
@@ -186,7 +186,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		}
 	}
 
-	private Map<String, List<String>> extractMinimalPairs(final File outputFile){
+	private Map<String, List<String>> extractMinimalPairs(final String workerID, final File outputFile){
 		final Charset charset = dicParser.getCharset();
 		int totalPairs = 0;
 		final Map<String, List<String>> minimalPairs = new HashMap<>(0);
@@ -232,7 +232,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 
 				sourceBR.reset();
 
-				setWorkerProgress(WORKER_NAME, readSoFarSource, totalSizeSource);
+				setWorkerProgress(workerID, readSoFarSource, totalSizeSource);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
@@ -243,7 +243,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		return minimalPairs;
 	}
 
-	private void createMinimalPairsFile(final File file, final Map<String, List<String>> minimalPairs){
+	private void createMinimalPairsFile(final String workerID, final File file, final Map<String, List<String>> minimalPairs){
 		try(final BufferedWriter destinationWriter = Files.newBufferedWriter(file.toPath(), dicParser.getCharset())){
 			int index = 0;
 			final int size = minimalPairs.size();
@@ -256,7 +256,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setWorkerProgress(WORKER_NAME, index ++, size);
+				setWorkerProgress(workerID, index ++, size);
 
 				sleepOnPause();
 			}

@@ -37,14 +37,12 @@ import java.util.stream.Stream;
 
 public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorrectParser>>{
 
-	private static final String WORKER_NAME = "AutoCorrect linter";
-
 
 	protected WorkerAutoCorrect(final WorkerDataParser<AutoCorrectParser> workerData){
 		super(workerData);
 	}
 
-	protected final void processLines(final Consumer<CorrectionEntry> dataProcessor){
+	protected final void processLines(final String workerID, final Consumer<CorrectionEntry> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load autocorrect
@@ -54,7 +52,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		final Stream<CorrectionEntry> stream = (workerData.isParallelProcessing()
 			? entries.parallelStream()
 			: entries.stream());
-		processAutoCorrect(stream, entries.size(), dataProcessor);
+		processAutoCorrect(workerID, stream, entries.size(), dataProcessor);
 
 		CorrectionEntry data = null;
 		try{
@@ -76,10 +74,10 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		return acoParser.getCorrectionsDictionary();
 	}
 
-	private void processAutoCorrect(final Stream<CorrectionEntry> entries, final int totalEntries,
+	private void processAutoCorrect(final String workerID, final Stream<CorrectionEntry> entries, final int totalEntries,
 			final Consumer<CorrectionEntry> dataProcessor){
 		try{
-			final Consumer<CorrectionEntry> innerProcessor = createInnerProcessor(dataProcessor, totalEntries);
+			final Consumer<CorrectionEntry> innerProcessor = createInnerProcessor(workerID, dataProcessor, totalEntries);
 			entries.forEach(innerProcessor);
 		}
 		catch(final LinterException e){
@@ -89,13 +87,14 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		}
 	}
 
-	private Consumer<CorrectionEntry> createInnerProcessor(final Consumer<CorrectionEntry> dataProcessor, final int totalEntries){
+	private Consumer<CorrectionEntry> createInnerProcessor(final String workerID, final Consumer<CorrectionEntry> dataProcessor,
+			final int totalEntries){
 		final AtomicInteger processingIndex = new AtomicInteger(0);
 		return data -> {
 			try{
 				dataProcessor.accept(data);
 
-				setWorkerProgress(WORKER_NAME, processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(workerID, processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}

@@ -135,21 +135,21 @@ public class DuplicatesWorker extends WorkerDictionary{
 		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
 			prepareProcessing(workerIDs[0], "Reading dictionary file (step 1/3)");
 
-			final BloomFilterInterface<String> duplicates = collectDuplicates();
+			final BloomFilterInterface<String> duplicates = collectDuplicates(workerIDs[0]);
 
 			setWorkerProgress(workerIDs[0], 100);
 
 			return duplicates;
 		};
 		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = duplicatesBloomFilter -> {
-			final List<Duplicate> duplicates = extractDuplicates(duplicatesBloomFilter);
+			final List<Duplicate> duplicates = extractDuplicates(workerIDs[1], duplicatesBloomFilter);
 
 			setWorkerProgress(workerIDs[1], 100);
 
 			return duplicates;
 		};
 		final Function<List<Duplicate>, File> step3 = duplicates -> {
-			writeDuplicates(outputFile, duplicates);
+			writeDuplicates(workerIDs[2], outputFile, duplicates);
 
 			finalizeProcessing(workerIDs[2], "Duplicates extracted successfully");
 
@@ -159,7 +159,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private BloomFilterInterface<String> collectDuplicates(){
+	private BloomFilterInterface<String> collectDuplicates(final String workerID){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
@@ -183,7 +183,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(workerID, lineIndex);
 
 			sleepOnPause();
 		};
@@ -204,7 +204,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return duplicatesBloomFilter;
 	}
 
-	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
+	private List<Duplicate> extractDuplicates(final String workerID, final BloomFilterInterface<String> duplicatesBloomFilter){
 		final ArrayList<Duplicate> result = new ArrayList<>(0);
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
@@ -233,7 +233,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				}
 			};
 			final ProgressCallback progressCallback = lineIndex -> {
-				setWorkerProgress(WORKER_NAME, lineIndex);
+				setWorkerProgress(workerID, lineIndex);
 
 				sleepOnPause();
 			};
@@ -255,7 +255,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result;
 	}
 
-	private void writeDuplicates(final File duplicatesFile, final Collection<Duplicate> duplicates){
+	private void writeDuplicates(final String workerID, final File duplicatesFile, final Collection<Duplicate> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
@@ -285,7 +285,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					writer.write(sj.toString());
 					writer.newLine();
 
-					setWorkerProgress(WORKER_NAME, ++ writtenSoFar, totalSize);
+					setWorkerProgress(workerID, ++ writtenSoFar, totalSize);
 
 					sleepOnPause();
 				}

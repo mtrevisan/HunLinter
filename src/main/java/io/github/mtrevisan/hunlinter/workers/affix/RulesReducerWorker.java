@@ -118,12 +118,12 @@ public class RulesReducerWorker extends WorkerDictionary{
 			return null;
 		};
 		final Function<Void, List<LineEntry>> step2 = ignored -> {
-			resetProcessing(WORKER_NAME, "Extracting minimal rules (step 2/3)");
+			resetProcessing(workerIDs[1], "Extracting minimal rules (step 2/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			try{
 				final List<LineEntry> reducedRules = rulesReducer.reduceRules(originalRules, percent -> {
-					setWorkerProgress(WORKER_NAME, percent);
+					setWorkerProgress(workerIDs[1], percent);
 
 					sleepOnPause();
 				});
@@ -139,14 +139,14 @@ public class RulesReducerWorker extends WorkerDictionary{
 			}
 		};
 		final Function<List<LineEntry>, Void> step3 = compactedRules -> {
-			resetProcessing(WORKER_NAME, "Verifying correctness (step 3/3)");
+			resetProcessing(workerIDs[2], "Verifying correctness (step 3/3)");
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Verifying correctness (step 3/3)…");
 
 			final List<String> reducedRules = rulesReducer.convertFormat(flag, keepLongestCommonAffix, compactedRules);
 
 			try{
 				rulesReducer.checkReductionCorrectness(flag, reducedRules, originalLines, percent -> {
-					setWorkerProgress(WORKER_NAME, percent);
+					setWorkerProgress(workerIDs[2], percent);
 
 					sleepOnPause();
 				});
@@ -160,7 +160,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			for(int i = 0; i < reducedRules.size(); i ++)
 				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, reducedRules.get(i));
 
-			finalizeProcessing(WORKER_NAME, "Successfully processed " + workerData.getWorkerName());
+			finalizeProcessing(workerIDs[2], "Successfully processed " + workerData.getWorkerName());
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Successfully processed");
 
 			return null;

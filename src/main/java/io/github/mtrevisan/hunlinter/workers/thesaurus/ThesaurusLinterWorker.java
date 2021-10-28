@@ -127,7 +127,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		final Function<Void, Void> step2 = ignored -> {
 			resetProcessing(workerIDs[1], "Reading dictionary file (step 2/3)");
 
-			collectWords(dicParser, wordGenerator);
+			collectWords(workerIDs[1], dicParser, wordGenerator);
 
 			setWorkerProgress(workerIDs[1], 100);
 
@@ -145,7 +145,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
-	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	private BloomFilterInterface<String> collectWords(final String workerID, final DictionaryParser dicParser,
+			final WordGenerator wordGenerator){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
@@ -164,7 +165,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
-			setWorkerProgress(WORKER_NAME, lineIndex);
+			setWorkerProgress(workerID, lineIndex);
 
 			sleepOnPause();
 		};
