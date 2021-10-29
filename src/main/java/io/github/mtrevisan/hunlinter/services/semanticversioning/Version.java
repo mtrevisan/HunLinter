@@ -46,9 +46,9 @@ public class Version implements Comparable<Version>{
 
 	private final Integer major;
 	private final Integer minor;
-	private final Integer patch;
-	private final String[] preRelease;
-	private final String[] build;
+	private Integer patch;
+	private String[] preRelease;
+	private String[] build;
 
 
 	/**
@@ -111,42 +111,50 @@ public class Version implements Comparable<Version>{
 			throw new IllegalArgumentException("Argument is not a valid version");
 
 		final String[] tokens = StringUtils.split(version, DOT, 3);
-		final String patchOnly = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX)[2];
-		if(hasLeadingZeros(tokens[0]) || hasLeadingZeros(tokens[1]) || hasLeadingZeros(patchOnly))
+		final String[] tokensWithPatch = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX);
+		if(hasLeadingZeros(tokens[0])
+				|| tokensWithPatch.length > 1 && hasLeadingZeros(tokens[1])
+				|| tokensWithPatch.length > 2 && hasLeadingZeros(tokensWithPatch[2]))
 			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
 		major = Integer.valueOf(tokens[0]);
-		minor = Integer.valueOf(tokens[1]);
-		final String patchAndOthers = tokens[2];
-		final StringTokenizer tokenizer = new StringTokenizer(patchAndOthers, PRE_RELEASE_PREFIX + BUILD_PREFIX, true);
-		patch = Integer.valueOf(tokenizer.nextToken());
-		String nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
-		if(PRE_RELEASE_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
-			preRelease = StringUtils.split(tokenizer.nextToken(), DOT);
+		minor = (tokens.length > 1? Integer.valueOf(tokens[1]): null);
+		if(tokens.length > 2){
+			final String patchAndOthers = tokens[2];
+			final StringTokenizer tokenizer = new StringTokenizer(patchAndOthers, PRE_RELEASE_PREFIX + BUILD_PREFIX, true);
+			patch = Integer.valueOf(tokenizer.nextToken());
+			String nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
+			if(PRE_RELEASE_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
+				preRelease = StringUtils.split(tokenizer.nextToken(), DOT);
 
-			nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
+				nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
 
-			for(final String pr : preRelease){
-				final boolean numeric = StringUtils.isNumeric(pr);
-				if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
-					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
-				if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
-					throw new IllegalArgumentException("Argument is not a valid version");
+				for(final String pr : preRelease){
+					final boolean numeric = StringUtils.isNumeric(pr);
+					if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
+						throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
+					if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+						throw new IllegalArgumentException("Argument is not a valid version");
+				}
 			}
-		}
-		else
-			preRelease = EMPTY_ARRAY;
-		if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
-			build = StringUtils.split(tokenizer.nextToken(), DOT);
+			else
+				preRelease = EMPTY_ARRAY;
+			if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
+				build = StringUtils.split(tokenizer.nextToken(), DOT);
 
-			for(final String b : build)
-				if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
-					throw new IllegalArgumentException("Argument is not a valid version");
+				for(final String b : build)
+					if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+						throw new IllegalArgumentException("Argument is not a valid version");
+			}
+			else
+				build = EMPTY_ARRAY;
+			if(tokenizer.hasMoreElements())
+				throw new IllegalArgumentException("Argument is not a valid version");
 		}
-		else
+		else{
+			preRelease = EMPTY_ARRAY;
 			build = EMPTY_ARRAY;
-		if(tokenizer.hasMoreElements())
-			throw new IllegalArgumentException("Argument is not a valid version");
+		}
 	}
 
 	private static boolean hasLeadingZeros(final CharSequence token){
@@ -316,7 +324,13 @@ public class Version implements Comparable<Version>{
 	@Override
 	public final String toString(){
 		final StringBuilder sb = (new StringBuilder())
-			.append(major).append(DOT).append(minor).append(DOT).append(patch);
+			.append(major);
+		if(minor != null)
+			sb.append(DOT)
+				.append(minor);
+		if(patch != null)
+			sb.append(DOT)
+				.append(patch);
 		if(preRelease.length > 0)
 			sb.append(PRE_RELEASE_PREFIX).append(String.join(DOT, preRelease));
 		if(build.length > 0)
