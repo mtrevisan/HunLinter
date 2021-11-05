@@ -41,6 +41,9 @@ public class Version implements Comparable<Version>{
 	/** A separator that separates the build metadata from the normal version or the pre-release version. */
 	private static final String BUILD_PREFIX = "+";
 
+	private static final char[] VALID_CHARS = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+
+	/** An empty immutable {@code String} array. */
 	private static final String[] EMPTY_ARRAY = new String[0];
 
 
@@ -59,7 +62,7 @@ public class Version implements Comparable<Version>{
 	 * @param patch	The patch version number
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch){
+	public Version(final int major, final int minor, final int patch){
 		this(major, minor, patch, EMPTY_ARRAY, EMPTY_ARRAY);
 	}
 
@@ -72,7 +75,7 @@ public class Version implements Comparable<Version>{
 	 * @param preRelease	The pre-release identifiers
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch, final String[] preRelease){
+	public Version(final int major, final int minor, final int patch, final String[] preRelease){
 		this(major, minor, patch, preRelease, EMPTY_ARRAY);
 	}
 
@@ -86,15 +89,15 @@ public class Version implements Comparable<Version>{
 	 * @param build	The build identifiers
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch, final String[] preRelease, final String[] build){
+	public Version(final int major, final int minor, final int patch, final String[] preRelease, final String[] build){
 		if(major < 0 || minor < 0 || patch < 0)
 			throw new IllegalArgumentException("Major, minor and patch versions MUST be non-negative integers.");
 
 		this.major = major;
 		this.minor = minor;
 		this.patch = patch;
-		this.preRelease = preRelease;
-		this.build = build;
+		this.preRelease = (preRelease != null? preRelease: EMPTY_ARRAY);
+		this.build = (build != null? build: EMPTY_ARRAY);
 	}
 
 	/**
@@ -113,8 +116,8 @@ public class Version implements Comparable<Version>{
 		final String[] tokens = StringUtils.split(version, DOT, 3);
 		final String[] tokensWithPatch = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX);
 		if(hasLeadingZeros(tokens[0])
-				|| tokensWithPatch.length > 1 && hasLeadingZeros(tokens[1])
-				|| tokensWithPatch.length > 2 && hasLeadingZeros(tokensWithPatch[2]))
+				|| tokensWithPatch != null && (tokensWithPatch.length > 1 && hasLeadingZeros(tokens[1])
+				|| tokensWithPatch.length > 2 && hasLeadingZeros(tokensWithPatch[2])))
 			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
 		major = Integer.valueOf(tokens[0]);
@@ -129,32 +132,32 @@ public class Version implements Comparable<Version>{
 
 				nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
 
-				for(final String pr : preRelease){
+				for(int i = 0; i < (preRelease != null? preRelease.length: 0); i ++){
+					final String pr = preRelease[i];
 					final boolean numeric = StringUtils.isNumeric(pr);
 					if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
 						throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
-					if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+					if(!numeric && !StringUtils.containsOnly(pr, VALID_CHARS))
 						throw new IllegalArgumentException("Argument is not a valid version");
 				}
 			}
-			else
-				preRelease = EMPTY_ARRAY;
 			if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
 				build = StringUtils.split(tokenizer.nextToken(), DOT);
 
-				for(final String b : build)
-					if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
+				for(int i = 0; i < (build != null? build.length: 0); i ++){
+					final String b = build[i];
+					if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, VALID_CHARS))
 						throw new IllegalArgumentException("Argument is not a valid version");
+				}
 			}
-			else
-				build = EMPTY_ARRAY;
+
 			if(tokenizer.hasMoreElements())
 				throw new IllegalArgumentException("Argument is not a valid version");
 		}
-		else{
+		if(preRelease == null)
 			preRelease = EMPTY_ARRAY;
+		if(build == null)
 			build = EMPTY_ARRAY;
-		}
 	}
 
 	private static boolean hasLeadingZeros(final CharSequence token){
