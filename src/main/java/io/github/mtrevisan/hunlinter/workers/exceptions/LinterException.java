@@ -66,7 +66,7 @@ public class LinterException extends RuntimeException{
 	}
 
 	public final LinterException withData(final Object data){
-		this.data = IndexDataPair.of(-1, data);
+		this.data = (IndexDataPair.class.isInstance(data)? (IndexDataPair<?>)data: IndexDataPair.of(-1, data));
 
 		return this;
 	}

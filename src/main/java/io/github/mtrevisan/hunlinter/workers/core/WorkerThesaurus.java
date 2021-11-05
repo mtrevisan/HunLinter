@@ -52,20 +52,6 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 			? entries.parallelStream()
 			: entries.stream());
 		processThesaurus(stream, entries.size(), dataProcessor);
-
-		ThesaurusEntry data = null;
-		try{
-			final ThesaurusParser theParser = workerData.getParser();
-			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-			for(int i = 0; i < dictionary.size(); i ++){
-				data = dictionary.get(i);
-				dataProcessor.accept(data);
-			}
-		}
-		catch(final RuntimeException re){
-			manageException(new LinterException(re)
-				.withData(data));
-		}
 	}
 
 	private List<ThesaurusEntry> loadThesaurus(){
