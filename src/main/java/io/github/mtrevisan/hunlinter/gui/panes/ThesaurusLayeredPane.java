@@ -258,6 +258,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
                "There is some duplicates with same part-of-speech and definition(s) '" + message
                + "'.\nForce insertion?", "Duplicate detected",
                JOptionPane.YES_NO_OPTION);
+				addButton.setEnabled(true);
             return (responseOption == JOptionPane.YES_OPTION);
          };
 			final ThesaurusParser theParser = parserManager.getTheParser();
