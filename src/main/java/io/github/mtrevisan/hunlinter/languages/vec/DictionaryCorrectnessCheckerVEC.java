@@ -83,7 +83,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private String northernPluralRule;
 	private String northernPluralStressedRule;
 	private Set<String> dontCheckProductivenessRules;
-	private Set<String> canAdminStressRules;
+	private Set<String> derivationCanAdminStress;
 	private Set<String> stemCanAdmitStress;
 
 	private static final String SINGLE_POS_NOT_PRESENT = "Part-of-Speech not unique";
@@ -129,7 +129,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		northernPluralStressedRule = rulesLoader.readProperty("northernPluralStressed");
 
 		dontCheckProductivenessRules = rulesLoader.readPropertyAsSet("dontCheckProductiveness", ',');
-		canAdminStressRules = rulesLoader.readPropertyAsSet("canAdmitStress", ',');
+		derivationCanAdminStress = rulesLoader.readPropertyAsSet("derivationCanAdmitStress", ',');
 		final Set<String> canAdmitStress = rulesLoader.readPropertyAsSet("stemCanAdmitStress", ',');
 		stemCanAdmitStress = new HashSet<>(canAdmitStress.size());
 		for(final String cas : canAdmitStress)
@@ -296,7 +296,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	@Override
 	public final boolean canAdmitStress(final Inflection inflection){
-		return inflection.hasRuleApplied(canAdminStressRules);
+		String derivationalField = null;
+		final List<String> morphologicalFields = inflection.getMorphologicalFieldsAsList();
+		for(int i = 0; derivationalField == null && i < morphologicalFields.size(); i ++)
+			if(morphologicalFields.get(i).startsWith(MorphologicalTag.DERIVATIONAL_SUFFIX.getCode()))
+				derivationalField = morphologicalFields.get(i);
+		return !derivationCanAdminStress.contains(derivationalField);
 	}
 
 	@Override
