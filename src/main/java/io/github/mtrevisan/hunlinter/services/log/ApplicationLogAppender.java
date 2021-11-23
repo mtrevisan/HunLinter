@@ -24,16 +24,27 @@
  */
 package io.github.mtrevisan.hunlinter.services.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import ch.qos.logback.core.encoder.Encoder;
-import org.slf4j.Marker;
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import org.slf4j.Marker;
 
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
+import java.awt.Color;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,12 +56,16 @@ import java.util.prefs.Preferences;
 
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
+	private static final Color COLOR_SAFETY_ORANGE = Color.getHSBColor(28.f / 256.f, 1.f, 1.f);
+
 	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 
-	private Encoder<ILoggingEvent> encoder;
-
 	private static final Map<Marker, List<JTextArea>> TEXT_AREAS = new HashMap<>(0);
+	private static final Map<Marker, List<JTextPane>> TEXT_PANES = new HashMap<>(0);
 	private static final Map<Marker, List<JLabel>> LABELS = new HashMap<>(0);
+
+
+	private Encoder<ILoggingEvent> encoder;
 
 
 	public static void addLabel(final JLabel label, final Marker... markers){
@@ -59,6 +74,10 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 	public static void addTextArea(final JTextArea textArea, final Marker... markers){
 		addComponent(TEXT_AREAS, textArea, markers);
+	}
+
+	public static void addTextPane(final JTextPane textPane, final Marker... markers){
+		addComponent(TEXT_PANES, textPane, markers);
 	}
 
 	private static <T> void addComponent(final Map<Marker, List<T>> map, final T component, final Marker... markers){
@@ -76,27 +95,62 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 	@Override
 	protected final void append(final ILoggingEvent eventObject){
-		if((!TEXT_AREAS.isEmpty() || !LABELS.isEmpty()) && encoder != null){
+		if((!TEXT_AREAS.isEmpty() || !TEXT_PANES.isEmpty() || !LABELS.isEmpty()) && encoder != null){
+			final Level level = eventObject.getLevel();
+			if(level == Level.WARN && !preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true))
+				return;
+
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
-
-			if(!preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true) && message.contains(" WARN: "))
-				return;
 
 			final Marker marker = eventObject.getMarker();
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
 				if(textAreas != null)
-					for(final JTextArea textArea : textAreas){
-						textArea.setCaretPosition(textArea.getDocument().getLength());
+					for(int i = 0; i < textAreas.size(); i ++){
+						final JTextArea textArea = textAreas.get(i);
+						final Document doc = textArea.getDocument();
+						textArea.setCaretPosition(doc.getLength());
 						textArea.append(message);
 					}
+
+				final List<JTextPane> textPanes = TEXT_PANES.get(marker);
+				if(textPanes != null){
+					for(int i = 0; i < textPanes.size(); i ++){
+						final Color color;
+						if(level == Level.ERROR)
+							color = Color.RED;
+						else if(level == Level.WARN)
+							color = COLOR_SAFETY_ORANGE;
+						else
+							color = Color.BLACK;
+						appendToPane(textPanes.get(i), message, color);
+					}
+				}
+
 				final List<JLabel> labels = LABELS.get(marker);
 				if(labels != null)
-					for(final JLabel label : labels)
-						label.setText(message);
+					for(int i = 0; i < labels.size(); i ++)
+						labels.get(i).setText(message);
 			});
 		}
+	}
+
+	private static void appendToPane(final JTextPane textPane, final String message, final Color color){
+		final StyleContext styleContext = StyleContext.getDefaultStyleContext();
+		AttributeSet attributeSet = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
+		attributeSet = styleContext.addAttribute(attributeSet, StyleConstants.FontFamily, FontHelper.getCurrentFont().getName());
+		attributeSet = styleContext.addAttribute(attributeSet, StyleConstants.FontSize, FontHelper.getCurrentFont().getSize());
+
+		final StyledDocument doc = textPane.getStyledDocument();
+		textPane.setCaretPosition(doc.getLength());
+		try{
+			doc.insertString(textPane.getDocument().getLength(), message, attributeSet);
+		}
+		catch(final BadLocationException ble){
+			ble.printStackTrace();
+		}
+		textPane.replaceSelection(System.lineSeparator());
 	}
 
 }

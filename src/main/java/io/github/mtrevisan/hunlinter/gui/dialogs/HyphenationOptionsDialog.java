@@ -244,7 +244,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			deleteRows(selectedRows);
 		}
 		catch(final RuntimeException re){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", re.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", re.getMessage());
 		}
 	}
 

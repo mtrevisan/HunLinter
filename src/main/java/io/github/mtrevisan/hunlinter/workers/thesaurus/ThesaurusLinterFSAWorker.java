@@ -77,7 +77,7 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 			final String[] words = StringUtils.split(originalDefinition, " –");
 			for(int i = 0; i < words.length; i ++)
 				if(dictionaryLookup.lookup(words[i]).isEmpty())
-					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
+					LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
@@ -89,7 +89,7 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
+						LOGGER.error(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
 							partOfSpeeches.toString(), originalDefinition));
 				}
 			}

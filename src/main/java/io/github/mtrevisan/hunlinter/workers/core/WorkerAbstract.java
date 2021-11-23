@@ -25,11 +25,13 @@
 package io.github.mtrevisan.hunlinter.workers.core;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+import java.util.prefs.Preferences;
 
 
 public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<Void, Void>{
@@ -147,11 +150,25 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final int index = data.getIndex();
 			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), le.getMessage(),
+			LOGGER.error(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), le.getMessage(),
 				lineText, data.getData());
 		}
 		else
 			le.printStackTrace();
+	}
+
+	protected static void manageException(final LinterWarning lw){
+		if(lw.getData() != null){
+			final String warningMessage = ExceptionHelper.getMessage(lw);
+			final IndexDataPair<?> data = lw.getData();
+			final int index = data.getIndex();
+			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			LOGGER.trace("{}{}: {}", warningMessage, lineText, data.getData());
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), lw.getMessage(),
+				lineText, data.getData());
+		}
+		else
+			lw.printStackTrace();
 	}
 
 

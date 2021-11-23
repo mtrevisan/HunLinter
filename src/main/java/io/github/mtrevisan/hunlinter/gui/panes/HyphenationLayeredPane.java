@@ -347,7 +347,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
       else{
          addRuleTextField.requestFocusInWindow();
 
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
       }
    }//GEN-LAST:event_addRuleButtonActionPerformed
 
@@ -359,7 +359,7 @@ public class HyphenationLayeredPane extends JLayeredPane{
             parserManager.storeHyphenationFile();
          }
          catch(final IOException ioe){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, ioe.getMessage());
+            LOGGER.error(ParserManager.MARKER_APPLICATION, ioe.getMessage());
          }
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),

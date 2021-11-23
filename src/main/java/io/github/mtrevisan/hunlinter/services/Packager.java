@@ -247,7 +247,7 @@ public class Packager{
 			}
 		}
 		catch(final SAXException | IOException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Configuration reading error: {}", e.getMessage());
 
 			LOGGER.error("Something very bad happened while extracting configuration file(s)", e);
 		}
@@ -328,7 +328,7 @@ public class Packager{
 			FileHelper.browse(projectPath.toFile());
 		}
 		catch(final InterruptedException | IOException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Package error: {}", e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Package error: {}", e.getMessage());
 
 			LOGGER.error("Something very bad happened while creating package", e);
 		}

@@ -188,7 +188,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                      parserManager.storeAutoCorrectFile();
                   }
                   catch(final TransformerException ex){
-                     LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
+                     LOGGER.error(ParserManager.MARKER_APPLICATION, ex.getMessage());
                   }
                };
                final CorrectionEntry definition = parserManager.getAcoParser().getCorrectionsDictionary().get(row);
@@ -326,11 +326,11 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 				final StringJoiner duplicatedWords = new StringJoiner(", ");
 				for(final CorrectionEntry correctionEntry : duplicationResult.getDuplicates())
 					duplicatedWords.add(correctionEntry.toString());
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
+            LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: Duplicate detected: {}", duplicatedWords);
          }
       }
       catch(final TransformerException e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
@@ -384,7 +384,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			parserManager.storeAutoCorrectFile();
 		}
 		catch(final TransformerException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 

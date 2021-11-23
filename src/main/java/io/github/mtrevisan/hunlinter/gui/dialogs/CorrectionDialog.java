@@ -176,7 +176,7 @@ public class CorrectionDialog extends JDialog{
          okButtonAction.accept(incorrect, correct);
       }
       catch(final RuntimeException re){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction,
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction,
 				re.getMessage());
       }
 

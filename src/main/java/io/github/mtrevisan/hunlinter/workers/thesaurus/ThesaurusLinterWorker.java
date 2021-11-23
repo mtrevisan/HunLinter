@@ -99,7 +99,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
+						LOGGER.error(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(MISSING_ENTRY, definition,
 							partOfSpeeches.toString(), originalDefinition));
 				}
 			}
@@ -111,7 +111,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
 			for(int i = 0; i < words.length; i ++)
 				if(!bloomFilter.contains(words[i]))
-					LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
+					LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
@@ -155,7 +155,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {

@@ -357,7 +357,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 			openAidButton.setEnabled(aidLinesPresent);
 		}
 		catch(final RuntimeException re){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
 			LOGGER.error("A bad error occurred", re);
 		}
@@ -451,14 +451,14 @@ public class DictionaryLayeredPane extends JLayeredPane{
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
 						final String errorMessage = ExceptionHelper.getMessage(re);
 						LOGGER.trace("{}, line {}", errorMessage, index);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
+						LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
 					}
 
 					index ++;
 				}
 			}
 			catch(final RuntimeException re){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), text);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), text);
 			}
 		}
 		else

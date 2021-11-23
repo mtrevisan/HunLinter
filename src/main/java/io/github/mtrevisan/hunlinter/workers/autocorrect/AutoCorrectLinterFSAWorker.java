@@ -85,7 +85,7 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(int i = 0; i < words.length; i ++)
 					if(dictionaryLookup.lookup(words[i]).isEmpty())
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
+						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 

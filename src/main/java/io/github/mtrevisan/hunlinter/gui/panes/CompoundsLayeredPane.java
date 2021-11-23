@@ -290,7 +290,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             dm.setInflections(words);
          }
          catch(final RuntimeException re){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), inputText);
+            LOGGER.error(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), inputText);
          }
       }
       else

@@ -104,7 +104,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
             wexParser.save(packager.getWordExceptionsFile());
          }
          catch(final TransformerException e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
+            LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       });
       correctionsRecordedLabel = new javax.swing.JLabel();
@@ -218,7 +218,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
          }
       }
       catch(final TransformerException | HeadlessException e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 

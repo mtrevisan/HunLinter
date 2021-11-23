@@ -289,11 +289,11 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
 				for(int i = 0; i < duplicates.size(); i ++)
 					duplicatedWords.add(duplicates.get(i).getDefinition());
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
+            LOGGER.warn(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
       catch(final IOException | LinterException e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
@@ -326,7 +326,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			}
 		}
 		catch(final RuntimeException re){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
 			LOGGER.error("A bad error occurred", re);
 		}
@@ -440,7 +440,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			}
 		}
 		catch(final IOException ioe){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", ioe.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", ioe.getMessage());
 		}
 	}
 

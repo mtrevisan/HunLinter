@@ -25,6 +25,7 @@
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -39,7 +40,7 @@ public class LinterWarning extends Exception{
 
 
 	private int index;
-	private Object data;
+	private IndexDataPair<?> data;
 
 
 	public LinterWarning(final String message, final Object... parameters){
@@ -56,7 +57,19 @@ public class LinterWarning extends Exception{
 		return index;
 	}
 
-	public final Object getData(){
+	public final LinterWarning withIndexDataPair(final IndexDataPair<?> data){
+		this.data = data;
+
+		return this;
+	}
+
+	public final LinterWarning withData(final Object data){
+		this.data = (IndexDataPair.class.isInstance(data)? (IndexDataPair<?>)data: IndexDataPair.of(-1, data));
+
+		return this;
+	}
+
+	public final IndexDataPair<?> getData(){
 		return data;
 	}
 

@@ -37,6 +37,7 @@ import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.Charset;
@@ -141,7 +142,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			unusedFlags.removeAll(usedFlags);
 //			unusedFlags.removeAll(usedFlags.keySet());
 			if(!unusedFlags.isEmpty())
-				manageException(new LinterException(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "))
+				manageException(new LinterWarning(UNUSED_FLAGS, StringUtils.join(unusedFlags, ", "))
 					.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 //			final StringBuilder originalRuleEntriesLog = new StringBuilder();
 //			for(final Map.Entry<String, Set<AffixEntry>> flagRules : usedFlags.entrySet()){

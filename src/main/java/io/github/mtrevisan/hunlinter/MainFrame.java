@@ -209,10 +209,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
-		FontHelper.addFontableProperty(parsingResultTextArea);
-		FontHelper.addLoggableProperty(parsingResultTextArea);
+		FontHelper.addFontableProperty(parsingResultTextPane);
+		FontHelper.addLoggableProperty(parsingResultTextPane);
 
-		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
+		ApplicationLogAppender.addTextPane(parsingResultTextPane, ParserManager.MARKER_APPLICATION);
 
 
 		futureOpenProjectPathFileChooser = JavaHelper.executeFuture(() -> {
@@ -250,7 +250,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	private void initComponents() {
 
       parsingResultScrollPane = new javax.swing.JScrollPane();
-      parsingResultTextArea = new javax.swing.JTextArea();
+      parsingResultTextPane = new javax.swing.JTextPane();
       mainProgressBar = new javax.swing.JProgressBar();
 		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
 		mainProgressBar.setUI(new MultiProgressBarUI());
@@ -323,11 +323,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
-      parsingResultTextArea.setEditable(false);
-      parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setRows(1);
-      parsingResultTextArea.setTabSize(3);
-      parsingResultScrollPane.setViewportView(parsingResultTextArea);
+      parsingResultTextPane.setEditable(false);
+      parsingResultScrollPane.setViewportView(parsingResultTextPane);
 
       mainTabbedPane.addTab("Inflections", dicLayeredPane);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
@@ -613,7 +610,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	@EventHandler
 	@SuppressWarnings("unused")
 	public final void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
-		parsingResultTextArea.setText(null);
+		parsingResultTextPane.setText(null);
 		filOpenProjectMenuItem.setEnabled(false);
 		recentProjectsMenu.setEnabled(false);
 
@@ -655,7 +652,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		if(cause.getMessage() == null)
 			cause.printStackTrace();
 
-		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
+		LOGGER.error(ParserManager.MARKER_APPLICATION, cause.getMessage());
 
 		if(cause instanceof ProjectNotFoundException pnfe){
 			//remove the file from the recent projects menu
@@ -675,11 +672,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			final int eventIndex = warningEvent.getIndex();
 			final String lineText = (eventIndex >= 0? ", line " + eventIndex: StringUtils.EMPTY);
 			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData);
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData);
 		}
 		else{
 			LOGGER.trace("WARN: {}", errorMessage);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}", warningEvent.getMessage());
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: {}", warningEvent.getMessage());
 		}
 	}
 
@@ -745,7 +742,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			loadLanguageDependentFont();
 		}
 		catch(final RuntimeException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);
 		}
@@ -1043,7 +1040,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parsingResultScrollPane;
-   private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JTextPane parsingResultTextPane;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;

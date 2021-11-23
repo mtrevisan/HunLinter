@@ -102,7 +102,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(int i = 0; i < words.length; i ++)
 					if(!bloomFilter.contains(words[i]))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
+						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 
@@ -141,7 +141,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {

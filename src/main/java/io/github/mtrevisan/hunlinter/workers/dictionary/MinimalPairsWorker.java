@@ -154,7 +154,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
