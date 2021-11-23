@@ -45,6 +45,7 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 import java.awt.Color;
+import java.awt.Font;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +58,8 @@ import java.util.prefs.Preferences;
 public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 	private static final Color COLOR_SAFETY_ORANGE = Color.getHSBColor(28.f / 256.f, 1.f, 1.f);
+
+	private static final int INDENTATION = 30;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 
@@ -137,20 +140,30 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 	}
 
 	private static void appendToPane(final JTextPane textPane, final String message, final Color color){
-		final StyleContext styleContext = StyleContext.getDefaultStyleContext();
-		AttributeSet attributeSet = styleContext.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, color);
-		attributeSet = styleContext.addAttribute(attributeSet, StyleConstants.FontFamily, FontHelper.getCurrentFont().getName());
-		attributeSet = styleContext.addAttribute(attributeSet, StyleConstants.FontSize, FontHelper.getCurrentFont().getSize());
+		final SimpleAttributeSet style = getStyle(color);
 
 		final StyledDocument doc = textPane.getStyledDocument();
-		textPane.setCaretPosition(doc.getLength());
+		final int start = doc.getLength();
+		textPane.setCaretPosition(start);
 		try{
-			doc.insertString(textPane.getDocument().getLength(), message, attributeSet);
+			doc.insertString(start, message, style);
+			doc.setParagraphAttributes(start, doc.getLength() - start, style, false);
 		}
 		catch(final BadLocationException ble){
 			ble.printStackTrace();
 		}
 		textPane.replaceSelection(System.lineSeparator());
+	}
+
+	private static SimpleAttributeSet getStyle(final Color foreground){
+		final SimpleAttributeSet style = new SimpleAttributeSet();
+		final Font currentFont = FontHelper.getCurrentFont();
+		StyleConstants.setFontFamily(style, currentFont.getFontName());
+		StyleConstants.setFontSize(style, currentFont.getSize());
+		StyleConstants.setForeground(style, foreground);
+		StyleConstants.setFirstLineIndent(style, -INDENTATION);
+		StyleConstants.setLeftIndent(style, INDENTATION);
+		return style;
 	}
 
 }
