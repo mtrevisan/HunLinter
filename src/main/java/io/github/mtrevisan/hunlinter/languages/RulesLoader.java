@@ -50,6 +50,8 @@ public class RulesLoader{
 	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {} cannot have rule {}";
 	private static final String WORD_WITH_LETTER_CANNOT_HAVE = "Word with letter `{}` cannot have rule {}";
 	private static final String WORD_WITH_LETTER_CANNOT_HAVE_USE = "Word with letter `{}` cannot have rule {}, use {}";
+	private static final String WORD_WITHOUT_LETTER_CANNOT_HAVE = "Word without letter `{}` cannot have rule {}";
+	private static final String WORD_WITHOUT_LETTER_CANNOT_HAVE_USE = "Word without letter `{}` cannot have rule {}, use {}";
 
 
 	private final PropertiesUTF8 rulesProperties;
@@ -67,6 +69,8 @@ public class RulesLoader{
 	private Map<Character, LetterMatcherEntry[]> letterAndRulesNotCombinable;
 	private String[] ruleAndRulesNotCombinableKeys;
 	private Map<String, RuleMatcherEntry[]> ruleAndRulesNotCombinable;
+	private Character[] letterAndRulesCombinableKeys;
+	private Map<Character, LetterMatcherEntry[]> letterAndRulesCombinable;
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
@@ -121,6 +125,31 @@ public class RulesLoader{
 			}
 
 			Character letter = null;
+			rules = readPropertyAsList("letterAndRulesCombinable", '/');
+			final Map<Character, List<LetterMatcherEntry>> letterAndRulesCombinable = new HashMap<>(0);
+			for(int i = 0; i < rules.size(); i ++){
+				final String elem = rules.get(i);
+				if(elem.length() == 1)
+					letter = elem.charAt(0);
+				else{
+					flags = strategy.parseFlags(elem);
+					final String correctRule = flags[flags.length - 1];
+					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+					letterAndRulesCombinable.computeIfAbsent(letter, k -> new ArrayList<>(1))
+						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
+							? WORD_WITHOUT_LETTER_CANNOT_HAVE_USE
+							: WORD_WITHOUT_LETTER_CANNOT_HAVE),
+							letter, wrongFlags, correctRule));
+				}
+			}
+			letterAndRulesCombinableKeys = new Character[letterAndRulesCombinable.size()];
+			this.letterAndRulesCombinable = new HashMap<>(letterAndRulesCombinable.size());
+			offset = 0;
+			for(final Map.Entry<Character, List<LetterMatcherEntry>> entry : letterAndRulesCombinable.entrySet()){
+				letterAndRulesCombinableKeys[offset ++] = entry.getKey();
+				this.letterAndRulesCombinable.put(entry.getKey(), entry.getValue().toArray(new LetterMatcherEntry[0]));
+			}
+
 			rules = readPropertyAsList("letterAndRulesNotCombinable", '/');
 			final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
 			for(int i = 0; i < rules.size(); i ++){
@@ -234,6 +263,16 @@ public class RulesLoader{
 				final RuleMatcherEntry[] ruleMatcherEntries = ruleAndRulesNotCombinable.get(ruleAndRulesNotCombinableKeys[i]);
 				for(int j = 0; j < ruleMatcherEntries.length; j ++)
 					ruleMatcherEntries[j].match(inflection);
+			}
+	}
+
+	public final void letterToFlagCompatibilityCheck(final Inflection inflection){
+		final String word = inflection.getWord();
+		for(int i = 0; i < letterAndRulesCombinableKeys.length; i ++)
+			if(!StringUtils.containsAny(word, letterAndRulesCombinableKeys[i])){
+				final LetterMatcherEntry[] letterMatcherEntries = letterAndRulesCombinable.get(letterAndRulesCombinableKeys[i]);
+				for(int j = 0; j < letterMatcherEntries.length; j ++)
+					letterMatcherEntries[j].match(inflection);
 			}
 	}
 

@@ -114,6 +114,8 @@ public class DictionaryCorrectnessChecker{
 		rulesLoader.letterToFlagIncompatibilityCheck(inflection);
 
 		rulesLoader.flagToFlagIncompatibilityCheck(inflection);
+
+		rulesLoader.letterToFlagCompatibilityCheck(inflection);
 	}
 
 	//used by the correctness check worker:
