@@ -269,7 +269,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						final Duplicate duplicate = entries.get(j);
 						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 							(duplicate.getInflection().hasInflectionRules()?
-							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")")));
+							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
 					}
 					writer.write(sj.toString());
 					writer.newLine();
