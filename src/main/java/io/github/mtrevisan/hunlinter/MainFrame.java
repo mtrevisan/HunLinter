@@ -110,10 +110,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -279,8 +275,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
       filCreatePackageMenuItem = new javax.swing.JMenuItem();
-      filFontSeparator = new javax.swing.JPopupMenu.Separator();
-      filFontMenuItem = new javax.swing.JMenuItem();
+      setFontMenuItem = new javax.swing.JMenuItem();
       filRecentProjectsSeparator = new javax.swing.JPopupMenu.Separator();
       filEmptyRecentProjectsMenuItem = new javax.swing.JMenuItem();
       filSeparator = new javax.swing.JPopupMenu.Separator();
@@ -360,12 +355,6 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filCreatePackageMenuItem.setText("Create package");
       filCreatePackageMenuItem.setEnabled(false);
       filMenu.add(filCreatePackageMenuItem);
-      filMenu.add(filFontSeparator);
-
-      filFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
-      filFontMenuItem.setMnemonic('f');
-      filFontMenuItem.setText("Select font…");
-      filMenu.add(filFontMenuItem);
       filMenu.add(filRecentProjectsSeparator);
 
       filEmptyRecentProjectsMenuItem.setMnemonic('e');
@@ -508,6 +497,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true));
       setCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       setMenu.add(setCheckUpdateOnStartupCheckBoxMenuItem);
+
+		setFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
+		setFontMenuItem.setMnemonic('f');
+		setFontMenuItem.setText("Select font…");
+		setMenu.add(setFontMenuItem);
 
       setReportWarningsCheckBoxMenuItem.setAction(new ReportWarningsAction(preferences));
       setReportWarningsCheckBoxMenuItem.setSelected(preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true));
@@ -1022,8 +1016,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem filCreatePackageMenuItem;
    private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
    private javax.swing.JMenuItem filExitMenuItem;
-   private javax.swing.JMenuItem filFontMenuItem;
-   private javax.swing.JPopupMenu.Separator filFontSeparator;
+   private javax.swing.JMenuItem setFontMenuItem;
    private javax.swing.JMenu filMenu;
    private javax.swing.JMenuItem filOpenProjectMenuItem;
    private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
