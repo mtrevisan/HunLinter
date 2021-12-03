@@ -61,8 +61,6 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))");
 	private static final String FALSE_S_INTO_X = "èsre";
 
-	private static final Pattern PATTERN_CONSONANT_GEMINATES = RegexHelper.pattern("([^aeiou])\\1+");
-
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
 	}

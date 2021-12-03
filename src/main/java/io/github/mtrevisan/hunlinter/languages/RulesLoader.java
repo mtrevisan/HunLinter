@@ -61,7 +61,7 @@ public class RulesLoader{
 	private final boolean wordCanHaveMultipleStresses;
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
-	private final Set<String> multipleStressedWords;
+	private final Set<String> validStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
 	private final Collection<String> canHaveNoInflections = new HashSet<>(0);
@@ -95,7 +95,7 @@ public class RulesLoader{
 		dataFields.put(MorphologicalTag.PART, null);
 
 		unsyllabableWords = readPropertyAsSet("unsyllabableWords", ',');
-		multipleStressedWords = readPropertyAsSet("multipleStressedWords", ',');
+		validStressedWords = readPropertyAsSet("validStressedWords", ',');
 
 		if(strategy != null){
 			String[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
@@ -231,8 +231,8 @@ public class RulesLoader{
 		return unsyllabableWords.contains(word);
 	}
 
-	public final boolean containsMultipleStressedWords(final String word){
-		return multipleStressedWords.contains(word);
+	public final boolean containsValidStressedWords(final String word){
+		return validStressedWords.contains(word);
 	}
 
 	public final boolean containsHasToContainStress(final String flag){

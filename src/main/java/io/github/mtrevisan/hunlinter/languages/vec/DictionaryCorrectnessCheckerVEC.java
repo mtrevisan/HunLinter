@@ -195,11 +195,10 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 
 	private void orthographyCheck(final Inflection inflection){
 		if(hasToCheckForOrthographyAndSyllabation(inflection)){
-			String word = inflection.getWord();
-			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsMultipleStressedWords(word)){
-				word = word.toLowerCase(Locale.ROOT);
+			final String word = inflection.getWord()
+				.toLowerCase(Locale.ROOT);
+			if(!rulesLoader.containsUnsyllabableWords(word) && !rulesLoader.containsValidStressedWords(word))
 				orthographyCheck(word);
-			}
 		}
 	}
 
@@ -223,7 +222,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	}
 
 	private void stressCheck(final String subword, final Inflection inflection){
-		if(!rulesLoader.containsMultipleStressedWords(subword)){
+		if(!rulesLoader.containsValidStressedWords(subword)){
 			final int stresses = WordVEC.countStresses(subword);
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
 				throw new LinterException(MULTIPLE_STRESSES, inflection.getWord());
