@@ -226,6 +226,9 @@ public final class WordVEC{
 	}
 
 	public static String markDefaultStress(final String word){
+		if("-".equals(word))
+			return word;
+
 		char delimiter = ' ';
 		final char[] chars = word.toCharArray();
 		for(int i = 0; delimiter == ' ' && i < chars.length; i ++){
