@@ -105,7 +105,7 @@ public class RulesLoader{
 				canHaveNoInflections.addAll(Arrays.asList(flags));
 
 			final Map<Character, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
-			List<String> rules = readPropertyAsList("notCombinableRules", '/');
+			List<Character> rules = readPropertyAsList("notCombinableRules", '/');
 			for(int i = 0; i < rules.size(); i ++){
 				final Character masterFlag = rules.get(i ++);
 				final Character[] wrongFlags = strategy.parseFlags(rules.get(i));
@@ -124,7 +124,7 @@ public class RulesLoader{
 			rules = readPropertyAsList("letterAndRulesNotCombinable", '/');
 			final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
 			for(int i = 0; i < rules.size(); i ++){
-				final String elem = rules.get(i);
+				final Character elem = rules.get(i);
 				if(elem.length() == 1)
 					letter = elem.charAt(0);
 				else{
@@ -149,7 +149,7 @@ public class RulesLoader{
 	}
 
 	private void fillDataFields(final MorphologicalTag tag, final String property){
-		final List<String> itr = readPropertyAsList(property, ',');
+		final List<Character> itr = readPropertyAsList(property, ',');
 		final Set<String> set = new HashSet<>(itr.size());
 		for(int i = 0; i < itr.size(); i ++)
 			set.add(tag.getCode() + itr.get(i));
@@ -165,8 +165,8 @@ public class RulesLoader{
 		return (StringUtils.isNotEmpty(line)? SetHelper.setOf(StringUtils.split(line, separator)): Collections.emptySet());
 	}
 
-	public final List<String> readPropertyAsList(final String key, final char separator){
-		final List<String> list = new ArrayList<>(rulesProperties.size());
+	public final List<Character> readPropertyAsList(final String key, final char separator){
+		final List<Character> list = new ArrayList<>(rulesProperties.size());
 		for(final Object o : rulesProperties.keySet()){
 			final String k = (String)o;
 			if(k.equals(key) || k.startsWith(key) && StringUtils.isNumeric(k.substring(key.length()))){
