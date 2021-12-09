@@ -154,8 +154,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final boolean canAdmitStress = canAdmitStress(inflection.getMorphologicalFieldStem());
 		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
 		final String[] subwords = StringUtils.split(derivedWord, WORD_SEPARATORS);
-		for(final String subword : subwords){
-			stressCheck(subword, inflection);
+		for(int i = 0; i < subwords.length; i ++){
+			final String subword = subwords[i];
+			stressCheck(subword, inflection, (i == subwords.length - 1));
 
 			final String markedDefaultStressWord = WordVEC.markDefaultStress(subword);
 			if(!subword.equals(markedDefaultStressWord) && !canAdmitStress && !canAdmitStress(inflection))
@@ -217,12 +218,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	@Override
 	protected final void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){
 		if(subwordIndex == 0)
-			stressCheck(subword, inflection);
+			stressCheck(subword, inflection, false);
 
 		ciuiCheck(subword, inflection);
 	}
 
-	private void stressCheck(final String subword, final Inflection inflection){
+	private void stressCheck(final String subword, final Inflection inflection, final boolean lastSubword){
 		if(!rulesLoader.containsValidStressedWords(subword)){
 			final int stresses = WordVEC.countStresses(subword);
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
@@ -233,9 +234,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				final String appliedRuleFlag = appliedRule.getFlag();
 				//retrieve last applied rule
 				if(stresses == 0 && (rulesLoader.containsHasToContainStress(appliedRuleFlag)
-						|| rulesLoader.containsHasToContainStressDerivationalSuffix(appliedRule.getMorphologicalFields(MorphologicalTag.DERIVATIONAL_SUFFIX))))
+						|| rulesLoader.containsHasToContainStressDerivationalSuffix(appliedRule.getMorphologicalFields(
+							MorphologicalTag.DERIVATIONAL_SUFFIX))))
 					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
-				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
+				if(lastSubword && rulesLoader.containsCannotContainStress(appliedRuleFlag) && stresses > 0
+						&& WordVEC.countStresses(appliedRule.getAppending()) == 0)
 					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
 			}
 		}
