@@ -232,6 +232,18 @@ public class DictionaryEntry{
 		return list;
 	}
 
+	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.size(): 0);
+		if(morphologicalFields != null){
+			final String tag = morphologicalTag.getCode();
+			final int purgeTag = tag.length();
+			for(final String mf : morphologicalFields)
+				if(mf.startsWith(tag))
+					collector.add(mf.substring(purgeTag));
+		}
+		return collector;
+	}
+
 	/**
 	 * @param affixData   Affix data
 	 * @param reverse   Whether the complex prefixes is used

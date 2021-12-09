@@ -140,7 +140,8 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public final void checkInflection(final Inflection inflection, final int index){
 		super.checkInflection(inflection, index);
 
-		stressCheck(inflection);
+		if(!rulesLoader.containsHasToContainStressDerivationalSuffix(inflection.getMorphologicalFields(MorphologicalTag.DERIVATIONAL_SUFFIX)))
+			stressCheck(inflection);
 
 		variantsCheck(inflection);
 
@@ -227,15 +228,16 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			if(!rulesLoader.isWordCanHaveMultipleStresses() && stresses > 1)
 				throw new LinterException(MULTIPLE_STRESSES, inflection.getWord());
 
-//			final AffixEntry appliedRule = getLastAppliedRule(inflection);
-//			if(appliedRule != null){
-//				final String appliedRuleFlag = appliedRule.getFlag();
-//				//retrieve last applied rule
-//				if(stresses == 0 && rulesLoader.containsHasToContainStress(appliedRuleFlag))
-//					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
-//				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
-//					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
-//			}
+			final AffixEntry appliedRule = getLastAppliedRule(inflection);
+			if(appliedRule != null){
+				final String appliedRuleFlag = appliedRule.getFlag();
+				//retrieve last applied rule
+				if(stresses == 0 && (rulesLoader.containsHasToContainStress(appliedRuleFlag)
+						|| rulesLoader.containsHasToContainStressDerivationalSuffix(appliedRule.getMorphologicalFields(MorphologicalTag.DERIVATIONAL_SUFFIX))))
+					throw new LinterException(MISSING_STRESS, inflection.getWord(), appliedRuleFlag);
+				if(stresses > 0 && WordVEC.countStresses(appliedRule.getAppending()) == 0 && rulesLoader.containsCannotContainStress(appliedRuleFlag))
+					throw new LinterException(ALREADY_PRESENT_STRESS, inflection.getWord(), appliedRuleFlag);
+			}
 		}
 	}
 

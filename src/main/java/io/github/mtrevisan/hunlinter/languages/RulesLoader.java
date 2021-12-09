@@ -63,6 +63,7 @@ public class RulesLoader{
 	private final Set<String> unsyllabableWords;
 	private final Set<String> validStressedWords;
 	private final Collection<String> hasToContainStress = new HashSet<>(0);
+	private Set<String> hasToContainStressDerivationalSuffix;
 	private final Collection<String> cannotContainStress = new HashSet<>(0);
 	private final Collection<String> canHaveNoInflections = new HashSet<>(0);
 	private Character[] letterAndRulesNotCombinableKeys;
@@ -101,6 +102,7 @@ public class RulesLoader{
 			String[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
 			if(flags != null)
 				hasToContainStress.addAll(Arrays.asList(flags));
+			hasToContainStressDerivationalSuffix = readPropertyAsSet("hasToContainStressDerivationalSuffix", ',');
 			flags = strategy.parseFlags(readProperty("cannotContainStress"));
 			if(flags != null)
 				cannotContainStress.addAll(Arrays.asList(flags));
@@ -237,6 +239,14 @@ public class RulesLoader{
 
 	public final boolean containsHasToContainStress(final String flag){
 		return hasToContainStress.contains(flag);
+	}
+
+	public final boolean containsHasToContainStressDerivationalSuffix(final List<String> derivationalSuffixes){
+		if(!hasToContainStressDerivationalSuffix.isEmpty())
+			for(int i = 0; i < derivationalSuffixes.size(); i ++)
+				if(hasToContainStressDerivationalSuffix.contains(derivationalSuffixes.get(i)))
+					return true;
+		return false;
 	}
 
 	public final boolean containsCannotContainStress(final String flag){

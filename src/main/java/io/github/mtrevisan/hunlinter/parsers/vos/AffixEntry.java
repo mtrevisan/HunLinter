@@ -264,7 +264,7 @@ public class AffixEntry{
 		return parent.getFlag();
 	}
 
-	private List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
+	public List<String> getMorphologicalFields(final MorphologicalTag morphologicalTag){
 		final List<String> collector = new ArrayList<>(morphologicalFields != null? morphologicalFields.size(): 0);
 		if(morphologicalFields != null){
 			final String tag = morphologicalTag.getCode();
