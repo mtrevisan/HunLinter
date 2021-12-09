@@ -786,7 +786,7 @@ public class RulesReducer{
 			}
 	}
 
-	public final List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
+	public final List<String> convertFormat(final Character flag, final boolean keepLongestCommonAffix, final List<LineEntry> compactedRules){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE, flag);
@@ -839,7 +839,7 @@ public class RulesReducer{
 		checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
 
-	public final void checkReductionCorrectness(final String flag, final List<String> reducedRules, final List<String> originalLines,
+	public final void checkReductionCorrectness(final Character flag, final List<String> reducedRules, final List<String> originalLines,
 			final ProgressCallback progressCallback){
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
@@ -882,7 +882,7 @@ public class RulesReducer{
 		}
 	}
 
-	public final LineEntry collectInflectionsByFlag(final List<Inflection> inflections, final String flag, final AffixType type){
+	public final LineEntry collectInflectionsByFlag(final List<Inflection> inflections, final Character flag, final AffixType type){
 		//collect all inflections that generates from the given flag
 		if(inflections.isEmpty())
 			return null;

@@ -60,7 +60,7 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	private DoubleASCIIParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(final String rawFlags){
+	public Character[] parseFlags(final String rawFlags){
 		if(StringUtils.isBlank(rawFlags))
 			return null;
 
@@ -70,37 +70,38 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		if(!canEncode(rawFlags))
 			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), rawFlags);
 
-		final String[] flags = extractFlags(rawFlags);
+		final Character[] flags = extractFlags(rawFlags);
 
 		checkForDuplicates(flags);
 
 		return flags;
 	}
 
-	private static String[] extractFlags(final CharSequence rawFlags){
+	private static Character[] extractFlags(final CharSequence rawFlags){
 		return RegexHelper.split(rawFlags, PATTERN);
 	}
 
 	@Override
-	public void validate(final String flag){
-		if(flag == null || flag.length() != 2)
+	public void validate(final Character flag){
+		if(flag == null || ((flag & 0xFF00) != 0? 2: 1) != 2)
 			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_TWO, flag);
-		if(!canEncode(flag))
+		if(!canEncode(Character.toString(flag)))
 			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), flag);
 	}
 
 	@Override
-	public String[] extractCompoundRule(final String compoundRule){
-		final String[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+	public Character[] extractCompoundRule(final String compoundRule){
+		final Character[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
 	}
 
-	private static void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
-		for(final String part : parts){
-			final int size = part.length();
+	private static void checkCompoundValidity(final Character[] parts, final CharSequence compoundRule){
+		for(int i = 0; i < parts.length; i ++){
+			final Character part = parts[i];
+			final int size = ((part & 0xFF00) != 0? 2: 1);
 			final boolean isFlag = (size != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(size != 2 && isFlag || !canEncode(compoundRule))

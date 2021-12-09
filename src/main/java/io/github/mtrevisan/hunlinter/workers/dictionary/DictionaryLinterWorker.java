@@ -73,7 +73,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 		//collectors of flags
-		final Set<String> flags = ConcurrentHashMap.newKeySet();
+		final Set<Character> flags = ConcurrentHashMap.newKeySet();
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());

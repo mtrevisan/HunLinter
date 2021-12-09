@@ -40,7 +40,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void ok(){
-		String[] flags = strategy.parseFlags("1,2");
+		Character[] flags = strategy.parseFlags("1,2");
 
 		Assertions.assertEquals(Arrays.asList("1", "2"), Arrays.asList(flags));
 	}
@@ -59,21 +59,21 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void empty(){
-		String[] flags = strategy.parseFlags("");
+		Character[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void nullFlags(){
-		String[] flags = strategy.parseFlags(null);
+		Character[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void joinFlags(){
-		String[] flags = new String[]{"1", "2"};
+		Character[] flags = new String[]{"1", "2"};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertEquals("1,2", continuationFlags);
@@ -82,7 +82,7 @@ class NumericalParsingStrategyTest{
 	@Test
 	void joinFlagsWithError1(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"1", "c"};
+			Character[] flags = new String[]{"1", "c"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be an integer number: `c`", exception.getMessage());
@@ -91,7 +91,7 @@ class NumericalParsingStrategyTest{
 	@Test
 	void joinFlagsWithError2(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"1", "1.2"};
+			Character[] flags = new String[]{"1", "1.2"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be an integer number: `1.2`", exception.getMessage());
@@ -100,7 +100,7 @@ class NumericalParsingStrategyTest{
 	@Test
 	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"1", ""};
+			Character[] flags = new String[]{"1", ""};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be an integer number: ``", exception.getMessage());
@@ -109,7 +109,7 @@ class NumericalParsingStrategyTest{
 	@Test
 	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ab", null};
+			Character[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be an integer number: `ab`", exception.getMessage());
@@ -117,7 +117,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinEmptyFlags(){
-		String[] flags = new String[]{};
+		Character[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
@@ -125,7 +125,7 @@ class NumericalParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags((Character[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

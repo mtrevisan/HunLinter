@@ -61,11 +61,11 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 	private NumericalParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(final String rawFlags){
+	public Character[] parseFlags(final String rawFlags){
 		if(StringUtils.isBlank(rawFlags))
 			return null;
 
-		final String[] flags = extractFlags(rawFlags);
+		final Character[] flags = extractFlags(rawFlags);
 
 		checkForDuplicates(flags);
 
@@ -76,15 +76,14 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		return flags;
 	}
 
-	private static String[] extractFlags(final String rawFlags){
+	private static Character[] extractFlags(final String rawFlags){
 		return StringUtils.split(rawFlags, COMMA);
 	}
 
 	@Override
-	public void validate(final String flag){
+	public void validate(final Character flag){
 		try{
-			final int numericalFlag = Integer.parseInt(flag);
-			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
+			if(flag <= 0 || flag > MAX_NUMERICAL_FLAG)
 				throw new LinterException(FLAG_MUST_BE_IN_RANGE, MAX_NUMERICAL_FLAG, flag);
 		}
 		catch(final NumberFormatException nfe){
@@ -93,24 +92,25 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 	}
 
 	@Override
-	public String joinFlags(final String[] flags, final int size){
+	public String joinFlags(final Character[] flags, final int size){
 		return joinFlags(flags, size, COMMA);
 	}
 
 	@Override
-	public String[] extractCompoundRule(final String compoundRule){
-		final String[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
+	public Character[] extractCompoundRule(final String compoundRule){
+		final Character[] parts = RegexHelper.extract(compoundRule, COMPOUND_RULE_SPLITTER);
 
 		checkCompoundValidity(parts, compoundRule);
 
 		return parts;
 	}
 
-	private static void checkCompoundValidity(final String[] parts, final String compoundRule){
-		for(final String part : parts){
-			final boolean isNumber = (part.length() != 1
+	private static void checkCompoundValidity(final Character[] parts, final String compoundRule){
+		for(int i = 0; i < parts.length; i ++){
+			final Character part = parts[i];
+			final boolean isNumber = (((part & 0xFF00) != 0? 2: 1) != 1
 				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
-			if(isNumber && !NumberUtils.isCreatable(part))
+			if(isNumber && !NumberUtils.isCreatable(Character.toString(part)))
 				throw new LinterException(BAD_FORMAT_COMPOUND_RULE, compoundRule);
 		}
 	}

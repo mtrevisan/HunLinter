@@ -40,7 +40,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void ok(){
-		String[] flags = strategy.parseFlags("abcd");
+		Character[] flags = strategy.parseFlags("abcd");
 
 		Assertions.assertEquals(Arrays.asList("ab", "cd"), Arrays.asList(flags));
 	}
@@ -53,21 +53,21 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void empty(){
-		String[] flags = strategy.parseFlags("");
+		Character[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void nullFlags(){
-		String[] flags = strategy.parseFlags(null);
+		Character[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void joinFlags(){
-		String[] flags = new String[]{"ab", "cd"};
+		Character[] flags = new String[]{"ab", "cd"};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertEquals("abcd", continuationFlags);
@@ -76,7 +76,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void joinFlagsWithError(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ab", "c"};
+			Character[] flags = new String[]{"ab", "c"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be of length two: `c`", exception.getMessage());
@@ -85,7 +85,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ab", ""};
+			Character[] flags = new String[]{"ab", ""};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be of length two: ``", exception.getMessage());
@@ -94,7 +94,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ab", null};
+			Character[] flags = new String[]{"ab", null};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag must be of length two: `null`", exception.getMessage());
@@ -102,7 +102,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinEmptyFlags(){
-		String[] flags = new String[]{};
+		Character[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
@@ -110,7 +110,7 @@ class DoubleCharParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags((Character[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

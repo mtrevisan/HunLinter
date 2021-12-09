@@ -52,7 +52,7 @@ public class DictionaryEntry{
 
 
 	protected String word;
-	protected List<String> continuationFlags;
+	protected List<Character> continuationFlags;
 	protected final List<String> morphologicalFields;
 	private final boolean combinable;
 
@@ -66,7 +66,7 @@ public class DictionaryEntry{
 		combinable = dicEntry.combinable;
 	}
 
-	DictionaryEntry(final String word, final List<String> continuationFlags, final List<String> morphologicalFields,
+	DictionaryEntry(final String word, final List<Character> continuationFlags, final List<String> morphologicalFields,
 			final boolean combinable){
 		Objects.requireNonNull(word, "Word cannot be null");
 
@@ -96,7 +96,7 @@ public class DictionaryEntry{
 		return combinable;
 	}
 
-	public final boolean removeContinuationFlag(final String continuationFlagToRemove){
+	public final boolean removeContinuationFlag(final Character continuationFlagToRemove){
 		boolean removed = false;
 		if(continuationFlagToRemove != null && continuationFlags != null){
 			final int previousSize = continuationFlags.size();
@@ -110,7 +110,7 @@ public class DictionaryEntry{
 		return removed;
 	}
 
-	public final List<String> getContinuationFlags(){
+	public final List<Character> getContinuationFlags(){
 		return continuationFlags;
 	}
 
@@ -118,14 +118,14 @@ public class DictionaryEntry{
 		return (continuationFlags != null? continuationFlags.size(): 0);
 	}
 
-	public final boolean hasContinuationFlag(final String flag){
+	public final boolean hasContinuationFlag(final Character flag){
 		return (continuationFlags != null && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public final boolean hasContinuationFlags(final String[] flags){
+	public final boolean hasContinuationFlags(final Character[] flags){
 		if(continuationFlags != null && flags != null){
-			final Collection<String> list = new HashSet<>(continuationFlags);
-			for(final String flag : flags)
+			final Collection<Character> list = new HashSet<>(continuationFlags);
+			for(final Character flag : flags)
 				if(!list.add(flag))
 					return true;
 			return false;
@@ -159,11 +159,11 @@ public class DictionaryEntry{
 		return null;
 	}
 
-	public final Map<String, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
+	public final Map<Character, List<DictionaryEntry>> distributeByCompoundRule(final AffixData affixData){
 		final int size = (continuationFlags != null? continuationFlags.size(): 0);
-		final Map<String, List<DictionaryEntry>> result = new HashMap<>(size);
+		final Map<Character, List<DictionaryEntry>> result = new HashMap<>(size);
 		for(int i = 0; i < size; i ++){
-			final String cf = continuationFlags.get(i);
+			final Character cf = continuationFlags.get(i);
 			if(affixData.isManagedByCompoundRule(cf))
 				result.computeIfAbsent(cf, k -> new ArrayList<>(1))
 					.add(this);
@@ -232,7 +232,7 @@ public class DictionaryEntry{
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */
-	public final List<List<String>> extractAllAffixes(final AffixData affixData, final boolean reverse){
+	public final List<List<Character>> extractAllAffixes(final AffixData affixData, final boolean reverse){
 		final Affixes affixes = separateAffixes(affixData);
 		return affixes.extractAllAffixes(reverse);
 	}
@@ -245,12 +245,12 @@ public class DictionaryEntry{
 	 */
 	private Affixes separateAffixes(final AffixData affixData){
 		final int maxSize = (continuationFlags != null? continuationFlags.size(): 0);
-		final List<String> terminals = new ArrayList<>(maxSize);
-		final List<String> prefixes = new ArrayList<>(maxSize);
-		final List<String> suffixes = new ArrayList<>(maxSize);
+		final List<Character> terminals = new ArrayList<>(maxSize);
+		final List<Character> prefixes = new ArrayList<>(maxSize);
+		final List<Character> suffixes = new ArrayList<>(maxSize);
 		if(continuationFlags != null){
 			for(int i = 0; i < continuationFlags.size(); i ++){
-				final String affix = continuationFlags.get(i);
+				final Character affix = continuationFlags.get(i);
 				if(affixData.isTerminalAffix(affix)){
 					terminals.add(affix);
 					continue;

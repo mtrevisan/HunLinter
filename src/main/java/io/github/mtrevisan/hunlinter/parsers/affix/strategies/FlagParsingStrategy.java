@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
 
 /** Abstraction of the process of parsing flags taken from the affix and dic files. */
@@ -43,7 +44,7 @@ public abstract class FlagParsingStrategy{
 	private static final String DUPLICATED_FLAG = "Flags must not be duplicated: {}";
 
 
-	public abstract void validate(final String flag);
+	public abstract void validate(final Character flag);
 
 	/**
 	 * Parses the given String into multiple flags
@@ -51,19 +52,23 @@ public abstract class FlagParsingStrategy{
 	 * @param rawFlags	String to parse into flags
 	 * @return Parsed flags
 	 */
-	public abstract String[] parseFlags(final String rawFlags);
+	public abstract Character[] parseFlags(final String rawFlags);
 
-	protected static void checkForDuplicates(final String[] flags){
-		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+	protected static void checkForDuplicates(final Character[] flags){
+		final Set<Character> notDuplicatedFlags = SetHelper.setOf(flags);
 		if(notDuplicatedFlags.size() < flags.length){
-			final Set<String> duplicates = SetHelper.getDuplicates(flags);
-			if(!duplicates.isEmpty())
-				throw new LinterException(DUPLICATED_FLAG, String.join(", ", duplicates));
+			final Set<Character> duplicates = SetHelper.getDuplicates(flags);
+			if(!duplicates.isEmpty()){
+				final StringJoiner sj = new StringJoiner(", ");
+				for(final Character chr : duplicates)
+					sj.add(Character.toString(chr));
+				throw new LinterException(DUPLICATED_FLAG, sj.toString());
+			}
 		}
 	}
 
 
-	public final String joinFlags(final List<String> flags){
+	public final String joinFlags(final List<Character> flags){
 		if(flags == null || flags.isEmpty())
 			return StringUtils.EMPTY;
 
@@ -71,7 +76,7 @@ public abstract class FlagParsingStrategy{
 		for(int i = 0; i < size; i ++)
 			validate(flags.get(i));
 
-		final StringBuilder sb = new StringBuilder(flags.get(0).length() * size);
+		final StringBuilder sb = new StringBuilder(((flags.get(0) & 0xFF00) != 0? 2: 1) * size);
 		for(int i = 0; i < size; i ++)
 			sb.append(flags.get(i));
 		return sb.toString();
@@ -83,16 +88,16 @@ public abstract class FlagParsingStrategy{
 	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	public final String joinFlags(final String[] flags){
+	public final String joinFlags(final Character[] flags){
 		return joinFlags(flags, (flags != null? flags.length: 0));
 	}
 
 	@SuppressWarnings("DesignForExtension")
-	public String joinFlags(final String[] flags, final int size){
+	public String joinFlags(final Character[] flags, final int size){
 		return joinFlags(flags, size, StringUtils.EMPTY);
 	}
 
-	protected final String joinFlags(final String[] flags, final int size, final String flagSeparator){
+	protected final String joinFlags(final Character[] flags, final int size, final String flagSeparator){
 		if(flags == null || size == 0)
 			return StringUtils.EMPTY;
 
@@ -108,6 +113,6 @@ public abstract class FlagParsingStrategy{
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags
 	 */
-	public abstract String[] extractCompoundRule(final String compoundRule);
+	public abstract Character[] extractCompoundRule(final String compoundRule);
 
 }

@@ -68,7 +68,7 @@ public class DictionaryCorrectnessChecker{
 	}
 
 	public final void checkCircumfix(final DictionaryEntry dicEntry){
-		final String circumfixFlag = affixData.getCircumfixFlag();
+		final Character circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null && dicEntry.hasContinuationFlag(circumfixFlag))
 			throw new LinterException(INVALID_CIRCUMFIX_FLAG, dicEntry.getWord(), circumfixFlag);
 	}
@@ -76,7 +76,7 @@ public class DictionaryCorrectnessChecker{
 	/** Used by the correctness check worker after calling {@link #loadRules()}. */
 	@SuppressWarnings("DesignForExtension")
 	public void checkInflection(final Inflection inflection, final int index){
-		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
+		final Character forbidCompoundFlag = affixData.getForbidCompoundFlag();
 		if(forbidCompoundFlag != null && !inflection.hasInflectionRules() && inflection.hasContinuationFlag(forbidCompoundFlag))
 			throw new LinterException(NON_AFFIX_ENTRY_CONTAINS_FORBID_COMPOUND_FLAG, AffixOption.FORBID_COMPOUND_FLAG.getCode());
 
@@ -120,12 +120,12 @@ public class DictionaryCorrectnessChecker{
 	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
 	@SuppressWarnings("DesignForExtension")
-	public boolean canHaveNoInflections(final String flag){
+	public boolean canHaveNoInflections(final Character flag){
 		return rulesLoader.containsCanHaveNoInflections(flag);
 	}
 
 	@SuppressWarnings("DesignForExtension")
-	public boolean shouldNotCheckProductiveness(final String flag){
+	public boolean shouldNotCheckProductiveness(final Character flag){
 		return false;
 	}
 

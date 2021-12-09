@@ -54,7 +54,7 @@ public class Inflection extends DictionaryEntry{
 	private final List<DictionaryEntry> compoundEntries;
 
 
-	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
+	public static Inflection createFromCompound(final String word, final List<Character> continuationFlags,
 			final List<DictionaryEntry> compoundEntries){
 		final List<String> morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
@@ -66,8 +66,8 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
-			final DictionaryEntry dicEntry, final Collection<String> remainingContinuationFlags, final boolean combinable){
-		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+			final DictionaryEntry dicEntry, final Collection<Character> remainingContinuationFlags, final boolean combinable){
+		final List<Character> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
 		final List<String> morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
 		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
@@ -84,7 +84,7 @@ public class Inflection extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Inflection(final String word, final List<String> continuationFlags, final List<String> morphologicalFields,
+	private Inflection(final String word, final List<Character> continuationFlags, final List<String> morphologicalFields,
 			final boolean combinable, final AffixEntry[] appliedRules, final List<DictionaryEntry> compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
@@ -143,7 +143,7 @@ public class Inflection extends DictionaryEntry{
 		return (appliedRules != null? appliedRules[appliedRules.length - 1]: null);
 	}
 
-	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
+	public final void capitalizeIfContainsFlag(final Character forceCompoundUppercaseFlag){
 		if(compoundEntries != null && !compoundEntries.isEmpty()
 				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
@@ -172,7 +172,7 @@ public class Inflection extends DictionaryEntry{
 //	}
 
 	@SuppressWarnings("ConstantConditions")
-	public final boolean isTwofolded(final String circumfixFlag){
+	public final boolean isTwofolded(final Character circumfixFlag){
 		if(appliedRules != null){
 			//find last applied rule with circumfix flag
 			int startIndex = appliedRules.length - 1;

@@ -33,11 +33,11 @@ import java.util.Arrays;
 public class RuleMatcherEntry{
 
 	private final String messagePattern;
-	private final String masterFlag;
-	private final String[] wrongFlags;
+	private final Character masterFlag;
+	private final Character[] wrongFlags;
 
 
-	public RuleMatcherEntry(final String messagePattern, final String masterFlag, final String[] wrongFlags){
+	public RuleMatcherEntry(final String messagePattern, final Character masterFlag, final Character[] wrongFlags){
 		this.messagePattern = messagePattern;
 		this.masterFlag = masterFlag;
 		this.wrongFlags = wrongFlags;

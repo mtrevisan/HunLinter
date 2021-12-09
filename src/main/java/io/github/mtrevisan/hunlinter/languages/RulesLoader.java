@@ -65,8 +65,8 @@ public class RulesLoader{
 	private final Collection<String> canHaveNoInflections = new HashSet<>(0);
 	private Character[] letterAndRulesNotCombinableKeys;
 	private Map<Character, LetterMatcherEntry[]> letterAndRulesNotCombinable;
-	private String[] ruleAndRulesNotCombinableKeys;
-	private Map<String, RuleMatcherEntry[]> ruleAndRulesNotCombinable;
+	private Character[] ruleAndRulesNotCombinableKeys;
+	private Map<Character, RuleMatcherEntry[]> ruleAndRulesNotCombinable;
 
 
 	public RulesLoader(final String language, final FlagParsingStrategy strategy){
@@ -94,7 +94,7 @@ public class RulesLoader{
 		multipleStressedWords = readPropertyAsSet("multipleStressedWords", ',');
 
 		if(strategy != null){
-			String[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
+			Character[] flags = strategy.parseFlags(readProperty("hasToContainStress"));
 			if(flags != null)
 				hasToContainStress.addAll(Arrays.asList(flags));
 			flags = strategy.parseFlags(readProperty("cannotContainStress"));
@@ -104,18 +104,18 @@ public class RulesLoader{
 			if(flags != null)
 				canHaveNoInflections.addAll(Arrays.asList(flags));
 
-			final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
+			final Map<Character, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 			List<String> rules = readPropertyAsList("notCombinableRules", '/');
 			for(int i = 0; i < rules.size(); i ++){
-				final String masterFlag = rules.get(i ++);
-				final String[] wrongFlags = strategy.parseFlags(rules.get(i));
+				final Character masterFlag = rules.get(i ++);
+				final Character[] wrongFlags = strategy.parseFlags(rules.get(i));
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new ArrayList<>(1))
 					.add(new RuleMatcherEntry(WORD_WITH_RULE_CANNOT_HAVE, masterFlag, wrongFlags));
 			}
-			ruleAndRulesNotCombinableKeys = new String[ruleAndRulesNotCombinable.size()];
+			ruleAndRulesNotCombinableKeys = new Character[ruleAndRulesNotCombinable.size()];
 			this.ruleAndRulesNotCombinable = new HashMap<>(ruleAndRulesNotCombinable.size());
 			int offset = 0;
-			for(final Map.Entry<String, List<RuleMatcherEntry>> entry : ruleAndRulesNotCombinable.entrySet()){
+			for(final Map.Entry<Character, List<RuleMatcherEntry>> entry : ruleAndRulesNotCombinable.entrySet()){
 				ruleAndRulesNotCombinableKeys[offset ++] = entry.getKey();
 				this.ruleAndRulesNotCombinable.put(entry.getKey(), entry.getValue().toArray(new RuleMatcherEntry[0]));
 			}
@@ -129,8 +129,8 @@ public class RulesLoader{
 					letter = elem.charAt(0);
 				else{
 					flags = strategy.parseFlags(elem);
-					final String correctRule = flags[flags.length - 1];
-					final String[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
+					final Character correctRule = flags[flags.length - 1];
+					final Character[] wrongFlags = ArrayUtils.remove(flags, flags.length - 1);
 					letterAndRulesNotCombinable.computeIfAbsent(letter, k -> new ArrayList<>(1))
 						.add(new LetterMatcherEntry((StringUtils.isNotBlank(correctRule)
 								? WORD_WITH_LETTER_CANNOT_HAVE_USE
@@ -214,7 +214,7 @@ public class RulesLoader{
 		return cannotContainStress.contains(flag);
 	}
 
-	public final boolean containsCanHaveNoInflections(final String flag){
+	public final boolean containsCanHaveNoInflections(final Character flag){
 		return canHaveNoInflections.contains(flag);
 	}
 

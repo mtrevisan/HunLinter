@@ -64,7 +64,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 	private final RulesReducer rulesReducer;
 
 
-	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
+	public RulesReducerWorker(final Character flag, final boolean keepLongestCommonAffix, final AffixData affixData,
 			final DictionaryParser dicParser, final WordGenerator wordGenerator, final Runnable onComplete){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 

@@ -47,7 +47,7 @@ import java.util.Queue;
  */
 public class HunSpellRegexWordGenerator{
 
-	private record GeneratedElement(List<String> word, int stateIndex){
+	private record GeneratedElement(List<Character> word, int stateIndex){
 
 		@Override
 		public boolean equals(final Object obj){
@@ -69,7 +69,7 @@ public class HunSpellRegexWordGenerator{
 	}
 
 
-	private final Digraph<String> graph = new Digraph<>();
+	private final Digraph<Character> graph = new Digraph<>();
 	private final int finalStateIndex;
 
 
@@ -80,7 +80,7 @@ public class HunSpellRegexWordGenerator{
 	 *
 	 * @param regexpParts	The regular expression already subdivided into input and modifiers (e.g. ["ag", "ert", "?", "b", "*"])
 	 */
-	public HunSpellRegexWordGenerator(final String[] regexpParts){
+	public HunSpellRegexWordGenerator(final Character[] regexpParts){
 		int offset = 0;
 		final int size = regexpParts.length;
 		for(int i = 0; i + offset < size; i ++){
@@ -120,24 +120,24 @@ public class HunSpellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public final List<List<String>> generateAll(final int minimumSubwords, final int limit){
-		final List<List<String>> matchedWords = new ArrayList<>(limit);
+	public final List<List<Character>> generateAll(final int minimumSubwords, final int limit){
+		final List<List<Character>> matchedWords = new ArrayList<>(limit);
 
 		final Queue<GeneratedElement> queue = new LinkedList<>();
 		queue.add(new GeneratedElement(new ArrayList<>(0), 0));
 		while(!queue.isEmpty()){
 			final GeneratedElement elem = queue.remove();
-			final List<String> subword = elem.word;
+			final List<Character> subword = elem.word;
 			final int stateIndex = elem.stateIndex;
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				final Iterable<IndexDataPair<String>> transitions = graph.adjacentVertices(stateIndex);
-				for(final IndexDataPair<String> transition : transitions){
+				final Iterable<IndexDataPair<Character>> transitions = graph.adjacentVertices(stateIndex);
+				for(final IndexDataPair<Character> transition : transitions){
 					final int key = transition.getIndex();
-					final String value = transition.getData();
+					final Character value = transition.getData();
 
-					List<String> nextWord = subword;
+					List<Character> nextWord = subword;
 					if(StringUtils.isNotBlank(value)){
 						nextWord = new ArrayList<>(subword);
 						nextWord.add(value);

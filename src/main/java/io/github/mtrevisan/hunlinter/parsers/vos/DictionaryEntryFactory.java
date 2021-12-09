@@ -87,7 +87,7 @@ public class DictionaryEntryFactory{
 			throw new LinterException(WRONG_FORMAT, line);
 
 		final String word = extractWord(m.group(PARAM_WORD));
-		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));
+		final List<Character> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));
 		final List<String> morphologicalFields = extractMorphologicalFields(m.group(PARAM_MORPHOLOGICAL_FIELDS), addStemTag, word);
 
 		final String convertedWord = affixData.applyInputConversionTable(word);
@@ -99,9 +99,9 @@ public class DictionaryEntryFactory{
 		return StringUtils.replace(word, SLASH_ESCAPED, SLASH);
 	}
 
-	private List<String> extractContinuationFlags(final String flagsGroup){
+	private List<Character> extractContinuationFlags(final String flagsGroup){
 		final String rawFlags = expandAliases(flagsGroup, aliasesFlag);
-		final String[] result = strategy.parseFlags(rawFlags);
+		final Character[] result = strategy.parseFlags(rawFlags);
 		return (result != null? Arrays.asList(result): null);
 	}
 

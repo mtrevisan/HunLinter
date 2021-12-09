@@ -81,7 +81,7 @@ public class AffixEntry{
 	private final String removing;
 	/** string to append. */
 	private final String appending;
-	final List<String> continuationFlags;
+	final List<Character> continuationFlags;
 	/** condition that must be met before the affix can be applied. */
 	private final String condition;
 	final List<String> morphologicalFields;
@@ -114,7 +114,7 @@ public class AffixEntry{
 			? new ArrayList<>(Arrays.asList(StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField))))
 			: null);
 
-		final String[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
+		final Character[] classes = strategy.parseFlags((continuationClasses != null? expandAliases(continuationClasses, aliasesFlag): null));
 		continuationFlags = (classes != null && classes.length > 0? new ArrayList<>(Arrays.asList(classes)): null);
 		removing = (!ZERO.equals(removal)? removal: StringUtils.EMPTY);
 		appending = (!ZERO.equals(addition)? addition: StringUtils.EMPTY);
@@ -168,12 +168,12 @@ public class AffixEntry{
 		return (continuationFlags != null && !continuationFlags.isEmpty());
 	}
 
-	public final boolean hasContinuationFlag(final String flag){
+	public final boolean hasContinuationFlag(final Character flag){
 		return (hasContinuationFlags() && flag != null && Collections.binarySearch(continuationFlags, flag) >= 0);
 	}
 
-	public final List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){
-		final Set<String> flags = new HashSet<>();
+	public final List<Character> combineContinuationFlags(final Collection<Character> otherContinuationFlags){
+		final Set<Character> flags = new HashSet<>();
 		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)

@@ -82,7 +82,7 @@ class WordGeneratorBase{
 	 */
 	protected final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final boolean isCompound,
 			final RuleEntry overriddenRule){
-		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		final Character forbiddenWordFlag = affixData.getForbiddenWordFlag();
 		if(dicEntry.hasContinuationFlag(forbiddenWordFlag))
 			return Collections.emptyList();
 
@@ -149,7 +149,7 @@ class WordGeneratorBase{
 
 	protected final List<Inflection> getOnefoldInflections(final DictionaryEntry dicEntry, final boolean isCompound, final boolean reverse,
 			final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final List<List<String>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
+		final List<List<Character>> allAffixes = dicEntry.extractAllAffixes(affixData, reverse);
 		return applyAffixRules(dicEntry, allAffixes, isCompound, overriddenRule);
 	}
 
@@ -176,8 +176,8 @@ class WordGeneratorBase{
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
 		for(int i = 0; i < twofoldInflections.size(); i ++){
 			final Inflection prod = twofoldInflections.get(i);
-			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
-			final List<String> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
+			final List<List<Character>> affixes = prod.extractAllAffixes(affixData, false);
+			final List<Character> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
 			if(!aff.isEmpty()){
 				final String overabundantAffixes = affixData.getFlagParsingStrategy().joinFlags(aff);
 				throw new LinterException(TWOFOLD_RULE_VIOLATED, prod, prod.getRulesSequence(), prod.getRulesSequence(), overabundantAffixes);
@@ -210,7 +210,7 @@ class WordGeneratorBase{
 	 * </pre></code>
 	 */
 	private void enforceCircumfix(final Iterable<Inflection> inflections){
-		final String circumfixFlag = affixData.getCircumfixFlag();
+		final Character circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();
 			while(itr.hasNext()){
@@ -223,7 +223,7 @@ class WordGeneratorBase{
 
 	/** Remove rules that invalidate the affix rule. */
 	private void enforceNeedAffixFlag(final Iterable<Inflection> inflections){
-		final String needAffixFlag = affixData.getNeedAffixFlag();
+		final Character needAffixFlag = affixData.getNeedAffixFlag();
 		if(needAffixFlag != null){
 			final Iterator<Inflection> itr = inflections.iterator();
 			while(itr.hasNext()){
@@ -234,7 +234,7 @@ class WordGeneratorBase{
 		}
 	}
 
-	private static boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
+	private static boolean hasNeedAffixFlag(final Inflection inflection, final Character needAffixFlag){
 		boolean hasNeedAffixFlag = false;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
 		if(appliedRules != null){
@@ -264,27 +264,27 @@ class WordGeneratorBase{
 		return (hasNeedAffixFlag || inflection.hasContinuationFlag(needAffixFlag));
 	}
 
-	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final List<List<String>> allAffixes,
+	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final List<List<Character>> allAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
-		final String circumfixFlag = affixData.getCircumfixFlag();
-		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		final Character circumfixFlag = affixData.getCircumfixFlag();
+		final Character forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final List<String> appliedAffixes = allAffixes.get(Affixes.INDEX_PREFIXES);
-		final List<String> postponedAffixes = allAffixes.get(Affixes.INDEX_SUFFIXES);
+		final List<Character> appliedAffixes = allAffixes.get(Affixes.INDEX_PREFIXES);
+		final List<Character> postponedAffixes = allAffixes.get(Affixes.INDEX_SUFFIXES);
 		if(circumfixFlag != null && allAffixes.get(Affixes.INDEX_TERMINALS).contains(circumfixFlag))
 			postponedAffixes.add(circumfixFlag);
 
 		final List<Inflection> inflections = new ArrayList<>(0);
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
 			for(int i = 0; i < appliedAffixes.size(); i ++){
-				final String affix = appliedAffixes.get(i);
+				final Character affix = appliedAffixes.get(i);
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);
 				//override with the given rule
 				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
 					rule = overriddenRule;
 
-				List<String> currentPostponedAffixes = postponedAffixes;
+				List<Character> currentPostponedAffixes = postponedAffixes;
 				if(dicEntry.getLastAppliedRule() != null
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX){
 					currentPostponedAffixes = new ArrayList<>(postponedAffixes);
@@ -299,7 +299,7 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	private List<Inflection> applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,
+	private List<Inflection> applyAffixRule(final DictionaryEntry dicEntry, final Character affix, final List<Character> postponedAffixes,
 			final boolean isCompound, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
 
@@ -315,10 +315,10 @@ class WordGeneratorBase{
 			throw new LinterException(NON_EXISTENT_RULE, affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 		}
 
-		final String forbidCompoundFlag = affixData.getForbidCompoundFlag();
-		final String permitCompoundFlag = affixData.getPermitCompoundFlag();
-		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
-		final String circumfixFlag = affixData.getCircumfixFlag();
+		final Character forbidCompoundFlag = affixData.getForbidCompoundFlag();
+		final Character permitCompoundFlag = affixData.getPermitCompoundFlag();
+		final Character forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		final Character circumfixFlag = affixData.getCircumfixFlag();
 
 		final String word = dicEntry.getWord();
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
@@ -348,7 +348,7 @@ class WordGeneratorBase{
 		return inflections;
 	}
 
-	private static boolean matches(final AffixEntry[] appliedRules, final AffixEntry entry, final String circumfixFlag){
+	private static boolean matches(final AffixEntry[] appliedRules, final AffixEntry entry, final Character circumfixFlag){
 		final AffixType entryType = entry.getType();
 		final int size = (appliedRules != null? appliedRules.length: 0);
 		for(int i = 0; i < size; i ++){
@@ -359,12 +359,12 @@ class WordGeneratorBase{
 		return false;
 	}
 
-	private static boolean hasToBeExpanded(final DictionaryEntry dicEntry, final Collection<String> appliedAffixes,
-			final String forbiddenWordFlag){
+	private static boolean hasToBeExpanded(final DictionaryEntry dicEntry, final Collection<Character> appliedAffixes,
+			final Character forbiddenWordFlag){
 		return (!appliedAffixes.isEmpty() && !dicEntry.hasContinuationFlag(forbiddenWordFlag));
 	}
 
-	private static boolean shouldApplyEntry(final AffixEntry entry, final String forbidCompoundFlag, final String permitCompoundFlag,
+	private static boolean shouldApplyEntry(final AffixEntry entry, final Character forbidCompoundFlag, final Character permitCompoundFlag,
 			final boolean isCompound){
 		boolean shouldApply = true;
 		if(isCompound){

@@ -40,28 +40,28 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void ok(){
-		String[] flags = strategy.parseFlags("èa");
+		Character[] flags = strategy.parseFlags("èa");
 
 		Assertions.assertEquals(Arrays.asList("è", "a"), Arrays.asList(flags));
 	}
 
 	@Test
 	void empty(){
-		String[] flags = strategy.parseFlags("");
+		Character[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void nullFlags(){
-		String[] flags = strategy.parseFlags(null);
+		Character[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void joinFlags(){
-		String[] flags = new String[]{"è", "a"};
+		Character[] flags = new String[]{"è", "a"};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertEquals("èa", continuationFlags);
@@ -70,7 +70,7 @@ class UTF8ParsingStrategyTest{
 	@Test
 	void joinFlagsWithError(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"è", "aŧ"};
+			Character[] flags = new String[]{"è", "aŧ"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `aŧ`", exception.getMessage());
@@ -79,7 +79,7 @@ class UTF8ParsingStrategyTest{
 	@Test
 	void joinFlagsWithNoUTF8(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"\uFFFD"};
+			Character[] flags = new String[]{"\uFFFD"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Each flag should be in UTF-8 encoding: `�`", exception.getMessage());
@@ -88,7 +88,7 @@ class UTF8ParsingStrategyTest{
 	@Test
 	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"è", ""};
+			Character[] flags = new String[]{"è", ""};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: ``", exception.getMessage());
@@ -97,7 +97,7 @@ class UTF8ParsingStrategyTest{
 	@Test
 	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"a", null};
+			Character[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in UTF-8 encoding: `null`", exception.getMessage());
@@ -105,7 +105,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinEmptyFlags(){
-		String[] flags = new String[]{};
+		Character[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
@@ -113,7 +113,7 @@ class UTF8ParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags((Character[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

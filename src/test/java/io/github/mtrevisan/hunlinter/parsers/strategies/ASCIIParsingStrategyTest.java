@@ -40,28 +40,28 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void ok(){
-		String[] flags = strategy.parseFlags("ab");
+		Character[] flags = strategy.parseFlags("ab");
 
 		Assertions.assertEquals(Arrays.asList("a", "b"), Arrays.asList(flags));
 	}
 
 	@Test
 	void empty(){
-		String[] flags = strategy.parseFlags("");
+		Character[] flags = strategy.parseFlags("");
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void nullFlags(){
-		String[] flags = strategy.parseFlags(null);
+		Character[] flags = strategy.parseFlags(null);
 
 		Assertions.assertNull(flags);
 	}
 
 	@Test
 	void joinFlags(){
-		String[] flags = new String[]{"a", "b"};
+		Character[] flags = new String[]{"a", "b"};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertEquals("ab", continuationFlags);
@@ -70,7 +70,7 @@ class ASCIIParsingStrategyTest{
 	@Test
 	void joinFlagsWithError(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"a", "ab"};
+			Character[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: `ab`", exception.getMessage());
@@ -79,7 +79,7 @@ class ASCIIParsingStrategyTest{
 	@Test
 	void joinFlagsWithNoASCII(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"ŧ"};
+			Character[] flags = new String[]{"ŧ"};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Each flag should be in US-ASCII encoding: `ŧ`", exception.getMessage());
@@ -88,7 +88,7 @@ class ASCIIParsingStrategyTest{
 	@Test
 	void joinFlagsWithEmpty(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"a", ""};
+			Character[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: ``", exception.getMessage());
@@ -97,7 +97,7 @@ class ASCIIParsingStrategyTest{
 	@Test
 	void joinFlagsWithNull(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> {
-			String[] flags = new String[]{"a", null};
+			Character[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
 		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: `null`", exception.getMessage());
@@ -105,7 +105,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinEmptyFlags(){
-		String[] flags = new String[]{};
+		Character[] flags = new String[]{};
 		String continuationFlags = strategy.joinFlags(flags);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
@@ -113,7 +113,7 @@ class ASCIIParsingStrategyTest{
 
 	@Test
 	void joinNullFlags(){
-		String continuationFlags = strategy.joinFlags((String[])null);
+		String continuationFlags = strategy.joinFlags((Character[])null);
 
 		Assertions.assertTrue(continuationFlags.isEmpty());
 	}

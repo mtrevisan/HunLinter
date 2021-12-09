@@ -82,7 +82,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 			compoundEndFlag, FlagParsingStrategy.FLAG_OPTIONAL};
 		final HunSpellRegexWordGenerator regexWordGenerator = new HunSpellRegexWordGenerator(compoundRule);
 		//generate all the words that matches the given regex
-		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
+		final List<List<Character>> permutations = regexWordGenerator.generateAll(2, limit);
 
 		final List<List<List<Inflection>>> entries = generateCompounds(permutations, inputs);
 
@@ -92,7 +92,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 	private Map<String, List<DictionaryEntry>> extractCompoundBeginMiddleEnd(final String[] inputCompounds, final String compoundBeginFlag,
 			final String compoundMiddleFlag, final String compoundEndFlag){
 		final Integer compoundMinimumLength = affixData.getCompoundMinimumLength();
-		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
+		final Character forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
 		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>(0);

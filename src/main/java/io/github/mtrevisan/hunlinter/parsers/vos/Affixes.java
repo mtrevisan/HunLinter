@@ -34,19 +34,19 @@ public class Affixes{
 	public static final int INDEX_SUFFIXES = 1;
 	public static final int INDEX_TERMINALS = 2;
 
-	private final List<String> prefixes;
-	private final List<String> suffixes;
-	private final List<String> terminals;
+	private final List<Character> prefixes;
+	private final List<Character> suffixes;
+	private final List<Character> terminals;
 
 
-	public Affixes(final List<String> prefixes, final List<String> suffixes, final List<String> terminals){
+	public Affixes(final List<Character> prefixes, final List<Character> suffixes, final List<Character> terminals){
 		this.prefixes = prefixes;
 		this.suffixes = suffixes;
 		this.terminals = terminals;
 	}
 
-	public final List<List<String>> extractAllAffixes(final boolean reverseAffixes){
-		final List<List<String>> result = new ArrayList<>(3);
+	public final List<List<Character>> extractAllAffixes(final boolean reverseAffixes){
+		final List<List<Character>> result = new ArrayList<>(3);
 		result.add(reverseAffixes? suffixes: prefixes);
 		result.add(reverseAffixes? prefixes: suffixes);
 		result.add(terminals);
