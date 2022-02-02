@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import java.util.Locale;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
@@ -53,11 +52,13 @@ public final class TimeWatch{
 	public TimeWatch reset(){
 		start = System.nanoTime();
 		end = 0l;
+
 		return this;
 	}
 
 	public TimeWatch stop(){
 		end = System.nanoTime();
+
 		return this;
 	}
 
@@ -89,14 +90,38 @@ public final class TimeWatch{
 		return (end > 0l? time(TimeUnit.MILLISECONDS) + SPACE + MILLIS: TIMER_NOT_STOPPED);
 	}
 
-	@SuppressWarnings("StringConcatenationInFormatCall")
 	public String toStringMicros(final int runs){
 		if(end < 0l)
 			return TIMER_NOT_STOPPED;
 
 		final double micros = (double)(end - start) / (runs * 1_000);
 		final int fractionalDigits = (micros > 100? 0: (micros > 10? 1: 3));
-		return String.format(Locale.US, "%." + fractionalDigits + "f " + MICROS, micros);
+
+		final StringBuilder sb = new StringBuilder(fractionalDigits + 2);
+		format(sb, micros, fractionalDigits);
+		sb.append(' ').append(MICROS);
+		return sb.toString();
+	}
+
+	private static StringBuilder format(final StringBuilder sb, final double value, final int fractionalDigits){
+		long factor = (long)Math.pow(10., fractionalDigits);
+		final long scaled = (long)(value * factor + 0.5);
+		int scale = fractionalDigits;
+		long scaled2 = scaled / 10;
+		while(factor <= scaled2){
+			factor *= 10;
+			scale ++;
+		}
+		while(scale >= 0){
+			if(scale == fractionalDigits - 1)
+				sb.append('.');
+
+			final long c = (scaled / factor) % 10;
+			scale --;
+			factor /= 10;
+			sb.append((char)('0' + c));
+		}
+		return sb;
 	}
 
 }
