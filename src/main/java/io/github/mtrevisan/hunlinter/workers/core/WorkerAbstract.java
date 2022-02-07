@@ -148,7 +148,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final String errorMessage = ExceptionHelper.getMessage(le);
 			final IndexDataPair<?> data = le.getData();
 			final int index = data.getIndex();
-			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			final String lineText = (index >= 0? ", line " + (index + 1): StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
 			LOGGER.error(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), le.getMessage(),
 				lineText, data.getData());
@@ -162,7 +162,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 			final String warningMessage = ExceptionHelper.getMessage(lw);
 			final IndexDataPair<?> data = lw.getData();
 			final int index = data.getIndex();
-			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			final String lineText = (index >= 0? ", line " + (index + 1): StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", warningMessage, lineText, data.getData());
 			LOGGER.warn(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), lw.getMessage(),
 				lineText, data.getData());
