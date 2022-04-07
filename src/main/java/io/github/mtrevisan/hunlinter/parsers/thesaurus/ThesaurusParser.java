@@ -112,19 +112,23 @@ public class ThesaurusParser{
 		charset = FileHelper.determineCharset(thePath, 20);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the thesaurus file is {}", charset.name());
 		final Map<String, ThesaurusEntry> entries = new HashMap<>(0);
+		String line = null;
 		try(final Scanner scanner = FileHelper.createScanner(thePath, charset)){
 			//skip charset
 			scanner.nextLine();
 
 			while(scanner.hasNextLine()){
-				final String line = scanner.nextLine();
+				line = scanner.nextLine();
 				if(line.isEmpty())
 					continue;
 
 				final ThesaurusEntry entry = new ThesaurusEntry(line, scanner);
 				if(entries.put(entry.getDefinition(), entry) != null)
-					throw new IllegalArgumentException("Duplicated synonym in thesaurus: " + line);
+					throw new LinterException("Duplicated synonym in thesaurus: " + line);
 			}
+		}
+		catch(final NumberFormatException nfe){
+			throw new LinterException("Cannot interpret definition count on line " + line);
 		}
 		catch(final Exception e){
 			throw new LinterException(e, e.getMessage());
