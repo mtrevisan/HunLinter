@@ -51,7 +51,6 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter against dictionary FSA";
 
-	private static final String INCORRECT_WORD_IN_DICTIONARY = "Dictionary contain incorrect entry {} (from entry {})";
 	private static final String CORRECT_WORD_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
@@ -68,20 +67,10 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 		Objects.requireNonNull(dictionaryLookup, "Dictionary lookup cannot be null");
 
 		final Consumer<CorrectionEntry> dataProcessor = data -> {
-			final String incorrectForm = data.getIncorrectForm();
 			final String correctForm = data.getCorrectForm();
 
-			boolean incorrectWordContainsSpecialChars = false;
 			boolean correctWordContainsSpecialChars = false;
-			int bound = incorrectForm.length();
-			for(int i = 0; i < bound; i ++){
-				final char chr = incorrectForm.charAt(i);
-				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
-					incorrectWordContainsSpecialChars = true;
-					break;
-				}
-			}
-			bound = correctForm.length();
+			final int bound = correctForm.length();
 			for(int i = 0; i < bound; i ++){
 				final char chr = correctForm.charAt(i);
 				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
@@ -90,13 +79,6 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 				}
 			}
 
-			if(!incorrectWordContainsSpecialChars){
-				//check if the (incorrect) word is not present in the dictionary
-				final String[] words = StringUtils.split(incorrectForm, " –");
-				for(int i = 0; i < words.length; i ++)
-					if(!dictionaryLookup.lookup(words[i]).isEmpty())
-						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(INCORRECT_WORD_IN_DICTIONARY, words[i], incorrectForm));
-			}
 			if(!correctWordContainsSpecialChars){
 				//check if the (correct) word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
