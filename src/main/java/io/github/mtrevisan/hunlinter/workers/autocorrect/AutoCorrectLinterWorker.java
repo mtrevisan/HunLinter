@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -62,7 +62,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter";
 
-	private static final String ENTRY_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
+	private static final String INCORRECT_WORD_IN_DICTIONARY = "Dictionary contain incorrect entry {} (from entry {})";
+	private static final String CORRECT_WORD_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -84,25 +85,41 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
 		final Consumer<CorrectionEntry> dataProcessor = data -> {
-			final String correctForm = data.getCorrectForm()
-				.toLowerCase(Locale.ROOT);
+			final String incorrectForm = data.getIncorrectForm();
+			final String correctForm = data.getCorrectForm();
 
-			boolean containsSpecialChars = false;
-			final int bound = correctForm.length();
+			boolean incorrectWordContainsSpecialChars = false;
+			boolean correctWordContainsSpecialChars = false;
+			int bound = incorrectForm.length();
+			for(int i = 0; i < bound; i ++){
+				final char chr = incorrectForm.charAt(i);
+				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
+					incorrectWordContainsSpecialChars = true;
+					break;
+				}
+			}
+			bound = correctForm.length();
 			for(int i = 0; i < bound; i ++){
 				final char chr = correctForm.charAt(i);
 				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
-					containsSpecialChars = true;
+					correctWordContainsSpecialChars = true;
 					break;
 				}
 			}
 
-			if(!containsSpecialChars){
-				//check if the word is present in the dictionary
+			if(!incorrectWordContainsSpecialChars){
+				//check if the (incorrect) word is not present in the dictionary
+				final String[] words = StringUtils.split(incorrectForm, " –");
+				for(int i = 0; i < words.length; i ++)
+					if(bloomFilter.contains(words[i]))
+						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(INCORRECT_WORD_IN_DICTIONARY, words[i], incorrectForm));
+			}
+			if(!correctWordContainsSpecialChars){
+				//check if the (correct) word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
 				for(int i = 0; i < words.length; i ++)
 					if(!bloomFilter.contains(words[i]))
-						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], correctForm));
+						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(CORRECT_WORD_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 
@@ -136,7 +153,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				for(int i = 0; i < inflections.size(); i ++){
-					final String str = inflections.get(i).getWord().toLowerCase(Locale.ROOT);
+					final String str = inflections.get(i).getWord();
 					bloomFilter.add(str);
 				}
 			}
