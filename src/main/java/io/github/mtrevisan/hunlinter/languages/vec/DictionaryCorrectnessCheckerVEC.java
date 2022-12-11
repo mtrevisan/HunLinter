@@ -172,11 +172,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
 		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
 			if(RegexHelper.find(derivedWord, patternNonVanishingEl))
-				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL, derivedWord);
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL, inflection.getWord());
 			if(inflection.hasContinuationFlag(northernPluralRule))
-				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE, northernPluralRule, northernPluralStressedRule, derivedWord);
+				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE, northernPluralRule, northernPluralStressedRule, inflection.getWord());
 			if(RegexHelper.find(derivedWord, patternVanishingElNextToConsonant))
-				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT, derivedWord);
+				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT, inflection.getWord());
 
 			variants.add(LanguageVariant.VENETIAN);
 		}
@@ -185,7 +185,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			variants.add(LanguageVariant.NORTHERN);
 
 		if(variants.size() > 1)
-			throw new LinterException(WORD_WITH_MIXED_VARIANTS, derivedWord);
+			throw new LinterException(WORD_WITH_MIXED_VARIANTS, inflection.getWord());
 	}
 
 	private static void incompatibilityCheck(final Inflection inflection, final int index){
