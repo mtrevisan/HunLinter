@@ -53,14 +53,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class DuplicatesWorker extends WorkerDictionary{
@@ -83,12 +83,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		@Override
 		public final int getExpectedNumberOfElements(){
-			return 1_000_000;
+			return (int)(MAX_DUPLICATES * 1.5);
 		}
 
 		@Override
 		public final double getFalsePositiveProbability(){
-			return 0.000_000_4;
+			return 0.1 / MAX_DUPLICATES;
 		}
 
 		@Override
@@ -100,11 +100,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Duplicates extraction";
 
+	private static final int MAX_DUPLICATES = 1_000;
+
 
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 
-	private final Comparator<String> comparator;
 	private final BloomFilterParameters dictionaryBaseData;
 
 
@@ -128,7 +129,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
 
-		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 
 		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
@@ -136,8 +136,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			return collectDuplicates();
 		};
-		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = this::extractDuplicates;
-		final Function<List<Duplicate>, File> step3 = duplicates -> {
+		final Function<BloomFilterInterface<String>, Collection<List<Duplicate>>> step2 = this::extractDuplicates;
+		final Function<Collection<List<Duplicate>>, File> step3 = duplicates -> {
 			writeDuplicates(outputFile, duplicates);
 
 			finalizeProcessing("Duplicates extracted successfully");
@@ -158,13 +158,20 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
+				if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
+					return;
+
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 				for(int i = 0; i < inflections.size(); i ++){
-					final String str = inflections.get(i).toStringWithPartOfSpeechAndStem();
-					if(!bloomFilter.add(str))
+					final String str = inflections.get(i).toStringWithPartOfSpeech();
+					if(!bloomFilter.add(str)){
 						duplicatesBloomFilter.add(str);
+
+						if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
+							break;
+					}
 				}
 			}
 			catch(final LinterException e){
@@ -186,16 +193,24 @@ public class DuplicatesWorker extends WorkerDictionary{
 		duplicatesBloomFilter.close();
 
 		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Maximum duplications reached");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections processed: {}",
+				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		}
+		else
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
+				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		return duplicatesBloomFilter;
 	}
 
-	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
-		final ArrayList<Duplicate> result = new ArrayList<>(0);
+	private Collection<List<Duplicate>> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
+		final Map<String, List<Duplicate>> result = new HashMap<>(0);
 
+		Collection<List<Duplicate>> sortedDuplicates = Collections.emptyList();
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			resetProcessing("Extracting duplicates (step 2/3)");
 
@@ -208,12 +223,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 					if(!inflections.isEmpty()){
 						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();
-						result.ensureCapacity(result.size() + inflections.size());
 						for(int i = 0; i < inflections.size(); i ++){
 							final Inflection inflection = inflections.get(i);
-							final String text = inflection.toStringWithPartOfSpeechAndStem();
+							final String text = inflection.toStringWithPartOfSpeech();
 							if(duplicatesBloomFilter.contains(text))
-								result.add(new Duplicate(inflection, word, lineIndex));
+								result.computeIfAbsent(inflection.toStringWithPartOfSpeech(), k -> new ArrayList<>(1))
+									.add(new Duplicate(inflection, word, lineIndex));
 						}
 					}
 				}
@@ -236,31 +251,30 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			duplicatesBloomFilter.clear();
 
-			result.sort((d1, d2) -> comparator.compare(d1.getInflection().getWord(), d2.getInflection().getWord()));
+			sortedDuplicates = result.values();
 		}
 		else
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
 
-		return result;
+		return sortedDuplicates;
 	}
 
-	private void writeDuplicates(final File duplicatesFile, final Collection<Duplicate> duplicates){
+	private void writeDuplicates(final File duplicatesFile, final Collection<List<Duplicate>> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
 			int writtenSoFar = 0;
-			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				final StringBuilder origin = new StringBuilder();
-				for(int i = 0; i < mergedDuplicates.size(); i ++){
-					final List<Duplicate> entries = mergedDuplicates.get(i);
+				for(final List<Duplicate> entries : duplicates){
 					final Inflection prod = entries.get(0).getInflection();
 					origin.setLength(0);
 					origin.append(prod.getWord());
-					if(!prod.getMorphologicalFieldPartOfSpeech().isEmpty())
+					final List<String> partOfSpeechOrInflectionalAffix = prod.getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
+					if(!partOfSpeechOrInflectionalAffix.isEmpty())
 						origin.append("(")
-							.append(String.join(", ", prod.getMorphologicalFieldPartOfSpeech()))
+							.append(String.join(", ", partOfSpeechOrInflectionalAffix))
 							.append(")");
 					origin.append(": ");
 					writer.write(origin.toString());
@@ -285,25 +299,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());
 		}
-	}
-
-	private List<List<Duplicate>> mergeDuplicates(final Collection<Duplicate> duplicates){
-		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechAndStem(),
-				duplicate -> {
-					final List<Duplicate> list = new ArrayList<>(1);
-					list.add(duplicate);
-					return list;
-				},
-				(oldValue, newValue) -> {
-					oldValue.addAll(newValue);
-					return oldValue;
-				}));
-
-		final List<List<Duplicate>> result = new ArrayList<>(dupls.values());
-		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
-			.thenComparing(list -> list.get(0).getInflection().getWord(), comparator));
-		return result;
 	}
 
 }

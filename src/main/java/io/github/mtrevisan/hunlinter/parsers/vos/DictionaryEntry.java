@@ -224,10 +224,26 @@ public class DictionaryEntry{
 		if(morphologicalFields == null)
 			return Collections.emptyList();
 
-		final String tag = MorphologicalTag.PART_OF_SPEECH.getCode();
+		final String tagPoS = MorphologicalTag.PART_OF_SPEECH.getCode();
 		final List<String> list = new ArrayList<>(morphologicalFields.size());
 		for(final String mf : morphologicalFields)
-			if(mf.startsWith(tag))
+			if(mf.startsWith(tagPoS))
+				list.add(mf);
+		return list;
+	}
+
+	public final List<String> getMorphologicalFieldPartOfSpeechOrInflectionalAffix(){
+		if(morphologicalFields == null)
+			return Collections.emptyList();
+
+		final String tagPoS = MorphologicalTag.PART_OF_SPEECH.getCode();
+		final String tagIS = MorphologicalTag.INFLECTIONAL_SUFFIX.getCode();
+		final String tagIP = MorphologicalTag.INFLECTIONAL_PREFIX.getCode();
+		final String tagDS = MorphologicalTag.DERIVATIONAL_SUFFIX.getCode();
+		final String tagDP = MorphologicalTag.DERIVATIONAL_PREFIX.getCode();
+		final List<String> list = new ArrayList<>(morphologicalFields.size());
+		for(final String mf : morphologicalFields)
+			if(mf.startsWith(tagPoS) || mf.startsWith(tagIS) || mf.startsWith(tagIP) || mf.startsWith(tagDS) || mf.startsWith(tagDP))
 				list.add(mf);
 		return list;
 	}
