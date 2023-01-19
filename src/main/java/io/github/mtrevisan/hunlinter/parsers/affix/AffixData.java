@@ -205,6 +205,15 @@ public class AffixData{
 		return getDataOrDefault(AffixOption.COMPOUND_RULE, Collections.emptySet());
 	}
 
+	public final Set<String> getCompoundRulesFlags(){
+		final FlagParsingStrategy strategy = getFlagParsingStrategy();
+		final Set<String> compoundRules = getCompoundRules();
+		final Set<String> compoundRulesFlags = new HashSet<>(compoundRules.size() * 2);
+		for(final String rule : getCompoundRules())
+			compoundRulesFlags.addAll(List.of(strategy.extractCompoundRule(rule)));
+		return compoundRulesFlags;
+	}
+
 	public final boolean isManagedByCompoundRule(final String flag){
 		for(final String rule : getCompoundRules())
 			if(isManagedByCompoundRule(rule, flag))
