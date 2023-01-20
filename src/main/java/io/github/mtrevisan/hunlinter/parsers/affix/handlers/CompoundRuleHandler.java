@@ -43,6 +43,7 @@ import java.util.Set;
 
 public class CompoundRuleHandler implements Handler{
 
+	private static final String COMPOUND_RULE_EXPECTED = "Expected a compound rule entry, found something else{} in parent flag `{}`; counter should be {}";
 	private static final String MISMATCHED_COMPOUND_RULE_TYPE = "Error reading line `{}`: mismatched compound rule type (expected {})";
 	private static final String DUPLICATED_LINE = "Error reading line `{}`: duplicated line";
 	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
@@ -62,6 +63,10 @@ public class CompoundRuleHandler implements Handler{
 			ParserHelper.assertNotEOF(scanner);
 
 			final String line = scanner.nextLine();
+			if(line == null || !line.startsWith(AffixOption.COMPOUND_RULE.getCode()))
+				throw new LinterException(COMPOUND_RULE_EXPECTED, (line != null && !line.isEmpty()? ": `" + line + "`": StringUtils.EMPTY),
+					AffixOption.COMPOUND_RULE.getCode(), i);
+
 			final String[] lineParts = StringUtils.split(line);
 
 			final AffixOption option = AffixOption.createFromCode(lineParts[0]);
