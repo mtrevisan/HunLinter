@@ -138,7 +138,7 @@ public class AffixEntry{
 			throw new LinterException(WRONG_TYPE, parentType, type, line);
 		if(parentFlag != null && !parentFlag.equals(flag))
 			throw new LinterException(WRONG_FLAG, parentFlag, flag, line);
-		if(removing.equals(appending))
+		if(!removing.isEmpty() && removing.equals(appending))
 			throw new LinterException(WRONG_REMOVING_APPENDING_FORMAT, line);
 		if(!removing.isEmpty()){
 			if(parentType == AffixType.SUFFIX){

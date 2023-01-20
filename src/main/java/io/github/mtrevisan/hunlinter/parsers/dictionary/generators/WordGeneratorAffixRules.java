@@ -58,7 +58,8 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 		return applyAffixRules(dicEntry, overriddenRule, true);
 	}
 
-	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule, final boolean enforceOnlyInCompound){
+	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule,
+			final boolean enforceOnlyInCompound){
 		final List<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
 
 		if(enforceOnlyInCompound)
