@@ -223,13 +223,11 @@ public class Inflection extends DictionaryEntry{
 		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public final String toStringWithPartOfSpeechAndStem(){
-		final List<String> pos = getMorphologicalFieldPartOfSpeech();
-		final String stem = getMorphologicalFieldStem();
+	public final String toStringWithPartOfSpeech(){
+		final List<String> pos = getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
 		if(!pos.isEmpty()){
 			pos.sort(Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA)
-				+ StringUtils.SPACE + stem;
+			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA);
 		}
 		return word;
 	}
