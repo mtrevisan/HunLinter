@@ -108,7 +108,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	private static void logExceptionError(final Exception e){
 		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage, e);
 	}
 
 	@SuppressWarnings("SameReturnValue")
