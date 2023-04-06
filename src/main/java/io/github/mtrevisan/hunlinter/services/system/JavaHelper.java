@@ -26,6 +26,8 @@ package io.github.mtrevisan.hunlinter.services.system;
 
 import io.github.mtrevisan.hunlinter.workers.core.RuntimeInterruptedException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
 import javax.swing.SwingUtilities;
@@ -39,9 +41,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 
 public final class JavaHelper{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JavaHelper.class);
+
 
 	private static final char QUOTATION_MARK = '"';
 
@@ -72,12 +78,8 @@ public final class JavaHelper{
 	public static <T> T waitForFuture(final Future<T> future){
 		while(true){
 			try{
-				if(future.isDone()){
-					//shut down executor service
-					EXECUTOR_SERVICE.shutdown();
-
+				if(future.isDone())
 					return future.get();
-				}
 			}
 			catch(final InterruptedException | ExecutionException ignored){}
 		}
@@ -174,6 +176,30 @@ public final class JavaHelper{
 
 		//exit
 		exit(0);
+	}
+
+	public static void shutdownExecutor(){
+		//disable new tasks from being submitted
+		EXECUTOR_SERVICE.shutdown();
+
+		LOGGER.info("Shutting down java executor");
+
+		try{
+			//wait a while for existing tasks to terminate
+			if(!EXECUTOR_SERVICE.awaitTermination(20, TimeUnit.SECONDS)){
+				//cancel currently executing tasks
+				EXECUTOR_SERVICE.shutdownNow();
+				//wait a while for tasks to respond to being cancelled
+				if(!EXECUTOR_SERVICE.awaitTermination(20, TimeUnit.SECONDS))
+					LOGGER.error("Java executor did not terminate");
+			}
+		}
+		catch(InterruptedException ie){
+			//(re-)cancel if current thread also interrupted
+			EXECUTOR_SERVICE.shutdownNow();
+			//preserve interrupt status
+			Thread.currentThread().interrupt();
+		}
 	}
 
 }

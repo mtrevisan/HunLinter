@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.workers.core;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
-import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
@@ -45,7 +44,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
-import java.util.prefs.Preferences;
 
 
 public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<Void, Void>{
@@ -108,7 +106,7 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	private static void logExceptionError(final Exception e){
 		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage, e);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
 	}
 
 	@SuppressWarnings("SameReturnValue")

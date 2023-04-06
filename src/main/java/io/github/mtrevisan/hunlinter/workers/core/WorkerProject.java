@@ -44,6 +44,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 
+
 	@FunctionalInterface
 	interface StageFunction{
 		void execute() throws IOException, SAXException;

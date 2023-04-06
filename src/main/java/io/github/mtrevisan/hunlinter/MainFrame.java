@@ -198,6 +198,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	public MainFrame(){
+		Runtime.getRuntime().addShutdownHook(new Thread(JavaHelper::shutdownExecutor));
+
 		packager = new Packager();
 		parserManager = new ParserManager(packager);
 		workerManager = new WorkerManager(packager, parserManager);
