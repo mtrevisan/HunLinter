@@ -60,7 +60,7 @@
 		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
 		<app.vendor>Mauro Trevisan</app.vendor>
 		<app.menu>Mauro Trevisan's Tools</app.menu>
-		<app.copyright>(c) 2019-2022 Mauro Trevisan</app.copyright>
+		<app.copyright>(c) 2019-2023 Mauro Trevisan</app.copyright>
 
 		<!-- Profiles & Build -->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->

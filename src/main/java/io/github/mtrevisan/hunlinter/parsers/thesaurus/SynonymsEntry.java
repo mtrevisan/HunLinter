@@ -45,6 +45,7 @@ public class SynonymsEntry{
 
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
+	private static final String PIPE = "|";
 
 	private static final String WRONG_FORMAT = "Wrong format for thesaurus entry: `{}`";
 	private static final String POS_NOT_IN_PARENTHESIS = "Part-of-speech is not in parenthesis: `{}`";
@@ -140,9 +141,9 @@ public class SynonymsEntry{
 
 	@Override
 	public final String toString(){
-		return (new StringJoiner(COLUMN))
-			.add(String.join(COMMA, partOfSpeeches))
-			.add(StringUtils.join(synonyms, COMMA))
+		return (new StringJoiner(PIPE))
+			.add("(" + String.join(COMMA, partOfSpeeches) + ")")
+			.add(StringUtils.join(synonyms, PIPE))
 			.toString();
 	}
 
