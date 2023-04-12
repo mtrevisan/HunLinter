@@ -60,7 +60,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix1() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -138,7 +138,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix2() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -210,7 +210,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix3() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -310,7 +310,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix4() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -396,7 +396,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix5() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -599,7 +599,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix6() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -646,7 +646,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix7() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -702,7 +702,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix8() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -765,7 +765,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix9() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -875,7 +875,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix10() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -932,7 +932,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix11() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -998,7 +998,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix12() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1061,7 +1061,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix13() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1147,7 +1147,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix14() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1235,7 +1235,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix15() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1279,7 +1279,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix16() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1338,7 +1338,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix17() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1419,7 +1419,7 @@ class RulesReducerSuffixTest{
 	*/
 	@Test
 	void caseSuffix18() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1623,7 +1623,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix19() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1695,7 +1695,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix20() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1763,7 +1763,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix21() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1810,7 +1810,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix22() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1872,7 +1872,7 @@ class RulesReducerSuffixTest{
 
 	@Test
 	void caseSuffix23() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,

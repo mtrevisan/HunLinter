@@ -30,9 +30,11 @@ import io.github.mtrevisan.hunlinter.languages.vec.DictionaryCorrectnessCheckerV
 import io.github.mtrevisan.hunlinter.languages.vec.OrthographyVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordTokenizerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,9 @@ import java.util.regex.Pattern;
 public final class BaseBuilder{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseBuilder.class);
+
+	private static final String COMPARATOR_WITHOUT_COUNTRY_CODE = "Cannot find comparator for language `{}`, use comparator for `{}` instead";
+	private static final String COMPARATOR_DEFAULT_MESSAGE = "Cannot find comparator for language `{}`, use default comparator";
 
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
@@ -94,6 +99,10 @@ public final class BaseBuilder{
 
 	public static Comparator<String> getComparator(final String language){
 		LanguageData languageData = DATA.get(language);
+		if(languageData == null && language != null && language.contains("-")){
+			final String realLanguageCode = language.substring(0, language.indexOf('-'));
+			languageData = DATA.get(realLanguageCode);
+		}
 		if(languageData == null){
 			languageData = LANGUAGE_DATA_DEFAULT;
 
@@ -114,6 +123,19 @@ public final class BaseBuilder{
 			}
 		}
 		return languageData.comparator;
+	}
+
+	public static void checkDefaultComparator(final String language){
+		LanguageData languageData = DATA.get(language);
+		if(languageData == null && language != null && language.contains("-")){
+			final String realLanguageCode = language.substring(0, language.indexOf('-'));
+			languageData = DATA.get(realLanguageCode);
+
+			if(languageData != null)
+				LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(COMPARATOR_WITHOUT_COUNTRY_CODE, language, realLanguageCode));
+		}
+		if(languageData == null)
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(COMPARATOR_DEFAULT_MESSAGE, language));
 	}
 
 	public static BloomFilterParameters getDictionaryBaseData(final String language){

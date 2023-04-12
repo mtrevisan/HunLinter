@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 
 public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{
 
-	public static final String LANGUAGE = "vec-IT";
+	public static final String LANGUAGE = "vec";
 
 	private static final String POS_PROPER_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("proper_noun");
 	private static final String POS_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("noun");

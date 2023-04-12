@@ -44,8 +44,12 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
 
 	private static final String COMMA = ",";
+	private static final String PIPE = "|";
 	/** Adds a zero-width space to let wrapping occurs after commas. */
-	private static final String WRAPPABLE_COMMA = COMMA + "&#8203;";
+	private static final String ZERO_WIDTH_SPACE = "&#8203;";
+	private static final String WRAPPABLE_COMMA = COMMA + ZERO_WIDTH_SPACE;
+	private static final String COLUMN = ":";
+	private static final String WRAPPABLE_COLUMN = COLUMN + ZERO_WIDTH_SPACE;
 
 	public static final String TAG_NEW_LINE = "<br>";
 //	private static final String TAG = "<html><body style=\"'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'\">{}</body></html>";
@@ -83,7 +87,12 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		return switch(columnIndex){
 			case 0 -> thesaurus.getDefinition();
-			case 1 -> JavaHelper.textFormat(TAG, StringUtils.replace(thesaurus.joinSynonyms(TAG_NEW_LINE), COMMA, WRAPPABLE_COMMA));
+			case 1 -> {
+				String temp = thesaurus.joinSynonyms(TAG_NEW_LINE);
+				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
+				temp = StringUtils.replace(temp, ")" + WRAPPABLE_COMMA, ") ");
+				yield JavaHelper.textFormat(TAG, temp);
+			}
 			default -> null;
 		};
 	}
@@ -98,7 +107,10 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	}
 
 	public String getSynonyms(final int rowIndex){
-		return StringUtils.replace((String)getValueAt(rowIndex, 1), WRAPPABLE_COMMA, COMMA);
+		String temp = (String)getValueAt(rowIndex, 1);
+		temp = StringUtils.replace(temp, WRAPPABLE_COMMA, COMMA);
+		temp = StringUtils.replace(temp, ") ", COLUMN);
+		return StringUtils.replace(temp, "(", StringUtils.EMPTY);
 	}
 
 	@SuppressWarnings("unused")
