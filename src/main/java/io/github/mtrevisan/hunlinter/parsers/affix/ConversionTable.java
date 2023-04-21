@@ -50,6 +50,7 @@ public class ConversionTable{
 	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
 	private static final String WRONG_FORMAT = "Error reading line `{}`: bad number of entries, it must be '<option> <pattern-from> <pattern-to>'";
 	private static final String BAD_OPTION = "Error reading line `{}`: bad option, it must be {}";
+	private static final String BAD_ENTRY = "Error reading line `{}`: already existing key";
 
 
 	private static final String KEY_INSIDE = reduceKey(" ");
@@ -85,8 +86,13 @@ public class ConversionTable{
 			checkValidity(parts, context);
 
 			final String key = reduceKey(parts[1]);
-			table.computeIfAbsent(key, k -> new ArrayList<>(1))
-				.add(Pair.of(parts[1], parts[2]));
+			final List<Pair<String, String>> pairs = table.computeIfAbsent(key, k -> new ArrayList<>(1));
+			final String ruleType = context.getRuleType();
+			if(AffixOption.INPUT_CONVERSION_TABLE.getCode().equals(ruleType) || AffixOption.OUTPUT_CONVERSION_TABLE.getCode().equals(ruleType))
+				for(final Pair<String, String> pair : pairs)
+					if(pair.getKey().equals(parts[1]))
+						throw new LinterException(BAD_ENTRY, line);
+			pairs.add(Pair.of(parts[1], parts[2]));
 		}
 
 		//sort substitutions by length
