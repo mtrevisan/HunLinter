@@ -110,7 +110,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 		String temp = (String)getValueAt(rowIndex, 1);
 		temp = StringUtils.replace(temp, WRAPPABLE_COMMA, COMMA);
 		temp = StringUtils.replace(temp, ") ", COLUMN);
-		return StringUtils.replace(temp, "(", StringUtils.EMPTY);
+		return StringUtils.replace(temp, ">(", ">");
 	}
 
 	@SuppressWarnings("unused")
