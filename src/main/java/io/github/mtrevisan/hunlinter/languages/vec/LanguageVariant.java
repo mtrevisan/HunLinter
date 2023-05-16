@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
+
 public enum LanguageVariant{
 	NORTHERN,
 	VENETIAN

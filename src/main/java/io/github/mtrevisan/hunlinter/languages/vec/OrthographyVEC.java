@@ -149,7 +149,8 @@ public final class OrthographyVEC extends Orthography{
 			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
 				&& !StringUtils.contains(syllabe, HyphenationParser.MODIFIER_LETTER_APOSTROPHE)
-				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS_ARRAY));
+				&& !(syllabe.equals(HyphenationParser.MINUS_SIGN) || syllabe.equals(HyphenationParser.EN_DASH) || syllabe.equals(HyphenationParser.SOFT_HYPHEN))
+				&& !StringUtils.containsAny(syllabe, WordVEC.VOWELS_ARRAY));
 		}
 		return errors;
 	}

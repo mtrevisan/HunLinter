@@ -44,7 +44,7 @@ class Location{
 	private static int computeP(final int k){
 		final int p;
 		//for even k
-		if(k % 2 == 0)
+		if((k & 1) == 0)
 			//p = 2 * (2^floor(k/2) - 1)
 			//k / 2 will give us floor(k / 2), 1 << k / 2 raise 2 to power floor(k / 2).
 			p = 2 * ((1 << k / 2) - 1);
