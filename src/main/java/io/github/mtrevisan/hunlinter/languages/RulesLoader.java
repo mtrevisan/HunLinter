@@ -49,9 +49,9 @@ public class RulesLoader{
 
 	private static final String WORD_WITH_RULE_CANNOT_HAVE = "Word with rule {} cannot have rule {}";
 	private static final String WORD_WITH_LETTER_CANNOT_HAVE = "Word with letter `{}` cannot have rule {}";
-	private static final String WORD_WITH_LETTER_CANNOT_HAVE_USE = "Word with letter `{}` cannot have rule {}, use {}";
+	private static final String WORD_WITH_LETTER_CANNOT_HAVE_USE = "Word with letter `{}` cannot have rule {}, use {} instead";
 	private static final String WORD_WITHOUT_LETTER_CANNOT_HAVE = "Word without letter `{}` cannot have rule {}";
-	private static final String WORD_WITHOUT_LETTER_CANNOT_HAVE_USE = "Word without letter `{}` cannot have rule {}, use {}";
+	private static final String WORD_WITHOUT_LETTER_CANNOT_HAVE_USE = "Word without letter `{}` cannot have rule {}, use {} instead";
 
 
 	private final PropertiesUTF8 rulesProperties;
