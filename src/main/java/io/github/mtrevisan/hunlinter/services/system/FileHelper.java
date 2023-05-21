@@ -232,9 +232,12 @@ public final class FileHelper{
 		return createScanner(is, charset);
 	}
 
-	private static Scanner createScanner(final InputStream is, final Charset charset){
-		final BOMInputStream bomis = new BOMInputStream(is, ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
-			ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE);
+	private static Scanner createScanner(final InputStream is, final Charset charset) throws IOException{
+		final BOMInputStream bomis = BOMInputStream.builder()
+			.setInputStream(is)
+			.setByteOrderMarks(new ByteOrderMark[]{ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
+				ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE})
+			.get();
 		return new Scanner(bomis, charset);
 	}
 

@@ -104,7 +104,8 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final byte[] encoded = encoder.encode(eventObject);
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 
-			final Marker marker = eventObject.getMarker();
+			final List<Marker> markerList = eventObject.getMarkerList();
+			final Marker marker = (!markerList.isEmpty()? markerList.get(0): null);
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
 				if(textAreas != null)
