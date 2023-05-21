@@ -104,13 +104,12 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 				itr.remove();
 
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
-				if(appliedRules != null)
-					for(int j = 0; j < appliedRules.length; j ++){
-						final AffixEntry appliedRule = appliedRules[j];
-						usedFlags.add(appliedRule.getFlag());
-//						usedFlags.computeIfAbsent(appliedRule.getFlag(), k -> new HashSet<>(1))
-//							.add(appliedRule);
-					}
+				for(int j = 0; j < appliedRules.length; j ++){
+					final AffixEntry appliedRule = appliedRules[j];
+					usedFlags.add(appliedRule.getFlag());
+//					usedFlags.computeIfAbsent(appliedRule.getFlag(), k -> new HashSet<>(1))
+//						.add(appliedRule);
+				}
 
 				try{
 					checker.checkInflection(inflection, indexData.getIndex());

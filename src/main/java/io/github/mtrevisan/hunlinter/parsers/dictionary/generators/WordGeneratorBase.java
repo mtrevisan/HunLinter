@@ -236,7 +236,7 @@ class WordGeneratorBase{
 	private static boolean hasNeedAffixFlag(final Inflection inflection, final String needAffixFlag){
 		boolean hasNeedAffixFlag = false;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
-		if(appliedRules != null){
+		if(appliedRules.length > 0){
 			//check that last suffix and last prefix don't have the needaffix flag
 			boolean lastSuffix = false;
 			boolean lastPrefix = false;
@@ -323,7 +323,7 @@ class WordGeneratorBase{
 		final AffixEntry[] applicableAffixes = AffixData.extractListOfApplicableAffixes(word, rule.getEntries());
 		if(applicableAffixes.length == 0 && (checker == null || !checker.shouldNotCheckProductiveness(affix)))
 			throw new NoApplicableRuleException("No applicable rules found for flag `" + affix + "` via `"
-				+ (dicEntry.getAppliedRules() != null && dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
+				+ (dicEntry.getAppliedRules().length > 0? dicEntry.toString(): word) + "`");
 
 		final List<Inflection> inflections = new ArrayList<>(applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){

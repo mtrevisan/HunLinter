@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.Duplicate;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
+import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
@@ -53,11 +54,14 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -210,7 +214,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private Collection<List<Duplicate>> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
 		final Map<String, List<Duplicate>> result = new HashMap<>(0);
 
-		Collection<List<Duplicate>> sortedDuplicates = Collections.emptyList();
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			resetProcessing("Extracting duplicates (step 2/3)");
 
@@ -227,8 +230,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 							final Inflection inflection = inflections.get(i);
 							final String text = inflection.toStringWithPartOfSpeech();
 							if(duplicatesBloomFilter.contains(text))
-								result.computeIfAbsent(inflection.toStringWithPartOfSpeech(), k -> new ArrayList<>(1))
-									.add(new Duplicate(inflection, word, lineIndex));
+								result.computeIfAbsent(text, k -> new ArrayList<>(1))
+									.add(new Duplicate(inflection, word, dicEntry.getContinuationFlags(), lineIndex));
 						}
 					}
 				}
@@ -250,13 +253,11 @@ public class DuplicatesWorker extends WorkerDictionary{
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
 			duplicatesBloomFilter.clear();
-
-			sortedDuplicates = result.values();
 		}
 		else
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
 
-		return sortedDuplicates;
+		return result.values();
 	}
 
 	private void writeDuplicates(final File duplicatesFile, final Collection<List<Duplicate>> duplicates){
@@ -264,29 +265,106 @@ public class DuplicatesWorker extends WorkerDictionary{
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
+			final Set<String> processedLines = new HashSet<>(totalSize);
+
 			int writtenSoFar = 0;
 			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
 				final StringBuilder origin = new StringBuilder();
+				final Comparator<Duplicate> comparator = Comparator.comparingInt(o -> o.getInflection().getAppliedRules().length);
 				for(final List<Duplicate> entries : duplicates){
-					final Inflection prod = entries.get(0).getInflection();
+					entries.sort(comparator);
+
+					final StringJoiner lines = new StringJoiner(", ");
+					for(final Duplicate duplicate : entries)
+						lines.add(Integer.toString(duplicate.getLineIndex()));
+					if(!processedLines.add(lines.toString()))
+						//already inserted line, skip
+						continue;
+
+					final Inflection prod = entries.iterator().next().getInflection();
 					origin.setLength(0);
 					origin.append(prod.getWord());
 					final List<String> partOfSpeechOrInflectionalAffix = prod.getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
 					if(!partOfSpeechOrInflectionalAffix.isEmpty())
 						origin.append("(")
-							.append(String.join(", ", partOfSpeechOrInflectionalAffix))
+							.append(String.join(" ", partOfSpeechOrInflectionalAffix))
 							.append(")");
 					origin.append(": ");
-					writer.write(origin.toString());
 					final StringJoiner sj = new StringJoiner(", ");
-					for(int j = 0; j < entries.size(); j ++){
-						final Duplicate duplicate = entries.get(j);
-						sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+					for(final Duplicate duplicate : entries){
+						final String info = StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
 							(duplicate.getInflection().hasInflectionRules()?
-							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
+							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY);
+						sj.add(info);
 					}
-					writer.write(sj.toString());
-					writer.newLine();
+
+					final Iterator<Duplicate> itr = entries.iterator();
+					final Duplicate firstDuplicate = itr.next();
+					final Inflection firstDuplicateInflection = firstDuplicate.getInflection();
+					final String firstDuplicateRulesSequence = firstDuplicateInflection.getRulesSequence();
+					final Set<String> firstDuplicateContinuationFlags = new HashSet<>(firstDuplicateInflection.getContinuationFlags());
+					boolean isCandidate = false;
+					while(itr.hasNext()){
+						final Duplicate nextDuplicate = itr.next();
+						final Inflection nextDuplicateInflection = nextDuplicate.getInflection();
+						final String nextDuplicateRulesSequence = nextDuplicateInflection.getRulesSequence();
+						final Set<String> nextDuplicateContinuationFlags = new HashSet<>(nextDuplicateInflection.getContinuationFlags());
+
+						Duplicate candidate = firstDuplicate;
+						String candidateRulesSequence = firstDuplicateRulesSequence;
+						Set<String> candidateContinuationFlags = firstDuplicateContinuationFlags;
+						Duplicate other = nextDuplicate;
+						String otherRulesSequence = nextDuplicateRulesSequence;
+						if(firstDuplicateRulesSequence.length() > nextDuplicateRulesSequence.length()){
+							candidate = nextDuplicate;
+							other = firstDuplicate;
+							candidateRulesSequence = nextDuplicateRulesSequence;
+							otherRulesSequence = firstDuplicateRulesSequence;
+							candidateContinuationFlags = nextDuplicateContinuationFlags;
+						}
+
+						final boolean containmentCondition = (firstDuplicateContinuationFlags.isEmpty()
+							|| candidateContinuationFlags.containsAll(firstDuplicateContinuationFlags));
+						final String testEnd = Inflection.LEADS_TO + candidateRulesSequence;
+						final String testStart = candidateRulesSequence + Inflection.LEADS_TO;
+						final boolean equalProduction = (candidateRulesSequence.equals(otherRulesSequence)
+							&& candidate.getWord().equals(other.getWord()));
+						if(candidateRulesSequence.isEmpty()
+								|| containmentCondition && (equalProduction
+									|| otherRulesSequence.startsWith(testStart) || otherRulesSequence.endsWith(testEnd))){
+							final Set<String> candidateAppliedRules = new HashSet<>(candidate.getContinuationFlags());
+							for(final AffixEntry candidateAppliedRule : candidate.getInflection().getAppliedRules())
+								candidateAppliedRules.remove(candidateAppliedRule.getFlag());
+
+							final Set<String> otherAppliedRules = new HashSet<>(other.getContinuationFlags());
+							for(final AffixEntry otherAppliedRule : other.getInflection().getAppliedRules())
+								otherAppliedRules.remove(otherAppliedRule.getFlag());
+
+							final Set<String> intersectionAppliedRules = new HashSet<>(candidateAppliedRules);
+							intersectionAppliedRules.retainAll(otherAppliedRules);
+							candidateAppliedRules.removeAll(intersectionAppliedRules);
+							otherAppliedRules.removeAll(intersectionAppliedRules);
+							if(candidateAppliedRules.isEmpty()){
+								final String info = candidate.getWord()
+									+ (equalProduction && ! other.getWord().equals(candidate.getWord())? " (or " + other.getWord() + ")": "")
+									+ " is a candidate for removal";
+								if(!sj.toString().endsWith(info))
+									sj.add(info);
+							}
+							else
+								sj.add(candidate.getWord() + " cannot be safely removed due to candidate having flags "
+									+ candidateAppliedRules
+									+ (!otherAppliedRules.isEmpty()? " and other having flags " + otherAppliedRules: ""));
+
+							isCandidate = true;
+						}
+					}
+
+					if(isCandidate){
+						writer.write(origin.toString());
+						writer.write(sj.toString());
+						writer.newLine();
+					}
 
 					setWorkerProgress(++ writtenSoFar, totalSize);
 

@@ -112,7 +112,7 @@ public class DictionaryEntry{
 	}
 
 	public final List<String> getContinuationFlags(){
-		return continuationFlags;
+		return (continuationFlags != null? continuationFlags: Collections.emptyList());
 	}
 
 	public final int getContinuationFlagCount(){
@@ -296,7 +296,7 @@ public class DictionaryEntry{
 						continue;
 
 					final AffixEntry[] appliedRules = getAppliedRules();
-					final String parentFlag = (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): null);
+					final String parentFlag = (appliedRules.length > 0? appliedRules[0].getFlag(): null);
 					throw new LinterException(NON_EXISTENT_RULE, affix, (parentFlag != null? " via " + parentFlag: StringUtils.EMPTY));
 				}
 

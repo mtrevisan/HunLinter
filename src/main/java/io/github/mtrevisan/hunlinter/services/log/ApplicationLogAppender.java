@@ -116,7 +116,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 					}
 
 				final List<JTextPane> textPanes = TEXT_PANES.get(marker);
-				if(textPanes != null){
+				if(textPanes != null)
 					for(int i = 0; i < textPanes.size(); i ++){
 						final Color color;
 						if(level == Level.ERROR)
@@ -127,7 +127,6 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 							color = Color.BLACK;
 						appendToPane(textPanes.get(i), message, color);
 					}
-				}
 
 				final List<JLabel> labels = LABELS.get(marker);
 				if(labels != null)

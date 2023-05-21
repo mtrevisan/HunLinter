@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -33,15 +34,17 @@ public class Duplicate{
 
 	private final Inflection inflection;
 	private final String word;
+	private final List<String> continuationFlags;
 	private final int lineIndex;
 
 
-	public Duplicate(final Inflection inflection, final String word, final int lineIndex){
+	public Duplicate(final Inflection inflection, final String word, final List<String> continuationFlags, final int lineIndex){
 		Objects.requireNonNull(inflection, "Inflection cannot be null");
 		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.inflection = inflection;
 		this.word = word;
+		this.continuationFlags = continuationFlags;
 		this.lineIndex = lineIndex;
 	}
 
@@ -51,6 +54,10 @@ public class Duplicate{
 
 	public final String getWord(){
 		return word;
+	}
+
+	public List<String> getContinuationFlags(){
+		return continuationFlags;
 	}
 
 	public final int getLineIndex(){
@@ -71,6 +78,10 @@ public class Duplicate{
 	@Override
 	public final int hashCode(){
 		return Integer.hashCode(lineIndex);
+	}
+
+	public int compareTo(final Duplicate other){
+		return 0;
 	}
 
 }

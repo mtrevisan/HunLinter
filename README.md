@@ -72,7 +72,7 @@ You can download and install it for free from this [link](https://www.oracle.com
     11. [Word exceptions](#screenshots-word-exceptions)
     12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
 8. [Changelog](#changelog)
-    1. [version 2.1.0](#changelog-2.1.1)
+    1. [version 2.0.0](#changelog-2.2.0)
     2. [version 2.1.0](#changelog-2.1.0)
     3. [version 2.0.2](#changelog-2.0.2)
     4. [version 2.0.1](#changelog-2.0.1)
@@ -324,12 +324,13 @@ It is possible to right-click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
-<a name="changelog-2.1.1"></a>
-### version 2.1.1 - 202109??
+<a name="changelog-2.2.0"></a>
+### version 2.2.0 - 20230521
 - rules reducer fixes and enhancements
 - considered different formats for part-of-speech in thesaurus file
 - fixed early creation of thesaurus parser (language was not available yet)
 - fixed circumfix inflections
+- enhanced duplication worker capabilities
 - delayed creation of file chooser (faster startup)
 - eliminated double reloading of dictionary in sort dialog when something changes
 - understood how `ICON` and `OCONV` works

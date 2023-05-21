@@ -43,11 +43,13 @@ public class Inflection extends DictionaryEntry{
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
-	private static final String LEADS_TO = " > ";
+	public static final String LEADS_TO = " > ";
 	private static final String POS_FIELD_PREFIX = ":";
 
 	public static final String POS_FSA_SEPARATOR = ",";
 	private static final String COMMA = ",";
+
+	private static final AffixEntry[] EMPTY_APPLIED_RULES = new AffixEntry[0];
 
 
 	private AffixEntry[] appliedRules;
@@ -121,7 +123,7 @@ public class Inflection extends DictionaryEntry{
 
 	@Override
 	public final AffixEntry[] getAppliedRules(){
-		return appliedRules;
+		return (appliedRules != null? appliedRules: EMPTY_APPLIED_RULES);
 	}
 
 	public final AffixEntry getAppliedRule(final int index){

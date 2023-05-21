@@ -47,7 +47,7 @@ public class LetterMatcherEntry{
 	}
 
 	public final void match(final Inflection inflection){
-		if(inflection.getContinuationFlags() != null)
+		if(!inflection.getContinuationFlags().isEmpty())
 			for(int i = 0; i < wrongFlags.length; i ++)
 				if(inflection.hasContinuationFlag(wrongFlags[i]))
 					throw new LinterException(messagePattern, masterLetter, wrongFlags[i], correctRule);

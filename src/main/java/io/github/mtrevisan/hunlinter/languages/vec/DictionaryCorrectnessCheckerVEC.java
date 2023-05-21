@@ -247,7 +247,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	private static AffixEntry getLastAppliedRule(final Inflection inflection){
 		AffixEntry appliedRuleFlag = null;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
-		if(appliedRules != null)
+		if(appliedRules.length > 0)
 			appliedRuleFlag = appliedRules[appliedRules.length - 1];
 		return appliedRuleFlag;
 	}
