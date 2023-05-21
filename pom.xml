@@ -80,7 +80,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
 
@@ -323,7 +323,7 @@
 						</goals>
 						<configuration>
 							<target>
-								<!-- trick used to prevent errors while removal of output folder if it doesn't exist yet -->
+								<!-- trick used to prevent errors with the removal of output folder if it doesn't exist yet -->
 								<mkdir dir="${project.build.directory}/${jvm.outputFolder}" />
 							</target>
 						</configuration>
