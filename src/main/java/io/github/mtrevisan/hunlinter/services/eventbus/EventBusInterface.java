@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -56,6 +56,8 @@ import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
  * @see <a href="https://github.com/taftster/simpleeventbus">Simple Event Bus</a>
  */
 public interface EventBusInterface{
+
+	void start();
 
 	/**
 	 * Subscribes the specified subscriber to the event bus.

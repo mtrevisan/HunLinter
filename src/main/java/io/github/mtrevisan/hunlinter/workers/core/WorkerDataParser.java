@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -37,12 +37,12 @@ public class WorkerDataParser<P> extends WorkerData{
 	public WorkerDataParser(final String workerName, final P parser){
 		super(workerName);
 
-		Objects.requireNonNull(parser);
+		Objects.requireNonNull(parser, "Parser cannot be null");
 
 		this.parser = parser;
 	}
 
-	public P getParser(){
+	public final P getParser(){
 		return parser;
 	}
 

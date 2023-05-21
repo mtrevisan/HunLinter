@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.models.CompoundTableModel;
 import io.github.mtrevisan.hunlinter.gui.models.HunLinterTableModelInterface;
@@ -33,42 +34,38 @@ import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
-import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import io.github.mtrevisan.hunlinter.workers.WorkerManager;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class CompoundsLayeredPane extends JLayeredPane implements ActionListener{
@@ -86,21 +83,24 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	private final Packager packager;
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
+	private final Frame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
 
 	private String formerCompoundInputText;
 
 
 	public CompoundsLayeredPane(final Packager packager, final ParserManager parserManager, final WorkerManager workerManager,
-			final PropertyChangeListener propertyChangeListener){
+			final Frame parentFrame, final PropertyChangeListener propertyChangeListener){
 		Objects.requireNonNull(packager, "Packager cannot be null");
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(parentFrame, "Parent frame cannot be null");
 		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
+		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
 
 
@@ -111,8 +111,6 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		FontHelper.addFontableProperty(inputTextArea, table);
 
 		GUIHelper.addUndoManager(inputTextArea);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -145,21 +143,12 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
             cmpInputComboBoxKeyReleased();
          }
       });
-      inputComboBox.addItemListener(new ItemListener(){
-         @Override
-         public void itemStateChanged(final ItemEvent evt){
-            cmpInputComboBoxKeyReleased();
-         }
-      });
+      inputComboBox.addItemListener(evt -> cmpInputComboBoxKeyReleased());
 
       limitLabel.setText("Limit:");
 
       limitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "20", "50", "100", "500", "1000" }));
-      limitComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            limitComboBoxActionPerformed(evt);
-         }
-      });
+      limitComboBox.addActionListener(this::limitComboBoxActionPerformed);
 
       ruleFlagsAidLabel.setText("Rule flags aid:");
 
@@ -169,7 +158,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       table.setModel(new CompoundTableModel());
       table.setShowHorizontalLines(false);
       table.setShowVerticalLines(false);
-      KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
+      final KeyStroke cancelKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
       table.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
 
       table.setRowSelectionAllowed(true);
@@ -181,11 +170,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       inputScrollPane.setViewportView(inputTextArea);
 
       loadInputButton.setText("Load input from dictionary");
-      loadInputButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            loadInputButtonActionPerformed(evt);
-         }
-      });
+      loadInputButton.addActionListener(this::loadInputButtonActionPerformed);
 
       openAidButton.setAction(new OpenFileAction(parserManager::getAidFile, packager));
       openAidButton.setText("Open Aid");
@@ -212,8 +197,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -277,11 +262,11 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion();
+	public final void actionPerformed(final ActionEvent event){
+		WorkerManager.checkForAbortion(parentFrame);
 	}
 
-   private void limitComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
+   private void limitComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitComboBoxActionPerformed
       final String inputText = ((String)inputComboBox.getEditor().getItem()).trim();
       final int limit = Integer.parseInt(limitComboBox.getItemAt(limitComboBox.getSelectedIndex()));
       final String inputCompounds = inputTextArea.getText();
@@ -289,29 +274,30 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
       if(StringUtils.isNotBlank(inputText) && StringUtils.isNotBlank(inputCompounds)){
          try{
             //FIXME transfer into ParserManager
-            final Inflection[] words;
+            final List<Inflection> words;
             final WordGenerator wordGenerator = parserManager.getWordGenerator();
             final AffixData affixData = parserManager.getAffixData();
 				final String[] input = StringUtils.split(inputCompounds, '\n');
             if(inputText.equals(affixData.getCompoundFlag())){
-               final int maxCompounds = affixData.getCompoundMaxWordCount();
+               final Integer maxCompounds = affixData.getCompoundMaxWordCount();
                words = wordGenerator.applyCompoundFlag(input, limit, maxCompounds);
             }
             else
 					words = wordGenerator.applyCompoundRules(input, inputText, limit);
 
-            final CompoundTableModel dm = (CompoundTableModel)table.getModel();
-            dm.setInflections(Arrays.asList(words));
+            @SuppressWarnings("unchecked")
+				final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
+            dm.setInflections(words);
          }
-         catch(final Exception e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), inputText);
+         catch(final RuntimeException re){
+            LOGGER.error(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), inputText);
          }
       }
       else
       	clearOutputTable(table);
    }//GEN-LAST:event_limitComboBoxActionPerformed
 
-   private void loadInputButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
+   private void loadInputButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadInputButtonActionPerformed
       final AffixParser affParser = parserManager.getAffParser();
       final FlagParsingStrategy strategy = affParser.getAffixData()
       .getFlagParsingStrategy();
@@ -328,15 +314,21 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
          },
          compounds -> {
             final StringJoiner sj = new StringJoiner(StringUtils.LF);
-				forEach(compounds, compound -> sj.add(compound.toString(strategy)));
+				if(compounds != null)
+					for(final Inflection compound : compounds)
+						sj.add(compound.toString(strategy));
+
             inputTextArea.setText(sj.toString());
             inputTextArea.setCaretPosition(0);
          },
          worker -> {
+            //change color of progress bar to reflect an error
+            if(worker.isCancelled())
+					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
             inputComboBox.setEnabled(true);
             limitComboBox.setEnabled(true);
             inputTextArea.setEnabled(true);
-            if(worker.isCancelled())
             loadInputButton.setEnabled(true);
          }
       );
@@ -347,7 +339,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -365,7 +358,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//affix file:
 		if(!compoundRules.isEmpty()){
 			inputComboBox.removeAllItems();
-			forEach(compoundRules, inputComboBox::addItem);
+			for(final String rule : compoundRules)
+				inputComboBox.addItem(rule);
 			final String compoundFlag = affixData.getCompoundFlag();
 			if(compoundFlag != null)
 				inputComboBox.addItem(compoundFlag);
@@ -379,7 +373,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		//aid file:
 		final List<String> lines = parserManager.getAidParser().getLines();
 		ruleFlagsAidComboBox.removeAllItems();
-		forEach(lines, ruleFlagsAidComboBox::addItem);
+		for(final String line : lines)
+			ruleFlagsAidComboBox.addItem(line);
 		final boolean aidLinesPresent = !lines.isEmpty();
 		//enable combo-box only if an AID file exists
 		ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
@@ -387,7 +382,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_COMPOUNDS)
 			return;
 
@@ -403,7 +399,8 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 	}
 
 	@EventHandler
-	public void clearAid(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearAid(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
@@ -412,7 +409,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
-	private void clearOutputTable(final JTable table){
+	private static void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
 	}
@@ -422,7 +419,7 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 		limitComboBox.setEnabled(StringUtils.isNotBlank(inputText));
 
-		if(formerCompoundInputText != null && formerCompoundInputText.equals(inputText))
+		if(inputText.equals(formerCompoundInputText))
 			return;
 		formerCompoundInputText = inputText;
 
@@ -432,13 +429,13 @@ public class CompoundsLayeredPane extends JLayeredPane implements ActionListener
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

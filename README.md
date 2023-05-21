@@ -33,13 +33,14 @@ You can download and install it for free from this [link](https://www.oracle.com
 1. [Motivation](#motivation)
 2. [What the application can do](#can-do)
 3. [How to enhance its capabilities](#enhancements)
-4. [Recognized flags](#recognized-flags)
+4. [Recognized charsets](#recognized-charsets)
+5. [Recognized flags](#recognized-flags)
     1. [General](#recognized-flags-general)
     2. [Suggestions](#recognized-flags-suggestions)
     3. [Compounding](#recognized-flags-compounding)
     4. [Affix creation](#recognized-flags-affix)
     5. [Others](#recognized-flags-others)
-5. [How to](#how-to)
+6. [How to](#how-to)
     1. [Open a project](#how-to-project)
     2. [Create an extension](#how-to-extension)
     3. [Linter dictionary](#how-to-linter-dictionary)
@@ -57,7 +58,7 @@ You can download and install it for free from this [link](https://www.oracle.com
     15. [Ordering table columns](#how-to-ordering)
     16. [Copying text](#how-to-copy)
     17. [Rule/dictionary insertion](#how-to-insertion)
-6. [Screenshots](#screenshots)
+7. [Screenshots](#screenshots)
     1. [Inflections](#screenshots-inflections)
     2. [Dictionary linter](#screenshots-correctness)
     3. [Thesaurus](#screenshots-thesaurus)
@@ -70,16 +71,17 @@ You can download and install it for free from this [link](https://www.oracle.com
     10. [Sentence exceptions](#screenshots-sentence-exceptions)
     11. [Word exceptions](#screenshots-word-exceptions)
     12. [Part-of-Speech dictionary](#screenshots-pos-dictionary)
-7. [Changelog](#changelog)
-    1. [version 2.1.0](#changelog-2.1.0)
-    2. [version 2.0.2](#changelog-2.0.2)
-    3. [version 2.0.1](#changelog-2.0.1)
-    4. [version 2.0.0](#changelog-2.0.0)
-    5. [version 1.10.0](#changelog-1.10.0)
-    6. [version 1.9.1](#changelog-1.9.1)
-    7. [version 1.9.0](#changelog-1.9.0)
-    8. [version 1.8.1](#changelog-1.8.1)
-    9. [version 1.8.0](#changelog-1.8.0)
+8. [Changelog](#changelog)
+    1. [version 2.0.0](#changelog-2.2.0)
+    2. [version 2.1.0](#changelog-2.1.0)
+    3. [version 2.0.2](#changelog-2.0.2)
+    4. [version 2.0.1](#changelog-2.0.1)
+    5. [version 2.0.0](#changelog-2.0.0)
+    6. [version 1.10.0](#changelog-1.10.0)
+    7. [version 1.9.1](#changelog-1.9.1)
+    8. [version 1.9.0](#changelog-1.9.0)
+    9. [version 1.8.1](#changelog-1.8.1)
+    10. [version 1.8.0](#changelog-1.8.0)
 
 
 <br/>
@@ -109,6 +111,18 @@ Along with these classes you can insert your `rules.properties`, a file that des
 After that you have to tell the application that exists those files editing the [BaseBuilder](src/main/java/io/github/mtrevisan/hunlinter/languages/BaseBuilder.java) class and adding a `LanguageData` to the `DATAS` hashmap.
 
 The application automatically recognize which checker to use based on the code in the `LANG` option present in the `.aff` file.
+
+
+<br/>
+
+<a name="recognized-charsets"></a>
+## Recognized charsets
+- UTF-8
+- ISO-8859-1, ISO-8859-2, ISO-8859-3, ISO-8859-4, ISO-8859-5, ISO-8859-6, ISO-8859-7, ISO-8859-8, ISO-8859-9, ISO-8859-10, ISO-8859-13, ISO-8859-14, ISO-8859-15,
+- KOI8-R, KOI8-U
+- MICROSOFT-CP1251
+- ISCII-DEVANAGARI
+- TIS620-2533
 
 
 <br/>
@@ -148,19 +162,19 @@ The font will be linked to the project so, opening it again later, the same font
 
 <a name="how-to-extension"></a>
 ### Create an extension
-In order to create an extension (eg. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
+In order to create an extension (e.g. for LibreOffice, or for Mozilla products) you have to use the option `File|Create package`. This will package the directory in which the `.aff/.dic` resides into a zip file. All there is to do afterwards is to rename the extensions into `.oxt` (LibreOffice), or `.xpi` (Mozilla).
 
 Remember that the package will have the same name of the directory, but the directory itself is not included, just the content is.
 
 <a name="how-to-linter-dictionary"></a>
 ### Linter dictionary
-To linter a dictionary just select `Dictionary tools|Check correctness`.
+To linter a dictionary just select `Dictionary tools|Correctness check`/`Dictionary tools|Correctness check using dictionary FSA`.
 
 Each line is then linted following the rules of a particular language (IF the corresponding files are present in the project, e.g. for Venetan). If no such file is present a general linter is applied.
 
 <a name="how-to-linter-thesaurus"></a>
 ### Linter thesaurus
-To linter the thesaurus just select `Thesaurus tools|Check correctness`.
+To linter the thesaurus just select `Thesaurus tools|Correctness check`/`Thesaurus tools|Correctness check using dictionary FSA`.
 
 Each thesaurus entry is linted checking for the presence of each synonym as a definition (with same Part-of-Speech).
 
@@ -168,9 +182,9 @@ In case of error it is suggested to copy _all_ the synonyms for the indicated wo
 
 <a name="how-to-linter-hyphenation"></a>
 ### Linter hyphenation
-To linter the hyphenation just select `Hyphenation tools|Check correctness`.
+To linter the hyphenation just select `Hyphenation tools|Correctness check`.
 
-Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc).
+Each hyphenation code is then linted following certain rules (among them the one that says that a breakpoint should not be on the boundary, that a code should have at least a breakpoint, etc.).
 
 <a name="how-to-sort"></a>
 ### Sort dictionary
@@ -192,7 +206,7 @@ Note: There is an uncertainty about the uniqueness count, but it should be small
 
 <a name="how-to-statistics"></a>
 ### Dictionary statistics
-Use `Dictionary tools|Statistics` to produce some statistics (graphs and values are exportable with a right click!) about word and compound word count, mode of words' length, mode of words' syllabe, most common syllabes, longest words (by letters and by syllabes).
+Use `Dictionary tools|Statistics` to produce some statistics (graphs and values are exportable with a right click!) about word and compound word count, mode of words' length, mode of words' syllabe, most common syllabes, the longest words (by letters and by syllabes).
 
 If you want to include hyphenation statistics be sure to use `Hyphenation tools|Statistics` instead, but expect a 3.6&times; or so increase in running time.
 
@@ -221,7 +235,7 @@ An external text file can be put into the directory `aids` (on the same level of
 
 This file could be used as a reminder of all the flag that can be added to a word and their meaning.
 
-The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `aid` (eg. for Venetan: `vec-IT.aid`).
+The filename has to be the language (as specified in the option `LANG` inside the `.aff` file), and the extension `aid` (e.g. for Venetan: `vec-IT.aid`).
 
 <a name="how-to-ordering"></a>
 ### Ordering table columns
@@ -235,7 +249,7 @@ Use `Ctrl+C` after selecting the row, or use the right click of the mouse to acc
 
 <a name="how-to-insertion"></a>
 ### Rule/dictionary insertion
-This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, or change them, you have plenty of tools around you. For Windows I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
+This is **NOT** an editor tool<sup>1</sup>! If you want to add affix rules, add words in the dictionary, or change them, you have plenty of tools around you. For Windows, I suggest [Notepad++](https://notepad-plus-plus.org/ "Notepad++ homepage") (for example, you will see immediately while typing if a word is already present in the dictionary).
 
 <sup>1</sup>: Even if for the hyphenation file a new rule can actually be added…
 
@@ -262,7 +276,7 @@ Entries can be inserted in two ways:
 
 Once something is written, an automatic filtering is executed to find all the words (and part-of-speech if given) that are already contained into the thesaurus.
 
-It is possible to right click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
+It is possible to right-click on a row to bring up the popup menu and select whether to copy it, remove it (and all the other rows in which the selected definition appears), or merge with the current synonyms.
 
 ![alt text](https://i.postimg.cc/yx1D0Xtz/thesaurus.png "Thesaurus")
 
@@ -310,6 +324,24 @@ It is possible to right click on a row to bring up the popup menu and select whe
 
 <a name="changelog"></a>
 ## Changelog
+<a name="changelog-2.2.0"></a>
+### version 2.2.0 - 20230521
+- rules reducer fixes and enhancements
+- considered different formats for part-of-speech in thesaurus file
+- fixed early creation of thesaurus parser (language was not available yet)
+- fixed circumfix inflections
+- enhanced duplication worker capabilities
+- delayed creation of file chooser (faster startup)
+- eliminated double reloading of dictionary in sort dialog when something changes
+- understood how `ICON` and `OCONV` works
+- supported ISO-8859-10, ISO-8859-14, and ISCII-DEVANAGARI charsets
+- added a check on declared charset and real charset of a file
+- adjusted scroll to the bottom of the log text area while changing font
+- decreased the loading time of sorting dialog
+- increased speed by 57% (for dictionary linter: from 2m 13s to 57s)
+- decreased start-up time
+- corrected some typos
+
 <a name="changelog-2.1.0"></a>
 ### version 2.1.0 - 20210807
 - fix bug on initial font size
@@ -326,7 +358,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 ### version 2.0.1 - 20210805
 - added warn for unused rules after dictionary linter
 - added the possibility to hide selected columns from dictionary table
-- (finally) added a windows installer
+- (finally) added a Windows installer
 - some minor improvements on speed and linting capabilities
 
 <a name="changelog-2.0.0"></a>
@@ -371,7 +403,7 @@ It is possible to right click on a row to bring up the popup menu and select whe
 - now all the relevant files are loaded by reading the `META-INF\manifest.xml` file, no assumptions was made
 - enhancement for hyphenation section: now it is possible also to insert custom hyphenations
 - bug fix on duplicate extraction
-- some simplifications was made in the main menu (removed thesaurus validation on request because it will be done anyway at loading)
+- some simplifications were made in the main menu (removed thesaurus validation on request because it will be done anyway at loading)
 - improvements on thesaurus table filtering
 - prevented the insertion of a new thesaurus if it is already contained
 - revised the dictionary sort dialog from scratch to better handle sections between comments

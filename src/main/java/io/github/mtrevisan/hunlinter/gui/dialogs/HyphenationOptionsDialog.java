@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,18 +24,20 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.gui.IntegerFilter;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptions;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import javax.swing.ListModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.DocumentFilter;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -47,8 +49,6 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class HyphenationOptionsDialog extends javax.swing.JDialog implements ActionListener{
@@ -64,8 +64,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 	public HyphenationOptionsDialog(final HyphenationOptionsParser options, final Consumer<HyphenationOptionsParser> acceptButtonAction, final java.awt.Frame parent){
 		super(parent, true);
 
-		Objects.requireNonNull(options);
-		Objects.requireNonNull(acceptButtonAction);
+		Objects.requireNonNull(options, "Options cannot be null");
+		Objects.requireNonNull(acceptButtonAction, "Accept button action cannot be null");
 
 		this.acceptButtonAction = acceptButtonAction;
 
@@ -81,7 +81,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 		final List<String> list = new ArrayList<>(options.getNoHyphen());
 		list.sort(Comparator.naturalOrder());
 		final DefaultListModel<String> model = new DefaultListModel<>();
-		forEach(list, model::addElement);
+		for(final String elem : list)
+			model.addElement(elem);
 		noHyphenationList.setModel(model);
 	}
 
@@ -142,18 +143,10 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       noHyphenationLabel.setText("No hyph character:");
 
       addButton.setText("Add");
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       acceptButton.setText("Accept");
-      acceptButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            acceptButtonActionPerformed(evt);
-         }
-      });
+      acceptButton.addActionListener(this::acceptButtonActionPerformed);
 
 		final Font currentFont = FontHelper.getCurrentFont();
 
@@ -163,7 +156,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
       noHyphenationList.registerKeyboardAction(this, cancelKeyStroke, JComponent.WHEN_FOCUSED);
       noHyphenationScrollPane.setViewportView(noHyphenationList);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -240,7 +233,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
    }// </editor-fold>//GEN-END:initComponents
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		if(event.getSource() == noHyphenationList)
 			removeSelectedRows();
 	}
@@ -250,8 +243,8 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			final int[] selectedRows = noHyphenationList.getSelectedIndices();
 			deleteRows(selectedRows);
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", re.getMessage());
 		}
 	}
 
@@ -261,12 +254,12 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 			model.remove(selectedRowIDs[i] - i);
 	}
 
-	private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+	private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
 		final DefaultListModel<String> model = (DefaultListModel<String>)(noHyphenationList.getModel());
 		model.addElement(noHyphenationTextField.getText());
 	}//GEN-LAST:event_addButtonActionPerformed
 
-   private void acceptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButtonActionPerformed
+   private void acceptButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_acceptButtonActionPerformed
 		final int minLeftNonCompound = (!minLeftNonCompoundTextField.getText().isEmpty()? Integer.parseInt(minLeftNonCompoundTextField.getText()): -1);
 		final int minRightNonCompound = (!minRightNonCompoundTextField.getText().isEmpty()? Integer.parseInt(minRightNonCompoundTextField.getText()): -1);
 		final int minLeftCompound = (!minLeftCompoundTextField.getText().isEmpty()? Integer.parseInt(minLeftCompoundTextField.getText()): -1);

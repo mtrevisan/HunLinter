@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,17 +28,17 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 
 
 /**
- * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
- * non-equal suffix and prefix <code>source</code> and <code>target</code> have. The
+ * Encodes {@code target} relative to {@code source} by trimming whatever
+ * non-equal suffix and prefix {@code source} and {@code target} have. The
  * output code is (bytes):
  *
  * <pre>
  * {P}{K}{suffix}
  * </pre>
  *
- * where (<code>P</code> - 'A') bytes should be trimmed from the start of
- * <code>source</code>, (<code>K</code> - 'A') bytes should be trimmed from the
- * end of <code>source</code> and then the <code>suffix</code> should be appended
+ * where ({@code P} - 'A') bytes should be trimmed from the start of
+ * {@code source}, ({@code K} - 'A') bytes should be trimmed from the
+ * end of {@code source} and then the {@code suffix} should be appended
  * to the resulting byte sequence.
  *
  * <p>
@@ -60,7 +60,7 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		//search for the maximum matching subsequence that can be encoded
 		int maxSubsequenceLength = 0;
 		int maxSubsequenceIndex = 0;
@@ -78,9 +78,10 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 		//determine how much to remove (and where) from `source` to get a prefix of `target`
 		int truncatePrefixBytes = maxSubsequenceIndex;
 		int truncateSuffixBytes = (source.length - (maxSubsequenceIndex + maxSubsequenceLength));
-		if(truncatePrefixBytes >= REMOVE_EVERYTHING || truncateSuffixBytes >= REMOVE_EVERYTHING){
+		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
 			maxSubsequenceLength = 0;
-			truncatePrefixBytes = truncateSuffixBytes = REMOVE_EVERYTHING;
+			truncateSuffixBytes = REMOVE_EVERYTHING;
+			truncatePrefixBytes = truncateSuffixBytes;
 		}
 
 		final int len1 = target.length - maxSubsequenceLength;
@@ -92,7 +93,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		int truncatePrefixBytes = decodeValue(encoded[0]);
 		int truncateSuffixBytes = decodeValue(encoded[1]);
 		if(truncatePrefixBytes == REMOVE_EVERYTHING || truncateSuffixBytes == REMOVE_EVERYTHING){
@@ -109,7 +110,7 @@ public class TrimPrefixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

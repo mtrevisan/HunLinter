@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,9 +28,25 @@ import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.Serial;
@@ -40,10 +56,8 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
-
-public class TagPanel extends JPanel{
+public final class TagPanel extends JPanel{
 
 	@Serial
 	private static final long serialVersionUID = 665517573169978352L;
@@ -98,10 +112,10 @@ public class TagPanel extends JPanel{
 			if(tags == null)
 				removeAll();
 			else
-				forEach(tags, tag -> {
+				for(final String tag : tags){
 					final JTagComponent component = new JTagComponent(tag, this::removeTag);
 					add(component, BorderLayout.LINE_END);
-				});
+				}
 
 			forceRepaint();
 		}
@@ -161,7 +175,7 @@ public class TagPanel extends JPanel{
 
 	private static final Border CLOSE_BORDER = BorderFactory.createLineBorder(COLOR_CLOSE, 1);
 
-	private static class JTagComponent extends JComponent{
+	private static final class JTagComponent extends JComponent{
 
 		@Serial
 		private static final long serialVersionUID = -7410352884175789897L;
@@ -179,7 +193,7 @@ public class TagPanel extends JPanel{
 			textLabel.setFont(currentFont);
 			textLabel.setForeground(COLOR_TEXT);
 			Dimension ps = textLabel.getPreferredSize();
-			final Dimension textLabelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
+			final Dimension textLabelSize = new Dimension(ps.width + (PAD << 1), ps.height + (PAD << 2));
 			textLabel.setPreferredSize(textLabelSize);
 			textLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -207,7 +221,7 @@ public class TagPanel extends JPanel{
 			final JPanel closePanel = new JPanel(new GridLayout());
 			closePanel.setOpaque(false);
 			ps = closeLabel.getPreferredSize();
-			final Dimension closePanelSize = new Dimension(ps.width + PAD * 2, ps.height + PAD * 4);
+			final Dimension closePanelSize = new Dimension(ps.width + (PAD << 1), ps.height + (PAD << 2));
 			closePanel.setPreferredSize(closePanelSize);
 			closePanel.add(closeLabel);
 
@@ -220,7 +234,7 @@ public class TagPanel extends JPanel{
 			super.paintComponent(g);
 
 			final int width = getWidth() - 1;
-			final int height = getHeight() - PAD * 2 - 1;
+			final int height = getHeight() - (PAD << 1) - 1;
 			final Graphics2D graphics = (Graphics2D)g;
 			graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

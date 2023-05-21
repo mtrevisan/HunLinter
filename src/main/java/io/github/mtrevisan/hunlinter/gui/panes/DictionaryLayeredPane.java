@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,35 +25,42 @@
 package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
-import io.github.mtrevisan.hunlinter.gui.models.HunLinterTableModelInterface;
-import io.github.mtrevisan.hunlinter.gui.models.InflectionTableModel;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
 import io.github.mtrevisan.hunlinter.gui.components.LabeledPopupMenu;
+import io.github.mtrevisan.hunlinter.gui.models.HunLinterTableModelInterface;
+import io.github.mtrevisan.hunlinter.gui.models.InflectionTableModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -61,16 +68,12 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.prefs.Preferences;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class DictionaryLayeredPane extends JLayeredPane{
@@ -98,6 +101,7 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	private final Packager packager;
 	private final ParserManager parserManager;
+	private DictionaryEntryFactory dictionaryEntryFactory;
 
 	private String formerInputText;
 
@@ -119,13 +123,9 @@ public class DictionaryLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(inputTextField);
 
 		try{
-			//FIXME
-//			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
-			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(iconSize, copyPopupMenu, GUIHelper::exportTableCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupExportTableMenu(copyPopupMenu, GUIHelper::exportTableCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, table);
 
 			//reset columns visibility
@@ -141,8 +141,6 @@ final int iconSize = 17;
 			GUIHelper.addPopupMenu(hideColumnsPopupMenu, table.getTableHeader());
 		}
 		catch(final IOException ignored){}
-
-		EventBusService.subscribe(this);
 	}
 
 	private void hideMorphologicalFieldsColumn(final Component invoker){
@@ -189,7 +187,7 @@ final int iconSize = 17;
 		column.setWidth(preferences.getInt(COLUMN_WIDTH, 182));
 	}
 
-	private void hideColumn(final TableColumn column){
+	private static void hideColumn(final TableColumn column){
 		column.setMinWidth(0);
 		column.setMaxWidth(0);
 		column.setWidth(0);
@@ -203,26 +201,7 @@ final int iconSize = 17;
       ruleFlagsAidLabel = new javax.swing.JLabel();
       ruleFlagsAidComboBox = new javax.swing.JComboBox<>();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String inflection = (String)model.getValueAt(row, 0);
-            final String morphologicalFields = (String)model.getValueAt(row, 1);
-            final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
-            .map(AffixEntry::toString)
-            .orElse(null);
-            final StringJoiner sj = new StringJoiner(TAB);
-            applyIf(new String[]{inflection, morphologicalFields, rule1, rule2, rule3}, Objects::nonNull, sj::add);
-            return sj.toString();
-         }
-      };
+      table = new MyJCopyableTable();
       totalInflectionsLabel = new javax.swing.JLabel();
       totalInflectionsValueLabel = new javax.swing.JLabel();
       openAidButton = new javax.swing.JButton();
@@ -237,7 +216,7 @@ final int iconSize = 17;
       inputTextField.setEnabled(false);
       inputTextField.setPreferredSize(new java.awt.Dimension(7, 22));
       inputTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             inputTextFieldKeyReleased(evt);
          }
       });
@@ -260,7 +239,7 @@ final int iconSize = 17;
       table.setRowSelectionAllowed(true);
       final TableCellRenderer dicCellRenderer = new TableRenderer();
       for(int i = 0; i < table.getColumnCount(); i ++)
-      table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
+      	table.getColumnModel().getColumn(i).setCellRenderer(dicCellRenderer);
       scrollPane.setViewportView(table);
 
       totalInflectionsLabel.setText("Total inflections:");
@@ -290,8 +269,8 @@ final int iconSize = 17;
       setLayer(openAffButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openDicButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -343,7 +322,8 @@ final int iconSize = 17;
    }// </editor-fold>//GEN-END:initComponents
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -357,6 +337,8 @@ final int iconSize = 17;
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
+			dictionaryEntryFactory = new DictionaryEntryFactory(parserManager.getAffixData());
+
 			//affix file:
 			inputTextField.setEnabled(true);
 			inputTextField.requestFocusInWindow();
@@ -367,24 +349,23 @@ final int iconSize = 17;
 			//aid file:
 			final List<String> lines = parserManager.getAidParser().getLines();
 			ruleFlagsAidComboBox.removeAllItems();
-			forEach(lines, ruleFlagsAidComboBox::addItem);
+			for(final String line : lines)
+				ruleFlagsAidComboBox.addItem(line);
 			//enable combo-box only if an AID file exists
 			final boolean aidLinesPresent = !lines.isEmpty();
 			ruleFlagsAidComboBox.setEnabled(aidLinesPresent);
 			openAidButton.setEnabled(aidLinesPresent);
 		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
-			LOGGER.error("A bad error occurred", e);
+			LOGGER.error("A bad error occurred", re);
 		}
 	}
 
 	@EventHandler
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_DICTIONARY)
 			return;
 
@@ -406,7 +387,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
-	public void clearAid(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearAid(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AID)
 			return;
 
@@ -415,14 +397,16 @@ final int iconSize = 17;
 		ruleFlagsAidComboBox.setEnabled(false);
 	}
 
-	private void inputTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyReleased
+	private void inputTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputTextFieldKeyReleased
 		debouncer.call(this);
 	}//GEN-LAST:event_inputTextFieldKeyReleased
 
 	private void calculateInflections(){
+		final String language = parserManager.getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final String text = inputTextField.getText().trim();
 
-		if(formerInputText != null && formerInputText.equals(text))
+		if(text.equals(formerInputText))
 			return;
 		formerInputText = text;
 
@@ -430,18 +414,18 @@ final int iconSize = 17;
 
 		if(StringUtils.isNotBlank(text)){
 			try{
-				final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(text,
-					parserManager.getAffixData());
-				final Inflection[] inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
+				final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(text);
+				final List<Inflection> inflections = parserManager.getWordGenerator().applyAffixRules(dicEntry);
 
-				final InflectionTableModel dm = (InflectionTableModel)table.getModel();
-				dm.setInflections(Arrays.asList(inflections));
+				@SuppressWarnings("unchecked")
+				final HunLinterTableModelInterface<Inflection> dm = (HunLinterTableModelInterface<Inflection>)table.getModel();
+				dm.setInflections(inflections);
 
 				//show first row
 				final Rectangle cellRect = table.getCellRect(0, 0, true);
 				table.scrollRectToVisible(cellRect);
 
-				totalInflectionsValueLabel.setText(Integer.toString(inflections.length));
+				totalInflectionsValueLabel.setText(Integer.toString(inflections.size()));
 
 				//check for correctness
 				int index = 0;
@@ -453,44 +437,74 @@ final int iconSize = 17;
 					try{
 						checker.checkInflection(inflection, index);
 					}
-					catch(final Exception e){
+					catch(final RuntimeException re){
 						dicCellRenderer.setErrorOnRow(index);
 
 						sb.setLength(0);
-						sb.append(e.getMessage());
+						sb.append(re.getMessage());
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
-						final String errorMessage = ExceptionHelper.getMessage(e);
+						final String errorMessage = ExceptionHelper.getMessage(re);
 						LOGGER.trace("{}, line {}", errorMessage, index);
-						LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
+						LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}", sb, index);
 					}
 
 					index ++;
 				}
 			}
-			catch(final Exception e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{} for input {}", e.getMessage(), text);
+			catch(final RuntimeException re){
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{} for input {}", re.getMessage(), text);
 			}
 		}
 		else
 			totalInflectionsValueLabel.setText(null);
 	}
 
-	private void clearOutputTable(final JTable table){
+	private static void clearOutputTable(final JTable table){
 		final HunLinterTableModelInterface<?> dm = (HunLinterTableModelInterface<?>)table.getModel();
 		dm.clear();
+	}
+
+	private static final class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final TableModel model = getModel();
+			final CharSequence inflection = (CharSequence)model.getValueAt(row, 0);
+			final CharSequence morphologicalFields = (CharSequence)model.getValueAt(row, 1);
+			final String rule1 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 2))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final String rule2 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 3))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final String rule3 = Optional.ofNullable((AffixEntry)model.getValueAt(row, 4))
+				.map(AffixEntry::toString)
+				.orElse(null);
+			final StringJoiner sj = new StringJoiner(TAB);
+			if(Objects.nonNull(inflection))
+				sj.add(inflection);
+			if(Objects.nonNull(morphologicalFields))
+				sj.add(morphologicalFields);
+			if(Objects.nonNull(rule1))
+				sj.add(rule1);
+			if(Objects.nonNull(rule2))
+				sj.add(rule2);
+			if(Objects.nonNull(rule3))
+				sj.add(rule3);
+			return sj.toString();
+		}
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

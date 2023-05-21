@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,36 +24,37 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import org.apache.commons.lang3.ArrayUtils;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 
 /**
- * This class implements a dictionary lookup of an inflected word over a
- * dictionary previously compiled using the
- * <code>dict_compile</code> tool.
+ * This class implements a dictionary lookup.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class DictionaryLookup implements Iterable<WordData>{
 
-	/** An FSA used for lookups */
+	/** An FSA used for look-ups. */
 	private final FSATraversal matcher;
 
-	/** An iterator for walking along the final states of the given FSA */
+	/** An iterator for walking along the final states of the given FSA. */
 	private final ByteSequenceIterator finalStatesIterator;
 
-	/** Private internal array of reusable word data objects */
-	private final SimpleDynamicArray<WordData> forms = new SimpleDynamicArray<>(WordData.class);
+	/** Private internal array of reusable word data objects. */
+	private final List<WordData> forms = new ArrayList<>(0);
 
-	/** The {@link Dictionary} this lookup is using */
+	/** The {@link Dictionary} this lookup is using. */
 	private final Dictionary dictionary;
 
 	private final SequenceEncoderInterface sequenceEncoder;
@@ -63,15 +64,15 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * Creates a new object of this class using the given FSA for word lookups
 	 * and encoding for converting characters to bytes.
 	 *
-	 * @param dictionary	The dictionary to use for lookups.
+	 * @param dictionary	The dictionary to use for look-ups.
 	 * @throws IllegalArgumentException	If FSA's root node cannot be acquired (dictionary is empty).
 	 */
 	public DictionaryLookup(final Dictionary dictionary) throws IllegalArgumentException{
-		Objects.requireNonNull(dictionary);
-		final FSA fsa = dictionary.fsa;
+		Objects.requireNonNull(dictionary, "Dictionary cannot be null");
+		final FSAAbstract fsa = dictionary.fsa;
 		final DictionaryMetadata metadata = dictionary.metadata;
-		Objects.requireNonNull(fsa);
-		Objects.requireNonNull(metadata);
+		Objects.requireNonNull(fsa, "FSA cannot be null");
+		Objects.requireNonNull(metadata, "Metadata cannot be null");
 
 		this.dictionary = dictionary;
 
@@ -82,7 +83,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 
 	/**
 	 * Returns a list of {@link WordData} entries for a given word. The returned
-	 * list is never <code>null</code>. Depending on the stemmer's
+	 * list is never {@code null}. Depending on the stemmer's
 	 * implementation the {@link WordData} may carry the stem and additional
 	 * information (tag) or just the stem.
 	 * <p>
@@ -93,7 +94,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 	 * @param word	The word (typically inflected) to look up base forms for.
 	 * @return	A list of {@link WordData} entries (possibly empty).
 	 */
-	public WordData[] lookup(String word){
+	public final List<WordData> lookup(String word){
 		final byte separator = dictionary.metadata.getSeparator();
 
 		if(!dictionary.metadata.getInputConversionPairs().isEmpty())
@@ -104,7 +105,8 @@ public class DictionaryLookup implements Iterable<WordData>{
 		if(ArrayUtils.indexOf(wordAsByteArray, separator) >= 0)
 			throw new IllegalArgumentException("No valid input can contain the separator: " + word);
 
-		forms.reset();
+		//clear the output list
+		forms.clear();
 
 		//try to find a partial match in the dictionary
 		final FSAMatchResult match = matcher.match(wordAsByteArray, dictionary.fsa.getRootNode());
@@ -125,7 +127,7 @@ public class DictionaryLookup implements Iterable<WordData>{
 					final byte[] bbArray = bb.array();
 					int separatorIndex = ArrayUtils.indexOf(bbArray, separator);
 
-					//now, expand the prefix/ suffix 'compression' and store the base form
+					//now, expand the prefix/suffix 'compression' and store the base form
 					final WordData wordData = new WordData();
 					final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
 					wordData.setWord((outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs))
@@ -152,11 +154,17 @@ public class DictionaryLookup implements Iterable<WordData>{
 			}
 		}
 		else if(match.kind == FSAMatchResult.EXACT_MATCH){
-			//this case is somewhat confusing: we should have hit the separator first...
-			//I don't really know how to deal with it at the time being.
-			throw new IllegalArgumentException("what?!?!");
+			//there is such a word in the dictionary (used for containment only!!), return its base form
+
+			//now, expand the prefix/suffix 'compression' and store the base form
+			final WordData wordData = new WordData();
+			final Map<String, String> outputConversionPairs = dictionary.metadata.getOutputConversionPairs();
+			wordData.setWord((outputConversionPairs.isEmpty()? word: applyReplacements(word, outputConversionPairs))
+				.getBytes(dictionary.metadata.getCharset()));
+
+			forms.add(wordData);
 		}
-		return forms.extractCopy();
+		return forms;
 	}
 
 	/**
@@ -183,9 +191,9 @@ public class DictionaryLookup implements Iterable<WordData>{
 		return sb.toString();
 	}
 
-	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary} */
+	/** Return an iterator over all {@link WordData} entries available in the embedded {@link Dictionary}. */
 	@Override
-	public Iterator<WordData> iterator(){
+	public final Iterator<WordData> iterator(){
 		return new DictionaryIterator(dictionary, true);
 	}
 

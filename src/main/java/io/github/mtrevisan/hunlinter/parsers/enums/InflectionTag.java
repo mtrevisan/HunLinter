@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -190,7 +191,7 @@ public enum InflectionTag{
 	PLURAL_FEMENINE_LONGOBARDO("plural+femenine+longobardo", "p", "f", "lon"),
 
 	LONBARDO("lonbardo", "lob"),
-	FIRST_SINGULAR_LONBARDO("singular+masculine+lonbardo", "1", "s", "lob"),
+	FIRST_SINGULAR_LONBARDO("first+singular+lonbardo", "1", "s", "lob"),
 	MASCULINE_NON_ENUMERABLE_LONBARDO("masculine+non_enumerable+lonbardo", "m", "ne", "lob"),
 
 	BOLONHEXE("boloñexe", "bol"),
@@ -232,10 +233,13 @@ public enum InflectionTag{
 	NORDIC("nordic", "n");
 
 
-	private static final Map<String, InflectionTag> VALUES = new HashMap<>();
+	private static final Map<String, InflectionTag> VALUES;
 	static{
-		for(final InflectionTag tag : EnumSet.allOf(InflectionTag.class))
-			VALUES.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);
+		final EnumSet<InflectionTag> tags = EnumSet.allOf(InflectionTag.class);
+		final Map<String, InflectionTag> map = new HashMap<>(tags.size());
+		for(final InflectionTag tag : tags)
+			map.put(MorphologicalTag.INFLECTIONAL_SUFFIX.getCode() + tag.code, tag);
+		VALUES = Collections.unmodifiableMap(map);
 	}
 
 	private final String code;

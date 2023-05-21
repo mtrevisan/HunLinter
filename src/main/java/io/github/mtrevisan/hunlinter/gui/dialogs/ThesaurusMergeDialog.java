@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,22 +24,21 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import java.awt.Font;
+import java.awt.Frame;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class ThesaurusMergeDialog extends JDialog{
@@ -57,7 +56,7 @@ public class ThesaurusMergeDialog extends JDialog{
 	public ThesaurusMergeDialog(final String definition, final SynonymsEntry baseSynonyms, final List<SynonymsEntry> synonymsEntries, final Frame parent){
 		super(parent, "Thesaurus merger", true);
 
-		Objects.requireNonNull(synonymsEntries);
+		Objects.requireNonNull(synonymsEntries, "Synonyms entries cannot be null");
 
 		this.baseSynonyms = baseSynonyms;
 		this.definition = definition;
@@ -67,7 +66,8 @@ public class ThesaurusMergeDialog extends JDialog{
 
 		GUIHelper.addUndoManager(mergerTextArea);
 
-		forEach(synonymsEntries, entry -> lineComboBox.addItem(entry.toString()));
+		for(final SynonymsEntry entry : synonymsEntries)
+			lineComboBox.addItem(entry.toString());
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -87,11 +87,7 @@ public class ThesaurusMergeDialog extends JDialog{
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		lineComboBox.setFont(currentFont);
-      lineComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            lineComboBoxActionPerformed(evt);
-         }
-      });
+      lineComboBox.addActionListener(this::lineComboBoxActionPerformed);
 
       mergerScrollPane.setBackground(java.awt.Color.white);
       mergerScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
@@ -104,13 +100,9 @@ public class ThesaurusMergeDialog extends JDialog{
       mergerScrollPane.setViewportView(mergerTextArea);
 
       mergeButton.setText("Merge");
-      mergeButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            mergeButtonActionPerformed(evt);
-         }
-      });
+      mergeButton.addActionListener(this::mergeButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -145,7 +137,7 @@ public class ThesaurusMergeDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void lineComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
+   private void lineComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lineComboBoxActionPerformed
 		final int synonymsIndex = lineComboBox.getSelectedIndex();
 
 		final String def = (baseSynonyms.containsSynonym(definition)? StringUtils.EMPTY: definition);
@@ -156,30 +148,30 @@ public class ThesaurusMergeDialog extends JDialog{
 		mergerTextArea.setCaretPosition(0);
    }//GEN-LAST:event_lineComboBoxActionPerformed
 
-   private void mergeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeButtonActionPerformed
+   private void mergeButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeButtonActionPerformed
 		merged = true;
 
 		dispose();
    }//GEN-LAST:event_mergeButtonActionPerformed
 
-	public String getMerge(){
+	public final String getMerge(){
 		return mergerTextArea.getText();
 	}
 
-	public boolean isMerged(){
+	public final boolean isMerged(){
 		return merged;
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

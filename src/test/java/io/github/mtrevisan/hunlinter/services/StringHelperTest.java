@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

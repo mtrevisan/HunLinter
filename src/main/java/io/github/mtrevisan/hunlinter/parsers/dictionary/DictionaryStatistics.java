@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 
 /**
@@ -59,8 +58,8 @@ public class DictionaryStatistics implements Closeable{
 	private final Frequency<String> syllabesFrequencies = new Frequency<>();
 	private final Frequency<Integer> syllabeLengthsFrequencies = new Frequency<>();
 	private final Frequency<Integer> stressFromLastFrequencies = new Frequency<>();
-	private final List<String> longestWordsByCharacters = new ArrayList<>();
-	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>();
+	private final List<String> longestWordsByCharacters = new ArrayList<>(0);
+	private final List<Hyphenation> longestWordsBySyllabes = new ArrayList<>(0);
 
 	private final BloomFilterInterface<String> bloomFilter;
 	private final Orthography orthography;
@@ -72,70 +71,71 @@ public class DictionaryStatistics implements Closeable{
 		orthography = BaseBuilder.getOrthography(language);
 	}
 
-	public int getTotalInflections(){
+	public final int getTotalInflections(){
 		return totalInflections;
 	}
 
-	public int getLongestWordCountByCharacters(){
+	public final int getLongestWordCountByCharacters(){
 		return longestWordCountByCharacters;
 	}
 
-	public int getLongestWordCountBySyllabes(){
+	public final int getLongestWordCountBySyllabes(){
 		return longestWordCountBySyllabes;
 	}
 
-	/** @return	The count of unique words */
-	public int getUniqueWords(){
+	/** @return	The count of unique words. */
+	public final int getUniqueWords(){
 		return bloomFilter.getAddedElements();
 	}
 
-	/** @return	The count of compound words */
-	public int getCompoundWords(){
+	/** @return	The count of compound words. */
+	public final int getCompoundWords(){
 		return compoundWords;
 	}
 
-	public int getContractedWords(){
+	public final int getContractedWords(){
 		return contractedWords;
 	}
 
-	public synchronized Frequency<Integer> getLengthsFrequencies(){
+	public final Frequency<Integer> getLengthsFrequencies(){
 		return lengthsFrequencies;
 	}
 
-	public synchronized Frequency<Integer> getSyllabeLengthsFrequencies(){
+	public final Frequency<Integer> getSyllabeLengthsFrequencies(){
 		return syllabeLengthsFrequencies;
 	}
 
-	public synchronized Frequency<Integer> getStressFromLastFrequencies(){
+	public final Frequency<Integer> getStressFromLastFrequencies(){
 		return stressFromLastFrequencies;
 	}
 
-	public synchronized List<String> getLongestWordsByCharacters(){
+	public final List<String> getLongestWordsByCharacters(){
 		return longestWordsByCharacters;
 	}
 
-	public synchronized List<Hyphenation> getLongestWordsBySyllabes(){
+	public final List<Hyphenation> getLongestWordsBySyllabes(){
 		return longestWordsBySyllabes;
 	}
 
-	public synchronized boolean hasSyllabeStatistics(){
+	public final boolean hasSyllabeStatistics(){
 		return (totalInflections > 0 && syllabeLengthsFrequencies.getSumOfFrequencies() > 0);
 	}
 
-	public void addData(final String word){
+	public final void addData(final String word){
 		addData(word, null);
 	}
 
-	public synchronized void addData(final String word, final Hyphenation hyphenation){
+	public final void addData(final String word, final Hyphenation hyphenation){
 		if(hyphenation != null && !orthography.hasSyllabationErrors(hyphenation.getSyllabes())){
-			final String[] syllabes = hyphenation.getSyllabes();
+			final List<String> syllabes = hyphenation.getSyllabes();
 
 			final int stressIndex = orthography.getStressedSyllabeIndexFromLast(syllabes);
 			if(stressIndex >= 0)
 				stressFromLastFrequencies.addValue(stressIndex);
-			syllabeLengthsFrequencies.addValue(syllabes.length);
+			syllabeLengthsFrequencies.addValue(syllabes.size());
 			final StringBuilder sb = new StringBuilder();
-			for(final String syllabe : syllabes){
+			for(int  i = 0; i < syllabes.size(); i ++){
+				final String syllabe = syllabes.get(i);
 				sb.append(syllabe);
 				if(orthography.countGraphemes(syllabe) == syllabe.length())
 					syllabesFrequencies.addValue(syllabe);
@@ -148,18 +148,18 @@ public class DictionaryStatistics implements Closeable{
 				compoundWords ++;
 			if(subword.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalInflections++;
+			totalInflections ++;
 		}
 		else{
 			lengthsFrequencies.addValue(word.length());
 			storeLongestWord(word);
 			if(word.contains(HyphenationParser.APOSTROPHE))
 				contractedWords ++;
-			totalInflections++;
+			totalInflections ++;
 		}
 	}
 
-	private synchronized void storeLongestWord(final String word){
+	private void storeLongestWord(final String word){
 		final int letterCount = orthography.countGraphemes(word);
 		if(letterCount > longestWordCountByCharacters){
 			longestWordsByCharacters.clear();
@@ -172,9 +172,9 @@ public class DictionaryStatistics implements Closeable{
 		bloomFilter.add(word);
 	}
 
-	private synchronized void storeHyphenation(final Hyphenation hyphenation){
-		final String[] syllabes = hyphenation.getSyllabes();
-		final int syllabeCount = syllabes.length;
+	private void storeHyphenation(final Hyphenation hyphenation){
+		final List<String> syllabes = hyphenation.getSyllabes();
+		final int syllabeCount = syllabes.size();
 		if(syllabeCount > longestWordCountBySyllabes){
 			longestWordsBySyllabes.clear();
 			longestWordsBySyllabes.add(hyphenation);
@@ -184,18 +184,24 @@ public class DictionaryStatistics implements Closeable{
 			longestWordsBySyllabes.add(hyphenation);
 	}
 
-	public synchronized List<String> getMostCommonSyllabes(final int size){
-		return syllabesFrequencies.getMostCommonValues(size).stream()
-			.map(value -> value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value)) + "f%%)", syllabesFrequencies.getPercentOf(value) * 100.))
-			.collect(Collectors.toList());
+	@SuppressWarnings("StringConcatenationInFormatCall")
+	public final List<String> getMostCommonSyllabes(final int size){
+		final List<String> values = syllabesFrequencies.getMostCommonValues(size);
+		final List<String> list = new ArrayList<>(values.size());
+		for(int i = 0; i < values.size(); i ++){
+			final String value = values.get(i);
+			list.add(value + String.format(Locale.ROOT, " (%." + Frequency.getDecimals(syllabesFrequencies.getPercentOf(value))
+				+ "f%%)", syllabesFrequencies.getPercentOf(value) * 100.));
+		}
+		return list;
 	}
 
 	@Override
-	public void close(){
+	public final void close(){
 		bloomFilter.close();
 	}
 
-	public synchronized void clear(){
+	public final void clear(){
 		totalInflections = 0;
 		longestWordCountByCharacters = 0;
 		longestWordCountBySyllabes = 0;

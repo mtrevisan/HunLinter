@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.regexgenerator;
 
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -38,7 +39,7 @@ import java.util.StringJoiner;
 /**
  * The {@code Digraph} class represents a directed graph of vertices.
  * <p>
- * It supports the following two primary operations: add an edge to the digraph, iterate over all of the vertices adjacent from a given vertex.
+ * It supports the following two primary operations: add an edge to the digraph, iterate over all the vertices adjacent from a given vertex.
  * Parallel edges and self-loops are permitted.
  * <p>
  * This implementation uses an adjacency-lists representation, which is a vertex-indexed array of {@link Pair} objects.
@@ -52,10 +53,10 @@ import java.util.StringJoiner;
  */
 public final class Digraph<T>{
 
-	private static final String NEWLINE = System.getProperty("line.separator");
+	private static final String NEWLINE = "\r\n";
 
 	//adjacency list for given vertex
-	private final List<List<Pair<Integer, T>>> adjacency = new ArrayList<>(0);
+	private final List<List<IndexDataPair<T>>> adjacency = new ArrayList<>(0);
 
 
 	public Digraph(){}
@@ -67,14 +68,14 @@ public final class Digraph<T>{
 	 */
 	public Digraph(final Digraph<T> graph){
 		final int vertices = graph.adjacency.size();
-		final Deque<Pair<Integer, T>> reverse = new ArrayDeque<>();
+		final Deque<IndexDataPair<T>> reverse = new ArrayDeque<>();
 		for(int v = 0; v < vertices; v ++){
 			//reverse so that adjacency list is in same order as original
 			reverse.clear();
-			for(final Pair<Integer, T> w : graph.adjacency.get(v))
+			for(final IndexDataPair<T> w : graph.adjacency.get(v))
 				reverse.push(w);
-			for(final Pair<Integer, T> w : reverse)
-				addEdge(v, w.getKey(), w.getValue());
+			for(final IndexDataPair<T> w : reverse)
+				addEdge(v, w.getIndex(), w.getData());
 		}
 	}
 
@@ -89,7 +90,7 @@ public final class Digraph<T>{
 	}
 
 	/**
-	 * Adds the directed edge {@code v→w} upon input <code>value</code> to this digraph.
+	 * Adds the directed edge {@code v→w} upon input {@code value} to this digraph.
 	 *
 	 * @param v	The tail vertex
 	 * @param w	The head vertex
@@ -98,7 +99,8 @@ public final class Digraph<T>{
 	public void addEdge(final int v, final int w, final T value){
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
-		adjacency.get(v).add(0, Pair.of(w, value));
+		adjacency.get(v)
+			.add(0, IndexDataPair.of(w, value));
 	}
 
 	/**
@@ -108,7 +110,7 @@ public final class Digraph<T>{
 	 * @return the vertices adjacent from vertex {@code vertex}
 	 * @throws IndexOutOfBoundsException unless {@code 0 <= vertex < vertices}
 	 */
-	public Iterable<Pair<Integer, T>> adjacentVertices(final int vertex){
+	public Iterable<IndexDataPair<T>> adjacentVertices(final int vertex){
 		return (vertex < adjacency.size()? adjacency.get(vertex): Collections.emptyList());
 	}
 
@@ -121,9 +123,9 @@ public final class Digraph<T>{
 		final Digraph<T> reverse = new Digraph<>();
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
-			final Iterable<Pair<Integer, T>> transitions = adjacentVertices(v);
-			for(final Pair<Integer, T> w : transitions)
-				reverse.addEdge(w.getKey(), v, w.getValue());
+			final Iterable<IndexDataPair<T>> transitions = adjacentVertices(v);
+			for(final IndexDataPair<T> w : transitions)
+				reverse.addEdge(w.getIndex(), v, w.getData());
 		}
 		return reverse;
 	}
@@ -135,24 +137,24 @@ public final class Digraph<T>{
 	 */
 	@Override
 	public String toString(){
-		final StringBuilder s = new StringBuilder();
-		s.append(NEWLINE);
+		final StringBuilder sb = new StringBuilder();
+		sb.append(NEWLINE);
 		final int vertices = adjacency.size();
 		for(int v = 0; v < vertices; v ++){
 			final StringJoiner transitions = new StringJoiner(", ");
 			forEach(adjacency.get(v), transitions);
-			s.append(v)
+			sb.append(v)
 				.append(':')
 				.append(StringUtils.SPACE)
 				.append(transitions)
 				.append(NEWLINE);
 		}
-		return s.toString();
+		return sb.toString();
 	}
 
-	public static <T> void forEach(final Iterable<Pair<Integer, T>> adjacency, final StringJoiner transitions){
-		for(final Pair<Integer, T> w : adjacency)
-			transitions.add(w.getKey() + StringUtils.SPACE + "(" + (w.getValue() != null? w.getValue(): "ε") + ")");
+	public static <T> void forEach(final Iterable<IndexDataPair<T>> adjacency, final StringJoiner transitions){
+		for(final IndexDataPair<T> w : adjacency)
+			transitions.add(w.getIndex() + StringUtils.SPACE + "(" + (w.getData() != null? w.getData(): "ε") + ")");
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,70 +24,76 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
-
-public class SynonymsEntry implements Comparable<SynonymsEntry>{
+public class SynonymsEntry{
 
 	private static final String COLUMN = ":";
 	private static final String COMMA = ",";
+	private static final String PIPE = "|";
 
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Wrong format for thesaurus entry: `{0}`");
-	private static final MessageFormat POS_NOT_IN_PARENTHESIS = new MessageFormat("Part-of-speech is not in parenthesis: `{0}`");
-	private static final MessageFormat NOT_ENOUGH_SYNONYMS = new MessageFormat("Not enough synonyms are supplied (at least one should be present): `{0}`");
-
-
-	private final String[] partOfSpeeches;
-	private final List<String> synonyms = new ArrayList<>();
+	private static final String WRONG_FORMAT = "Wrong format for thesaurus entry: `{}`";
+	private static final String POS_NOT_IN_PARENTHESIS = "Part-of-speech is not in parenthesis: `{}`";
+	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
 
-	public SynonymsEntry(final String partOfSpeechAndSynonyms){
+	private final List<String> partOfSpeeches;
+	private final List<String> synonyms;
+
+
+	public SynonymsEntry(String partOfSpeechAndSynonyms){
 		Objects.requireNonNull(partOfSpeechAndSynonyms, "Part-of-speech and synonyms cannot be null");
 
 		//all entries should be in lowercase
+		if(partOfSpeechAndSynonyms.charAt(0) == ThesaurusEntry.PIPE.charAt(0))
+			partOfSpeechAndSynonyms = HyphenationParser.MINUS_SIGN + partOfSpeechAndSynonyms;
 		final String[] components = StringUtils.split(partOfSpeechAndSynonyms.toLowerCase(Locale.ROOT),
 			ThesaurusEntry.PART_OF_SPEECH_SEPARATOR, 2);
-		if(components.length < 2)
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{partOfSpeechAndSynonyms}));
+		if(components.length == 2){
+			final String partOfSpeech = components[0].trim();
+			final char firstChar = partOfSpeech.charAt(0);
+			final char lastChart = StringHelper.lastChar(partOfSpeech);
+			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
+				throw new LinterException(POS_NOT_IN_PARENTHESIS, partOfSpeechAndSynonyms);
 
-		final String partOfSpeech = components[0].trim();
-		if(partOfSpeech.charAt(0) == '(' ^ partOfSpeech.charAt(partOfSpeech.length() - 1) == ')')
-			throw new LinterException(POS_NOT_IN_PARENTHESIS.format(new Object[]{partOfSpeechAndSynonyms}));
+			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
+			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
+			partOfSpeeches = Arrays.asList(StringUtils.split(pos, ','));
+			for(int i = 0; i < partOfSpeeches.size(); i ++)
+				partOfSpeeches.set(i, partOfSpeeches.get(i).trim());
+			partOfSpeeches.sort(Comparator.naturalOrder());
 
-		partOfSpeeches = StringUtils.split(StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")"), ',');
-		for(int i = 0; i < partOfSpeeches.length; i ++)
-			partOfSpeeches[i] = partOfSpeeches[i].trim();
-
-		final Collection<String> uniqueValues = new HashSet<>();
-		for(final String synonym : StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR)){
-			final String trim = synonym.trim();
-			if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
-				synonyms.add(trim);
+			final String[] syns = StringUtils.split(components[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
+			final Collection<String> uniqueValues = new HashSet<>(syns.length);
+			synonyms = new ArrayList<>(syns.length);
+			for(final String synonym : syns){
+				final String trim = synonym.trim();
+				if(StringUtils.isNotBlank(trim) && uniqueValues.add(trim))
+					synonyms.add(trim);
+			}
+			if(synonyms.isEmpty())
+				throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
 		}
-		if(synonyms.isEmpty())
-			throw new LinterException(NOT_ENOUGH_SYNONYMS.format(new Object[]{partOfSpeechAndSynonyms}));
+		else
+			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 	}
 
-	public SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){
+	public final SynonymsEntry merge(final CharSequence definition, final SynonymsEntry entry){
 		final SynonymsEntry newEntry = new SynonymsEntry(toString());
 
 		//remove intersection
@@ -99,45 +105,49 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 		return newEntry;
 	}
 
-	public String[] getPartOfSpeeches(){
+	public final List<String> getPartOfSpeeches(){
 		return partOfSpeeches;
 	}
 
-	public boolean hasSamePartOfSpeeches(final String[] partOfSpeeches){
-		return SetHelper.setOf(this.partOfSpeeches).equals(new HashSet<>(Arrays.asList(partOfSpeeches)));
+	public final boolean hasSamePartOfSpeeches(final List<String> partOfSpeeches){
+		partOfSpeeches.sort(Comparator.naturalOrder());
+		return this.partOfSpeeches.equals(partOfSpeeches);
 	}
 
-	public List<String> getSynonyms(){
+	public final List<String> getSynonyms(){
 		return synonyms;
 	}
 
-	public boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
-		return !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches);
+	public final boolean containsPartOfSpeech(final Collection<String> partOfSpeeches){
+		return !Collections.disjoint(this.partOfSpeeches, partOfSpeeches);
 	}
 
-	public boolean containsSynonym(final String synonym){
-		return (LoopHelper.match(synonyms, s -> ThesaurusDictionary.removeSynonymUse(s).equals(synonym)) != null);
+	public final boolean containsSynonym(final String synonym){
+		if(synonyms != null)
+			for(int i = 0; i < synonyms.size(); i ++)
+				if(ThesaurusDictionary.removeSynonymUse(synonyms.get(i)).equals(synonym))
+					return true;
+		return false;
 	}
 
-	public boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
-		return ((partOfSpeeches == null || Arrays.asList(this.partOfSpeeches).containsAll(partOfSpeeches))
-			&& this.synonyms.containsAll(synonyms));
+	public final boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
+		return ((partOfSpeeches == null || this.partOfSpeeches.containsAll(partOfSpeeches)) && this.synonyms.containsAll(synonyms));
 	}
 
-	public boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
-		return ((partOfSpeeches == null || !Collections.disjoint(Arrays.asList(this.partOfSpeeches), partOfSpeeches))
+	public final boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
+		return ((partOfSpeeches == null || !Collections.disjoint(this.partOfSpeeches, partOfSpeeches))
 			&& !Collections.disjoint(this.synonyms, synonyms));
 	}
 
 	@Override
-	public String toString(){
-		return (new StringJoiner(COLUMN))
-			.add(String.join(COMMA, partOfSpeeches))
-			.add(StringUtils.join(synonyms, COMMA))
+	public final String toString(){
+		return (new StringJoiner(PIPE))
+			.add("(" + String.join(COMMA, partOfSpeeches) + ")")
+			.add(StringUtils.join(synonyms, PIPE))
 			.toString();
 	}
 
-	public String toLine(final CharSequence definition){
+	public final String toLine(final CharSequence definition){
 		final StringJoiner sj = new StringJoiner(", ", "(", ")");
 		for(final String partOfSpeech : partOfSpeeches)
 			sj.add(partOfSpeech);
@@ -149,33 +159,22 @@ public class SynonymsEntry implements Comparable<SynonymsEntry>{
 	}
 
 	@Override
-	public int compareTo(final SynonymsEntry other){
-		return new CompareToBuilder()
-			.append(partOfSpeeches, other.partOfSpeeches)
-			.append(synonyms, other.synonyms)
-			.toComparison();
-	}
-
-	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final SynonymsEntry rhs = (SynonymsEntry)obj;
-		return new EqualsBuilder()
-			.append(partOfSpeeches, rhs.partOfSpeeches)
-			.append(synonyms, rhs.synonyms)
-			.isEquals();
+		return (partOfSpeeches.equals(rhs.partOfSpeeches)
+			&& synonyms.equals(rhs.synonyms));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(partOfSpeeches)
-			.append(synonyms)
-			.toHashCode();
+	public final int hashCode(){
+		int result = synonyms.hashCode();
+		result = 31 * result + partOfSpeeches.hashCode();
+		return result;
 	}
 
 }

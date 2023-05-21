@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
+import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_10Charset;
+import io.github.mtrevisan.hunlinter.services.system.charsets.ISO8859_14Charset;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
@@ -32,7 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -46,47 +49,67 @@ import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public final class FileHelper{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileHelper.class);
 
-	private static final MessageFormat WRONG_FILE_FORMAT_CHARSET = new MessageFormat("The file is not in an allowable charset ({0})");
+	private static final String CANNOT_READ_FILE = "The file cannot be read with the given charset {}";
+	private static final String WRONG_FILE_FORMAT_CHARSET = "The file is not in an allowable charset ({}), found {}";
 
+	private static final String ISO_8859_10 = "ISO-8859-10";
+	private static final String ISO_8859_14 = "ISO-8859-14";
+	private static final String MICROSOFT_CP_1251 = "MICROSOFT-CP1251";
+	private static final String ISCII_DEVANAGARI = "ISCII-DEVANAGARI";
+	private static final String TIS_620_2533 = "TIS620-2533";
 
+	private static final String[] HUNSPELL_CHARSET_NAMES = {
+		"UTF-8",
+		"ISO-8859-1", "ISO-8859-2", "ISO-8859-3", "ISO-8859-4", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7", "ISO-8859-8", "ISO-8859-9",
+		ISO_8859_10, "ISO-8859-13", ISO_8859_14, "ISO-8859-15",
+		"KOI8-R", "KOI8-U", MICROSOFT_CP_1251, ISCII_DEVANAGARI, TIS_620_2533
+	};
 	private static final List<Charset> HUNSPELL_CHARSETS;
+	private static final Map<String, String> CHARSET_ALIASES = Map.of(
+		MICROSOFT_CP_1251, "WINDOWS-1251",
+		ISCII_DEVANAGARI, "x-ISCII91",
+		TIS_620_2533, "TIS-620"
+	);
 	static{
-		HUNSPELL_CHARSETS = Stream.of(
-				"UTF-8", "ISO_8859_1", "ISO_8859_2", "ISO_8859_3", "ISO_8859_4", "ISO_8859_5",
-				"ISO_8859_6", "ISO_8859_7", "ISO_8859_8", "ISO_8859_9", "ISO_8859_10", "ISO_8859_13", "ISO_8859_14", "ISO_8859_15",
-				"KOI8_R", "KOI8_U", "MICROSOFT_CP1251", "ISCII_DEVANAGARI")
-			.map(name -> {
-				Charset cs = null;
-				try{
-					cs = Charset.forName(name);
-				}
-				catch(final Exception ignored){}
-				return cs;
-			})
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+		Arrays.sort(HUNSPELL_CHARSET_NAMES);
+
+		HUNSPELL_CHARSETS = new ArrayList<>(HUNSPELL_CHARSET_NAMES.length);
+		for(String name : HUNSPELL_CHARSET_NAMES){
+			name = CHARSET_ALIASES.getOrDefault(name, name);
+
+			Charset cs = null;
+			if(Charset.isSupported(name))
+				cs = Charset.forName(name);
+			else if(ISO_8859_10.equals(name))
+				cs = new ISO8859_10Charset();
+			else if(ISO_8859_14.equals(name))
+				cs = new ISO8859_14Charset();
+			else
+				LOGGER.warn(ParserManager.MARKER_APPLICATION, "Cannot create decoder for charset {}", name);
+
+			if(cs != null)
+				HUNSPELL_CHARSETS.add(cs);
+		}
 	}
 
 
@@ -117,36 +140,59 @@ public final class FileHelper{
 		}
 	}
 
-	public static Charset readCharset(final String charsetName){
-		try{
-			final Charset cs = Charset.forName(charsetName);
-
-			//line should be a valid charset
-			if(!HUNSPELL_CHARSETS.contains(cs))
-				throw new Exception();
-
-			return cs;
-		}
-		catch(final Exception e){
-			throw new LinterException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsetName}));
-		}
-	}
-
-	public static Charset determineCharset(final Path path){
+	public static Charset determineCharset(final Path path, final int limitLinesRead){
+		String fileCharsetName = null;
 		for(final Charset cs : HUNSPELL_CHARSETS){
 			try(final BufferedReader reader = Files.newBufferedReader(path, cs)){
-				reader.read();
-				return cs;
+				if(fileCharsetName == null)
+					fileCharsetName = readHunspellCharsetName(reader, limitLinesRead);
+
+				if(fileCharsetName != null && fileCharsetName.equals(getHunspellCharsetName(cs)))
+					return cs;
 			}
 			catch(final IOException ignored){}
 		}
 
-		final StringJoiner sj = new StringJoiner(", ");
-		forEach(HUNSPELL_CHARSETS, charset -> sj.add(charset.name()));
-		final String charsets = sj.toString();
-		throw new IllegalArgumentException(WRONG_FILE_FORMAT_CHARSET.format(new Object[]{charsets}));
+		if(Arrays.binarySearch(HUNSPELL_CHARSET_NAMES, fileCharsetName) >= 0)
+			throw new LinterIllegalArgumentException(CANNOT_READ_FILE, fileCharsetName);
+		else
+			throw new LinterIllegalArgumentException(WRONG_FILE_FORMAT_CHARSET, HUNSPELL_CHARSETS.toString().toUpperCase(Locale.ROOT),
+				fileCharsetName);
 	}
 
+	private static String readHunspellCharsetName(final BufferedReader reader, final int limitLinesRead) throws IOException{
+		//scan each lines until either a valid charset name is found as the first line (hyphenation or thesaurus file),
+		//or `SET <charsetName>` is found (affix file)
+		int linesRead = 0;
+		while(limitLinesRead < 0 || linesRead < limitLinesRead){
+			String line = reader.readLine();
+			if(line == null)
+				break;
+
+			linesRead ++;
+			try{
+				line = line.trim()
+					.toUpperCase(Locale.ROOT);
+				if(line.startsWith("SET "))
+					line = line.substring(4);
+				final Charset fileCharset = Charset.forName(CHARSET_ALIASES.getOrDefault(line, line));
+					return getHunspellCharsetName(fileCharset);
+			}
+			catch(final RuntimeException ignored){}
+		}
+		return null;
+	}
+
+	public static String getHunspellCharsetName(final Charset charset){
+		String charsetName = charset.name()
+			.toUpperCase(Locale.ROOT);
+		for(final Map.Entry<String, String> entry : CHARSET_ALIASES.entrySet())
+			if(entry.getValue().equals(charsetName)){
+				charsetName = entry.getKey();
+				break;
+			}
+		return (Arrays.binarySearch(HUNSPELL_CHARSET_NAMES, charsetName) >= 0? charsetName: null);
+	}
 
 	public static File createDeleteOnExitFile(final String filename, final String extension) throws IOException{
 		final File file = File.createTempFile(filename, extension);
@@ -199,8 +245,8 @@ public final class FileHelper{
 			reader.skip(Integer.MAX_VALUE);
 			lines = reader.getLineNumber() + 1;
 		}
-		catch(final IOException e){
-			e.printStackTrace();
+		catch(final IOException ioe){
+			ioe.printStackTrace();
 		}
 		return lines;
 	}
@@ -213,7 +259,7 @@ public final class FileHelper{
 				final int n = raf.readInt();
 				size = Integer.toUnsignedLong(Integer.reverseBytes(n));
 			}
-			catch(final Exception ignored){}
+			catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
 		}
 		else
 			size = file.length();
@@ -225,7 +271,7 @@ public final class FileHelper{
 		try(final RandomAccessFile raf = new RandomAccessFile(file, "r")){
 			magic = (raf.read() & 0xFF | ((raf.read() << 8) & 0xFF00));
 		}
-		catch(final Throwable ignored){}
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
 		return (magic == GZIPInputStream.GZIP_MAGIC);
 	}
 
@@ -236,7 +282,7 @@ public final class FileHelper{
 	public static List<String> readAllLines(final Path path, final Charset charset, final int inputBufferSize) throws IOException{
 		final List<String> lines;
 		if(isGZipped(path.toFile())){
-			lines = new ArrayList<>();
+			lines = new ArrayList<>(0);
 			final Scanner scanner = createScanner(path, charset, inputBufferSize);
 			while(scanner.hasNextLine())
 				lines.add(scanner.nextLine());
@@ -259,6 +305,7 @@ public final class FileHelper{
 
 
 	//https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
+	@SuppressWarnings("UseOfProcessBuilder")
 	public static boolean browse(File file) throws IOException, InterruptedException{
 		if(file.isFile())
 			file = file.getParentFile();
@@ -288,6 +335,7 @@ public final class FileHelper{
 	}
 
 	//https://stackoverflow.com/questions/526037/how-to-open-user-system-preferred-editor-for-given-file
+	@SuppressWarnings("UseOfProcessBuilder")
 	public static boolean openFileWithChosenEditor(final File file) throws IOException, InterruptedException{
 		//system-specific
 		ProcessBuilder builder = null;
@@ -311,6 +359,7 @@ public final class FileHelper{
 		return executeDesktopCommand(Desktop.Action.BROWSE, url);
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	private static boolean executeDesktopCommand(final Desktop.Action action, final Object parameter){
 		boolean done = false;
 		final Desktop desktop = getDesktopFor(action);
@@ -335,7 +384,7 @@ public final class FileHelper{
 					}
 			}
 		}
-		catch(final Exception e){
+		catch(final IOException | URISyntaxException e){
 			LOGGER.error("Cannot execute {} command", action, e);
 		}
 		return done;
@@ -345,6 +394,7 @@ public final class FileHelper{
 		return (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(action)? Desktop.getDesktop(): null);
 	}
 
+	@SuppressWarnings("UseOfProcessBuilder")
 	private static boolean runOSCommand(final ProcessBuilder builder) throws IOException, InterruptedException{
 		boolean accomplished = false;
 		if(builder != null){
@@ -356,20 +406,20 @@ public final class FileHelper{
 
 	public static void moveFile(final Path source, final Path target) throws IOException{
 		if(SystemUtils.IS_OS_WINDOWS || Files.notExists(target))
-			//for windows we can't go wrong because the OS manages locking
+			//for Windows, we can't go wrong because the OS manages locking
 			Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
 		else{
-			//let's unlink file first so we don't run into file-busy errors
+			//let's unlink file first, so we don't run into file-busy errors
 			final Path temp = Files.createTempFile(target.getParent(), null, null);
 			Files.move(target, temp, StandardCopyOption.REPLACE_EXISTING);
 
 			try{
 				Files.move(source, target);
 			}
-			catch(final IOException e){
+			catch(final IOException ioe){
 				Files.move(temp, target);
 
-				throw e;
+				throw ioe;
 			}
 			finally{
 				Files.deleteIfExists(temp);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,36 +24,55 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 
 public final class ParserHelper{
 
-	private static final MessageFormat WRONG_FILE_FORMAT = new MessageFormat("Malformed file, the first line is not a number, was `{0}`");
+	private static final String WRONG_FILE_FORMAT = "Malformed file, the first line is not a number, was `{}`";
 
 	//FIXME https://zverok.github.io/blog/2021-03-16-spellchecking-dictionaries.html #4
 	public static final char COMMENT_MARK_SHARP = '#';
-	public static final char COMMENT_MARK_SLASH = '/';
-	public static final char COMMENT_MARK_PERCENT = '%';
+	private static final char COMMENT_MARK_SLASH = '/';
+	private static final char COMMENT_MARK_PERCENT = '%';
+	private static final char COMMENT_MARK_TAB = '\t';
+
+	private static final char[] HYPHENATION_COMMENTS = {COMMENT_MARK_SLASH, COMMENT_MARK_PERCENT};
+	private static final char[] DICTIONARY_COMMENTS = {COMMENT_MARK_SHARP, COMMENT_MARK_SLASH, COMMENT_MARK_TAB};
 
 
 	private ParserHelper(){}
 
-	public static boolean isComment(final CharSequence line, final char... comment){
-		return (StringUtils.isBlank(line) || StringUtils.indexOfAny(line, comment) == 0);
+	public static boolean isDictionaryComment(final String line){
+		return isComment(line, DICTIONARY_COMMENTS);
+	}
+
+	public static boolean isHyphenationComment(final String line){
+		return isComment(line, HYPHENATION_COMMENTS);
+	}
+
+	private static boolean isComment(final String line, final char[] comments){
+		if(StringUtils.isBlank(line))
+			return true;
+
+		final char chr = StringUtils.trim(line).charAt(0);
+		for(final char comment : comments)
+			if(chr == comment)
+				return true;
+		return false;
 	}
 
 	public static void assertNotEOF(final Scanner scanner) throws EOFException{
@@ -61,8 +80,8 @@ public final class ParserHelper{
 			throw new EOFException("Unexpected EOF while reading file");
 	}
 
-	public static void forEachLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
-			final Consumer<Integer> progressCallback, final char... comment){
+	public static void forEachDictionaryLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
+			final ProgressCallback progressCallback){
 		final int totalLines = FileHelper.getLinesCount(file, charset);
 		int progress = 0;
 		int progressIndex = 0;
@@ -73,7 +92,7 @@ public final class ParserHelper{
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 
-				if(!isComment(line, comment))
+				if(!isDictionaryComment(line))
 					fun.accept(progress, line);
 
 				if(progressCallback != null && ++ progress % progressStep == 0)
@@ -83,23 +102,23 @@ public final class ParserHelper{
 			if(progressCallback != null)
 				progressCallback.accept(100);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
 		}
 	}
 
-	public static void assertLinesCount(final List<String> lines) throws IOException{
+	public static void assertLinesCount(final List<String> lines) throws EOFException{
 		if(lines.isEmpty())
 			throw new EOFException("Unexpected EOF while reading file");
 		final String line = lines.get(0);
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT, line);
 	}
 
 	public static String assertLinesCount(final Scanner scanner){
 		final String line = scanner.nextLine();
 		if(!NumberUtils.isCreatable(line))
-			throw new LinterException(WRONG_FILE_FORMAT.format(new Object[]{line}));
+			throw new LinterException(WRONG_FILE_FORMAT, line);
 
 		return line;
 	}

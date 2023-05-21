@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -36,6 +36,8 @@ import java.util.Iterator;
 /**
  * An iterator over {@link WordData} entries of a {@link Dictionary}.
  * The stems can be decoded from compressed format or preserved as compressed format.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 class DictionaryIterator implements Iterator<WordData>{
 
@@ -45,7 +47,7 @@ class DictionaryIterator implements Iterator<WordData>{
 	private final SequenceEncoderInterface sequenceEncoder;
 
 
-	public DictionaryIterator(final Dictionary dictionary, final boolean decodeStems){
+	DictionaryIterator(final Dictionary dictionary, final boolean decodeStems){
 		separator = dictionary.metadata.getSeparator();
 
 		entriesItr = dictionary.fsa.iterator();
@@ -53,12 +55,12 @@ class DictionaryIterator implements Iterator<WordData>{
 	}
 
 	@Override
-	public boolean hasNext(){
+	public final boolean hasNext(){
 		return entriesItr.hasNext();
 	}
 
 	@Override
-	public WordData next(){
+	public final WordData next(){
 		final ByteBuffer entryBuffer = entriesItr.next();
 		final byte[] array = entryBuffer.array();
 		final int limit = entryBuffer.remaining();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -40,9 +40,6 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public final class SetHelper{
@@ -50,14 +47,8 @@ public final class SetHelper{
 	private SetHelper(){}
 
 
-	public static Set<Character> makeCharacterSetFrom(final CharSequence text){
-		return text.codePoints()
-			.mapToObj(chr -> (char)chr)
-			.collect(Collectors.toSet());
-	}
-
 	public static <T> Set<T> newConcurrentSet(){
-		return Collections.newSetFromMap(new ConcurrentHashMap<>());
+		return Collections.newSetFromMap(new ConcurrentHashMap<>(0));
 	}
 
 	@SafeVarargs
@@ -112,9 +103,40 @@ public final class SetHelper{
 	 * @return	The union of {@code sets}
 	 */
 	public static <T> Set<T> union(final Iterable<Set<T>> sets){
-		final Set<T> union = new HashSet<>();
-		forEach(sets, union::addAll);
+		final Set<T> union = new HashSet<>(0);
+		if(sets != null)
+			for(final Set<T> elem : sets)
+				union.addAll(elem);
 		return union;
+	}
+
+	/**
+	 * Returns a set with the intersection between two sets (A ∩ B).
+	 * <p>
+	 * The returned set contains all elements that are contained in {@code set1} and {@code set2}.
+	 * The iteration order of the returned set is undefined.
+	 *
+	 * @param set1	First set
+	 * @param set2	Second set
+	 * @return	The intersection of {@code set1} and {@code set2}
+	 */
+	public static char[] intersection(final char[] set1, final char[] set2){
+		final char[] list = new char[Math.min(set1.length, set2.length)];
+		Arrays.sort(set1);
+		Arrays.sort(set2);
+		int size = 0;
+		int i = 0;
+		int j = 0;
+		while(i < set1.length && j < set2.length)
+			switch(Character.compare(set1[i], set2[j])){
+				case -1 -> i ++;
+				case 1 -> j ++;
+				default -> {
+					list[size ++] = set1[i ++];
+					j ++;
+				}
+			}
+		return Arrays.copyOf(list, size);
 	}
 
 	/**
@@ -251,7 +273,7 @@ public final class SetHelper{
 	}
 
 	public static <K, V> Map<K, List<V>> bucket(final Iterable<V> entries, final Function<V, K> keyMapper){
-		final Map<K, List<V>> bucket = new HashMap<>();
+		final Map<K, List<V>> bucket = new HashMap<>(0);
 		for(final V entry : entries)
 			processBucketEntry(bucket, keyMapper, entry);
 		return bucket;
@@ -266,6 +288,7 @@ public final class SetHelper{
 
 	public static <K, V> List<V> collect(final Iterable<V> entries, final Function<V, K> keyMapper,
 			final BiConsumer<V, V> mergeFunction){
+		//NOTE: cannot force initial capacity to zero because... who knows why java fuck it up...
 		final Map<K, V> compaction = new HashMap<>();
 		for(final V entry : entries){
 			final K key = keyMapper.apply(entry);
@@ -276,11 +299,10 @@ public final class SetHelper{
 		return new ArrayList<>(compaction.values());
 	}
 
-	@SafeVarargs
-	public static <V> Set<V> getDuplicates(final V... list){
-		final Collection<V> uniques = new HashSet<>();
-		final Set<V> duplicates = new HashSet<>();
-		for(final V elem : list)
+	public static <V> Set<V> getDuplicates(final V[] array){
+		final Collection<V> uniques = new HashSet<>(array.length);
+		final Set<V> duplicates = new HashSet<>(array.length);
+		for(final V elem : array)
 			if(!uniques.add(elem))
 				duplicates.add(elem);
 		return duplicates;

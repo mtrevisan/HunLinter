@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,10 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix;
 
-import io.github.mtrevisan.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AffixHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.AliasesHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CompoundRuleHandler;
@@ -36,18 +33,24 @@ import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CopyOverAsNumberHand
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.CopyOverHandler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.Handler;
 import io.github.mtrevisan.hunlinter.parsers.affix.handlers.RelationTableHandler;
+import io.github.mtrevisan.hunlinter.parsers.affix.handlers.WordBreakTableHandler;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
+import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -75,8 +78,11 @@ import java.util.regex.Pattern;
  */
 public class AffixParser{
 
-	private static final MessageFormat BAD_FIRST_LINE = new MessageFormat("The first non-comment line in the affix file must be a 'SET charset', was: `{0}`");
-	private static final MessageFormat GLOBAL_ERROR_MESSAGE = new MessageFormat("{0}, line {1,number,#}");
+	private static final Logger LOGGER = LoggerFactory.getLogger(AffixParser.class);
+
+
+	private static final String BAD_FIRST_LINE = "The first non-comment line in the affix file must be a 'SET charset', was: `{}`";
+	private static final String GLOBAL_ERROR_MESSAGE = "{}, line {}";
 
 	private static final String NO_LANGUAGE = "xxx";
 
@@ -175,38 +181,45 @@ public class AffixParser{
 	/**
 	 * Parse the rules out from a .aff file.
 	 *
-	 * @param affFile	The content of the affix file
-	 * @param configurationLanguage    The language implemented by the affix file
-	 * @throws IOException	If an I/O error occurs
-	 * @throws LinterException   If something is wrong while parsing the file (eg. a missing rule)
+	 * @param affFile	The content of the affix file.
+	 * @param configurationLanguage    The language implemented by the affix file.
+	 * @throws IOException	If an I/O error occurs.
+	 * @throws LinterException   If something is wrong while parsing the file (e.g. a missing rule).
 	 */
-	public void parse(final File affFile, final String configurationLanguage) throws IOException{
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	public final void parse(final File affFile, final String configurationLanguage) throws IOException{
 		clear();
 
 		int index = 0;
 		boolean encodingRead = false;
-		final Charset charset = FileHelper.determineCharset(affFile.toPath());
-		try(final Scanner scanner = FileHelper.createScanner(affFile.toPath(), charset)){
+		final Path affPath = affFile.toPath();
+		final Charset charset = FileHelper.determineCharset(affPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the affix file is {}", charset.name());
+		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
+			final ParsingContext context = new ParsingContext();
 			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				index ++;
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+				if(ParserHelper.isDictionaryComment(line))
 					continue;
 
 				if(!encodingRead && !line.startsWith(prefix))
-					throw new LinterException(BAD_FIRST_LINE.format(new Object[]{line}));
+					throw new LinterException(BAD_FIRST_LINE, line);
 				encodingRead = true;
 
-				final ParsingContext context = new ParsingContext(line, index, scanner);
+				context.update(line, index, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
 				final Handler handler = lookupHandlerByRuleType(ruleType);
 				if(handler != null){
 					try{
 						index += handler.parse(context, data);
 					}
-					catch(final RuntimeException e){
-						throw new LinterException(GLOBAL_ERROR_MESSAGE.format(new Object[]{e.getMessage(), index}));
+					catch(final LinterException le){
+						throw new LinterException((Throwable)null, GLOBAL_ERROR_MESSAGE, le.getMessage(), index);
+					}
+					catch(final RuntimeException re){
+						throw new LinterException(re, GLOBAL_ERROR_MESSAGE, re.getMessage(), index);
 					}
 				}
 			}
@@ -289,25 +302,25 @@ public class AffixParser{
 		if(!data.containsData(AffixOption.COMPOUND_MINIMUM_LENGTH))
 			data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 3);
 		else{
-			final int compoundMin = data.getData(AffixOption.COMPOUND_MINIMUM_LENGTH);
-			if(compoundMin < 1)
+			final Integer compoundMin = data.getCompoundMinimumLength();
+			if(compoundMin != null && compoundMin < 1)
 				data.addData(AffixOption.COMPOUND_MINIMUM_LENGTH, 1);
 		}
 	}
 
-	private Handler lookupHandlerByRuleType(final AffixOption ruleType){
+	private static Handler lookupHandlerByRuleType(final AffixOption ruleType){
 		return PARSING_HANDLERS.get(ruleType);
 	}
 
-	public AffixData getAffixData(){
+	public final AffixData getAffixData(){
 		return data;
 	}
 
-	public String getLanguage(){
+	public final String getLanguage(){
 		return data.getLanguage();
 	}
 
-	public void clear(){
+	public final void clear(){
 		data.clear();
 	}
 

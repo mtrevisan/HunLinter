@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters;
 
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 
 /**
@@ -43,8 +45,7 @@ public final class HeapSort{
 		sort(data, 0, data.length, comparator);
 	}
 
-	public static <T> void sort(final T[] data, final Comparator<? super T> comparator,
-			final Consumer<Integer> progressCallback){
+	public static <T> void sort(final T[] data, final Comparator<? super T> comparator, final ProgressCallback progressCallback){
 		sort(data, 0, data.length, comparator, progressCallback);
 	}
 
@@ -53,8 +54,8 @@ public final class HeapSort{
 		sort(data, low, high, comparator, null);
 	}
 
-	public static synchronized <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
-			final Consumer<Integer> progressCallback){
+	public static <T> void sort(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
+			final ProgressCallback progressCallback){
 		Objects.requireNonNull(data, "Data cannot be null");
 		Objects.requireNonNull(comparator, "Comparator cannot be null");
 		assert low < high && low < data.length && high <= data.length;
@@ -79,7 +80,7 @@ public final class HeapSort{
 		int progressIndex = 50;
 		for(int heapsize = high - 1; heapsize > low; heapsize --){
 			//swap root value with last element
-			SorterHelper.swap(data, low, heapsize);
+			ArrayUtils.swap(data, low, heapsize);
 
 			//sift down:
 			siftDown(data, low, heapsize, comparator);
@@ -92,9 +93,9 @@ public final class HeapSort{
 			progressCallback.accept(100);
 	}
 
-	/** Build the heap in array a so that largest value is at the root */
+	/** Build the heap in array a so that largest value is at the root. */
 	private static <T> void buildMaxHeap(final T[] data, final int low, final int high, final Comparator<? super T> comparator,
-			final int progressStep, final Consumer<Integer> progressCallback){
+			final int progressStep, final ProgressCallback progressCallback){
 		int progress = 0;
 		for(int heapsize = low + 1; heapsize < high; heapsize ++){
 			//if child is bigger than parent
@@ -104,7 +105,7 @@ public final class HeapSort{
 				while(node > 0){
 					final int parent = parent(node);
 					if(comparator.compare(data[node], data[parent]) > 0)
-						SorterHelper.swap(data, node, parent);
+						ArrayUtils.swap(data, node, parent);
 					node = parent;
 				}
 			}
@@ -128,7 +129,7 @@ public final class HeapSort{
 
 			//if parent is smaller than left child, then swapping parent with left child
 			if(leftChild < heapsize && comparator.compare(data[parent], data[leftChild]) < 0)
-				SorterHelper.swap(data, parent, leftChild);
+				ArrayUtils.swap(data, parent, leftChild);
 
 			parent = leftChild;
 		}while(leftChild < heapsize);

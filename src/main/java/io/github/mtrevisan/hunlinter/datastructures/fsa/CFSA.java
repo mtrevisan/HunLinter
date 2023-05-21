@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,7 +34,7 @@ import java.util.Set;
 
 
 /**
- * CFSA (Compact Finite State Automaton) binary format implementation, version 2:
+ * CFSA (Compact Finite State Automaton) binary format implementation:
  * <ul>
  *  <li>{@link #BIT_TARGET_NEXT} applicable on all arcs, not necessarily the last one.</li>
  *  <li>v-coded goto field</li>
@@ -112,15 +112,15 @@ import java.util.Set;
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class CFSA2 extends FSA{
+public class CFSA extends FSAAbstract{
 
-	/** Automaton header version value */
+	/** Automaton header version value. */
 	public static final byte VERSION = (byte)0xC6;
 
-	/** The target node of this arc follows the last arc of the current state (no goto field) */
+	/** The target node of this arc follows the last arc of the current state (no goto field). */
 	public static final int BIT_TARGET_NEXT = 0x80;
 
-	/** The arc is the last one from the current node's arcs list */
+	/** The arc is the last one from the current node's arcs list. */
 	public static final int BIT_LAST_ARC = 0x40;
 
 	/**
@@ -129,16 +129,16 @@ public class CFSA2 extends FSA{
 	 */
 	public static final int BIT_FINAL_ARC = 0x20;
 
-	/** The count of bits assigned to storing an indexed label */
+	/** The count of bits assigned to storing an indexed label. */
 	private static final int LABEL_INDEX_BITS = 5;
 
-	/** Masks only the M bits of a flag byte */
+	/** Masks only the M bits of a flag byte. */
 	private static final int LABEL_INDEX_MASK = (1 << LABEL_INDEX_BITS) - 1;
 
-	/** Maximum size of the labels index */
+	/** Maximum size of the labels index. */
 	public static final int LABEL_INDEX_SIZE = (1 << LABEL_INDEX_BITS) - 1;
 
-	/** Epsilon node's offset */
+	/** Epsilon node's offset. */
 	private static final int EPSILON = 0;
 
 	/**
@@ -148,18 +148,18 @@ public class CFSA2 extends FSA{
 	 */
 	private final byte[] arcs;
 
-	/** Flags for this automaton version */
-	private final EnumSet<FSAFlags> flags;
+	/** Flags for this automaton version. */
+	private final Set<FSAFlags> flags;
 
-	/** Label mapping for M-indexed labels */
+	/** Label mapping for M-indexed labels. */
 	private final byte[] labelMapping;
 
-	/** If <code>true</code> states are prepended with numbers */
+	/** If {@code true} states are prepended with numbers. */
 	private final boolean hasNumbers;
 
 
-	/** Reads an automaton from a byte stream */
-	CFSA2(final InputStream stream) throws IOException{
+	/** Reads an automaton from a byte stream. */
+	CFSA(final InputStream stream) throws IOException{
 		final DataInputStream in = new DataInputStream(stream);
 
 		//read flags
@@ -183,82 +183,58 @@ public class CFSA2 extends FSA{
 		arcs = readRemaining(in);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public int getRootNode(){
+	public final int getRootNode(){
 		//skip dummy node marking terminating state
 		return getDestinationNodeOffset(getFirstArc(EPSILON));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getFirstArc(final int node){
 		return (hasNumbers? skipVInt(node): node);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public final int getNextArc(final int arc){
 		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public int getEndNode(final int arc){
+	public final int getEndNode(final int arc){
 		return getDestinationNodeOffset(arc);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public byte getArcLabel(final int arc){
+	public final byte getArcLabel(final int arc){
 		final int index = arcs[arc] & LABEL_INDEX_MASK;
 		return (index > 0? labelMapping[index]: arcs[arc + 1]);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public int getRightLanguageCount(final int node){
-		assert getFlags().contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
+	public final int getRightLanguageCount(final int node){
+		assert flags.contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
 
 		return readVInt(arcs, node);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public boolean isArcFinal(final int arc){
+	public final boolean isArcFinal(final int arc){
 		return ((arcs[arc] & BIT_FINAL_ARC) != 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public boolean isArcTerminal(final int arc){
+	public final boolean isArcTerminal(final int arc){
 		return (getDestinationNodeOffset(arc) == 0);
 	}
 
 	/**
-	 * Returns <code>true</code> if this arc has <code>NEXT</code> bit set.
+	 * Returns {@code true} if this arc has {@code NEXT} bit set.
 	 *
 	 * @param arc The node's arc identifier.
 	 * @return Returns true if the argument is the last arc of a node.
 	 * @see #BIT_LAST_ARC
 	 */
-	public boolean isArcLast(final int arc){
+	public final boolean isArcLast(final int arc){
 		return ((arcs[arc] & BIT_LAST_ARC) != 0);
 	}
 
@@ -267,15 +243,12 @@ public class CFSA2 extends FSA{
 	 * @return Returns true if {@link #BIT_TARGET_NEXT} is set for this arc.
 	 * @see #BIT_TARGET_NEXT
 	 */
-	public boolean isNextSet(final int arc){
+	public final boolean isNextSet(final int arc){
 		return ((arcs[arc] & BIT_TARGET_NEXT) != 0);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return flags;
 	}
 
@@ -297,7 +270,7 @@ public class CFSA2 extends FSA{
 			return readVInt(arcs, arc + ((arcs[arc] & LABEL_INDEX_MASK) == 0? 2: 1));
 	}
 
-	/** Read the arc's layout and skip as many bytes, as needed, to skip it */
+	/** Read the arc's layout and skip as many bytes, as needed, to skip it. */
 	private int skipArc(int offset){
 		final int flag = arcs[offset ++];
 
@@ -314,7 +287,7 @@ public class CFSA2 extends FSA{
 		return offset;
 	}
 
-	/** Read a v-int */
+	/** Read a v-int. */
 	private static int readVInt(final byte[] array, int offset){
 		byte b = array[offset];
 		int value = b & 0x7F;
@@ -325,7 +298,7 @@ public class CFSA2 extends FSA{
 		return value;
 	}
 
-	/** Skip a v-int */
+	/** Skip a v-int. */
 	private int skipVInt(int offset){
 		//do nothing
 		while(arcs[offset ++] < 0){}

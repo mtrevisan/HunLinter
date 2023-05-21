@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,14 +33,14 @@ public class JavaBitArray implements BitArray{
 	private static final String WRONG_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 
-	/** The data-set */
+	/** The data-set. */
 	private final long[] data;
 
 
 	/**
-	 * Construct an instance of the {@link JavaBitArray} that can hold the given number of bits
+	 * Construct an instance of this class that can hold the given number of bits.
 	 *
-	 * @param bits the number of bits this instance can hold
+	 * @param bits the number of bits this instance can hold.
 	 */
 	public JavaBitArray(final long bits){
 		if(bits <= 0)
@@ -50,13 +50,13 @@ public class JavaBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean get(final int index){
+	public final boolean get(final int index){
 		return ((data[index >> 6] & (1l << index)) != 0l);
 	}
 
 	/** Returns true if the bit changed value. */
 	@Override
-	public boolean set(final int index){
+	public final boolean set(final int index){
 		if(!get(index)){
 			data[index >> 6] |= (1l << index);
 			return true;
@@ -65,13 +65,13 @@ public class JavaBitArray implements BitArray{
 	}
 
 	@Override
-	public void clear(final int index){
+	public final void clear(final int index){
 		if(get(index))
 			data[index >> 6] &= ~(1l << index);
 	}
 
 	@Override
-	public void clearAll(){
+	public final void clearAll(){
 		int size = data.length;
 		while(size > 0)
 			data[-- size] = 0l;
@@ -83,7 +83,7 @@ public class JavaBitArray implements BitArray{
 	 * @return total number of bits allocated
 	 */
 	@Override
-	public int size(){
+	public final int size(){
 		return data.length * Long.SIZE;
 	}
 

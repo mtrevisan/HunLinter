@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,38 +24,32 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSABuilder;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.LexicographicalComparator;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.MetadataBuilder;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSA2Serializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializer;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.BufferUtils;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.CFSASerializer;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSASerializerInterface;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.SequenceEncoderInterface;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.services.sorters.SmoothSort;
-import io.github.mtrevisan.hunlinter.services.text.StringHelper;
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.InflectionTag;
 import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.enums.PartOfSpeechTag;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -64,9 +58,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -84,11 +80,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 
 	public PoSFSAWorker(final ParserManager parserManager, final File outputFile){
-		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), outputFile);
+		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), parserManager.getLanguage(),
+			outputFile);
 	}
 
 	public PoSFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final File outputFile){
+			final String language, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -98,6 +95,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(language, "Language cannot be null");
 		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
@@ -106,51 +104,45 @@ public class PoSFSAWorker extends WorkerDictionary{
 		try{
 			metadata = readMetadata(affixData, outputFile, charset);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
 		}
 		final byte separator = metadata.getSeparator();
-		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType().get();
+		final SequenceEncoderInterface sequenceEncoder = metadata.getSequenceEncoderType()
+			.get();
 
 
-		final SimpleDynamicArray<byte[]> encodings = new SimpleDynamicArray<>(byte[].class, 50_000_000, 1.2f);
+		final ByteArrayList encodings = new ByteArrayList(1_000_000.f);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final SimpleDynamicArray<byte[]> currentEncodings = encode(inflections, separator, sequenceEncoder);
-
-			encodings.addAll(currentEncodings);
+			encode(encodings, inflections, separator, sequenceEncoder);
 
 			sleepOnPause();
 		};
 		final FSABuilder builder = new FSABuilder();
-		final Consumer<byte[]> fsaProcessor = builder::add;
 
-		final Function<Void, SimpleDynamicArray<byte[]>> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/5)");
+		final Function<Void, ByteArrayList> step1 = ignored -> {
+			prepareProcessing("Reading dictionary file (step 1/4)");
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			processLines(dicPath, charset, lineProcessor);
 
 			return encodings;
 		};
-		final Function<SimpleDynamicArray<byte[]>, SimpleDynamicArray<byte[]>> step2 = list -> {
-			resetProcessing("Sorting (step 2/5)");
+		final Function<ByteArrayList, ByteArrayList> step2 = list -> {
+			resetProcessing("Sorting (step 2/4)");
 
 			//sort list
-			SmoothSort.sort(list.data, 0, list.limit, LexicographicalComparator.lexicographicalComparator(),
-				percent -> {
-					setProgress(percent, 100);
-
-					sleepOnPause();
-				});
+			list.parallelSort(LexicographicalComparator.lexicographicalComparator());
 
 			return list;
 		};
-		final Function<SimpleDynamicArray<byte[]>, FSA> step3 = list -> {
-			resetProcessing("Creating FSA (step 3/5)");
+		final Function<ByteArrayList, FSAAbstract> step3 = list -> {
+			resetProcessing("Creating FSA (step 3/4)");
 
 			getWorkerData()
 				.withNoHeader()
@@ -158,16 +150,13 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			int progress = 0;
 			int progressIndex = 0;
-			final int progressStep = (int)Math.ceil(list.limit / 100.f);
-			for(int index = 0; index < list.limit; index ++){
-				final byte[] encoding = list.data[index];
-				fsaProcessor.accept(encoding);
-
-				//release memory
-				list.data[index] = null;
+			final int progressStep = (int)Math.ceil(list.size() / 100.f);
+			for(int index = 0; index < list.size(); index ++){
+				final byte[] encoding = list.get(index);
+				builder.add(encoding);
 
 				if(++ progress % progressStep == 0)
-					setProgress(++ progressIndex, 100);
+					setWorkerProgress(++ progressIndex);
 
 				sleepOnPause();
 			}
@@ -177,46 +166,32 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 			return builder.complete();
 		};
-		final Function<FSA, File> step4 = fsa -> {
-			resetProcessing("Compressing FSA (step 4/5)");
+		final Function<FSAAbstract, File> step4 = fsa -> {
+			resetProcessing("Compressing FSA (step 4/4)");
 
-			final FSASerializer serializer = new CFSA2Serializer();
+			final FSASerializerInterface serializer = new CFSASerializer();
 			try(final ByteArrayOutputStream os = new ByteArrayOutputStream()){
 				serializer.serialize(fsa, os, percent -> {
-					setProgress(percent, 100);
+					setWorkerProgress(percent);
 
 					sleepOnPause();
 				});
 
 				Files.write(outputFile.toPath(), os.toByteArray());
 
+				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
+
 				return outputFile;
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new WorkerException(ioe, ioe.getMessage());
 			}
 		};
-		final Function<File, File> step5 = fsa -> {
-			resetProcessing("Verifying correctness (step 5/5)");
-
-			try{
-				//verify by reading
-				final Iterable<WordData> s = new DictionaryLookup(Dictionary.read(outputFile.toPath()));
-				for(final Iterator<?> i = s.iterator(); i.hasNext(); i.next()){}
-
-				finalizeProcessing("Successfully processed " + workerData.getWorkerName() + ": " + outputFile.getAbsolutePath());
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
-			}
-
-			return outputFile;
-		};
-		final Function<File, Void> step6 = WorkerManager.openFolderStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5).andThen(step6));
+		final Function<File, Void> step5 = WorkerManager.openFolderStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4).andThen(step5));
 	}
 
-	private DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)
+	private static DictionaryMetadata readMetadata(final AffixData affixData, final File outputFile, final Charset charset)
 			throws IOException{
 		final Path metadataPath = MetadataBuilder.getMetadataPath(outputFile);
 		if(!metadataPath.toFile().exists())
@@ -225,12 +200,12 @@ public class PoSFSAWorker extends WorkerDictionary{
 		return MetadataBuilder.read(metadataPath);
 	}
 
-	private SimpleDynamicArray<byte[]> encode(final Inflection[] inflections, final byte separator,
+	private static void encode(final ByteArrayList encodings, final List<Inflection> inflections, final byte separator,
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		final SimpleDynamicArray<byte[]> out = new SimpleDynamicArray<>(byte[].class, inflections.length, 1.2f);
-		for(final Inflection inflection : inflections){
+		for(int i = 0; i < inflections.size(); i ++){
+			final Inflection inflection = inflections.get(i);
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
 
@@ -239,61 +214,87 @@ public class PoSFSAWorker extends WorkerDictionary{
 			if(pos == null || pos.size() != 1)
 				throw new LinterException(SINGLE_POS_NOT_PRESENT);
 
-			final String word = inflection.getWord();
+			final String word = inflection.getWord().toLowerCase(Locale.ROOT);
 			//target
 			final byte[] inflectedWord = StringHelper.getRawBytes(word);
 
 			//extract stem
 			final List<String> stems = bucket.get(MorphologicalTag.STEM);
-			final byte[][] encodedStems = new byte[stems.size()][];
 
 			//extract inflection
 			final List<String> suffixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_SUFFIX);
 			final List<String> prefixInflection = bucket.get(MorphologicalTag.INFLECTIONAL_PREFIX);
-			tag = BufferUtils.clearAndEnsureCapacity(tag, 512);
+			tag = clearAndEnsureCapacity(tag, 512);
 			tag.put(StringHelper.getRawBytes(PartOfSpeechTag.createFromCodeAndValue(pos.get(0)).getTag()));
 			extractInflection(suffixInflection, tag);
 			extractInflection(prefixInflection, tag);
 			tag.flip();
 
-			int position = 0;
-			for(final String stem : stems){
-				//source
-				byte[] inflectionStem = StringHelper.getRawBytes(stem);
-				//remove the initial part `st:`
-				inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length);
-
-				final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
-
-				int offset = inflectedWord.length;
-				final byte[] assembled = new byte[offset + 1 + encoded.length + 1 + tag.remaining()];
-				System.arraycopy(inflectedWord, 0, assembled, 0, offset);
-				assembled[offset ++] = separator;
-				System.arraycopy(encoded, 0, assembled, offset, encoded.length);
-				offset += encoded.length;
-				assembled[offset ++] = separator;
-				System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
-				encodedStems[position ++] = assembled;
+			for(int j = 0; j < stems.size(); j ++){
+				final byte[] assembled = encode(inflectedWord, tag, stems.get(j), separator, sequenceEncoder);
+				encodings.add(assembled);
 			}
-			out.addAll(encodedStems);
 		}
-		return out;
 	}
 
-	private void extractInflection(final Iterable<String> suffixInflection, final ByteBuffer output){
+	private static byte[] encode(final byte[] inflectedWord, final ByteBuffer tag, final String stem, final byte separator,
+			final SequenceEncoderInterface sequenceEncoder){
+		byte[] inflectionStem = StringHelper.getRawBytes(stem);
+		//remove the initial part `st:`
+		inflectionStem = Arrays.copyOfRange(inflectionStem, 3, inflectionStem.length);
+
+		final byte[] encoded = sequenceEncoder.encode(inflectedWord, inflectionStem);
+		int offset = inflectedWord.length;
+		final byte[] assembled = new byte[offset + 1 + encoded.length + 1 + tag.remaining()];
+		System.arraycopy(inflectedWord, 0, assembled, 0, offset);
+		assembled[offset ++] = separator;
+		System.arraycopy(encoded, 0, assembled, offset, encoded.length);
+		offset += encoded.length;
+		assembled[offset ++] = separator;
+		System.arraycopy(tag.array(), 0, assembled, offset, tag.remaining());
+		return assembled;
+	}
+
+	/**
+	 * Ensure the buffer's capacity is large enough to hold a given number
+	 * of elements. If the input buffer is not large enough, a new buffer is allocated
+	 * and returned.
+	 *
+	 * @param elements The required number of elements to be appended to the buffer.
+	 * @param buffer   The buffer to check or {@code null} if a new buffer should be
+	 *                 allocated.
+	 * @return Returns the same buffer or a new buffer with the given capacity.
+	 */
+	private static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
+			buffer = ByteBuffer.allocate(elements);
+		else
+			buffer.clear();
+		return buffer;
+	}
+
+	private static void extractInflection(final List<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
-			for(final String code : suffixInflection){
-				final String[] tags = InflectionTag.createFromCodeAndValue(code).getTags();
-				for(final String tag : tags)
+			for(int i = 0; i < suffixInflection.size(); i ++){
+				final String[] tags = InflectionTag.createFromCodeAndValue(suffixInflection.get(i)).getTags();
+				for(int j = 0; j < tags.length; j ++)
 					output.put(POS_FSA_TAG_SEPARATOR)
-						.put(StringHelper.getRawBytes(tag));
+						.put(StringHelper.getRawBytes(tags[j]));
 			}
 	}
 
 	//NOTE: the only morphological tags really needed are: PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
-	private Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
-		return SetHelper.bucket(inflection.getMorphologicalFieldsAsArray(), MorphologicalTag::createFromCode,
-			MorphologicalTag.class);
+	private static Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
+		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
+		final List<String> morphologicalFieldsAsList = inflection.getMorphologicalFieldsAsList();
+		for(int i = 0; i < morphologicalFieldsAsList.size(); i ++){
+			final String entry = morphologicalFieldsAsList.get(i);
+			final MorphologicalTag key = MorphologicalTag.createFromCode(entry);
+			if(key != null)
+				bucket.computeIfAbsent(key, k -> new ArrayList<>(1))
+					.add(entry);
+		}
+		return bucket;
 	}
 
 

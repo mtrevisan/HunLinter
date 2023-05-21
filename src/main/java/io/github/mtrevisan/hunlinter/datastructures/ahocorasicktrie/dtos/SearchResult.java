@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.util.Objects;
 
 
 /**
@@ -35,11 +34,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class SearchResult<V>{
 
-	/** the beginning index, inclusive */
+	/** the beginning index, inclusive. */
 	private final int begin;
-	/** the ending index, exclusive */
+	/** the ending index, exclusive. */
 	private final int end;
-	/** the value assigned to the keyword */
+	/** the value assigned to the keyword. */
 	private final V value;
 
 
@@ -49,49 +48,46 @@ public class SearchResult<V>{
 		this.value = value;
 	}
 
-	public int getIndexBegin(){
+	public final int getIndexBegin(){
 		return begin;
 	}
 
-	public int getIndexEnd(){
+	public final int getIndexEnd(){
 		return end;
 	}
 
-	public int getMatchLength(){
+	public final int getMatchLength(){
 		return end - begin;
 	}
 
-	public V getValue(){
+	public final V getValue(){
 		return value;
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return "[" + begin + ":" + end + "] = " + value;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final SearchResult<?> rhs = (SearchResult<?>)obj;
-		return new EqualsBuilder()
-			.append(begin, rhs.begin)
-			.append(end, rhs.end)
-			.append(value, rhs.value)
-			.isEquals();
+		return (begin == rhs.begin
+			&& end == rhs.end
+			&& Objects.equals(value, rhs.value));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(begin)
-			.append(end)
-			.append(value)
-			.toHashCode();
+	public final int hashCode(){
+		int result = Integer.hashCode(begin);
+		result = 31 * result + Integer.hashCode(end);
+		result = 31 * result + value.hashCode();
+		return result;
 	}
 
 }

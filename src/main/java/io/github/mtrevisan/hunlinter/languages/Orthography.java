@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,9 +27,9 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
-import java.util.stream.IntStream;
 
 
 public class Orthography{
@@ -48,35 +48,39 @@ public class Orthography{
 		return SingletonHelper.INSTANCE;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String correctOrthography(final String word){
 		return correctApostrophes(word);
 	}
 
-	protected String correctApostrophes(final String word){
+	private static String correctApostrophes(final String word){
 		return StringUtils.replaceChars(word, WRONG_APOSTROPHES, CORRECT_APOSTROPHES);
 	}
 
-	public boolean[] getSyllabationErrors(final String[] syllabes){
-		return new boolean[syllabes.length];
+	@SuppressWarnings("DesignForExtension")
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
+		return new boolean[syllabes.size()];
 	}
 
-	public boolean hasSyllabationErrors(final String[] syllabes){
+	public final boolean hasSyllabationErrors(final List<String> syllabes){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-		return IntStream.range(0, errors.length)
-			.mapToObj(idx -> errors[idx])
-			.anyMatch(error -> error);
+		for(int idx = 0; idx < errors.length; idx ++)
+			if(errors[idx])
+				return true;
+		return false;
 	}
 
-	public StringJoiner formatHyphenation(final String[] syllabes){
+	public final StringJoiner formatHyphenation(final List<String> syllabes){
 		final StringJoiner sj = new StringJoiner(HyphenationParser.SOFT_HYPHEN);
 		return formatHyphenation(syllabes, sj, Function.identity());
 	}
 
-	public StringJoiner formatHyphenation(final String[] syllabes, final StringJoiner sj, final Function<String, String> errorFormatter){
+	public final StringJoiner formatHyphenation(final List<String> syllabes, final StringJoiner sj,
+			final Function<String, String> errorFormatter){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-		for(int i = 0; i < syllabes.length; i ++){
+		for(int i = 0; i < syllabes.size(); i ++){
 			final Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
-			sj.add(fun.apply(syllabes[i]));
+			sj.add(fun.apply(syllabes.get(i)));
 		}
 		return sj;
 	}
@@ -85,18 +89,22 @@ public class Orthography{
 	 * @param syllabes	The list of syllabes
 	 * @return The 0-based index of the syllabe starting from the end
 	 */
-	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
+	@SuppressWarnings("DesignForExtension")
+	public int getStressedSyllabeIndexFromLast(final List<String> syllabes){
 		return -1;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public int countGraphemes(final String word){
 		return word.length();
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String markDefaultStress(final String word){
 		return word;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public boolean hasStressedGrapheme(final String word){
 		return false;
 	}

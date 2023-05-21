@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -40,25 +40,25 @@ import java.nio.ByteBuffer;
  */
 public interface SequenceEncoderInterface{
 
-	/** Maximum encodable single-byte code */
+	/** Maximum encodable single-byte code. */
 	int REMOVE_EVERYTHING = 255;
 
 
 	/**
-	 * Encodes <code>target</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
+	 * Encodes {@code target} relative to {@code source}, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param source   The source byte sequence.
-	 * @param target   The target byte sequence to encode relative to <code>source</code>
-	 * @return	The {@link ByteBuffer} with encoded <code>target</code>.
+	 * @param target   The target byte sequence to encode relative to {@code source}
+	 * @return	The {@link ByteBuffer} with encoded {@code target}.
 	 */
 	byte[] encode(final byte[] source, final byte[] target);
 
 	/**
-	 * Decodes <code>encoded</code> relative to <code>source</code>, optionally reusing the provided {@link ByteBuffer}.
+	 * Decodes {@code encoded} relative to {@code source}, optionally reusing the provided {@link ByteBuffer}.
 	 *
 	 * @param source	The source byte sequence.
 	 * @param encoded	The {@linkplain #encode previously encoded} byte sequence.
-	 * @return	The {@link ByteBuffer} with decoded <code>target</code>.
+	 * @return	The {@link ByteBuffer} with decoded {@code target}.
 	 */
 	byte[] decode(final byte[] source, final byte[] encoded);
 

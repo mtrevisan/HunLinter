@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,13 +25,13 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 
-import java.text.MessageFormat;
+import java.io.EOFException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -39,48 +39,43 @@ import java.util.Scanner;
 
 public class AliasesHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
-	private static final MessageFormat WRONG_FORMAT = new MessageFormat("Error reading line `{0}`: bad number of entries, it must be '<option> <flag/morphological field>'");
-	private static final MessageFormat BAD_OPTION = new MessageFormat("Error reading line `{0}`: bad option, it must be {1}");
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String WRONG_FORMAT = "Error reading line `{}`: bad number of entries, it must be '<option> <flag/morphological field>'";
+	private static final String BAD_OPTION = "Error reading line `{}`: bad option, it must be {}";
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
-		try{
-			final Scanner scanner = context.getScanner();
-			if(!NumberUtils.isCreatable(context.getFirstParameter()))
-				throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
-			final int numEntries = Integer.parseInt(context.getFirstParameter());
-			if(numEntries <= 0)
-				throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
+		final Scanner scanner = context.getScanner();
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
-			final List<String> aliases = new ArrayList<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+		final List<String> aliases = new ArrayList<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-				final String line = scanner.nextLine();
-				final String[] parts = StringUtils.split(line);
+			final String line = scanner.nextLine();
+			final String[] parts = StringUtils.split(line);
 
-				checkValidity(parts, context);
+			checkValidity(parts, context);
 
-				aliases.add(parts[1]);
-			}
-
-			affixData.addData(context.getRuleType(), aliases);
-
-			return numEntries;
+			aliases.add(parts[1]);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e.getMessage());
-		}
+
+		affixData.addData(context.getRuleType(), aliases);
+
+		return numEntries;
 	}
 
-	private void checkValidity(final String[] parts, final ParsingContext context){
+	private static void checkValidity(final String[] parts, final ParsingContext context){
 		if(parts.length != 2)
-			throw new LinterException(WRONG_FORMAT.format(new Object[]{context}));
+			throw new LinterException(WRONG_FORMAT, context);
 		if(!context.getRuleType().equals(parts[0]))
-			throw new LinterException(BAD_OPTION.format(new Object[]{context, context.getRuleType()}));
+			throw new LinterException(BAD_OPTION, context, context.getRuleType());
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -42,7 +42,7 @@ import java.util.Set;
 
 public class FSATestUtils{
 
-	public static void walkNode(byte[] buffer, int depth, FSA fsa, int node, int cnt, List<String> result){
+	public static void walkNode(byte[] buffer, int depth, FSAAbstract fsa, int node, int cnt, List<String> result){
 		for(int arc = fsa.getFirstArc(node); arc != 0; arc = fsa.getNextArc(arc)){
 			buffer[depth] = fsa.getArcLabel(arc);
 
@@ -59,8 +59,8 @@ public class FSATestUtils{
 		}
 	}
 
-	/** Check if the DFSA is correct with respect to the given input */
-	public static void checkCorrect(final List<byte[]> input, final FSA fsa){
+	/** Check if the DFSA is correct with respect to the given input. */
+	public static void checkCorrect(final List<byte[]> input, final FSAAbstract fsa){
 		//(1) All input sequences are in the right language
 		final Set<ByteBuffer> rl = new HashSet<>();
 		for(final ByteBuffer bb : fsa){
@@ -81,7 +81,7 @@ public class FSATestUtils{
 		Assertions.assertEquals(0, rl.size());
 	}
 
-	/* Drain bytes from a byte buffer to a string */
+	/** Drain bytes from a byte buffer to a string. */
 	public static String toString(ByteBuffer sequence) {
 		byte [] bytes = new byte [sequence.remaining()];
 		sequence.get(bytes);
@@ -92,7 +92,7 @@ public class FSATestUtils{
 	 * Check if the DFSA reachable from a given state is minimal.
 	 * This means no two states have the same right language.
 	 */
-	public static void checkMinimal(final FSA fsa){
+	public static void checkMinimal(final FSAAbstract fsa){
 		final Map<String, Integer> stateLanguages = new HashMap<>();
 
 		fsa.visitPostOrder(new StateVisitor(){
@@ -114,7 +114,7 @@ public class FSATestUtils{
 		});
 	}
 
-	static List<byte[]> allSequences(FSA fsa, int state){
+	static List<byte[]> allSequences(FSAAbstract fsa, int state){
 		List<byte[]> seq = new ArrayList<>();
 		for(ByteBuffer bb : fsa.getSequences(state))
 			seq.add(Arrays.copyOf(bb.array(), bb.remaining()));

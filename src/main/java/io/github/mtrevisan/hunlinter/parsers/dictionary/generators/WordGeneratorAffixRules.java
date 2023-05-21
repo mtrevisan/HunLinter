@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,58 +26,80 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
+import java.util.Iterator;
+import java.util.List;
 
 
-class WordGeneratorAffixRules extends WordGeneratorBase{
+public class WordGeneratorAffixRules extends WordGeneratorBase{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WordGeneratorAffixRules.class);
 
 
-	WordGeneratorAffixRules(final AffixData affixData, final DictionaryCorrectnessChecker checker){
+	public WordGeneratorAffixRules(final AffixData affixData, final DictionaryCorrectnessChecker checker){
 		super(affixData, checker);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry){
+	public final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry){
 		return applyAffixRules(dicEntry, null);
 	}
 
-	Inflection[] applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
-		Inflection[] inflections = applyAffixRules(dicEntry, false, overriddenRule);
+	final List<Inflection> applyAffixRulesWithCompounds(final DictionaryEntry dicEntry){
+		return applyAffixRules(dicEntry, null, false);
+	}
 
-		inflections = enforceOnlyInCompound(inflections);
+	final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+		return applyAffixRules(dicEntry, overriddenRule, true);
+	}
+
+	private List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule,
+			final boolean enforceOnlyInCompound){
+		final List<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
+
+		if(enforceOnlyInCompound)
+			enforceOnlyInCompound(inflections);
 
 		//convert using output table
-		forEach(inflections,
-			inflection -> inflection.applyOutputConversionTable(affixData::applyOutputConversionTable));
+		for(int i = 0; i < inflections.size(); i ++)
+			inflections.get(i).applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
-			forEach(inflections, inflection -> LOGGER.trace("Inflected word: {}", inflection));
+			for(int i = 0; i < inflections.size(); i ++)
+				LOGGER.trace("Inflected word: {}", inflections.get(i));
 
 		return inflections;
 	}
 
-	/** Remove rules that invalidate the onlyInCompound rule */
-	private Inflection[] enforceOnlyInCompound(Inflection[] inflections){
+	/** Remove rules that invalidate the onlyInCompound rule. */
+	private void enforceOnlyInCompound(final Iterable<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();
-		if(onlyInCompoundFlag != null)
-			inflections = LoopHelper.removeIf(inflections, inflection -> {
+		if(onlyInCompoundFlag != null){
+			final Iterator<Inflection> itr = inflections.iterator();
+			while(itr.hasNext()){
+				final Inflection inflection = itr.next();
 				final boolean hasOnlyInCompoundFlag = inflection.hasContinuationFlag(onlyInCompoundFlag);
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
-				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules,
-					appliedRule -> appliedRule.hasContinuationFlag(onlyInCompoundFlag)) != null);
-				return (hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules);
-			});
-		return inflections;
+				final boolean hasOnlyInCompoundFlagInAppliedRules = (match(appliedRules, onlyInCompoundFlag) != null);
+				if(hasOnlyInCompoundFlag || hasOnlyInCompoundFlagInAppliedRules)
+					itr.remove();
+			}
+		}
+	}
+
+	private static AffixEntry match(final AffixEntry[] array, final String onlyInCompoundFlag){
+		final int size = (array != null? array.length: 0);
+		for(int i = 0; i < size; i ++){
+			final AffixEntry appliedRule = array[i];
+			if(appliedRule.hasContinuationFlag(onlyInCompoundFlag))
+				return appliedRule;
+		}
+		return null;
 	}
 
 }

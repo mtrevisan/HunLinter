@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,15 +24,18 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import io.github.mtrevisan.hunlinter.languages.Orthography;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,7 +44,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -54,10 +56,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -71,17 +70,20 @@ import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
  */
 public class HyphenationParser{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(HyphenationParser.class);
+
+
 	private static final String MORE_THAN_TWO_LEVELS = "Cannot have more than two levels";
-	private static final MessageFormat DUPLICATED_CUSTOM_HYPHENATION = new MessageFormat("Custom hyphenation `{0}` is already present");
-	private static final MessageFormat DUPLICATED_HYPHENATION = new MessageFormat("Duplicate found: `{0}`");
-	private static final MessageFormat INVALID_RULE = new MessageFormat("Rule `{0}` has an invalid format");
-	private static final MessageFormat INVALID_HYPHENATION_POINT = new MessageFormat("Rule `{0}` has no hyphenation point(s)");
-	private static final MessageFormat INVALID_HYPHENATION_POINT_NEAR_DOT = new MessageFormat("Rule `{0}` is invalid, the hyphenation point should not be adjacent to a dot");
-	private static final MessageFormat MORE_HYPHENATION_DOTS = new MessageFormat("Augmented rule `{0}` has not exactly one hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_INDEX_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the index number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = new MessageFormat("Augmented rule `{0}` has the length number not less than the hyphenation point");
-	private static final MessageFormat AUGMENTED_RULE_LENGTH_EXCEEDS = new MessageFormat("Augmented rule `{0}` has the length number that exceeds the length of the rule");
-	private static final MessageFormat DUPLICATED_RULE = new MessageFormat("Pattern `{0}` already present as `{1}`");
+	private static final String DUPLICATED_CUSTOM_HYPHENATION = "Custom hyphenation `{}` is already present";
+	private static final String DUPLICATED_HYPHENATION = "Duplicate found: `{}`";
+	private static final String INVALID_RULE = "Rule `{}` has an invalid format";
+	private static final String INVALID_HYPHENATION_POINT = "Rule `{}` has no hyphenation point(s)";
+	private static final String INVALID_HYPHENATION_POINT_NEAR_DOT = "Rule `{}` is invalid, the hyphenation point should not be adjacent to a dot";
+	private static final String MORE_HYPHENATION_DOTS = "Augmented rule `{}` has not exactly one hyphenation point";
+	private static final String AUGMENTED_RULE_INDEX_NOT_LESS_THAN = "Augmented rule `{}` has the index number not less than the hyphenation point";
+	private static final String AUGMENTED_RULE_LENGTH_NOT_LESS_THAN = "Augmented rule `{}` has the length number not less than the hyphenation point";
+	private static final String AUGMENTED_RULE_LENGTH_EXCEEDS = "Augmented rule `{}` has the length number that exceeds the length of the rule";
+	private static final String DUPLICATED_RULE = "Pattern `{}` already present as `{}`";
 
 	private static final String NEXT_LEVEL = "NEXTLEVEL";
 
@@ -89,7 +91,7 @@ public class HyphenationParser{
 //	private static final String HYPHEN = "‐";
 //	private static final String HYPHEN_MINUS = "-";
 	public static final String MINUS_SIGN = "-";
-	public static final char EQUALS_SIGN = '=';
+	static final char EQUALS_SIGN = '=';
 	public static final String SOFT_HYPHEN = "\u00AD";
 	public static final String EN_DASH = "–";
 //	private static final char EM_DASH = '—';
@@ -104,8 +106,7 @@ public class HyphenationParser{
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 
 	private static final String ONE = "1";
-	public static final String WORD_BOUNDARY = ".";
-	public static final String AUGMENTED_RULE = "/";
+	private static final char AUGMENTED_RULE = '/';
 
 	private static final String COMMA = ",";
 
@@ -117,22 +118,7 @@ public class HyphenationParser{
 	private static final Pattern PATTERN_INVALID_RULE_END = RegexHelper.pattern("[\\d]\\.$");
 	private static final Pattern PATTERN_AUGMENTED_RULE_HYPHEN_INDEX = RegexHelper.pattern("[13579]");
 
-	public static final int PARAM_RULE = 1;
-	public static final int PARAM_ADD_BEFORE = 2;
-	public static final int PARAM_HYPHEN = 3;
-	public static final int PARAM_ADD_AFTER = 4;
-	public static final int PARAM_START = 5;
-	public static final int PARAM_CUT = 6;
-	public static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
-	public static final Pattern PATTERN_POINTS_AND_NUMBERS = RegexHelper.pattern("[.\\d]");
-	public static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
-
-	public static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
-
-	private static final Pattern PATTERN_KEY = RegexHelper.pattern("[\\d=]|/.+$");
 	private static final Pattern PATTERN_HYPHENATION_POINT = RegexHelper.pattern("[^13579]|/.+$");
-
-	public static final Pattern PATTERN_REDUCE = RegexHelper.pattern("/.+$");
 
 	private static final char[] NEW_LINE = {'\n'};
 
@@ -141,7 +127,8 @@ public class HyphenationParser{
 
 	private static final Map<Level, Set<String>> REDUCED_PATTERNS = new EnumMap<>(Level.class);
 	static{
-		forEach(Level.values(), level -> REDUCED_PATTERNS.put(level, new HashSet<>()));
+		for(final Level level : Level.values())
+			REDUCED_PATTERNS.put(level, new HashSet<>(0));
 	}
 
 	private final Comparator<String> comparator;
@@ -152,30 +139,33 @@ public class HyphenationParser{
 	private final Map<Level, AhoCorasickTrie<String>> patterns = new EnumMap<>(Level.class);
 	private final Map<Level, Map<String, String>> customHyphenations = new EnumMap<>(Level.class);
 	private HyphenationOptionsParser options;
+	private Charset charset;
 
 
 	public HyphenationParser(final Comparator<String> comparator){
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 
 		this.comparator = comparator;
 
 		for(final Level level : Level.values()){
-			rules.put(level, new HashMap<>());
-			customHyphenations.put(level, new HashMap<>());
+			rules.put(level, new HashMap<>(0));
+			customHyphenations.put(level, new HashMap<>(0));
 		}
 		options = new HyphenationOptionsParser();
 	}
 
 	HyphenationParser(final Comparator<String> comparator, final Map<Level, AhoCorasickTrie<String>> patterns,
 			Map<Level, Map<String, String>> customHyphenations, final HyphenationOptionsParser options){
-		Objects.requireNonNull(patterns);
-		Objects.requireNonNull(comparator);
+		Objects.requireNonNull(patterns, "Patterns cannot be null");
+		Objects.requireNonNull(comparator, "Comparator cannot be null");
 
 		this.comparator = comparator;
 
 		secondLevelPresent = patterns.containsKey(Level.COMPOUND);
-		forEach(Level.values(), level -> this.patterns.put(level, patterns.get(level)));
-		customHyphenations = Optional.ofNullable(customHyphenations).orElse(new EnumMap<>(Level.class));
+		for(final Level level : Level.values())
+			this.patterns.put(level, patterns.get(level));
+		customHyphenations = Optional.ofNullable(customHyphenations)
+			.orElse(new EnumMap<>(Level.class));
 		for(final Level level : Level.values()){
 			final Map<String, String> ch = customHyphenations.getOrDefault(level, new HashMap<>(0));
 			this.customHyphenations.put(level, ch);
@@ -183,27 +173,27 @@ public class HyphenationParser{
 		this.options = (options != null? options: new HyphenationOptionsParser());
 	}
 
-	public boolean isSecondLevelPresent(){
+	public final boolean isSecondLevelPresent(){
 		return secondLevelPresent;
 	}
 
-	public Pattern getPatternNoHyphen(){
+	public final Pattern getPatternNoHyphen(){
 		return patternNoHyphen;
 	}
 
-	public Map<Level, AhoCorasickTrie<String>> getPatterns(){
+	public final Map<Level, AhoCorasickTrie<String>> getPatterns(){
 		return patterns;
 	}
 
-	public Map<Level, Map<String, String>> getCustomHyphenations(){
+	public final Map<Level, Map<String, String>> getCustomHyphenations(){
 		return customHyphenations;
 	}
 
-	public HyphenationOptionsParser getOptions(){
+	public final HyphenationOptionsParser getOptions(){
 		return options;
 	}
 
-	public void setOptions(final HyphenationOptionsParser options){
+	public final void setOptions(final HyphenationOptionsParser options){
 		this.options = options;
 	}
 
@@ -213,17 +203,18 @@ public class HyphenationParser{
 	 * @param hypFile	The content of the hyphenation file
 	 * @throws LinterException   If something is wrong while parsing the file
 	 */
-	public void parse(final File hypFile){
-		final Path path = hypFile.toPath();
+	public final void parse(final File hypFile){
+		final Path hypPath = hypFile.toPath();
 		Level level = Level.NON_COMPOUND;
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
-			String line = scanner.nextLine();
-			FileHelper.readCharset(line);
+		charset = FileHelper.determineCharset(hypPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the Hyphenation file is {}", charset.name());
+		try(final Scanner scanner = FileHelper.createScanner(hypPath, charset)){
+			//skip charset
+			scanner.nextLine();
 
 			while(scanner.hasNextLine()){
-				line = scanner.nextLine();
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SLASH, ParserHelper.COMMENT_MARK_PERCENT))
+				String line = scanner.nextLine();
+				if(ParserHelper.isHyphenationComment(line))
 					continue;
 
 				final boolean parsedLine = options.parseLine(line);
@@ -253,45 +244,48 @@ public class HyphenationParser{
 			}
 
 			if(level == Level.NON_COMPOUND)
-				addDefaults(level, charset);
+				addDefaults(Level.NON_COMPOUND, charset);
 		}
-		catch(final Exception t){
-			throw new LinterException(t.getMessage());
+		catch(final IOException ioe){
+			throw new LinterException(ioe, ioe.getMessage());
 		}
 
 		//build tries
-		forEach(Level.values(), lev -> buildTrie(lev, rules.get(lev)));
+		for(final Level lev : Level.values())
+			buildTrie(lev, rules.get(lev));
 
 		secondLevelPresent = (level == Level.COMPOUND);
-//System.out.println(com.carrotsearch.sizeof.RamUsageEstimator.sizeOfAll(hypParser.patterns));
-//103 352 B compact trie
-//106 800 B basic trie
 	}
 
-	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`) */
-	private String convertUnicode(final CharSequence line){
+	/** Transform escaped unicode into true unicode (ex. `^^e1` into `á`). */
+	private static String convertUnicode(final CharSequence line){
 		final String[] components = RegexHelper.extract(line, PATTERN_ESCAPED_UNICODE);
 		for(int i = 0; i < components.length; i ++)
 			if(components[i].startsWith(ESCAPE_SEQUENCE))
 				components[i] = String.valueOf((char)Integer.parseInt(components[i].substring(2), 16));
-		return StringUtils.join(components);
+		final StringBuilder sb = new StringBuilder(line.length());
+		for(final String component : components)
+			sb.append(component);
+		return sb.toString();
 	}
 
 	private void parseCustomRule(final String line, final Level level){
 		final String key = StringHelper.removeAll(line, EQUALS_SIGN);
 		if(customHyphenations.get(level).containsKey(key))
-			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION.format(new Object[]{line}));
+			throw new LinterException(DUPLICATED_CUSTOM_HYPHENATION, line);
 
-		customHyphenations.get(level).put(key, line);
+		customHyphenations.get(level)
+			.put(key, line);
 	}
 
 	private void parseCommonRule(final String line, final Level level){
+		//remove all (breaking) numbers
 		final String key = getKeyFromData(line);
 		final boolean duplicatedRule = isRuleDuplicated(key, line, level);
 		if(duplicatedRule)
-			throw new LinterException(DUPLICATED_HYPHENATION.format(new Object[]{line}));
+			throw new LinterException(DUPLICATED_HYPHENATION, line);
 
-		//insert current pattern into the radix tree (remove all numbers)
+		//insert current pattern into the radix tree
 		rules.get(level)
 			.put(key, line);
 	}
@@ -302,12 +296,18 @@ public class HyphenationParser{
 			? Arrays.asList(APOSTROPHE, MINUS_SIGN, String.valueOf(MODIFIER_LETTER_APOSTROPHE), EN_DASH)
 			: Arrays.asList(APOSTROPHE, MINUS_SIGN));
 
-		patternNoHyphen = RegexHelper.pattern("[" + StringUtils.join(retroCompatibilityNoHyphen) + "]");
+		final StringBuilder sb = new StringBuilder(6);
+		sb.append('[');
+		for(final String rcnh : retroCompatibilityNoHyphen)
+			sb.append(rcnh);
+		sb.append(']');
+		patternNoHyphen = RegexHelper.pattern(sb.toString());
 
 		options.getNoHyphen()
 			.addAll(retroCompatibilityNoHyphen);
 
-		for(final String noHyphen : retroCompatibilityNoHyphen){
+		for(int i = 0; i < retroCompatibilityNoHyphen.size(); i ++){
+			final String noHyphen = retroCompatibilityNoHyphen.get(i);
 			final String line = ONE + noHyphen + ONE;
 			if(!isRuleDuplicated(noHyphen, line, level))
 				rules.get(level)
@@ -315,33 +315,38 @@ public class HyphenationParser{
 		}
 	}
 
-	public static boolean isAugmentedRule(final String line){
-		return line.contains(AUGMENTED_RULE);
+	public static boolean isAugmentedRule(final CharSequence line){
+		return StringUtils.contains(line, AUGMENTED_RULE);
 	}
 
 	public static boolean isCustomRule(final String line){
 		return (!isAugmentedRule(line) && StringUtils.contains(line, EQUALS_SIGN));
 	}
 
-	private boolean isRuleDuplicated(final String key, final CharSequence line, final Level level){
+	private boolean isRuleDuplicated(final String key, final String line, final Level level){
 		boolean duplicatedRule = false;
 		final String foundNodeValue = rules.get(level)
 			.get(key);
 		if(foundNodeValue != null){
-			final String clearedLine = RegexHelper.clear(line, PATTERN_REDUCE);
-			final String clearedFoundNodeValue = RegexHelper.clear(foundNodeValue, PATTERN_REDUCE);
+			final String clearedLine = removeNonStandardPart(line);
+			final String clearedFoundNodeValue = removeNonStandardPart(foundNodeValue);
 			duplicatedRule = (clearedLine.contains(clearedFoundNodeValue) || clearedFoundNodeValue.contains(clearedLine));
 		}
 		return duplicatedRule;
 	}
 
-	public void clear(){
+	public final void clear(){
 		secondLevelPresent = false;
 		patternNoHyphen = null;
-		forEach(Level.values(), lev -> rules.get(lev).clear());
 		patterns.clear();
-		forEach(Level.values(), lev -> REDUCED_PATTERNS.get(lev).clear());
-		forEach(customHyphenations.values(), Map::clear);
+		for(final Level lev : Level.values()){
+			rules.get(lev)
+				.clear();
+			REDUCED_PATTERNS.get(lev)
+				.clear();
+		}
+		for(final Map<String, String> elem : customHyphenations.values())
+			elem.clear();
 		options.clear();
 	}
 
@@ -352,7 +357,7 @@ public class HyphenationParser{
 	 * @param level   Level to add the rule to
 	 * @return The value of a rule if already in place, {@code null} if the insertion has completed successfully
 	 */
-	public String addRule(final String rule, final Level level){
+	public final String addRule(final String rule, final Level level){
 		validateRule(rule, level);
 
 		final String oldRule;
@@ -381,13 +386,15 @@ public class HyphenationParser{
 	 * @param level	Level to remove the rule from
 	 * @return {@code true} if the removal has completed successfully
 	 */
-	public boolean removeRule(final String rule, final Level level){
+	public final boolean removeRule(final String rule, final Level level){
 		final String oldRule;
 		if(isCustomRule(rule)){
 			final String key = StringHelper.removeAll(rule, EQUALS_SIGN);
-			oldRule = customHyphenations.get(level).get(key);
+			oldRule = customHyphenations.get(level)
+				.get(key);
 			if(oldRule != null)
-				customHyphenations.get(level).remove(key);
+				customHyphenations.get(level)
+					.remove(key);
 		}
 		else{
 			final String key = getKeyFromData(rule);
@@ -406,10 +413,10 @@ public class HyphenationParser{
 	}
 
 	/**
-	 * Line must contains exactly one hyphenation point
+	 * Line must contain exactly one hyphenation point.
 	 *
-	 * @param rule   Rule to be validated
-	 * @param level   Level to add the rule to
+	 * @param rule   Rule to be validated.
+	 * @param level   Level to add the rule to.
 	 */
 	public static void validateRule(final String rule, final Level level){
 		validateBasicRules(rule);
@@ -427,19 +434,19 @@ public class HyphenationParser{
 
 	private static void validateBasicRules(final CharSequence rule){
 		if(!RegexHelper.find(rule, PATTERN_VALID_RULE))
-			throw new LinterException(INVALID_RULE.format(new Object[]{rule}));
+			throw new LinterException(INVALID_RULE, rule);
 		if(!StringUtils.contains(rule, EQUALS_SIGN)){
 			if(!RegexHelper.find(rule, PATTERN_VALID_RULE_BREAK_POINTS))
-				throw new LinterException(INVALID_HYPHENATION_POINT.format(new Object[]{rule}));
+				throw new LinterException(INVALID_HYPHENATION_POINT, rule);
 			if(RegexHelper.find(rule, PATTERN_INVALID_RULE_START) || RegexHelper.find(rule, PATTERN_INVALID_RULE_END))
-				throw new LinterException(INVALID_HYPHENATION_POINT_NEAR_DOT.format(new Object[]{rule}));
+				throw new LinterException(INVALID_HYPHENATION_POINT_NEAR_DOT, rule);
 		}
 	}
 
 	private static void validateAugmentedRule(final CharSequence cleanedRule, final String rule){
 		final int count = RegexHelper.clear(cleanedRule, PATTERN_HYPHENATION_POINT).length();
 		if(count != 1)
-			throw new LinterException(MORE_HYPHENATION_DOTS.format(new Object[]{rule}));
+			throw new LinterException(MORE_HYPHENATION_DOTS, rule);
 
 		final String[] parts = StringUtils.split(rule, COMMA);
 		if(parts.length > 1){
@@ -447,12 +454,12 @@ public class HyphenationParser{
 
 			final int startIndex = extractStartIndex(parts);
 			if(startIndex < 0 || startIndex >= index)
-				throw new LinterException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_INDEX_NOT_LESS_THAN, rule);
 			final int length = extractLength(parts);
 			if(length < 0 || startIndex + length < index)
-				throw new LinterException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_LENGTH_NOT_LESS_THAN, rule);
 			if(startIndex + length >= parts[0].length())
-				throw new LinterException(AUGMENTED_RULE_LENGTH_EXCEEDS.format(new Object[]{rule}));
+				throw new LinterException(AUGMENTED_RULE_LENGTH_EXCEEDS, rule);
 		}
 	}
 
@@ -476,19 +483,18 @@ public class HyphenationParser{
 				break;
 			}
 		if(alreadyPresentRule != null)
-			throw new LinterException(DUPLICATED_RULE.format(new Object[]{rule, alreadyPresentRule}));
+			throw new LinterException(DUPLICATED_RULE, rule, alreadyPresentRule);
 	}
 
 	public static int getIndexOfBreakpoint(final CharSequence rule){
-		final Matcher m = RegexHelper.matcher(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
-		m.find();
-		return m.start();
+		return RegexHelper.indexOf(rule, PATTERN_AUGMENTED_RULE_HYPHEN_INDEX);
 	}
 
-	public void save(final File hypFile) throws IOException{
-		final Charset charset = StandardCharsets.UTF_8;
-		try(final BufferedWriter writer = Files.newBufferedWriter(hypFile.toPath(), charset)){
-			writeln(writer, charset.name());
+	public final void save(final File hypFile) throws IOException{
+		final Path hypPath = hypFile.toPath();
+		try(final BufferedWriter writer = Files.newBufferedWriter(hypPath, charset)){
+			final String hunspellCharsetName = FileHelper.getHunspellCharsetName(charset);
+			writeln(writer, hunspellCharsetName);
 
 			writer.newLine();
 			options.write(writer);
@@ -507,17 +513,17 @@ public class HyphenationParser{
 	private void savePatternsByLevel(final BufferedWriter writer, final Level level) throws IOException{
 		final List<String> patternsByLevel = new ArrayList<>(rules.get(level).values());
 		patternsByLevel.sort(comparator);
-		for(final String pattern : patternsByLevel)
-			writeln(writer, pattern);
+		for(int i = 0; i < patternsByLevel.size(); i ++)
+			writeln(writer, patternsByLevel.get(i));
 
 		//write custom hyphenations
 		final List<String> customs = new ArrayList<>(customHyphenations.get(level).values());
 		customs.sort(comparator);
-		for(final String rule : customs)
-			writeln(writer, rule);
+		for(int i = 0; i < customs.size(); i ++)
+			writeln(writer, customs.get(i));
 	}
 
-	private void writeln(final BufferedWriter writer, final String line) throws IOException{
+	private static void writeln(final BufferedWriter writer, final String line) throws IOException{
 		writer.write(line);
 		writer.write(NEW_LINE);
 	}
@@ -529,14 +535,34 @@ public class HyphenationParser{
 	 * @param level	The level to check the rule for
 	 * @return	Whether the hyphenator has the given rule
 	 */
-	public boolean hasRule(final String rule, final Level level){
+	public final boolean hasRule(final String rule, final Level level){
 		return (isCustomRule(rule)
 			? customHyphenations.get(level).containsValue(rule)
 			: rules.get(level).containsKey(getKeyFromData(rule)));
 	}
 
-	public static String getKeyFromData(final CharSequence rule){
-		return RegexHelper.clear(rule, PATTERN_KEY);
+	/**
+	 * Removes the non-standard part `/-=-`.
+	 */
+	static String removeNonStandardPart(final String rule){
+		final int index = rule.indexOf('/');
+		return (index >= 0? rule.substring(0, index): rule);
+	}
+
+	/**
+	 * Removes every number from the rule, and keep only the word part (eliminating the non-standard part `/-=-`).
+	 */
+	private static String getKeyFromData(final CharSequence rule){
+		final StringBuilder sb = new StringBuilder(rule.length());
+		for(int i = 0; i < rule.length(); i ++){
+			final char chr = rule.charAt(i);
+			if(chr == '/')
+				break;
+
+			if(!Character.isDigit(chr))
+				sb.append(chr);
+		}
+		return sb.toString();
 	}
 
 }

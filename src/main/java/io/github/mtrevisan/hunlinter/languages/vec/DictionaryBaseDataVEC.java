@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,9 +29,9 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParam
 
 public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 
-	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 30_000_000;
-	private static final double FALSE_POSITIVE_PROBABILITY = 1. / EXPECTED_NUMBER_OF_ELEMENTS;
-	private static final double GROW_RATIO_WHEN_FULL = 1.3;
+	private static final int EXPECTED_NUMBER_OF_ELEMENTS = 50_000_000;
+	private static final double FALSE_POSITIVE_PROBABILITY = 0.4 / EXPECTED_NUMBER_OF_ELEMENTS;
+	private static final double GROWTH_RATE_WHEN_FULL = 0.2;
 
 
 	private static class SingletonHelper{
@@ -56,8 +56,8 @@ public final class DictionaryBaseDataVEC extends BloomFilterParameters{
 	}
 
 	@Override
-	public double getGrowRatioWhenFull(){
-		return GROW_RATIO_WHEN_FULL;
+	public double getGrowthRateWhenFull(){
+		return GROWTH_RATE_WHEN_FULL;
 	}
 
 }

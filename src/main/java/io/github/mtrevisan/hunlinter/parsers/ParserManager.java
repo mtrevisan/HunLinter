@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,26 +30,25 @@ import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
+import io.github.mtrevisan.hunlinter.parsers.aid.AidParser;
+import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenator;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import org.apache.commons.lang3.ArrayUtils;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.services.filelistener.FileChangeListener;
+import io.github.mtrevisan.hunlinter.services.filelistener.FileListenerManager;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.parsers.aid.AidParser;
-import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenator;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
-import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.filelistener.FileChangeListener;
-import io.github.mtrevisan.hunlinter.services.filelistener.FileListenerManager;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -62,6 +61,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class ParserManager implements FileChangeListener{
@@ -82,7 +82,7 @@ public class ParserManager implements FileChangeListener{
 	private final AffixParser affParser;
 	private final AidParser aidParser;
 	private DictionaryParser dicParser;
-	private final ThesaurusParser theParser;
+	private ThesaurusParser theParser;
 	private HyphenationParser hypParser;
 
 	private HyphenatorInterface hyphenator;
@@ -99,11 +99,10 @@ public class ParserManager implements FileChangeListener{
 
 
 	public ParserManager(final Packager packager){
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		affParser = new AffixParser();
 		aidParser = new AidParser();
-		theParser = new ThesaurusParser(packager.getLanguage());
 		acoParser = new AutoCorrectParser();
 		sexParser = new ExceptionsParser(Packager.FILENAME_SENTENCE_EXCEPTIONS);
 		wexParser = new ExceptionsParser(Packager.FILENAME_WORD_EXCEPTIONS);
@@ -113,59 +112,65 @@ public class ParserManager implements FileChangeListener{
 		this.packager = packager;
 	}
 
-	public AffixParser getAffParser(){
+	public final AffixParser getAffParser(){
 		return affParser;
 	}
 
-	public AffixData getAffixData(){
+	public final AffixData getAffixData(){
 		return affParser.getAffixData();
 	}
 
-	public String getLanguage(){
+	public final String getLanguage(){
 		return affParser.getLanguage();
 	}
 
-	public AidParser getAidParser(){
+	public final AidParser getAidParser(){
 		return aidParser;
 	}
 
-	public DictionaryParser getDicParser(){
+	public final DictionaryParser getDicParser(){
 		return dicParser;
 	}
 
-	public ThesaurusParser getTheParser(){
+	public final ThesaurusParser getTheParser(){
 		return theParser;
 	}
 
-	public HyphenationParser getHypParser(){
+	public final HyphenationParser getHypParser(){
 		return hypParser;
 	}
 
-	public HyphenatorInterface getHyphenator(){
+	public final HyphenatorInterface getHyphenator(){
 		return hyphenator;
 	}
 
-	public AutoCorrectParser getAcoParser(){
+	public final AutoCorrectParser getAcoParser(){
 		return acoParser;
 	}
 
-	public ExceptionsParser getSexParser(){
+	public final ExceptionsParser getSexParser(){
 		return sexParser;
 	}
 
-	public ExceptionsParser getWexParser(){
+	public final ExceptionsParser getWexParser(){
 		return wexParser;
 	}
 
-	public DictionaryCorrectnessChecker getChecker(){
+	public final DictionaryCorrectnessChecker getChecker(){
 		return checker;
 	}
 
-	public WordGenerator getWordGenerator(){
+	public final WordGenerator getWordGenerator(){
 		return wordGenerator;
 	}
 
-	public void registerFileListener(){
+	public final void startFileListener(){
+		registerFileListener();
+
+		flm.start();
+	}
+
+	private void registerFileListener(){
 		flm.unregisterAll();
 
 		final File affFile = packager.getAffixFile();
@@ -174,21 +179,20 @@ public class ParserManager implements FileChangeListener{
 		final File aidFile = getAidFile();
 		final File sexFile = packager.getSentenceExceptionsFile();
 		final File wexFile = packager.getWordExceptionsFile();
-		final File[] files = ArrayUtils.removeAllOccurrences(new File[]{affFile, dicFile, hypFile, aidFile, sexFile, wexFile},
-			null);
+		final File[] files = {affFile, dicFile, hypFile, aidFile, sexFile, wexFile};
 		for(final File file : files)
-			flm.register(this, file.getAbsolutePath());
+			if(file != null)
+				flm.register(this, file.getAbsolutePath());
 	}
 
-	public void startFileListener(){
-		flm.start();
-	}
+	public final void stopFileListener(){
+		flm.unregisterAll();
 
-	public void stopFileListener(){
 		flm.stop();
 	}
 
-	public void openAffixFile(final File affFile) throws IOException{
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	public final void openAffixFile(final File affFile) throws IOException{
 		if(!affFile.exists()){
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);
 
@@ -202,7 +206,7 @@ public class ParserManager implements FileChangeListener{
 		LOGGER.info(MARKER_APPLICATION, "Finished reading Affix file");
 	}
 
-	public void openHyphenationFile(final File hypFile){
+	public final void openHyphenationFile(final File hypFile){
 		if(hypFile != null && hypFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Hyphenation file: {}", hypFile.getName());
 
@@ -219,13 +223,13 @@ public class ParserManager implements FileChangeListener{
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_HYPHENATION);
 	}
 
-	public void getCorrectnessChecker(){
-		Objects.requireNonNull(affParser);
+	public final void getCorrectnessChecker(){
+		Objects.requireNonNull(affParser, "Affix parser cannot be null");
 
 		checker = BaseBuilder.getCorrectnessChecker(affParser.getAffixData(), hyphenator);
 	}
 
-	public void prepareDictionaryFile(final File dicFile){
+	public final void prepareDictionaryFile(final File dicFile){
 		final AffixData affixData = affParser.getAffixData();
 		if(dicFile.exists()){
 			final String language = affixData.getLanguage();
@@ -238,7 +242,7 @@ public class ParserManager implements FileChangeListener{
 		wordGenerator = new WordGenerator(affixData, dicParser, checker);
 	}
 
-	public void openAidFile(final File aidFile) throws IOException{
+	public final void openAidFile(final File aidFile) throws IOException{
 		if(aidFile != null && aidFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Aid file: {}", aidFile.getName());
 
@@ -250,10 +254,11 @@ public class ParserManager implements FileChangeListener{
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AID);
 	}
 
-	public void openThesaurusFile(final File theDataFile) throws IOException{
+	public final void openThesaurusFile(final File theDataFile) throws IOException{
 		if(theDataFile != null && theDataFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Thesaurus file: {}", theDataFile.getName());
 
+			theParser = new ThesaurusParser(packager.getLanguage());
 			theParser.parse(theDataFile);
 
 			LOGGER.info(MARKER_APPLICATION, "Finished reading Thesaurus file");
@@ -262,7 +267,7 @@ public class ParserManager implements FileChangeListener{
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_THESAURUS);
 	}
 
-	public void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
+	public final void openAutoCorrectFile(final File acoFile) throws IOException, SAXException{
 		if(acoFile != null && acoFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Auto-Correct file: {}", acoFile.getName());
 
@@ -274,7 +279,7 @@ public class ParserManager implements FileChangeListener{
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT);
 	}
 
-	public void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
+	public final void openSentenceExceptionsFile(final File sexFile) throws IOException, SAXException{
 		if(sexFile != null && sexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Sentence Exceptions file: {}", sexFile.getName());
 
@@ -287,7 +292,7 @@ public class ParserManager implements FileChangeListener{
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION);
 	}
 
-	public void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
+	public final void openWordExceptionsFile(final File wexFile) throws IOException, SAXException{
 		if(wexFile != null && wexFile.exists()){
 			LOGGER.info(MARKER_APPLICATION, "Opening Word Exceptions file: {}", wexFile.getName());
 
@@ -301,44 +306,43 @@ public class ParserManager implements FileChangeListener{
 	}
 
 
-	public void storeHyphenationFile() throws IOException{
+	public final void storeHyphenationFile() throws IOException{
 		final File hypFile = packager.getHyphenationFile();
 		hypParser.save(hypFile);
 	}
 
-	public void storeThesaurusFiles() throws IOException{
+	public final void storeThesaurusFiles() throws IOException{
 		final File theIndexFile = packager.getThesaurusIndexFile();
 		final File theDataFile = packager.getThesaurusDataFile();
 		theParser.save(theIndexFile, theDataFile);
 	}
 
-	public void storeSentenceExceptionFile() throws TransformerException{
+	public final void storeSentenceExceptionFile() throws TransformerException{
 		final File sexFile = packager.getSentenceExceptionsFile();
 		sexParser.save(sexFile);
 	}
 
-	public void storeWordExceptionFile() throws TransformerException{
+	public final void storeWordExceptionFile() throws TransformerException{
 		final File wexFile = packager.getWordExceptionsFile();
 		wexParser.save(wexFile);
 	}
 
-	public void storeAutoCorrectFile() throws TransformerException{
+	public final void storeAutoCorrectFile() throws TransformerException{
 		final File acoFile = packager.getAutoCorrectFile();
 		acoParser.save(acoFile);
 	}
 
 
-	public File getAidFile(){
+	public final File getAidFile(){
 		return Path.of(FOLDER_AID, affParser.getLanguage() + EXTENSION_AID)
 			.toFile();
 	}
 
 
 	@Override
-	public void fileDeleted(final Path path){
+	public final void fileDeleted(final Path path){
 		LOGGER.info(MARKER_APPLICATION, "File {} deleted", path.getFileName());
 
-		//FIXME
 		final File file = path.toFile();
 		if(file.equals(packager.getAffixFile()))
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_CLEAR_AFFIX);
@@ -357,8 +361,9 @@ public class ParserManager implements FileChangeListener{
 	}
 
 	@Override
-	public void fileModified(final Path path){
+	public final void fileModified(final Path path){
 		if(path.toFile().toString().equals(packager.getDictionaryFile().toString()))
+			//cannot refresh file because on sorting the dictionary is changed, leading to a useless reloading
 			EventBusService.publish(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 		else{
 			LOGGER.info(MARKER_APPLICATION, "File {} modified, reloading", path.getFileName());
@@ -368,22 +373,24 @@ public class ParserManager implements FileChangeListener{
 	}
 
 
-	public List<String> getDictionaryLines() throws IOException{
+	public final List<String> getDictionaryLines() throws IOException{
 		final File dicFile = packager.getDictionaryFile();
-		return Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())
-			.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
-			.collect(Collectors.toList());
+		try(final Stream<String> lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())){
+			return lines
+				.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
+				.collect(Collectors.toList());
+		}
 	}
 
-	public boolean hasHyphenationRule(final String addedRule, final HyphenationParser.Level level){
+	public final boolean hasHyphenationRule(final String addedRule, final HyphenationParser.Level level){
 		return hypParser.hasRule(addedRule, level);
 	}
 
-	public String addHyphenationRule(final String newRule, final HyphenationParser.Level level){
+	public final String addHyphenationRule(final String newRule, final HyphenationParser.Level level){
 		return hypParser.addRule(newRule, level);
 	}
 
-	public void createPackage(){
+	public final void createPackage(){
 		packager.createPackage(packager.getProjectPath(), getLanguage());
 	}
 

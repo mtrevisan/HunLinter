@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,9 +26,14 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.MenuSelectionManager;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 
@@ -43,19 +48,20 @@ public class HyphenationLinterAction extends AbstractAction{
 	private final PropertyChangeListener propertyChangeListener;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public HyphenationLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("hyphenation.linter",
 			new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		workerManager.createHyphenationLinterWorker(
@@ -65,8 +71,33 @@ public class HyphenationLinterAction extends AbstractAction{
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(true)
+			worker -> {
+				//change color of progress bar to reflect an error
+				if(worker.isCancelled())
+					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
+				setEnabled(true);
+			}
 		);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

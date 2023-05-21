@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,12 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -54,7 +56,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		super(workerData);
 	}
 
-	protected void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
+	protected final void processLines(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor){
 		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		try{
@@ -68,15 +70,13 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			else
 				processLinesSequential(path, charset, dataProcessor);
 		}
-		catch(final LinterException e){
-			throw e;
-		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new ParserException(ioe);
 		}
 	}
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset) throws IOException{
 		//read entire file in memory
 		final List<String> lines = Files.readAllLines(path, charset);
@@ -86,7 +86,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 		final List<IndexDataPair<String>> entries = new ArrayList<>(lines.size());
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
-			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+			if(ParserHelper.isDictionaryComment(line))
 				continue;
 
 			entries.add(IndexDataPair.of(lineIndex, line));
@@ -113,8 +113,9 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			processLinesSequentialBySize(path, charset, dataProcessor, fileSize);
 	}
 
-	private void processLinesSequentialByLine(final Path path, final Charset charset,
-			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	private void processLinesSequentialByLine(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor)
+			throws IOException{
 		//read entire file in memory
 		final List<String> lines = FileHelper.readAllLines(path, charset);
 		if(!workerData.isNoHeader())
@@ -124,7 +125,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
 			final String line = lines.get(lineIndex);
-			if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+			if(ParserHelper.isDictionaryComment(line))
 				continue;
 
 			innerProcessor.accept(IndexDataPair.of(lineIndex, line));
@@ -147,7 +148,7 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				lineSize += StringHelper.rawBytesLength(line);
-				if(ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH))
+				if(ParserHelper.isDictionaryComment(line))
 					continue;
 
 				innerProcessor.accept(IndexDataPair.of(lineIndex ++, line), lineSize);
@@ -165,12 +166,13 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if(progress.incrementAndGet() % progressStep == 0)
-					setProgress(progressIndex.incrementAndGet(), 100);
+					setWorkerProgress(progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
-			catch(final Exception e){
-				final LinterException le = new LinterException(e.getMessage(), e.getCause(), data);
+			catch(final RuntimeException re){
+				final LinterException le = new LinterException(re, re.getMessage())
+					.withData(data);
 				manageException(le);
 
 				if(workerData.isCancelOnException())
@@ -189,35 +191,38 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 				dataProcessor.accept(data);
 
 				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
-					setProgress(progressIndex.incrementAndGet(), 100);
+					setWorkerProgress(progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e, data);
+			catch(final RuntimeException re){
+				throw new LinterException(re)
+					.withIndexDataPair(data);
 			}
 		};
 	}
 
 
-	protected synchronized void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
+	protected static void writeLine(final BufferedWriter writer, final String line, final char[] lineSeparator){
 		try{
 			writer.write(line);
 			writer.write(lineSeparator);
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new WriterException(ioe);
 		}
 	}
 
-	protected void closeWriter(final Writer writer){
+	protected static void closeWriter(final Writer writer){
 		try{
 			writer.close();
 		}
-		catch(final IOException ignored){}
+		catch(final IOException ioe){
+			throw new WriterException(ioe);
+		}
 	}
 
 }

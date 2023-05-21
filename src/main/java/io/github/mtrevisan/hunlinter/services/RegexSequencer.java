@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,34 +24,36 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.services.system.Memoizer;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 
-public class RegexSequencer{
+public final class RegexSequencer{
 
 	private static final Pattern PATTERN = RegexHelper.pattern("(?<!\\[\\^?)(?![^\\[]*\\])");
 
 	private static final String CLASS_START = "[";
 	private static final String NEGATED_CLASS_START = CLASS_START + "^";
 
-	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? new String[0]: RegexHelper.split(seq, PATTERN)));
+	private static final String[] EMPTY_ARRAY = new String[0];
+	private static final Function<String, String[]> SPLIT_SEQUENCE = Memoizer.memoize(seq -> (seq.isEmpty()? EMPTY_ARRAY: RegexHelper.split(seq, PATTERN)));
 
+
+	private RegexSequencer(){}
 
 	public static String[] splitSequence(final String sequence){
 		return SPLIT_SEQUENCE.apply(sequence);
 	}
 
-	public String[] getEmptySequence(){
-		return new String[0];
+	public static String[] getEmptySequence(){
+		return EMPTY_ARRAY;
 	}
 
-	public int length(final String[] sequence){
+	public static int length(final String[] sequence){
 		return sequence.length;
 	}
 
@@ -64,7 +66,7 @@ public class RegexSequencer{
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals} method.
 	 */
-	public boolean startsWith(final String[] sequence, final String[] prefix){
+	public static boolean startsWith(final String[] sequence, final String[] prefix){
 		final int count = prefix.length;
 		if(count > sequence.length)
 			return false;
@@ -84,7 +86,7 @@ public class RegexSequencer{
 	 *				Note also that {@code true} will be returned if the argument is an empty sequence or is equal to this {@code RadixTreeKey} object as
 	 *				determined by the {@link #equals} method.
 	 */
-	public boolean endsWith(final String[] sequence, final String[] suffix){
+	public static boolean endsWith(final String[] sequence, final String[] suffix){
 		final int count = suffix.length;
 		if(count > sequence.length)
 			return false;
@@ -105,7 +107,7 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
 	 */
-	public String[] characterAt(final String[] sequence, final int index){
+	public static String[] characterAt(final String[] sequence, final int index){
 		return subSequence(sequence, index, index + 1);
 	}
 
@@ -119,11 +121,11 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or the end of the sequence is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than the length of the sequence.
 	 */
-	public String[] subSequence(final String[] sequence, final int beginIndex){
+	public static String[] subSequence(final String[] sequence, final int beginIndex){
 		return (beginIndex > 0? subSequence(sequence, beginIndex, length(sequence)): sequence);
 	}
 
-	public boolean equals(final String[] sequenceA, final String[] sequenceB){
+	public static boolean equals(final String[] sequenceA, final String[] sequenceB){
 		if(sequenceA.length != sequenceB.length)
 			return false;
 
@@ -133,11 +135,11 @@ public class RegexSequencer{
 		return true;
 	}
 
-	public boolean equalsAtIndex(final String[] sequenceA, final String[] sequenceB, final int indexA, final int indexB){
+	public static boolean equalsAtIndex(final String[] sequenceA, final String[] sequenceB, final int indexA, final int indexB){
 		return matches(sequenceA[indexA], sequenceB[indexB]);
 	}
 
-	private boolean matches(final String fieldA, final String fieldB){
+	private static boolean matches(final String fieldA, final String fieldB){
 		final boolean response;
 		final boolean fieldAHasClassStart = fieldA.startsWith(CLASS_START);
 		final boolean fieldBHasClassStart = fieldB.startsWith(CLASS_START);
@@ -161,22 +163,25 @@ public class RegexSequencer{
 	 * @exception IndexOutOfBoundsException	If the {@code beginIndex} is negative, or {@code endIndex} is larger than the length of
 	 *														this sequence, or {@code beginIndex} is larger than {@code endIndex}.
 	 */
-	public String[] subSequence(final String[] sequence, final int beginIndex, final int endIndex){
+	public static String[] subSequence(final String[] sequence, final int beginIndex, final int endIndex){
 		return ArrayUtils.subarray(sequence, beginIndex, endIndex);
 	}
 
-	public String[] concat(final String[] sequenceA, final String[] sequenceB){
+	public static String[] concat(final String[] sequenceA, final String[] sequenceB){
 		return (sequenceA.length > 0? ArrayUtils.addAll(sequenceA, sequenceB): sequenceB);
 	}
 
-	public String[] reverse(final String[] sequence){
+	public static String[] reverse(final String[] sequence){
 		final String[] reverse = Arrays.copyOf(sequence, sequence.length);
 		ArrayUtils.reverse(reverse);
 		return reverse;
 	}
 
-	public String toString(final String[] sequence){
-		return StringUtils.join(sequence, StringUtils.EMPTY);
+	public static String toString(final String[] sequence){
+		final StringBuilder sb = new StringBuilder();
+		for(final String seq : sequence)
+			sb.append(seq);
+		return sb.toString();
 	}
 
 }

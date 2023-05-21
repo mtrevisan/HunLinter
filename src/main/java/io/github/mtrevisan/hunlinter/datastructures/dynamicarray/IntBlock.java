@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -35,21 +35,21 @@ class IntBlock{
 		data = new int[capacity];
 	}
 
-	int size(){
+	final int size(){
 		return limit;
 	}
 
-	boolean isFull(){
+	final boolean isFull(){
 		return (limit == data.length);
 	}
 
-	/** Increase the space allocated for storing elements */
-	void grow(){
+	/** Increase the space allocated for storing elements. */
+	final void grow(){
 		limit ++;
 	}
 
-	/** Set the last element to null and decrease the space allocated for storing elements */
-	void shrink(){
+	/** Set the last element to null and decrease the space allocated for storing elements. */
+	final void shrink(){
 		limit --;
 	}
 

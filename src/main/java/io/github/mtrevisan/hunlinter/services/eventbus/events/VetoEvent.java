@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.services.eventbus.events;
 
-import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.EventObject;
 
@@ -45,6 +48,19 @@ public class VetoEvent extends EventObject{
 
 	public VetoEvent(final Object event){
 		super(event);
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

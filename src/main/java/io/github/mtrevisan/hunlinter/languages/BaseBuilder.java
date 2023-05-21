@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,29 +25,44 @@
 package io.github.mtrevisan.hunlinter.languages;
 
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
+import io.github.mtrevisan.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.DictionaryCorrectnessCheckerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.OrthographyVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordTokenizerVEC;
 import io.github.mtrevisan.hunlinter.languages.vec.WordVEC;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.languages.vec.DictionaryBaseDataVEC;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
+import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.text.Collator;
+import java.text.ParseException;
+import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 
 
 public final class BaseBuilder{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseBuilder.class);
+
+	private static final String COMPARATOR_WITHOUT_COUNTRY_CODE = "Cannot find comparator for language `{}`, use comparator for `{}` instead";
+	private static final String COMPARATOR_DEFAULT_MESSAGE = "Cannot find comparator for language `{}`, use default comparator";
+
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
+
+	private static final Pattern PATTERN_REPLACEMENT = RegexHelper.pattern("<'_'");
 
 	private static class LanguageData{
 		private Class<? extends DictionaryCorrectnessChecker> baseClass;
@@ -67,7 +82,7 @@ public final class BaseBuilder{
 		LANGUAGE_DATA_DEFAULT.orthography = Orthography.getInstance();
 		LANGUAGE_DATA_DEFAULT.wordTokenizer = new WordTokenizer();
 	}
-	private static final Map<String, LanguageData> DATA = new HashMap<>();
+	private static final Map<String, LanguageData> DATA = new HashMap<>(1);
 	static{
 		final LanguageData langData = new LanguageData();
 		langData.baseClass = DictionaryCorrectnessCheckerVEC.class;
@@ -83,8 +98,44 @@ public final class BaseBuilder{
 	private BaseBuilder(){}
 
 	public static Comparator<String> getComparator(final String language){
-		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
-			.comparator;
+		LanguageData languageData = DATA.get(language);
+		if(languageData == null && language != null && language.contains("-")){
+			final String realLanguageCode = language.substring(0, language.indexOf('-'));
+			languageData = DATA.get(realLanguageCode);
+		}
+		if(languageData == null){
+			languageData = LANGUAGE_DATA_DEFAULT;
+
+			if(language != null){
+				Collator collator = Collator.getInstance(Locale.forLanguageTag(language));
+
+				//make ordering per-word
+				if(collator instanceof RuleBasedCollator ruleBasedCollator){
+					try{
+						//insert a collation rule to sort the space character before the underscore
+						final String rules = ruleBasedCollator.getRules();
+						collator = new RuleBasedCollator(RegexHelper.replaceAll(rules, PATTERN_REPLACEMENT, "<' '='\t'<'_'"));
+					}
+					catch(final ParseException ignored){}
+				}
+
+				languageData.comparator = collator::compare;
+			}
+		}
+		return languageData.comparator;
+	}
+
+	public static void checkDefaultComparator(final String language){
+		LanguageData languageData = DATA.get(language);
+		if(languageData == null && language != null && language.contains("-")){
+			final String realLanguageCode = language.substring(0, language.indexOf('-'));
+			languageData = DATA.get(realLanguageCode);
+
+			if(languageData != null)
+				LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(COMPARATOR_WITHOUT_COUNTRY_CODE, language, realLanguageCode));
+		}
+		if(languageData == null)
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(COMPARATOR_DEFAULT_MESSAGE, language));
 	}
 
 	public static BloomFilterParameters getDictionaryBaseData(final String language){
@@ -116,10 +167,12 @@ public final class BaseBuilder{
 			.baseClass;
 		final InputStream is = cl.getResourceAsStream("rules.properties");
 		if(is != null){
-			try(final InputStreamReader isr = new InputStreamReader(is, StandardCharsets.UTF_8)){
-				rulesProperties.load(isr);
+			try{
+				rulesProperties.load(is);
 			}
-			catch(final IOException ignored){}
+			catch(final IOException ioe){
+				LOGGER.error("Error while reading rules", ioe);
+			}
 		}
 		return rulesProperties;
 	}

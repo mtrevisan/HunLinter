@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,10 +25,16 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -38,16 +44,38 @@ public class ExitAction extends AbstractAction{
 	private static final long serialVersionUID = -3856496810694201902L;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public ExitAction(){
 		super("system.exit", new ImageIcon(ExitAction.class.getResource("/file_exit.png")));
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
-		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
-		parentFrame.dispose();
+	public final void actionPerformed(final ActionEvent event){
+		if(event != null){
+			final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
+			parentFrame.dispose();
+		}
 
-		System.exit(0);
+		JavaHelper.exit(0);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

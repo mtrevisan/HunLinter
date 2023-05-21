@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -49,19 +49,19 @@ class BinaryFileBuffer implements Closeable{
 	}
 
 	@Override
-	public void close(){
+	public final void close(){
 		scanner.close();
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return (cache == null);
 	}
 
-	public String peek(){
+	public final String peek(){
 		return cache;
 	}
 
-	public String pop(){
+	public final String pop(){
 		final String answer = peek();
 		readNextLine();
 		return answer;

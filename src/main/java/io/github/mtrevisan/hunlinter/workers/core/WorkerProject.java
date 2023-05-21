@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,7 +28,8 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -43,6 +44,7 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerProject.class);
 
+
 	@FunctionalInterface
 	interface StageFunction{
 		void execute() throws IOException, SAXException;
@@ -54,8 +56,8 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 	}
 
 	@Override
-	protected Void doInBackground(){
-		prepareProcessing("Opening project");
+	protected final Void doInBackground(){
+		prepareProcessing(null);
 
 		final Packager packager = workerData.getPackager();
 		try{
@@ -72,23 +74,29 @@ public class WorkerProject extends WorkerAbstract<WorkerDataProject>{
 				() -> parserManager.openWordExceptionsFile(packager.getWordExceptionsFile()));
 			for(int index = 0; index < stages.size(); index ++){
 				stages.get(index).execute();
-				setProgress(Math.min((int)Math.ceil((index + 1) * 100 / stages.size()), 100));
+				setWorkerProgress(index + 1, stages.size());
 
 				sleepOnPause();
 			}
 
 			finalizeProcessing("Project loaded successfully");
 		}
-		catch(final Exception e){
-			if(! JavaHelper.isInterruptedException(e)){
-				final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
-				LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
-			}
-
-			cancel(e instanceof FileNotFoundException? new ProjectNotFoundException(packager.getProjectPath(), e): e);
+		catch(final FileNotFoundException e){
+			logExceptionError(e);
+		}
+		catch(final IOException | SAXException | LinterException | LinterIllegalArgumentException e){
+			if(JavaHelper.isInterruptedException(e))
+				cancel(e);
+			else
+				logExceptionError(e);
 		}
 
 		return null;
+	}
+
+	private static void logExceptionError(final Exception e){
+		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
 	}
 
 }

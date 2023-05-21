@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,8 +26,13 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.MenuSelectionManager;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 
@@ -41,19 +46,39 @@ public class CreatePackageAction extends AbstractAction{
 	private final ParserManager parserManager;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public CreatePackageAction(final ParserManager parserManager){
 		super("system.package", new ImageIcon(CreatePackageAction.class.getResource("/file_package.png")));
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		parserManager.createPackage();
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

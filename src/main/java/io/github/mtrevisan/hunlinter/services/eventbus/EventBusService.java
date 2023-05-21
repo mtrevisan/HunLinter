@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -41,6 +41,9 @@ import java.util.ServiceLoader;
 public final class EventBusService{
 
 	private static final EventBusInterface EVENT_BUS = new BasicEventBus(true);
+	static{
+		EVENT_BUS.start();
+	}
 
 
 	private EventBusService(){}

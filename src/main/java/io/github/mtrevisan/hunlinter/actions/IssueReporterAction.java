@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,8 +26,12 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -39,13 +43,33 @@ public class IssueReporterAction extends AbstractAction{
 	private static final String URL_REPORT_ISSUE = "https://github.com/mtrevisan/HunLinter/issues";
 
 
+	@SuppressWarnings("ConstantConditions")
 	public IssueReporterAction(){
 		super("system.issue", new ImageIcon(IssueReporterAction.class.getResource("/help_issue.png")));
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		FileHelper.browseURL(URL_REPORT_ISSUE);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

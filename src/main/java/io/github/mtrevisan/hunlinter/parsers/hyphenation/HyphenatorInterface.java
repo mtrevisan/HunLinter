@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,13 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import java.util.List;
+
 
 public interface HyphenatorInterface{
 
 	Hyphenation hyphenate(final String word);
 
-	Hyphenation hyphenate(final String word, final String addedRule, final HyphenationParser.Level level);
+	Hyphenation hyphenate(final String word, final String additionalRule, final HyphenationParser.Level level);
 
-	String[] splitIntoCompounds(final String word);
+	List<String> splitIntoCompounds(final String word);
 
 }

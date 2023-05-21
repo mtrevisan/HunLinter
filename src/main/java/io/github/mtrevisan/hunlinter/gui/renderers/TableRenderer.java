@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,13 +24,19 @@
  */
 package io.github.mtrevisan.hunlinter.gui.renderers;
 
-import javax.swing.*;
+import com.carrotsearch.hppcrt.IntSet;
+import com.carrotsearch.hppcrt.sets.IntHashSet;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
+import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.Serial;
-import java.util.Collection;
-import java.util.HashSet;
 
 
 public class TableRenderer extends DefaultTableCellRenderer{
@@ -40,19 +46,19 @@ public class TableRenderer extends DefaultTableCellRenderer{
 
 	private static final MatteBorder BORDER_ERROR = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED);
 
-	private final Collection<Integer> errors = new HashSet<>();
+	private final IntSet errors = new IntHashSet(0);
 
 
-	public void setErrorOnRow(final int line){
+	public final void setErrorOnRow(final int line){
 		errors.add(line);
 	}
 
-	public void clearErrors(){
+	public final void clearErrors(){
 		errors.clear();
 	}
 
 	@Override
-	public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
+	public final Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected,
 			final boolean hasFocus, final int row, final int column){
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
@@ -66,10 +72,15 @@ public class TableRenderer extends DefaultTableCellRenderer{
 		return this;
 	}
 
-	public void adjustRowHeight(final JTable table, final int rowIndex){
-		final int rowHeight = getPreferredSize().height + 4;
-		if(rowHeight > table.getRowHeight(rowIndex))
-			table.setRowHeight(rowIndex, rowHeight);
+	private void adjustRowHeight(final JTable table, final int rowIndex){
+		final int fontHeight = getFontMetrics(FontHelper.getCurrentFont()).getHeight();
+		final String value = (String)table.getValueAt(rowIndex, 1);
+		if(value != null){
+			final int cellLines = StringUtils.countMatches(value.toString(), ThesaurusTableModel.TAG_NEW_LINE) + 1;
+			final int rowHeight = fontHeight * cellLines + 4;
+			if(rowHeight != table.getRowHeight(rowIndex))
+				table.setRowHeight(rowIndex, rowHeight);
+		}
 	}
 
 }

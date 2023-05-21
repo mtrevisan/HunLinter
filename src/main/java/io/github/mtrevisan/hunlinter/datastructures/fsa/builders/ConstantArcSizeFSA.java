@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.util.Collections;
 import java.util.Set;
@@ -36,29 +36,29 @@ import java.util.Set;
  * @see FSABuilder
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public class ConstantArcSizeFSA extends FSA{
+public class ConstantArcSizeFSA extends FSAAbstract{
 
-	/** Size of the target address field (constant for the builder) */
+	/** Size of the target address field (constant for the builder). */
 	public static final int TARGET_ADDRESS_SIZE = 4;
-	/** Size of the flags field (constant for the builder) */
+	/** Size of the flags field (constant for the builder). */
 	private static final int FLAGS_SIZE = 1;
-	/** Size of the label field (constant for the builder) */
+	/** Size of the label field (constant for the builder). */
 	private static final int LABEL_SIZE = 1;
-	/** Size of a single arc structure */
+	/** Size of a single arc structure. */
 	public static final int ARC_SIZE = FLAGS_SIZE + LABEL_SIZE + TARGET_ADDRESS_SIZE;
-	/** Offset of the flags field inside an arc */
+	/** Offset of the flags field inside an arc. */
 	public static final int FLAGS_OFFSET = 0;
-	/** Offset of the label field inside an arc */
+	/** Offset of the label field inside an arc. */
 	public static final int LABEL_OFFSET = FLAGS_SIZE;
-	/** Offset of the address field inside an arc */
+	/** Offset of the address field inside an arc. */
 	public static final int ADDRESS_OFFSET = LABEL_OFFSET + LABEL_SIZE;
 
-	/** A dummy address of the terminal state */
+	/** A dummy address of the terminal state. */
 	static final int TERMINAL_STATE = 0;
 
-	/** An arc flag indicating the arc is last within its state */
+	/** An arc flag indicating the arc is last within its state. */
 	public static final int BIT_ARC_LAST = 0x01;
-	/** An arc flag indicating the target node of an arc corresponds to a final state */
+	/** An arc flag indicating the target node of an arc corresponds to a final state. */
 	public static final int BIT_ARC_FINAL = 0x02;
 
 	/**
@@ -66,7 +66,7 @@ public class ConstantArcSizeFSA extends FSA{
 	 * root or to the terminal state, indicating an empty automaton.
 	 */
 	private final int epsilon;
-	/** FSA data, serialized as a byte array */
+	/** FSA data, serialized as a byte array. */
 	private final byte[] data;
 
 
@@ -82,26 +82,26 @@ public class ConstantArcSizeFSA extends FSA{
 	}
 
 	@Override
-	public int getRootNode(){
+	public final int getRootNode(){
 		return getEndNode(getFirstArc(epsilon));
 	}
 
 	@Override
-	public int getFirstArc(final int node){
+	public final int getFirstArc(final int node){
 		return node;
 	}
 
 	@Override
-	public int getNextArc(final int arc){
+	public final int getNextArc(final int arc){
 		return (isArcLast(arc)? 0: skipArc(arc));
 	}
 
 	@Override
-	public byte getArcLabel(final int arc){
+	public final byte getArcLabel(final int arc){
 		return data[arc + LABEL_OFFSET];
 	}
 
-	/** Returns the address of an arc */
+	/** Returns the address of an arc. */
 	private int getArcTarget(int arc){
 		arc += ADDRESS_OFFSET;
 		return (data[arc]) << 24
@@ -111,12 +111,12 @@ public class ConstantArcSizeFSA extends FSA{
 	}
 
 	@Override
-	public boolean isArcFinal(final int arc){
+	public final boolean isArcFinal(final int arc){
 		return ((data[arc + FLAGS_OFFSET] & BIT_ARC_FINAL) != 0);
 	}
 
 	@Override
-	public boolean isArcTerminal(final int arc){
+	public final boolean isArcTerminal(final int arc){
 		return (getArcTarget(arc) == 0);
 	}
 
@@ -125,16 +125,16 @@ public class ConstantArcSizeFSA extends FSA{
 	}
 
 	@Override
-	public int getEndNode(final int arc){
+	public final int getEndNode(final int arc){
 		return getArcTarget(arc);
 	}
 
 	@Override
-	public Set<FSAFlags> getFlags(){
+	public final Set<FSAFlags> getFlags(){
 		return Collections.emptySet();
 	}
 
-	private int skipArc(final int offset){
+	private static int skipArc(final int offset){
 		return offset + ARC_SIZE;
 	}
 

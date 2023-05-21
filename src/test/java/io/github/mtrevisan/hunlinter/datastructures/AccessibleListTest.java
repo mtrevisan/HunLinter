@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -22,25 +22,38 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos;
+package io.github.mtrevisan.hunlinter.datastructures;
+
+import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 
-/**
- * Processor the handles the output when a keyword is hit
- *
- * @param <V>	The type of values stored in the tree
- */
-public interface HitProcessor<V>{
+class AccessibleListTest{
 
-	/**
-	 * Hit a keyword.
-	 * You can use some code like text.substring(begin, end) to get the keyword
-	 *
-	 * @param begin	The beginning index, inclusive.
-	 * @param end	The ending index, exclusive.
-	 * @param value	The value assigned to the keyword
-	 * @return	<code>true</code> for continuing the search and <code>false</code> for stopping it.
-	 */
-	boolean hit(final int begin, final int end, final V value);
+	@Test
+	void add(){
+		DynamicIntArray array = new DynamicIntArray();
+
+		for(int i = 0; i < 1_000_000; i ++)
+			array.add(i);
+
+		for(int i = 0; i < 1_000_000; i ++)
+			Assertions.assertEquals(i, array.get(i));
+	}
+
+	@Test
+	void remove(){
+		DynamicIntArray array = new DynamicIntArray();
+
+		for(int i = 0; i < 1_000_000; i ++)
+			array.add(i);
+
+		for(int i = 0; i < 900_000; i ++)
+			array.remove();
+
+		for(int i = 0; i < 100_000; i ++)
+			Assertions.assertEquals(i, array.get(i));
+	}
 
 }

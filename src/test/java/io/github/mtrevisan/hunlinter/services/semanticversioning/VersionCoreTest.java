@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -46,9 +46,9 @@ class VersionCoreTest{
 		Version v1 = new Version("2.3.7");
 		Version v2 = new Version("1.3.7");
 
-		Assertions.assertTrue(v1.greaterThan(v2));
-		Assertions.assertFalse(v2.greaterThan(v1));
-		Assertions.assertFalse(v1.greaterThan(v1));
+		Assertions.assertTrue(v1.isGreaterThan(v2));
+		Assertions.assertFalse(v2.isGreaterThan(v1));
+		Assertions.assertFalse(v1.isGreaterThan(v1));
 	}
 
 	@Test
@@ -56,9 +56,9 @@ class VersionCoreTest{
 		Version v1 = new Version("2.3.7");
 		Version v2 = new Version("1.3.7");
 
-		Assertions.assertTrue(v1.greaterThanOrEqualTo(v2));
-		Assertions.assertFalse(v2.greaterThanOrEqualTo(v1));
-		Assertions.assertTrue(v1.greaterThanOrEqualTo(v1));
+		Assertions.assertTrue(v1.isGreaterThanOrEqualTo(v2));
+		Assertions.assertFalse(v2.isGreaterThanOrEqualTo(v1));
+		Assertions.assertTrue(v1.isGreaterThanOrEqualTo(v1));
 	}
 
 	@Test
@@ -66,9 +66,9 @@ class VersionCoreTest{
 		Version v1 = new Version("2.3.7");
 		Version v2 = new Version("1.3.7");
 
-		Assertions.assertFalse(v1.lessThan(v2));
-		Assertions.assertTrue(v2.lessThan(v1));
-		Assertions.assertFalse(v1.lessThan(v1));
+		Assertions.assertFalse(v1.isLessThan(v2));
+		Assertions.assertTrue(v2.isLessThan(v1));
+		Assertions.assertFalse(v1.isLessThan(v1));
 	}
 
 	@Test
@@ -76,9 +76,9 @@ class VersionCoreTest{
 		Version v1 = new Version("2.3.7");
 		Version v2 = new Version("1.3.7");
 
-		Assertions.assertFalse(v1.lessThanOrEqualTo(v2));
-		Assertions.assertTrue(v2.lessThanOrEqualTo(v1));
-		Assertions.assertTrue(v1.lessThanOrEqualTo(v1));
+		Assertions.assertFalse(v1.isLessThanOrEqualTo(v2));
+		Assertions.assertTrue(v2.isLessThanOrEqualTo(v1));
+		Assertions.assertTrue(v1.isLessThanOrEqualTo(v1));
 	}
 
 	@Test
@@ -99,7 +99,7 @@ class VersionCoreTest{
 			Version v1 = new Version(versions[i - 1]);
 			Version v2 = new Version(versions[i]);
 
-			Assertions.assertTrue(v1.lessThan(v2));
+			Assertions.assertTrue(v1.isLessThan(v2));
 		}
 	}
 

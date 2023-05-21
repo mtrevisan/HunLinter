@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -22,34 +22,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
-
-import java.nio.ByteBuffer;
+package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
 
-/**
- * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
- */
-public final class BufferUtils{
+public interface HitConsumer{
 
-	private BufferUtils(){}
-
-	/**
-	 * Ensure the buffer's capacity is large enough to hold a given number
-	 * of elements. If the input buffer is not large enough, a new buffer is allocated
-	 * and returned.
-	 *
-	 * @param elements The required number of elements to be appended to the buffer.
-	 * @param buffer   The buffer to check or <code>null</code> if a new buffer should be
-	 *                 allocated.
-	 * @return Returns the same buffer or a new buffer with the given capacity.
-	 */
-	public static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
-		if(buffer == null || buffer.capacity() < elements)
-			buffer = ByteBuffer.allocate(elements);
-		else
-			buffer.clear();
-		return buffer;
-	}
+	boolean apply(final int[] hits, final int index);
 
 }

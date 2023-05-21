@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,9 +27,15 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.HelpDialog;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -39,12 +45,13 @@ public class AboutAction extends AbstractAction{
 	private static final long serialVersionUID = 4363575204925273954L;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public AboutAction(){
 		super("system.about", new ImageIcon(AboutAction.class.getResource("/help_about.png")));
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
@@ -52,6 +59,25 @@ public class AboutAction extends AbstractAction{
 		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

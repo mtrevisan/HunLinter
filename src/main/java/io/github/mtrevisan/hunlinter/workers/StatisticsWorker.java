@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,9 +28,9 @@ import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.DictionaryStatisticsDialog;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryStatistics;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -38,6 +38,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -46,6 +47,7 @@ import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 import java.awt.Frame;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -79,24 +81,25 @@ public class StatisticsWorker extends WorkerDictionary{
 
 
 		final AffixData affixData = affParser.getAffixData();
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		final String language = affixData.getLanguage();
 		dicStatistics = new DictionaryStatistics(language, affixData.getCharset());
 		orthography = BaseBuilder.getOrthography(language);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
+				for(int i = 0; i < inflections.size(); i ++){
 					//collect statistics
-					final String word = inflection.getWord();
-					final String[] subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
-					if(subwords == null || subwords.length == 0)
+					final String word = inflections.get(i).getWord();
+					final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
+					if(subwords == null || subwords.isEmpty())
 						dicStatistics.addData(word);
 					else
-						for(final String subword : subwords){
-							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subword));
+						for(int j = 0; j < subwords.size(); j ++){
+							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subwords.get(j)));
 							dicStatistics.addData(word, hyph);
 						}
 				}
@@ -110,7 +113,8 @@ public class StatisticsWorker extends WorkerDictionary{
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 

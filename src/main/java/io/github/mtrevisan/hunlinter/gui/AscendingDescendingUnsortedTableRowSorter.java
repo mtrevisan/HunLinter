@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import javax.swing.*;
+import javax.swing.SortOrder;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.util.List;
@@ -32,12 +32,12 @@ import java.util.List;
 
 class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends TableRowSorter<M>{
 
-	public AscendingDescendingUnsortedTableRowSorter(final M model){
+	AscendingDescendingUnsortedTableRowSorter(final M model){
 		super(model);
 	}
 
 	@Override
-	public void toggleSortOrder(final int column){
+	public final void toggleSortOrder(final int column){
 		final List<? extends SortKey> sortKeys = getSortKeys();
 		if(!sortKeys.isEmpty() && sortKeys.get(0).getSortOrder() == SortOrder.DESCENDING)
 			setSortKeys(null);
@@ -51,13 +51,8 @@ class AscendingDescendingUnsortedTableRowSorter<M extends TableModel> extends Ta
 	 * Overridden to cope with the annoying IOOBE
 	 */
 	@Override
-	public int convertRowIndexToModel(final int index){
-		try{
-			return super.convertRowIndexToModel(index);
-		}
-		catch(final IndexOutOfBoundsException ignored){
-			return -1;
-		}
+	public final int convertRowIndexToModel(final int index){
+		return super.convertRowIndexToModel(index);
 	}
 
 }

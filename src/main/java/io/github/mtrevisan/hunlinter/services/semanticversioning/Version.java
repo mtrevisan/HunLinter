@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,9 +25,8 @@
 package io.github.mtrevisan.hunlinter.services.semanticversioning;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.Arrays;
 import java.util.StringTokenizer;
 
 
@@ -37,17 +36,22 @@ import java.util.StringTokenizer;
 public class Version implements Comparable<Version>{
 
 	private static final String DOT = ".";
-	/** A separator that separates the pre-release version from the normal version */
+	/** A separator that separates the pre-release version from the normal version. */
 	private static final String PRE_RELEASE_PREFIX = "-";
-	/** A separator that separates the build metadata from the normal version or the pre-release version */
+	/** A separator that separates the build metadata from the normal version or the pre-release version. */
 	private static final String BUILD_PREFIX = "+";
+
+	private static final char[] VALID_CHARS = "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+
+	/** An empty immutable {@code String} array. */
+	private static final String[] EMPTY_ARRAY = new String[0];
 
 
 	private final Integer major;
 	private final Integer minor;
-	private final Integer patch;
-	private final String[] preRelease;
-	private final String[] build;
+	private Integer patch;
+	private String[] preRelease;
+	private String[] build;
 
 
 	/**
@@ -58,8 +62,8 @@ public class Version implements Comparable<Version>{
 	 * @param patch	The patch version number
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch){
-		this(major, minor, patch, null, null);
+	public Version(final int major, final int minor, final int patch){
+		this(major, minor, patch, EMPTY_ARRAY, EMPTY_ARRAY);
 	}
 
 	/**
@@ -71,8 +75,8 @@ public class Version implements Comparable<Version>{
 	 * @param preRelease	The pre-release identifiers
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch, final String[] preRelease){
-		this(major, minor, patch, preRelease, null);
+	public Version(final int major, final int minor, final int patch, final String[] preRelease){
+		this(major, minor, patch, preRelease, EMPTY_ARRAY);
 	}
 
 	/**
@@ -85,15 +89,15 @@ public class Version implements Comparable<Version>{
 	 * @param build	The build identifiers
 	 * @throws IllegalArgumentException	If one of the version numbers is a negative integer
 	 */
-	Version(final int major, final int minor, final int patch, final String[] preRelease, final String[] build){
+	public Version(final int major, final int minor, final int patch, final String[] preRelease, final String[] build){
 		if(major < 0 || minor < 0 || patch < 0)
 			throw new IllegalArgumentException("Major, minor and patch versions MUST be non-negative integers.");
 
 		this.major = major;
 		this.minor = minor;
 		this.patch = patch;
-		this.preRelease = preRelease;
-		this.build = build;
+		this.preRelease = (preRelease != null? preRelease: EMPTY_ARRAY);
+		this.build = (build != null? build: EMPTY_ARRAY);
 	}
 
 	/**
@@ -110,45 +114,53 @@ public class Version implements Comparable<Version>{
 			throw new IllegalArgumentException("Argument is not a valid version");
 
 		final String[] tokens = StringUtils.split(version, DOT, 3);
-		final String patchOnly = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX)[2];
-		if(hasLeadingZeros(tokens[0]) || hasLeadingZeros(tokens[1]) || hasLeadingZeros(patchOnly))
+		final String[] tokensWithPatch = StringUtils.split(version, DOT + PRE_RELEASE_PREFIX + BUILD_PREFIX);
+		if(hasLeadingZeros(tokens[0])
+				|| tokensWithPatch != null && (tokensWithPatch.length > 1 && hasLeadingZeros(tokens[1])
+				|| tokensWithPatch.length > 2 && hasLeadingZeros(tokensWithPatch[2])))
 			throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
 
-		major = Integer.parseInt(tokens[0]);
-		minor = Integer.parseInt(tokens[1]);
-		final String patchAndOthers = tokens[2];
-		final StringTokenizer tokenizer = new StringTokenizer(patchAndOthers, PRE_RELEASE_PREFIX + BUILD_PREFIX, true);
-		patch = Integer.parseInt(tokenizer.nextToken());
-		String nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
-		if(PRE_RELEASE_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
-			preRelease = StringUtils.split(tokenizer.nextToken(), DOT);
+		major = Integer.valueOf(tokens[0]);
+		minor = (tokens.length > 1? Integer.valueOf(tokens[1]): null);
+		if(tokens.length > 2){
+			final String patchAndOthers = tokens[2];
+			final StringTokenizer tokenizer = new StringTokenizer(patchAndOthers, PRE_RELEASE_PREFIX + BUILD_PREFIX, true);
+			patch = Integer.valueOf(tokenizer.nextToken());
+			String nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
+			if(PRE_RELEASE_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
+				preRelease = StringUtils.split(tokenizer.nextToken(), DOT);
 
-			nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
+				nextToken = (tokenizer.hasMoreElements()? tokenizer.nextToken(): null);
 
-			for(final String pr : preRelease){
-				final boolean numeric = StringUtils.isNumeric(pr);
-				if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
-					throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
-				if(!numeric && !StringUtils.containsOnly(pr, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
-					throw new IllegalArgumentException("Argument is not a valid version");
+				for(int i = 0; i < (preRelease != null? preRelease.length: 0); i ++){
+					final String pr = preRelease[i];
+					final boolean numeric = StringUtils.isNumeric(pr);
+					if(numeric && pr.length() > 1 && pr.charAt(0) == '0')
+						throw new IllegalArgumentException("Numeric identifier MUST NOT contain leading zeros");
+					if(!numeric && !StringUtils.containsOnly(pr, VALID_CHARS))
+						throw new IllegalArgumentException("Argument is not a valid version");
+				}
 			}
-		}
-		else
-			preRelease = new String[0];
-		if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
-			build = StringUtils.split(tokenizer.nextToken(), DOT);
+			if(BUILD_PREFIX.equals(nextToken) && tokenizer.hasMoreElements()){
+				build = StringUtils.split(tokenizer.nextToken(), DOT);
 
-			for(final String b : build)
-				if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, "-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"))
-					throw new IllegalArgumentException("Argument is not a valid version");
+				for(int i = 0; i < (build != null? build.length: 0); i ++){
+					final String b = build[i];
+					if(!StringUtils.isNumeric(b) && !StringUtils.containsOnly(b, VALID_CHARS))
+						throw new IllegalArgumentException("Argument is not a valid version");
+				}
+			}
+
+			if(tokenizer.hasMoreElements())
+				throw new IllegalArgumentException("Argument is not a valid version");
 		}
-		else
-			build = new String[0];
-		if(tokenizer.hasMoreElements())
-			throw new IllegalArgumentException("Argument is not a valid version");
+		if(preRelease == null)
+			preRelease = EMPTY_ARRAY;
+		if(build == null)
+			build = EMPTY_ARRAY;
 	}
 
-	private boolean hasLeadingZeros(final CharSequence token){
+	private static boolean hasLeadingZeros(final CharSequence token){
 		return (token.length() > 1 && token.charAt(0) == '0');
 	}
 
@@ -163,7 +175,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean greaterThan(final Version other){
+	public final boolean isGreaterThan(final Version other){
 		return (compareTo(other) > 0);
 	}
 
@@ -174,7 +186,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is greater than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean greaterThanOrEqualTo(final Version other){
+	public final boolean isGreaterThanOrEqualTo(final Version other){
 		return (compareTo(other) >= 0);
 	}
 
@@ -185,7 +197,7 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean lessThan(final Version other){
+	public final boolean isLessThan(final Version other){
 		return (compareTo(other) < 0);
 	}
 
@@ -196,34 +208,35 @@ public class Version implements Comparable<Version>{
 	 * @return	{@code true} if this version is less than or equal to the other version
 	 * @see #compareTo(Version other)
 	 */
-	public boolean lessThanOrEqualTo(final Version other){
+	public final boolean isLessThanOrEqualTo(final Version other){
 		return (compareTo(other) <= 0);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == null || obj.getClass() != getClass())
-			return false;
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
+		if(obj == null || getClass() != obj.getClass())
+			return false;
 
 		final Version rhs = (Version)obj;
-		return new EqualsBuilder()
-			.append(major, rhs.major)
-			.append(minor, rhs.minor)
-			.append(patch, rhs.patch)
-			.isEquals();
+		return (major.equals(rhs.major)
+			&& minor.equals(rhs.minor)
+			&& patch.equals(rhs.patch)
+			&& Arrays.equals(preRelease, rhs.preRelease)
+			&& Arrays.equals(build, rhs.build));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder(17, 37)
-			.append(major)
-			.append(minor)
-			.append(patch)
-			.append(preRelease)
-			.append(build)
-			.toHashCode();
+	public final int hashCode(){
+		int result = (major != null? Integer.hashCode(major): 0);
+		if(minor != null)
+			result = 31 * result + Integer.hashCode(minor);
+		if(patch != null)
+			result = 31 * result + patch.hashCode();
+		result = 31 * result + Arrays.hashCode(preRelease);
+		result = 31 * result + Arrays.hashCode(build);
+		return result;
 	}
 
 	/**
@@ -237,7 +250,7 @@ public class Version implements Comparable<Version>{
 	 * @see #compareToWithBuilds(Version other)
 	 */
 	@Override
-	public int compareTo(final Version other){
+	public final int compareTo(final Version other){
 		final int result = compareToCore(other);
 		return (result != 0? result: compareToIdentifiers(preRelease, other.preRelease));
 	}
@@ -254,7 +267,7 @@ public class Version implements Comparable<Version>{
 	 * @param other	The object to be compared.
 	 * @return	A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
 	 */
-	public int compareToWithBuilds(final Version other){
+	public final int compareToWithBuilds(final Version other){
 		int result = compareTo(other);
 		if(result == 0)
 			result = compareToIdentifiers(preRelease, other.preRelease);
@@ -262,18 +275,36 @@ public class Version implements Comparable<Version>{
 	}
 
 	private int compareToCore(final Version other){
-		return (!major.equals(other.major)? major - other.major:
-			(!minor.equals(other.minor)? minor - other.minor:
-			patch - other.patch));
+		int comparison = compareToCore(major, other.major);
+		if(comparison != 0)
+			return comparison;
+
+		comparison = compareToCore(minor, other.minor);
+		if(comparison != 0)
+			return comparison;
+
+		return compareToCore(patch, other.patch);
 	}
 
-	private int compareToIdentifiers(final String[] preRelease, final String[] otherPreRelease){
+	private static int compareToCore(final Integer value1, final Integer value2){
+		int comparison = 0;
+		if(value1 != null || value2 != null){
+			if(value1 != null && value2 == null)
+				return 1;
+			if(value1 == null)
+				return -1;
+			comparison = Integer.compare(value1, value2);
+		}
+		return comparison;
+	}
+
+	private static int compareToIdentifiers(final String[] preRelease, final String[] otherPreRelease){
 		final int result = compareIdentifierArrays(preRelease, otherPreRelease);
-		//a larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal
+		//a larger set of pre-release fields has a higher precedence than a smaller set, if all the preceding identifiers are equal
 		return (result != 0? result: preRelease.length - otherPreRelease.length);
 	}
 
-	private int compareIdentifierArrays(final String[] preRelease, final String[] otherPreRelease){
+	private static int compareIdentifierArrays(final String[] preRelease, final String[] otherPreRelease){
 		int result = (otherPreRelease.length - preRelease.length);
 		for(int i = 0; i < getLeastCommonArrayLength(preRelease, otherPreRelease); i ++){
 			result = compareIdentifiers(preRelease[i], otherPreRelease[i]);
@@ -283,20 +314,26 @@ public class Version implements Comparable<Version>{
 		return result;
 	}
 
-	private int getLeastCommonArrayLength(final String[] array1, final String[] array2){
+	private static int getLeastCommonArrayLength(final String[] array1, final String[] array2){
 		return Math.min(array1.length, array2.length);
 	}
 
-	private int compareIdentifiers(final String identifier1, final String identifier2){
+	private static int compareIdentifiers(final String identifier1, final String identifier2){
 		return (StringUtils.isNumeric(identifier1) && StringUtils.isNumeric(identifier2)
 			? Integer.parseInt(identifier1) - Integer.parseInt(identifier2)
 			: identifier1.compareTo(identifier2));
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		final StringBuilder sb = (new StringBuilder())
-			.append(major).append(DOT).append(minor).append(DOT).append(patch);
+			.append(major);
+		if(minor != null)
+			sb.append(DOT)
+				.append(minor);
+		if(patch != null)
+			sb.append(DOT)
+				.append(patch);
 		if(preRelease.length > 0)
 			sb.append(PRE_RELEASE_PREFIX).append(String.join(DOT, preRelease));
 		if(build.length > 0)

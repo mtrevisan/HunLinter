@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,7 +34,6 @@ import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.Arrays;
 
 
@@ -47,20 +46,21 @@ import java.util.Arrays;
 public class MemoryMappedFileBitArray implements BitArray{
 
 	private static final String EMPTY_BACKUP_FILE = "Backup file cannot be empty/null";
-	private static final String INVALID_BACKUP_FILE = "Backup file doesn''t represent a valid file";
+	private static final String INVALID_BACKUP_FILE = "Backup file doesn't represent a valid file";
 	private static final String INVALID_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
 
-	/** Underlying file that represents the state of the {@link BitArray} */
+	/** Underlying file that represents the state of the {@link BitArray}. */
 	private final RandomAccessFile backingFile;
-	/** The maximum number of elements this file will store */
+	/** The maximum number of elements this file will store. */
 	private final int maxElements;
-	/** The number of bytes being used for this byte-array */
+	/** The number of bytes being used for this byte-array. */
 	private final int numberOfBytes;
-	/** The memory-mapped byte-buffer */
+	/** The memory-mapped byte-buffer. */
 	private MappedByteBuffer buffer;
 
 
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public MemoryMappedFileBitArray(final File backingFile, final int bits) throws IOException{
 		if(backingFile == null)
 			throw new IllegalArgumentException(EMPTY_BACKUP_FILE);
@@ -78,7 +78,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		//initialize the rest
 		maxElements = bits;
 		try(final FileChannel channel = this.backingFile.getChannel()){
-			buffer = channel.map(MapMode.READ_WRITE, 0, this.backingFile.length());
+			buffer = channel.map(FileChannel.MapMode.READ_WRITE, 0, this.backingFile.length());
 		}
 	}
 
@@ -95,7 +95,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean get(final int index){
+	public final boolean get(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
@@ -106,7 +106,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public boolean set(final int index){
+	public final boolean set(final int index){
 		if(!get(index)){
 			final int pos = index >> 3;
 			final int bit = 1 << (index & 0x07);
@@ -117,7 +117,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public void clear(final int index){
+	public final void clear(final int index){
 		if(index > maxElements)
 			throw new IndexOutOfBoundsException("Index is greater than max allowed elements");
 
@@ -127,19 +127,19 @@ public class MemoryMappedFileBitArray implements BitArray{
 	}
 
 	@Override
-	public void clearAll(){
+	public final void clearAll(){
 		if(buffer != null)
 			for(int index = 0; index < numberOfBytes; index ++)
 				buffer.put(index, (byte)0);
 	}
 
 	@Override
-	public int size(){
+	public final int size(){
 		return numberOfBytes * Byte.SIZE;
 	}
 
 	@Override
-	public void close() throws IOException{
+	public final void close() throws IOException{
 		try(backingFile){
 			closeDirectBuffer();
 		}
@@ -176,7 +176,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 				unmapper.bindTo(theUnsafe)
 					.invokeExact(buffer);
 			}
-			catch(final Throwable ignored){ }
+			catch(@SuppressWarnings("OverlyBroadCatchBlock") final Throwable ignored){ }
 
 			buffer = null;
 		}

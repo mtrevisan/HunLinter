@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,38 +27,44 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.Duplicate;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
+import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.Duplicate;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
-import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
-import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 public class DuplicatesWorker extends WorkerDictionary{
@@ -80,17 +86,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 		protected DuplicatesDictionaryBaseData(){}
 
 		@Override
-		public int getExpectedNumberOfElements(){
-			return 1_000_000;
+		public final int getExpectedNumberOfElements(){
+			return (int)(MAX_DUPLICATES * 1.5);
 		}
 
 		@Override
-		public double getFalsePositiveProbability(){
-			return 0.000_000_4;
+		public final double getFalsePositiveProbability(){
+			return 0.1 / MAX_DUPLICATES;
 		}
 
 		@Override
-		public double getGrowRatioWhenFull(){
+		public final double getGrowthRateWhenFull(){
 			return 1.3;
 		}
 
@@ -98,11 +104,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 	public static final String WORKER_NAME = "Duplicates extraction";
 
+	private static final int MAX_DUPLICATES = 1_000;
+
 
 	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 
-	private final Comparator<String> comparator;
 	private final BloomFilterParameters dictionaryBaseData;
 
 
@@ -126,7 +133,6 @@ public class DuplicatesWorker extends WorkerDictionary{
 		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
 
-		comparator = BaseBuilder.getComparator(language);
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 
 		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
@@ -134,8 +140,8 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			return collectDuplicates();
 		};
-		final Function<BloomFilterInterface<String>, List<Duplicate>> step2 = this::extractDuplicates;
-		final Function<List<Duplicate>, File> step3 = duplicates -> {
+		final Function<BloomFilterInterface<String>, Collection<List<Duplicate>>> step2 = this::extractDuplicates;
+		final Function<Collection<List<Duplicate>>, File> step3 = duplicates -> {
 			writeDuplicates(outputFile, duplicates);
 
 			finalizeProcessing("Duplicates extracted successfully");
@@ -156,26 +162,32 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
-				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
+					return;
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.toStringWithPartOfSpeechAndStem();
-					if(!bloomFilter.add(str))
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+
+				for(int i = 0; i < inflections.size(); i ++){
+					final String str = inflections.get(i).toStringWithPartOfSpeech();
+					if(!bloomFilter.add(str)){
 						duplicatesBloomFilter.add(str);
+
+						if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
+							break;
+					}
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+		final ProgressCallback progressCallback = lineIndex -> {
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 		bloomFilter.close();
 		final int totalInflections = bloomFilter.getAddedElements();
@@ -185,15 +197,22 @@ public class DuplicatesWorker extends WorkerDictionary{
 		duplicatesBloomFilter.close();
 
 		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES){
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Maximum duplications reached");
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections processed: {}",
+				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		}
+		else
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
+				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
 		return duplicatesBloomFilter;
 	}
 
-	private List<Duplicate> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
-		final ArrayList<Duplicate> result = new ArrayList<>();
+	private Collection<List<Duplicate>> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
+		final Map<String, List<Duplicate>> result = new HashMap<>(0);
 
 		if(duplicatesBloomFilter.getAddedElements() > 0){
 			resetProcessing("Extracting duplicates (step 2/3)");
@@ -203,29 +222,29 @@ public class DuplicatesWorker extends WorkerDictionary{
 			final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 				try{
 					final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-					final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+					final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-					if(inflections.length > 0){
-						final String word = inflections[WordGenerator.BASE_INFLECTION_INDEX].getWord();
-						result.ensureCapacity(result.size() + inflections.length);
-						for(final Inflection inflection : inflections){
-							final String text = inflection.toStringWithPartOfSpeechAndStem();
+					if(!inflections.isEmpty()){
+						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();
+						for(int i = 0; i < inflections.size(); i ++){
+							final Inflection inflection = inflections.get(i);
+							final String text = inflection.toStringWithPartOfSpeech();
 							if(duplicatesBloomFilter.contains(text))
-								result.add(new Duplicate(inflection, word, lineIndex));
+								result.computeIfAbsent(text, k -> new ArrayList<>(1))
+									.add(new Duplicate(inflection, word, dicEntry.getContinuationFlags(), lineIndex));
 						}
 					}
 				}
 				catch(final LinterException e){
-					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 				}
 			};
-			final Consumer<Integer> progressCallback = lineIndex -> {
-				setProgress(Math.min(lineIndex, 100));
+			final ProgressCallback progressCallback = lineIndex -> {
+				setWorkerProgress(lineIndex);
 
 				sleepOnPause();
 			};
-			ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-				ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+			ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
 			final double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
@@ -234,68 +253,130 @@ public class DuplicatesWorker extends WorkerDictionary{
 				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
 
 			duplicatesBloomFilter.clear();
-
-			result.sort((d1, d2) -> comparator.compare(d1.getInflection().getWord(), d2.getInflection().getWord()));
 		}
 		else
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
 
-		return result;
+		return result.values();
 	}
 
-	private void writeDuplicates(final File duplicatesFile, final Collection<Duplicate> duplicates){
+	private void writeDuplicates(final File duplicatesFile, final Collection<List<Duplicate>> duplicates){
 		final int totalSize = duplicates.size();
 		if(totalSize > 0){
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
-			int writtenSoFar = 0;
-			final List<List<Duplicate>> mergedDuplicates = mergeDuplicates(duplicates);
-			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
-				for(final List<Duplicate> entries : mergedDuplicates){
-					final Inflection prod = entries.get(0).getInflection();
-					String origin = prod.getWord();
-					if(prod.getMorphologicalFieldPartOfSpeech().length > 0)
-						origin += "(" + String.join(", ", prod.getMorphologicalFieldPartOfSpeech()) + ")";
-					writer.write(origin + ": ");
-					final StringJoiner sj = new StringJoiner(", ");
-					if(entries != null)
-						for(final Duplicate duplicate : entries)
-							sj.add(StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-								(duplicate.getInflection().hasInflectionRules()?
-								" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY));
-					writer.write(sj.toString());
-					writer.newLine();
+			final Set<String> processedLines = new HashSet<>(totalSize);
 
-					setProgress(++ writtenSoFar, totalSize);
+			int writtenSoFar = 0;
+			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
+				final StringBuilder origin = new StringBuilder();
+				final Comparator<Duplicate> comparator = Comparator.comparingInt(o -> o.getInflection().getAppliedRules().length);
+				for(final List<Duplicate> entries : duplicates){
+					entries.sort(comparator);
+
+					final StringJoiner lines = new StringJoiner(", ");
+					for(final Duplicate duplicate : entries)
+						lines.add(Integer.toString(duplicate.getLineIndex()));
+					if(!processedLines.add(lines.toString()))
+						//already inserted line, skip
+						continue;
+
+					final Inflection prod = entries.iterator().next().getInflection();
+					origin.setLength(0);
+					origin.append(prod.getWord());
+					final List<String> partOfSpeechOrInflectionalAffix = prod.getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
+					if(!partOfSpeechOrInflectionalAffix.isEmpty())
+						origin.append("(")
+							.append(String.join(" ", partOfSpeechOrInflectionalAffix))
+							.append(")");
+					origin.append(": ");
+					final StringJoiner sj = new StringJoiner(", ");
+					for(final Duplicate duplicate : entries){
+						final String info = StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
+							(duplicate.getInflection().hasInflectionRules()?
+							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY);
+						sj.add(info);
+					}
+
+					final Iterator<Duplicate> itr = entries.iterator();
+					final Duplicate firstDuplicate = itr.next();
+					final Inflection firstDuplicateInflection = firstDuplicate.getInflection();
+					final String firstDuplicateRulesSequence = firstDuplicateInflection.getRulesSequence();
+					final Set<String> firstDuplicateContinuationFlags = new HashSet<>(firstDuplicateInflection.getContinuationFlags());
+					boolean isCandidate = false;
+					while(itr.hasNext()){
+						final Duplicate nextDuplicate = itr.next();
+						final Inflection nextDuplicateInflection = nextDuplicate.getInflection();
+						final String nextDuplicateRulesSequence = nextDuplicateInflection.getRulesSequence();
+						final Set<String> nextDuplicateContinuationFlags = new HashSet<>(nextDuplicateInflection.getContinuationFlags());
+
+						Duplicate candidate = firstDuplicate;
+						String candidateRulesSequence = firstDuplicateRulesSequence;
+						Set<String> candidateContinuationFlags = firstDuplicateContinuationFlags;
+						Duplicate other = nextDuplicate;
+						String otherRulesSequence = nextDuplicateRulesSequence;
+						if(firstDuplicateRulesSequence.length() > nextDuplicateRulesSequence.length()){
+							candidate = nextDuplicate;
+							other = firstDuplicate;
+							candidateRulesSequence = nextDuplicateRulesSequence;
+							otherRulesSequence = firstDuplicateRulesSequence;
+							candidateContinuationFlags = nextDuplicateContinuationFlags;
+						}
+
+						final boolean containmentCondition = (firstDuplicateContinuationFlags.isEmpty()
+							|| candidateContinuationFlags.containsAll(firstDuplicateContinuationFlags));
+						final String testEnd = Inflection.LEADS_TO + candidateRulesSequence;
+						final String testStart = candidateRulesSequence + Inflection.LEADS_TO;
+						final boolean equalProduction = (candidateRulesSequence.equals(otherRulesSequence)
+							&& candidate.getWord().equals(other.getWord()));
+						if(candidateRulesSequence.isEmpty()
+								|| containmentCondition && (equalProduction
+									|| otherRulesSequence.startsWith(testStart) || otherRulesSequence.endsWith(testEnd))){
+							final Set<String> candidateAppliedRules = new HashSet<>(candidate.getContinuationFlags());
+							for(final AffixEntry candidateAppliedRule : candidate.getInflection().getAppliedRules())
+								candidateAppliedRules.remove(candidateAppliedRule.getFlag());
+
+							final Set<String> otherAppliedRules = new HashSet<>(other.getContinuationFlags());
+							for(final AffixEntry otherAppliedRule : other.getInflection().getAppliedRules())
+								otherAppliedRules.remove(otherAppliedRule.getFlag());
+
+							final Set<String> intersectionAppliedRules = new HashSet<>(candidateAppliedRules);
+							intersectionAppliedRules.retainAll(otherAppliedRules);
+							candidateAppliedRules.removeAll(intersectionAppliedRules);
+							otherAppliedRules.removeAll(intersectionAppliedRules);
+							if(candidateAppliedRules.isEmpty()){
+								final String info = candidate.getWord()
+									+ (equalProduction && ! other.getWord().equals(candidate.getWord())? " (or " + other.getWord() + ")": "")
+									+ " is a candidate for removal";
+								if(!sj.toString().endsWith(info))
+									sj.add(info);
+							}
+							else
+								sj.add(candidate.getWord() + " cannot be safely removed due to candidate having flags "
+									+ candidateAppliedRules
+									+ (!otherAppliedRules.isEmpty()? " and other having flags " + otherAppliedRules: ""));
+
+							isCandidate = true;
+						}
+					}
+
+					if(isCandidate){
+						writer.write(origin.toString());
+						writer.write(sj.toString());
+						writer.newLine();
+					}
+
+					setWorkerProgress(++ writtenSoFar, totalSize);
 
 					sleepOnPause();
 				}
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
+			catch(final IOException ioe){
+				throw new WriterException(ioe);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());
 		}
-	}
-
-	private List<List<Duplicate>> mergeDuplicates(final Collection<Duplicate> duplicates){
-		final Map<String, List<Duplicate>> dupls = duplicates.stream()
-			.collect(Collectors.toMap(duplicate -> duplicate.getInflection().toStringWithPartOfSpeechAndStem(),
-				duplicate -> {
-					final List<Duplicate> list = new ArrayList<>(1);
-					list.add(duplicate);
-					return list;
-				},
-				(oldValue, newValue) -> {
-					oldValue.addAll(newValue);
-					return oldValue;
-				}));
-
-		final List<List<Duplicate>> result = new ArrayList<>(dupls.values());
-		result.sort(Comparator.<List<Duplicate>>comparingInt(List::size).reversed()
-			.thenComparing(list -> list.get(0).getInflection().getWord(), comparator));
-		return result;
 	}
 
 }

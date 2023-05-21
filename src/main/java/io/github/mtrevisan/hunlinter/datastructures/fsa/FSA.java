@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,260 +25,264 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.ByteSequenceIterator;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.serializers.FSAHeader;
-import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicIntArray;
 
-import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.BitSet;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.EnumSet;
 import java.util.Set;
 
 
 /**
- * This is a top abstract class for handling Finite State Automata.
- * These automata are arc-based, a design described in Jan Daciuk's <i>Incremental Construction of Finite-State Automata
- * and Transducers, and their use in the Natural Language Processing</i> (PhD thesis, Technical University of Gdansk).
+ * FSA binary format implementation for version 5.
  *
- * @see <a href="http://www.jandaciuk.pl/thesis/thesis.html">Incremental Construction of Finite-State Automata and Transducers, and their use in the Natural Language Processing</a>
+ * <p>
+ * Version 5 indicates the dictionary was built with these flags:
+ * {@link FSAFlags#FLEXIBLE}, {@link FSAFlags#STOPBIT} and
+ * {@link FSAFlags#NEXTBIT}. The internal representation of the FSA must
+ * therefore follow this description (please note this format describes only a
+ * single transition (arc), not the entire dictionary file).
+ *
+ * <pre>
+ * ---- this node header present only if automaton was compiled with NUMBERS option.
+ * Byte
+ *        +-+-+-+-+-+-+-+-+\
+ *      0 | | | | | | | | | \  LSB
+ *        +-+-+-+-+-+-+-+-+  +
+ *      1 | | | | | | | | |  |      number of strings recognized
+ *        +-+-+-+-+-+-+-+-+  +----- by the automaton starting
+ *        : : : : : : : : :  |      from this node.
+ *        +-+-+-+-+-+-+-+-+  +
+ *  ctl-1 | | | | | | | | | /  MSB
+ *        +-+-+-+-+-+-+-+-+/
+ *
+ * ---- remaining part of the node
+ *
+ * Byte
+ *       +-+-+-+-+-+-+-+-+\
+ *     0 | | | | | | | | | +------ label
+ *       +-+-+-+-+-+-+-+-+/
+ *
+ *                  +------------- node pointed to is next
+ *                  | +----------- the last arc of the node
+ *                  | | +--------- the arc is final
+ *                  | | |
+ *             +-----------+
+ *             |    | | |  |
+ *         ___+___  | | |  |
+ *        /       \ | | |  |
+ *       MSB           LSB |
+ *        7 6 5 4 3 2 1 0  |
+ *       +-+-+-+-+-+-+-+-+ |
+ *     1 | | | | | | | | | \ \
+ *       +-+-+-+-+-+-+-+-+  \ \  LSB
+ *       +-+-+-+-+-+-+-+-+     +
+ *     2 | | | | | | | | |     |
+ *       +-+-+-+-+-+-+-+-+     |
+ *     3 | | | | | | | | |     +----- target node address (in bytes)
+ *       +-+-+-+-+-+-+-+-+     |      (not present except for the byte
+ *       : : : : : : : : :     |       with flags if the node pointed to
+ *       +-+-+-+-+-+-+-+-+     +       is next)
+ *   gtl | | | | | | | | |    /  MSB
+ *       +-+-+-+-+-+-+-+-+   /
+ * gtl+1                           (gtl = gotoLength)
+ * </pre>
+ *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
-public abstract class FSA implements Iterable<ByteBuffer>{
+public class FSA extends FSAAbstract{
+
+	/** Default filler byte. */
+	public static final byte DEFAULT_FILLER = '_';
+	/** Default annotation byte. */
+	public static final byte DEFAULT_ANNOTATION = '+';
+
+	/** Automaton version as in the file header. */
+	public static final byte VERSION = 5;
 
 	/**
-	 * @return Returns the identifier of the root node of this automaton.
-	 * Returns 0 if the start node is also the end node (the automaton is empty).
+	 * Bit indicating that an arc corresponds to the last character of a sequence
+	 * available when building the automaton.
 	 */
-	public abstract int getRootNode();
+	public static final int BIT_FINAL_ARC = 0x01;
 
 	/**
-	 * @param node Identifier of the node.
-	 * @return Returns the identifier of the first arc leaving <code>node</code> or 0 if the node has no outgoing arcs.
+	 * Bit indicating that an arc is the last one of the node's list and the
+	 * following one belongs to another node.
 	 */
-	public abstract int getFirstArc(final int node);
+	public static final int BIT_LAST_ARC = 0x02;
 
 	/**
-	 * @param arc The arc's identifier.
-	 * @return Returns the identifier of the next arc after <code>arc</code> and leaving <code>node</code>.
-	 * 	Zero is returned if no more arcs are available for the node.
+	 * Bit indicating that the target node of this arc follows it in the
+	 * compressed automaton structure (no goto field).
 	 */
-	public abstract int getNextArc(final int arc);
+	public static final int BIT_TARGET_NEXT = 0x04;
 
 	/**
-	 * @param node	Identifier of the node.
-	 * @param label	The arc's label.
-	 * @return	The identifier of an arc leaving <code>node</code> and labeled with <code>label</code>.
-	 * 	An identifier equal to 0 means the node has no outgoing arc labeled <code>label</code>.
+	 * An offset in the arc structure, where the address and flags field begins.
+	 * In version 5 of FSA automata, this value is constant (1, skip label).
 	 */
-	public int getArc(final int node, final byte label){
-		for(int arc = getFirstArc(node); arc != 0; arc = getNextArc(arc))
-			if(getArcLabel(arc) == label)
-				return arc;
-		//an arc labeled with "label" not found
-		return 0;
+	public static final int ADDRESS_OFFSET = 1;
+
+	/**
+	 * An array of bytes with the internal representation of the automaton. Please
+	 * see the documentation of this class for more information on how this
+	 * structure is organized.
+	 */
+	public final byte[] arcs;
+
+	/** The length of the node header structure (if the automaton was compiled with {@code NUMBERS} option). Otherwise, zero. */
+	public final int nodeDataLength;
+
+	/** Flags for this automaton version. */
+	private Set<FSAFlags> flags;
+
+	/** Number of bytes each address takes in full, expanded form (goto length). */
+	public final int gtl;
+
+	/** Filler character. */
+	public final byte filler;
+
+	/** Annotation character. */
+	public final byte annotation;
+
+
+	/** Read and wrap a binary automaton in FSA version 5. */
+	FSA(final InputStream stream) throws IOException{
+		final DataInputStream in = new DataInputStream(stream);
+
+		filler = in.readByte();
+		annotation = in.readByte();
+		final byte hgtl = in.readByte();
+
+		/*
+		 * Determine if the automaton was compiled with NUMBERS
+		 * If so, modify ctl and goto fields accordingly.
+		 */
+		flags = EnumSet.of(FSAFlags.FLEXIBLE, FSAFlags.STOPBIT, FSAFlags.NEXTBIT);
+		if((hgtl & 0xF0) != 0)
+			flags.add(FSAFlags.NUMBERS);
+
+		flags = Collections.unmodifiableSet(flags);
+
+		nodeDataLength = (hgtl >>> 4) & 0x0F;
+		gtl = hgtl & 0x0F;
+
+		arcs = readRemaining(in);
 	}
 
 	/**
-	 * @param arc The arc's identifier.
-	 * @return Return the label associated with a given <code>arc</code>.
+	 * @return The start node of this automaton.
 	 */
-	public abstract byte getArcLabel(final int arc);
+	@Override
+	public final int getRootNode(){
+		// Skip dummy node marking terminating state.
+		final int epsilonNode = skipArc(getFirstArc(0));
 
-	/**
-	 * @param arc The arc's identifier.
-	 * @return Returns <code>true</code> if the destination node at the end of this <code>arc</code> corresponds to
-	 * 	an input sequence created when building this automaton.
-	 */
-	public abstract boolean isArcFinal(final int arc);
+		// And follow the epsilon node's first (and only) arc.
+		return getDestinationNodeOffset(getFirstArc(epsilonNode));
+	}
 
-	/**
-	 * @param arc The arc's identifier.
-	 * @return Returns whether this <code>arc</code> does NOT have a terminating node
-	 * 	(@link {@link #getEndNode(int)} will throw an exception). Implies {@link #isArcFinal(int)}.
-	 */
-	public abstract boolean isArcTerminal(final int arc);
+	@Override
+	public final int getFirstArc(final int node){
+		return (nodeDataLength + node);
+	}
 
-	/**
-	 * @param arc The arc's identifier.
-	 * @return Return the end node pointed to by a given <code>arc</code>.
-	 * 	Terminal arcs (those that point to a terminal state) have no end node representation and throw a runtime exception.
-	 */
-	public abstract int getEndNode(final int arc);
+	@Override
+	public final int getNextArc(final int arc){
+		return (isArcLast(arc)? 0: skipArc(arc));
+	}
 
-	/**
-	 * @return Returns a set of flags for this FSA instance.
-	 */
-	public abstract Set<FSAFlags> getFlags();
+	@Override
+	public final int getEndNode(final int arc){
+		return getDestinationNodeOffset(arc);
+	}
 
-	/**
-	 * @param node	Identifier of the node.
-	 * @return	The number of sequences reachable from the given state if the automaton was compiled with {@link FSAFlags#NUMBERS}. The size
-	 * 	of the right language of the state, in other words.
-	 * @throws UnsupportedOperationException	If the automaton was not compiled with {@link FSAFlags#NUMBERS}.
-	 *		The value can then be computed by manual count of {@link #getSequences}.
-	 */
-	public int getRightLanguageCount(final int node){
-		throw new UnsupportedOperationException("Automaton not compiled with " + FSAFlags.NUMBERS);
+	@Override
+	public final byte getArcLabel(final int arc){
+		return arcs[arc];
+	}
+
+	@Override
+	public final boolean isArcFinal(final int arc){
+		return ((arcs[arc + ADDRESS_OFFSET] & BIT_FINAL_ARC) != 0);
+	}
+
+	@Override
+	public final boolean isArcTerminal(final int arc){
+		return (getDestinationNodeOffset(arc) == 0);
 	}
 
 	/**
-	 * Returns an iterator over all binary sequences starting at the given FSA
-	 * state (node) and ending in final nodes. This corresponds to a set of
-	 * suffixes of a given prefix from all sequences stored in the automaton.
+	 * @return	The number encoded at the given node. The number equals the count
+	 *		of the set of suffixes reachable from {@code node} (called its right language).
+	 */
+	@Override
+	public final int getRightLanguageCount(final int node){
+		assert flags.contains(FSAFlags.NUMBERS) : "This FSA was not compiled with NUMBERS.";
+
+		return decodeFromBytes(arcs, node, nodeDataLength);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 *
 	 * <p>
-	 * The returned iterator is a {@link ByteBuffer} whose contents changes on
-	 * each call to {@link Iterator#next()}. The keep the contents between calls
-	 * to {@link Iterator#next()}, one must copy the buffer to some other
-	 * location.
-	 * </p>
-	 *
-	 * <p>
-	 * <b>Important.</b> It is guaranteed that the returned byte buffer is backed
-	 * by a byte array and that the content of the byte buffer starts at the
-	 * array's index 0.
-	 * </p>
-	 *
-	 * @param node	Identifier of the starting node from which to return subsequences.
-	 * @return	An iterable over all sequences encoded starting at the given node.
-	 */
-	public Iterable<ByteBuffer> getSequences(final int node){
-		return (node > 0? () -> new ByteSequenceIterator(this, node): Collections.emptyList());
-	}
-
-	/**
-	 * An alias of calling {@link #iterator} directly ({@link FSA} is also
-	 * {@link Iterable}).
-	 *
-	 * @return Returns all sequences encoded in the automaton.
-	 */
-	public final Iterable<ByteBuffer> getSequences(){
-		return getSequences(getRootNode());
-	}
-
-	/**
-	 * Returns an iterator over all binary sequences starting from the initial FSA
-	 * state (node) and ending in final nodes. The returned iterator is a
-	 * {@link ByteBuffer} whose contents changes on each call to
-	 * {@link Iterator#next()}. The keep the contents between calls to
-	 * {@link Iterator#next()}, one must copy the buffer to some other location.
-	 *
-	 * <p>
-	 * <b>Important.</b> It is guaranteed that the returned byte buffer is backed
-	 * by a byte array and that the content of the byte buffer starts at the
-	 * array's index 0.
+	 * For this automaton version, an additional {@link FSAFlags#NUMBERS} flag may
+	 * be set to indicate the automaton contains extra fields for each node.
 	 * </p>
 	 */
 	@Override
-	public final Iterator<ByteBuffer> iterator(){
-		return getSequences().iterator();
+	public final Set<FSAFlags> getFlags(){
+		return flags;
 	}
 
 	/**
-	 * Visit all states. The order of visiting is undefined. This method may be
-	 * faster than traversing the automaton in post- or pre-order since it can scan
-	 * states linearly. Returning false from {@link StateVisitor#accept(int)}
-	 * immediately terminates the traversal.
+	 * Returns {@code true} if this arc has {@code NEXT} bit set.
 	 *
-	 * @param v   Visitor to receive traversal calls.
+	 * @param arc The node's arc identifier.
+	 * @return Returns true if the argument is the last arc of a node.
+	 * @see #BIT_LAST_ARC
 	 */
-	public void visitAllStates(final StateVisitor v){
-		visitPostOrder(v);
+	public final boolean isArcLast(final int arc){
+		return ((arcs[arc + ADDRESS_OFFSET] & BIT_LAST_ARC) != 0);
 	}
 
 	/**
-	 * Visits all states reachable from the root node in post-order.
-	 * Returning false from {@link StateVisitor#accept(int)} skips traversal of all sub-states of a given state.
-	 *
-	 * @param v   Visitor to receive traversal calls.
+	 * @param arc	The node's arc identifier.
+	 * @return   {@code true} if {@link #BIT_TARGET_NEXT} is set for this arc.
+	 * @see #BIT_TARGET_NEXT
 	 */
-	public void visitPostOrder(final StateVisitor v){
-		final DynamicIntArray stack = new DynamicIntArray();
-		//push root node to first stack
-		stack.push(getRootNode());
-
-		//post-order traversal stack
-		final DynamicIntArray out = new DynamicIntArray();
-
-		//loop while first stack is not empty
-		while(!stack.isEmpty()){
-			final int current = stack.pop();
-
-			//pop a node from first stack and push it to second stack
-			out.push(current);
-
-			//push children of the popped node from left to right to first stack
-			for(int arc = getFirstArc(current); arc != 0; arc = getNextArc(arc))
-				if(!isArcTerminal(arc))
-					stack.add(getEndNode(arc));
-		}
-
-		//process nodes from second stack
-		final BitSet visited = new BitSet();
-		for(int i = out.size() - 1; i >= 0; i --){
-			final int n = out.get(i);
-			if(!visited.get(n) && !v.accept(n))
-				break;
-
-			visited.set(n);
-		}
+	public final boolean isNextSet(final int arc){
+		return (arcs[arc + ADDRESS_OFFSET] & BIT_TARGET_NEXT) != 0;
 	}
 
-	/**
-	 * @param in The input stream.
-	 * @return Reads all remaining bytes from an input stream and returns
-	 * them as a byte array.
-	 * @throws IOException Rethrown if an I/O exception occurs.
-	 */
-	protected static byte[] readRemaining(final InputStream in) throws IOException{
-		try(final ByteArrayOutputStream baos = new ByteArrayOutputStream()){
-			final byte[] buffer = new byte[1024 * 8];
-			int len;
-			while((len = in.read(buffer)) >= 0)
-				baos.write(buffer, 0, len);
-			return baos.toByteArray();
-		}
+	/** Returns the address of the node pointed to by this . */
+	final int getDestinationNodeOffset(final int arc){
+		if(isNextSet(arc))
+			//the destination node follows this arc in the array
+			return skipArc(arc);
+		else
+			//the destination node address has to be extracted from the arc's goto field
+			return decodeFromBytes(arcs, arc + ADDRESS_OFFSET, gtl) >>> 3;
 	}
 
-	/**
-	 * A factory for reading automata in any of the supported versions.
-	 *
-	 * @param stream The input stream to read automaton data from. The stream is not closed.
-	 * @return Returns an instantiated automaton. Never null.
-	 * @throws IOException If the input stream does not represent an automaton or is otherwise invalid.
-	 */
-	public static FSA read(final InputStream stream) throws IOException{
-		final FSAHeader header = FSAHeader.read(stream);
-		return switch(header.getVersion()){
-			case FSA5.VERSION -> new FSA5(stream);
-			case CFSA2.VERSION -> new CFSA2(stream);
-			default -> throw new IOException(String.format(Locale.ROOT, "Unsupported automaton version: 0x%02x", header.getVersion() & 0xFF));
-		};
+	/** Read the arc's layout and skip as many bytes, as needed. */
+	private int skipArc(final int offset){
+		return offset + (isNextSet(offset)
+			//label + flags
+			? 1 + 1
+			//label + flags/address
+			: 1 + gtl);
 	}
 
-	/**
-	 * A factory for reading a specific FSA subclass, including proper casting.
-	 *
-	 * @param stream The input stream to read automaton data from. The stream is not closed.
-	 * @param clazz  A subclass of {@link FSA} to cast the read automaton to.
-	 * @param <T>    A subclass of {@link FSA} to cast the read automaton to.
-	 * @return Returns an instantiated automaton. Never null.
-	 * @throws IOException If the input stream does not represent an automaton, is otherwise
-	 *                     invalid or the class of the automaton read from the input stream
-	 *                     is not assignable to <code>clazz</code>.
-	 */
-	public static <T extends FSA> T read(final InputStream stream, final Class<? extends T> clazz) throws IOException{
-		final FSA fsa = read(stream);
-		if(!clazz.isInstance(fsa))
-			throw new IOException(String.format(Locale.ROOT, "Expected FSA type %s, but read an incompatible type %s.",
-				clazz.getSimpleName(), fsa.getClass().getSimpleName()));
-
-		return clazz.cast(fsa);
+	/** Returns an n-byte integer encoded in byte-packed representation. */
+	private static int decodeFromBytes(final byte[] arcs, final int start, final int n){
+		int r = 0;
+		for(int i = n; -- i >= 0; )
+			r = r << 8 | (arcs[start + i] & 0xFF);
+		return r;
 	}
 
 }

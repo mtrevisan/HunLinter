@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,12 +30,15 @@ import io.github.mtrevisan.hunlinter.gui.models.SortableListModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.DictionarySortCellRenderer;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.GUIException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JDialog;
+import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Frame;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -60,7 +63,7 @@ public class DictionarySortDialog extends JDialog{
 	public DictionarySortDialog(final ParserManager parserManager, final Frame parent){
 		super(parent, "Dictionary sorter", true);
 
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.parserManager = parserManager;
 		dicParser = parserManager.getDicParser();
@@ -72,8 +75,6 @@ public class DictionarySortDialog extends JDialog{
 		reloadDictionaryParser(MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY);
 
 		lblMessage.setText("Select a section from the list:");
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -100,21 +101,13 @@ public class DictionarySortDialog extends JDialog{
 
       btnNextUnsortedArea.setText("▼");
       btnNextUnsortedArea.setToolTipText("Next unsorted area");
-      btnNextUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnNextUnsortedAreaActionPerformed(evt);
-         }
-      });
+      btnNextUnsortedArea.addActionListener(this::btnNextUnsortedAreaActionPerformed);
 
       btnPreviousUnsortedArea.setText("▲");
       btnPreviousUnsortedArea.setToolTipText("Previous unsorted area");
-      btnPreviousUnsortedArea.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnPreviousUnsortedAreaActionPerformed(evt);
-         }
-      });
+      btnPreviousUnsortedArea.addActionListener(this::btnPreviousUnsortedAreaActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,24 +139,25 @@ public class DictionarySortDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	public void setDictionaryEnabled(final boolean enabled){
+	public final void setDictionaryEnabled(final boolean enabled){
 		entriesList.setEnabled(enabled);
 	}
 
 	@EventHandler
-	public void reloadDictionaryParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void reloadDictionaryParser(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_PARSER_RELOAD_DICTIONARY)
 			return;
 
 		try{
-			parserManager.getDicParser().clearBoundaries();
+			dicParser.clearBoundaries();
 
 			//reload text
 			final int lastVisibleIndex = getFirstVisibleIndex();
 			loadLines(parserManager.getDictionaryLines(), lastVisibleIndex);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new GUIException(ioe);
 		}
 	}
 
@@ -171,10 +165,10 @@ public class DictionarySortDialog extends JDialog{
 		final SortableListModel model = (SortableListModel)entriesList.getModel();
 		model.replaceAll(listData, 0);
 
-		entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
+		if(firstVisibleItemIndex >= 0)
+			entriesList.ensureIndexIsVisible(firstVisibleItemIndex);
 
-		//re-render sections
-		entriesList.repaint();
+		entriesList.updateUI();
 	}
 
 	private void setCurrentFont(){
@@ -184,7 +178,7 @@ public class DictionarySortDialog extends JDialog{
 		setCellRenderer(dicCellRenderer);
 	}
 
-   private void btnNextUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
+   private void btnNextUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);
@@ -200,7 +194,7 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
-   private void btnPreviousUnsortedAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
+   private void btnPreviousUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);
@@ -221,28 +215,28 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.setCellRenderer(renderer);
 	}
 
-	public void addListSelectionListener(final ListSelectionListener listener){
+	public final void addListSelectionListener(final ListSelectionListener listener){
 		entriesList.addListSelectionListener(listener);
 	}
 
-	public int getFirstVisibleIndex(){
+	public final int getFirstVisibleIndex(){
 		return entriesList.getFirstVisibleIndex();
 	}
 
-	public int getSelectedIndex(){
+	public final int getSelectedIndex(){
 		return entriesList.getSelectedIndex();
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,15 +26,14 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.regexgenerator.HunSpellRegexWordGenerator;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,13 +42,12 @@ import java.util.Objects;
 
 class WordGeneratorCompoundRules extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
-	private static final MessageFormat MISSING_WORD = new MessageFormat("Missing word(s) for rule {0} in compound rule {1}");
+	private static final String NON_POSITIVE_LIMIT = "Limit cannot be non-positive: {}";
+	private static final String MISSING_WORD = "Missing word(s) for rule {} in compound rule {}";
 
 
-	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryCorrectnessChecker checker){
-		super(affixData, dicParser, wordGenerator, checker);
+	WordGeneratorCompoundRules(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, checker);
 	}
 
 	/**
@@ -61,18 +59,18 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 	 * @return	The list of inflections for the given rule
 	 * @throws NoApplicableRuleException	If there is a rule that doesn't apply to the word
 	 */
-	Inflection[] applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
+	final List<Inflection> applyCompoundRules(final String[] inputCompounds, final String compoundRule, final int limit){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		Objects.requireNonNull(compoundRule, "Compound rule cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
+			throw new LinterException(NON_POSITIVE_LIMIT, limit);
 
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		loadDictionaryForInclusionTest();
 
 		//extract map flag -> dictionary entries
-		final Map<String, DictionaryEntry[]> inputs = extractCompoundRules(inputCompounds);
+		final Map<String, List<DictionaryEntry>> inputs = extractCompoundRules(inputCompounds);
 
 		final String[] compoundRuleComponents = strategy.extractCompoundRule(compoundRule);
 
@@ -82,37 +80,36 @@ class WordGeneratorCompoundRules extends WordGeneratorCompound{
 		//generate all the words that matches the given regex
 		final List<List<String>> permutations = regexWordGenerator.generateAll(2, limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
 
-	/** Extract a map of flag > dictionary entry from input compounds */
-	private Map<String, DictionaryEntry[]> extractCompoundRules(final String[] inputCompounds){
+	/** Extract a map of flag > dictionary entry from input compounds. */
+	private Map<String, List<DictionaryEntry>> extractCompoundRules(final String[] inputCompounds){
 		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
 		//extract map flag -> compounds
-		Map<String, DictionaryEntry[]> compoundRules = new HashMap<>();
+		Map<String, List<DictionaryEntry>> compoundRules = new HashMap<>(inputCompounds.length);
 		for(final String inputCompound : inputCompounds){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
-			final Map<String, DictionaryEntry[]> distribution = dicEntry.distributeByCompoundRule(affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
+			final Map<String, List<DictionaryEntry>> distribution = dicEntry.distributeByCompoundRule(affixData);
 			compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);
 		}
 		return compoundRules;
 	}
 
-	private void checkCompoundRuleInputCorrectness(final Map<String, DictionaryEntry[]> inputs,
+	private static void checkCompoundRuleInputCorrectness(final Map<String, List<DictionaryEntry>> inputs,
 			final String[] compoundRuleComponents){
 		for(final String component : compoundRuleComponents)
 			if(raiseError(inputs, component))
-				throw new LinterException(MISSING_WORD.format(new Object[]{component,
-					StringUtils.join(compoundRuleComponents, StringUtils.EMPTY)}));
+				throw new LinterException(MISSING_WORD, component, StringUtils.join(compoundRuleComponents));
 	}
 
-	private boolean raiseError(final Map<String, DictionaryEntry[]> inputs, final String component){
-		final char chr = (component.length() == 1? component.charAt(0): 0);
-		return (chr != '*' && chr != '?' && inputs.get(component) == null);
+	private static boolean raiseError(final Map<String, List<DictionaryEntry>> inputs, final String component){
+		return (!FlagParsingStrategy.FLAG_ANY.equals(component) && !FlagParsingStrategy.FLAG_OPTIONAL.equals(component)
+			&& inputs.get(component) == null);
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core;
 
+import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public final class BitArrayBuilder{
 	private BitArrayBuilder(){}
 
 	public static BitArray getBitArray(final Type type, final int bits){
-		Objects.requireNonNull(type);
+		Objects.requireNonNull(type, "Type cannot be null");
 
 		BitArray ba = null;
 		switch(type){
@@ -54,14 +54,14 @@ public final class BitArrayBuilder{
 
 			case MEMORY_MAPPED_FILE:
 				try{
-					final File file = File.createTempFile(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplicates-bitarray", ".bits");
+					final File file = File.createTempFile(DownloaderHelper.ARTIFACT_ID + "-duplicates-bitarray", ".bits");
 					file.deleteOnExit();
 					ba = new MemoryMappedFileBitArray(file, bits);
 				}
-				catch(final IOException e){
+				catch(final IOException ioe){
 					ba = new JavaBitArray(bits);
 
-					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", e);
+					LOGGER.warn("Cannot instantiate a Memory-Mapped File BitArray, fallback to standard java implementation", ioe);
 				}
 		}
 		return ba;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,67 +24,67 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
-import io.github.mtrevisan.hunlinter.datastructures.FixedArray;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
-import io.github.mtrevisan.hunlinter.services.ParserHelper;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
+import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.EOFException;
 import java.io.IOException;
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 
 public class AffixHandler implements Handler{
 
-	private static final MessageFormat BAD_THIRD_PARAMETER = new MessageFormat("Error reading line `{0}`: the third parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Duplicated line: {0}");
-	private static final MessageFormat MISMATCHED_RULE_TYPE = new MessageFormat("Mismatched rule type (expected `{0}`)");
-	private static final MessageFormat MISMATCHED_RULE_FLAG = new MessageFormat("Mismatched rule flag (expected `{0}`)");
+	private static final String BAD_THIRD_PARAMETER = "Error reading line `{}`: the third parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String DUPLICATED_LINE = "Duplicated line: {}";
+	private static final String MISMATCHED_RULE_TYPE = "Mismatched rule type (expected `{}`)";
+	private static final String MISMATCHED_RULE_FLAG = "Mismatched rule flag (expected `{}`)";
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		try{
 			final AffixType parentType = AffixType.createFromCode(context.getRuleType());
 			final String ruleFlag = context.getFirstParameter();
 			final char combinable = context.getSecondParameter().charAt(0);
 			if(!NumberUtils.isCreatable(context.getThirdParameter()))
-				throw new LinterException(BAD_THIRD_PARAMETER.format(new Object[]{context}));
+				throw new LinterException(BAD_THIRD_PARAMETER, context);
 
 			final RuleEntry parent = new RuleEntry(parentType, ruleFlag, combinable);
-			final AffixEntry[] entries = readEntries(context, parent, affixData);
+			final List<AffixEntry> entries = readEntries(context, parent, affixData);
 			parent.setEntries(entries);
 
 			affixData.addData(ruleFlag, parent);
 
 			return Integer.parseInt(context.getThirdParameter());
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e.getMessage());
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
+			throw new ParserException(ioe.getMessage(), ioe);
 		}
 	}
 
-	private AffixEntry[] readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
-			throws IOException{
+	private static List<AffixEntry> readEntries(final ParsingContext context, final RuleEntry parent, final AffixData affixData)
+			throws EOFException{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
-		if(numEntries <= 0)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getThirdParameter()}));
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getThirdParameter());
 
+		final List<AffixEntry> entries = new ArrayList<>(numEntries);
 		final Scanner scanner = context.getScanner();
 		final AffixType parentType = AffixType.createFromCode(context.getRuleType());
 		final String parentFlag = context.getFirstParameter();
@@ -94,23 +94,21 @@ public class AffixHandler implements Handler{
 		final List<String> aliasesFlag = affixData.getData(AffixOption.ALIASES_FLAG);
 		final List<String> aliasesMorphologicalField = affixData.getData(AffixOption.ALIASES_MORPHOLOGICAL_FIELD);
 		String line;
-		final FixedArray<AffixEntry> entries = new FixedArray<>(AffixEntry.class, numEntries);
 		for(int i = 0; i < numEntries; i ++){
 			ParserHelper.assertNotEOF(scanner);
 
 			line = scanner.nextLine();
 			final AffixEntry entry = new AffixEntry(line, context.getIndex() + i, parentType, parentFlag, strategy, aliasesFlag,
-				aliasesMorphologicalField);
-			entry.setParent(parent);
-//com.carrotsearch.sizeof.RamUsageEstimator.sizeOf(entry)
+					aliasesMorphologicalField)
+				.setParent(parent);
 
 
 			checkValidity(parentType, parentFlag, context, entry);
 
 
-			if(ArrayUtils.contains(entries.data, entry))
-				EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{entry.toString()}),
-					IndexDataPair.of(context.getIndex() + i, null)));
+			if(entries.contains(entry))
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, entry.toString())
+					.withIndex(context.getIndex() + i));
 			else
 				entries.add(entry);
 
@@ -125,15 +123,15 @@ public class AffixHandler implements Handler{
 //else
 //	prefixEntries.put(arr, lst);
 		}
-		return entries.extractCopyOrNull();
+		return entries;
 	}
 
-	private void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
-		final String ruleTypeCode = ruleType.getOption().getCode();
+	private static void checkValidity(final AffixType ruleType, final String ruleFlag, final ParsingContext context, final AffixEntry entry){
+		final String ruleTypeCode = (ruleType != null? ruleType.getOption().getCode(): null);
 		if(!context.getRuleType().equals(ruleTypeCode))
-			throw new LinterException(MISMATCHED_RULE_TYPE.format(new Object[]{ruleType}));
+			throw new LinterException(MISMATCHED_RULE_TYPE, ruleType);
 		if(!context.getFirstParameter().equals(ruleFlag))
-			throw new LinterException(MISMATCHED_RULE_FLAG.format(new Object[]{ruleFlag}));
+			throw new LinterException(MISMATCHED_RULE_FLAG, ruleFlag);
 
 		entry.validate();
 	}

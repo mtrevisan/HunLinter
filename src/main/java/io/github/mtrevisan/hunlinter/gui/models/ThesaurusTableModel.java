@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,14 +25,14 @@
 package io.github.mtrevisan.hunlinter.gui.models;
 
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.table.AbstractTableModel;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.text.MessageFormat;
 import java.util.List;
 
 
@@ -43,61 +43,85 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	private static final String[] COLUMN_NAMES = {"Definition", "Synonyms"};
 
+	private static final String COMMA = ",";
+	private static final String PIPE = "|";
+	/** Adds a zero-width space to let wrapping occurs after commas. */
+	private static final String ZERO_WIDTH_SPACE = "&#8203;";
+	private static final String WRAPPABLE_COMMA = COMMA + ZERO_WIDTH_SPACE;
+	private static final String COLUMN = ":";
+	private static final String WRAPPABLE_COLUMN = COLUMN + ZERO_WIDTH_SPACE;
+
 	public static final String TAG_NEW_LINE = "<br>";
-	private static final MessageFormat TAG = new MessageFormat("<html><body style=\"'white-space:nowrap'\">{0}</body></html>");
+//	private static final String TAG = "<html><body style=\"'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'\">{}</body></html>";
+	private static final String TAG = "<html>{}</html>";
 
 
 	private List<ThesaurusEntry> synonyms;
 
 
-	public ThesaurusEntry getSynonymsAt(final int index){
+	public final ThesaurusEntry getSynonymsAt(final int index){
 		return synonyms.get(index);
 	}
 
-	public void setSynonyms(final List<ThesaurusEntry> synonyms){
+	public final void setSynonyms(final List<ThesaurusEntry> synonyms){
 		this.synonyms = synonyms;
 
 		fireTableDataChanged();
 	}
 
 	@Override
-	public int getRowCount(){
+	public final int getRowCount(){
 		return (synonyms != null? synonyms.size(): 0);
 	}
 
 	@Override
-	public int getColumnCount(){
+	public final int getColumnCount(){
 		return COLUMN_NAMES.length;
 	}
 
 	@Override
-	public Object getValueAt(final int rowIndex, final int columnIndex){
+	public final Object getValueAt(final int rowIndex, final int columnIndex){
 		if(synonyms == null || synonyms.size() <= rowIndex)
 			return null;
 
 		final ThesaurusEntry thesaurus = synonyms.get(rowIndex);
 		return switch(columnIndex){
 			case 0 -> thesaurus.getDefinition();
-			case 1 -> TAG.format(new Object[]{thesaurus.joinSynonyms(TAG_NEW_LINE)});
+			case 1 -> {
+				String temp = thesaurus.joinSynonyms(TAG_NEW_LINE);
+				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
+				temp = StringUtils.replace(temp, ")" + WRAPPABLE_COMMA, ") ");
+				yield JavaHelper.textFormat(TAG, temp);
+			}
 			default -> null;
 		};
 	}
 
 	@Override
-	public String getColumnName(final int column){
+	public final String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 
+	public String getDefinition(final int rowIndex){
+		return (String)getValueAt(rowIndex, 0);
+	}
+
+	public String getSynonyms(final int rowIndex){
+		String temp = (String)getValueAt(rowIndex, 1);
+		temp = StringUtils.replace(temp, WRAPPABLE_COMMA, COMMA);
+		temp = StringUtils.replace(temp, ") ", COLUMN);
+		return StringUtils.replace(temp, ">(", ">");
+	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

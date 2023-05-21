@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,21 +27,21 @@ package io.github.mtrevisan.hunlinter.parsers.affix;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.StringJoiner;
 
 
 public class ParsingContext{
 
-	private final String line;
-	private final int index;
-	private final Scanner scanner;
+	private String line;
+	private int index;
+	private Scanner scanner;
 
-	private final String[] lineParts;
+	private String[] lineParts;
 
 
-	public ParsingContext(final String line, final int index, final Scanner scanner){
+	public final void update(final String line, final int index, final Scanner scanner){
 		Objects.requireNonNull(line, "Line cannot be null");
 		Objects.requireNonNull(scanner, "Scanner cannot be null");
 
@@ -52,41 +52,44 @@ public class ParsingContext{
 		lineParts = StringUtils.split(line);
 	}
 
-	public String getLine(){
+	public final String getLine(){
 		final int commentIndex = line.indexOf(ParserHelper.COMMENT_MARK_SHARP);
 		return (commentIndex >= 0? line.substring(0, commentIndex).trim(): line);
 	}
 
-	public int getIndex(){
+	public final int getIndex(){
 		return index;
 	}
 
-	public Scanner getScanner(){
+	public final Scanner getScanner(){
 		return scanner;
 	}
 
-	public String getRuleType(){
+	public final String getRuleType(){
 		return lineParts[0];
 	}
 
-	public String getFirstParameter(){
+	public final String getFirstParameter(){
 		return lineParts[1];
 	}
 
-	public String getSecondParameter(){
+	public final String getSecondParameter(){
 		return lineParts[2];
 	}
 
-	public String getThirdParameter(){
+	public final String getThirdParameter(){
 		return lineParts[3];
 	}
 
-	public String getAllButFirstParameter(){
-		return StringUtils.join(Arrays.asList(lineParts).subList(1, lineParts.length), StringUtils.SPACE);
+	public final String getAllButFirstParameter(){
+		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
+		for(int i = 1; i < lineParts.length; i ++)
+			sj.add(lineParts[i]);
+		return sj.toString();
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return line;
 	}
 

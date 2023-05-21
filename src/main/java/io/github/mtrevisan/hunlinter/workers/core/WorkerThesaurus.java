@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,8 +41,8 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 		super(workerData);
 	}
 
-	protected void processLines(final Consumer<ThesaurusEntry> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+	protected final void processLines(final Consumer<ThesaurusEntry> dataProcessor){
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load thesaurus
 		final List<ThesaurusEntry> entries = loadThesaurus();
@@ -52,19 +52,6 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 			? entries.parallelStream()
 			: entries.stream());
 		processThesaurus(stream, entries.size(), dataProcessor);
-
-		ThesaurusEntry data = null;
-		try{
-			final ThesaurusParser theParser = workerData.getParser();
-			final List<ThesaurusEntry> dictionary = theParser.getSynonymsDictionary();
-			for(final ThesaurusEntry thesaurusEntry : dictionary){
-				data = thesaurusEntry;
-				dataProcessor.accept(data);
-			}
-		}
-		catch(final Exception e){
-			manageException(new LinterException(e, data));
-		}
 	}
 
 	private List<ThesaurusEntry> loadThesaurus(){
@@ -91,15 +78,16 @@ public class WorkerThesaurus extends WorkerAbstract<WorkerDataParser<ThesaurusPa
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e, data);
+			catch(final RuntimeException re){
+				throw new LinterException(re)
+					.withData(data);
 			}
 		};
 	}

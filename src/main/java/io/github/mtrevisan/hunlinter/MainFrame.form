@@ -86,8 +86,8 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DictionaryLinterAction(workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="99"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="mnemonic" type="int" value="97"/>
+                <Property name="text" type="java.lang.String" value="Correctness check"/>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
             </MenuItem>
@@ -96,7 +96,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DictionarySorterAction(parserManager, workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="115"/>
+                <Property name="mnemonic" type="int" value="111"/>
                 <Property name="text" type="java.lang.String" value="Sort dictionary&#x2026;"/>
               </Properties>
             </MenuItem>
@@ -126,7 +126,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DictionaryHyphenationStatisticsAction(false, workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="116"/>
+                <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" value="Statistics"/>
               </Properties>
             </MenuItem>
@@ -162,7 +162,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DictionaryExtractMinimalPairsAction(workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="109"/>
                 <Property name="text" type="java.lang.String" value="Extract minimal pairs&#x2026;"/>
               </Properties>
             </MenuItem>
@@ -198,8 +197,17 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new ThesaurusLinterAction(workerManager, this)" type="code"/>
                 </Property>
+                <Property name="mnemonic" type="int" value="97"/>
+                <Property name="text" type="java.lang.String" value="Correctness check"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="theLinterFSAMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new ThesaurusLinterFSAAction(workerManager, this)" type="code"/>
+                </Property>
                 <Property name="mnemonic" type="int" value="99"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="text" type="java.lang.String" value="Correctness check using dictionary FSA…"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -216,8 +224,8 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new HyphenationLinterAction(workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="100"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="mnemonic" type="int" value="97"/>
+                <Property name="text" type="java.lang.String" value="Correctness check"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="hypDuplicatesSeparator">
@@ -227,7 +235,7 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DictionaryHyphenationStatisticsAction(true, workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="116"/>
+                <Property name="mnemonic" type="int" value="83"/>
                 <Property name="text" type="java.lang.String" value="Statistics"/>
               </Properties>
             </MenuItem>
@@ -245,8 +253,17 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new AutoCorrectLinterAction(workerManager, this)" type="code"/>
                 </Property>
-                <Property name="mnemonic" type="int" value="67"/>
-                <Property name="text" type="java.lang.String" value="Check correctness"/>
+                <Property name="mnemonic" type="int" value="97"/>
+                <Property name="text" type="java.lang.String" value="Correctness check"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="acoLinterFSAMenuItem">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new AutoCorrectLinterFSAAction(workerManager, this)" type="code"/>
+                </Property>
+                <Property name="mnemonic" type="int" value="99"/>
+                <Property name="text" type="java.lang.String" value="Correctness check using dictionary FSA…"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -402,9 +419,6 @@
             <Property name="rows" type="int" value="1"/>
             <Property name="tabSize" type="int" value="3"/>
           </Properties>
-          <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();&#xd;&#xa;caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);"/>
-          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -423,8 +437,8 @@
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Dictionary">
-                <Property name="tabTitle" type="java.lang.String" value="Dictionary"/>
+              <JTabbedPaneConstraints tabName="Inflections">
+                <Property name="tabTitle" type="java.lang.String" value="Inflections"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

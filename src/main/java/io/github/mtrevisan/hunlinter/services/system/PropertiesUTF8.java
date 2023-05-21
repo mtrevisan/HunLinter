@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,11 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serial;
@@ -50,7 +55,7 @@ import java.util.Properties;
 public class PropertiesUTF8 extends Properties{
 
 	@Serial
-	private static final long serialVersionUID = -7320018209057349063l;
+	private static final long serialVersionUID = -7320018209057349063L;
 
 	/** Characters used to write comment lines in a property file. */
 	private static final String COMMENT = "#!";
@@ -74,27 +79,19 @@ public class PropertiesUTF8 extends Properties{
 	 * @throws IllegalArgumentException	If the input stream contains a malformed Unicode escape sequence.
 	 */
 	@Override
-	public synchronized void load(final InputStream inStream) throws IOException{
+	public final synchronized void load(final InputStream inStream) throws IOException{
 		try(final BufferedReader in = new BufferedReader(new InputStreamReader(inStream, StandardCharsets.UTF_8))){
 			String line;
+			final StringBuilder property = new StringBuilder();
 			while((line = in.readLine()) != null){
 				line = removeWhiteSpaces(line);
 				if(!line.isEmpty() && COMMENT.indexOf(line.charAt(0)) < 0){
 					//removes the beginning separators
-					String property = line;
-					//reads the whole property if it is on multiple lines
-					while(continueLine(line)){
-						property = property.substring(0, property.length() - 1);
-						line = in.readLine();
-						property += line;
-					}
+					property.setLength(0);
+					readWholeLine(property, line, in);
 
 					if(!property.isEmpty()){
-						int endOfKey = 0;
-						//calculates the ending index of the key
-						final int l = property.length();
-						while(endOfKey < l && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
-							endOfKey ++;
+						final int endOfKey = getEndIndexOfKey(property);
 						String key = property.substring(0, endOfKey);
 						String value = property.substring(endOfKey + 1);
 
@@ -106,6 +103,26 @@ public class PropertiesUTF8 extends Properties{
 				}
 			}
 		}
+	}
+
+	private static void readWholeLine(final StringBuilder property, String line, final BufferedReader in) throws IOException{
+		property.append(line);
+		//reads the whole property if it is on multiple lines
+		while(isLineContinuing(line)){
+			//remove the last (`\`) character
+			property.setLength(property.length() - 1);
+			line = in.readLine();
+			property.append(removeWhiteSpaces(line));
+		}
+	}
+
+	/** Calculates the ending index of the key. */
+	private static int getEndIndexOfKey(final StringBuilder property){
+		int endOfKey = 0;
+		final int len = property.length();
+		while(endOfKey < len && (KEY_VALUE_SEPARATORS.indexOf(property.charAt(endOfKey)) < 0))
+			endOfKey ++;
+		return endOfKey;
 	}
 
 	/**
@@ -127,8 +144,8 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The beginning of the property that might be continued on the next line.
 	 * @return	Whether the property continues on the following line.
 	 */
-	private boolean continueLine(final CharSequence line){
-		return (line != null && !line.isEmpty() && line.charAt(line.length() - 1) == '\\');
+	private static boolean isLineContinuing(final CharSequence line){
+		return (line != null && !line.isEmpty() && StringHelper.lastChar(line) == '\\');
 	}
 
 	/**
@@ -138,7 +155,7 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The String to treat.
 	 * @return	The converted line.
 	 */
-	private String loadConversion(final CharSequence line){
+	private static String loadConversion(final CharSequence line){
 		final StringBuilder sb = new StringBuilder(line.length());
 		//replace all the "\." substrings with their corresponding escaped characters
 		for(int index = 0; index < line.length(); index ++){
@@ -174,7 +191,7 @@ public class PropertiesUTF8 extends Properties{
 						}
 						//index must point on the last character of the escaped sequence to avoid missing the next character
 						index --;
-						currentChar = (char) value;
+						currentChar = (char)value;
 					default:
 						break;
 				}
@@ -186,8 +203,9 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 
+	//we do not want that a thread could modify this instance while storing it, hence the synchronization
 	@Override
-	public void store(final OutputStream out, final String header) throws IOException{
+	public final synchronized void store(final OutputStream out, final String header) throws IOException{
 		try(final BufferedWriter output = new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8))){
 			if(header != null){
 				output.write('#' + header);
@@ -195,15 +213,14 @@ public class PropertiesUTF8 extends Properties{
 			}
 			output.write('#' + ZonedDateTime.now().toString());
 			output.newLine();
-			//we do not want that a thread could modify this instance while storing it
-			synchronized(this){
-				for(final Object k : keySet()){
-					final String key = storeConversion((CharSequence)k);
-					final String value = storeConversion((CharSequence) get(key));
+			for(final Object k : keySet()){
+				final String key = storeConversion((CharSequence)k);
+				final String value = storeConversion((CharSequence) get(key));
 
-					output.write(key + '=' + value);
-					output.newLine();
-				}
+				output.write(key);
+				output.write('=');
+				output.write(value);
+				output.newLine();
 			}
 			output.flush();
 		}
@@ -216,9 +233,9 @@ public class PropertiesUTF8 extends Properties{
 	 * @param line	The String to treat.
 	 * @return	The resulting String.
 	 */
-	private String storeConversion(final CharSequence line){
+	private static String storeConversion(final CharSequence line){
 		final int length = line.length();
-		final StringBuilder sb = new StringBuilder(length * 2);
+		final StringBuilder sb = new StringBuilder(length << 1);
 		for(int i = 0; i < length; i ++){
 			final char currentChar = line.charAt(i);
 			switch(currentChar){
@@ -249,8 +266,21 @@ public class PropertiesUTF8 extends Properties{
 	}
 
 	@Override
-	public PropertiesUTF8 clone(){
+	public final synchronized PropertiesUTF8 clone(){
 		return (PropertiesUTF8)super.clone();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

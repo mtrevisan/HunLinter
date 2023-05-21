@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,9 +26,9 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetadata;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -42,12 +42,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Queue;
+import java.util.Locale;
 
 
 /**
  * @see <a href="http://wiki.languagetool.org/hunspell-support">LanguageTool - Spell check</a>
  * @see <a href="http://wiki.languagetool.org/developing-a-tagger-dictionary">LanguageTool - Developing a tagger dictionary</a>
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public final class MetadataBuilder{
 
@@ -73,7 +74,7 @@ public final class MetadataBuilder{
 		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
-			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(Locale.ROOT),
 			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
 			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
 		if(affixData.getLanguage() != null)
@@ -97,7 +98,7 @@ public final class MetadataBuilder{
 		final Collection<String> content = new ArrayList<>(Arrays.asList(
 			DictionaryAttribute.CREATION_DATE.propertyName + EQUALS + ZonedDateTime.now().format(DateTimeFormatter.ofPattern("u-MM-dd")),
 			DictionaryAttribute.SEPARATOR.propertyName + EQUALS + Inflection.POS_FSA_SEPARATOR,
-			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(),
+			DictionaryAttribute.ENCODING.propertyName + EQUALS + charset.name().toLowerCase(Locale.ROOT),
 			DictionaryAttribute.ENCODER.propertyName + EQUALS + encoder,
 			DictionaryAttribute.FREQUENCY_INCLUDED.propertyName + EQUALS + "false"));
 		if(affixData.getLanguage() != null)

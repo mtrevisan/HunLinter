@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,15 +25,11 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.text.MessageFormat;
 import java.util.regex.Pattern;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -42,9 +38,9 @@ import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
  */
 final class NumericalParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat FLAG_MUST_BE_IN_RANGE = new MessageFormat("Flag must be in the range [1, {0}]: was `{1}`");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Flag must be an integer number: was `{0}`");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by numbers and the optional operators '*' and '?': was `{0}`");
+	private static final String FLAG_MUST_BE_IN_RANGE = "Flag must be in the range [1, {}]: `{}`";
+	private static final String BAD_FORMAT = "Flag must be an integer number: `{}`";
+	private static final String BAD_FORMAT_COMPOUND_RULE = "Compound rule must be composed by numbers and the optional operators '" + FlagParsingStrategy.FLAG_OPTIONAL + "' or '" + FlagParsingStrategy.FLAG_ANY + "': `{}`";
 
 
 	private static final int MAX_NUMERICAL_FLAG = 65_535;
@@ -65,21 +61,23 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 	private NumericalParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(final String flags){
-		if(StringUtils.isBlank(flags))
+	public String[] parseFlags(final String rawFlags){
+		if(StringUtils.isBlank(rawFlags))
 			return null;
 
-		final String[] singleFlags = extractFlags(flags);
+		final String[] flags = extractFlags(rawFlags);
 
-		checkForDuplicates(singleFlags);
+		checkForDuplicates(flags);
 
-		LoopHelper.forEach(singleFlags, this::validate);
+		final int size = (flags != null? flags.length: 0);
+		for(int i = 0; i < size; i ++)
+			validate(flags[i]);
 
-		return singleFlags;
+		return flags;
 	}
 
-	private String[] extractFlags(final String flags){
-		return StringUtils.split(flags, COMMA);
+	private static String[] extractFlags(final String rawFlags){
+		return StringUtils.split(rawFlags, COMMA);
 	}
 
 	@Override
@@ -87,10 +85,10 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		try{
 			final int numericalFlag = Integer.parseInt(flag);
 			if(numericalFlag <= 0 || numericalFlag > MAX_NUMERICAL_FLAG)
-				throw new LinterException(FLAG_MUST_BE_IN_RANGE.format(new Object[]{MAX_NUMERICAL_FLAG, flag}));
+				throw new LinterException(FLAG_MUST_BE_IN_RANGE, MAX_NUMERICAL_FLAG, flag);
 		}
-		catch(final NumberFormatException e){
-			throw new LinterException(BAD_FORMAT.format(new Object[]{flag}));
+		catch(final NumberFormatException nfe){
+			throw new LinterException(nfe, BAD_FORMAT, flag);
 		}
 	}
 
@@ -108,11 +106,12 @@ final class NumericalParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final String compoundRule){
+	private static void checkCompoundValidity(final String[] parts, final String compoundRule){
 		for(final String part : parts){
-			final boolean isNumber = (part.length() != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+			final boolean isNumber = (part.length() != 1
+				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(isNumber && !NumberUtils.isCreatable(part))
-				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE, compoundRule);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,29 +24,32 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import io.github.mtrevisan.hunlinter.services.text.HammingDistance;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
-import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
-import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -59,7 +62,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -93,11 +95,11 @@ public class MinimalPairsWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(language);
-		Objects.requireNonNull(dicParser);
-		Objects.requireNonNull(checker);
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(outputFile);
+		Objects.requireNonNull(language, "Language cannot be null");
+		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
+		Objects.requireNonNull(checker, "Checker cannot be null");
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(outputFile, "Output file cannot be null");
 
 
 		this.dicParser = dicParser;
@@ -137,49 +139,50 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	}
 
 	private List<String> extractWords(){
-		final List<String> list = new ArrayList<>();
+		final List<String> list = new ArrayList<>(0);
 
 		final Charset charset = dicParser.getCharset();
 		final File dicFile = dicParser.getDicFile();
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-				LoopHelper.applyIf(inflections,
-					checker::shouldBeProcessedForMinimalPair,
-					inflection -> list.add(inflection.getWord()));
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				for(int i = 0; i < inflections.size(); i ++){
+					final Inflection inflection = inflections.get(i);
+					if(checker.shouldBeProcessedForMinimalPair(inflection))
+						list.add(inflection.getWord());
+				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+		final ProgressCallback progressCallback = lineIndex -> {
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 		list.sort(BaseBuilder.COMPARATOR_LENGTH.thenComparing(comparator));
 		return list;
 	}
 
-	private void writeSupportFile(final File file, final Iterable<String> list){
+	private void writeSupportFile(final File file, final List<String> list){
 		final Charset charset = dicParser.getCharset();
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset))){
-			LoopHelper.forEach(list, line -> writeLine(writer, line, NEW_LINE));
+			for(int i = 0; i < list.size(); i ++)
+				writeLine(writer, list.get(i), NEW_LINE);
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
+			throw new WriterException(ioe);
 		}
 	}
 
 	private Map<String, List<String>> extractMinimalPairs(final File outputFile){
 		final Charset charset = dicParser.getCharset();
 		int totalPairs = 0;
-		final Map<String, List<String>> minimalPairs = new HashMap<>();
+		final Map<String, List<String>> minimalPairs = new HashMap<>(0);
 		try(final BufferedReader sourceBR = Files.newBufferedReader(outputFile.toPath(), dicParser.getCharset())){
 			String sourceLine;
 			long readSoFarSource = 0;
@@ -216,20 +219,19 @@ public class MinimalPairsWorker extends WorkerDictionary{
 						}
 					}
 				}
-				catch(final Exception ignored){
-					//FIXME
-					//length varied, consider another line for minimal pair search
+				catch(final IOException ignored){
+					//FIXME length varied, consider another line for minimal pair search
 				}
 
 				sourceBR.reset();
 
-				setProgress(readSoFarSource, totalSizeSource);
+				setWorkerProgress(readSoFarSource, totalSizeSource);
 			}
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total minimal pairs: {}", DictionaryParser.COUNTER_FORMATTER.format(totalPairs));
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
 		}
 		return minimalPairs;
 	}
@@ -247,13 +249,13 @@ public class MinimalPairsWorker extends WorkerDictionary{
 				destinationWriter.write(key + ": " + StringUtils.join(values, ", "));
 				destinationWriter.newLine();
 
-				setProgress(index ++, size);
+				setWorkerProgress(index ++, size);
 
 				sleepOnPause();
 			}
 		}
-		catch(final Exception e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
 		}
 	}
 

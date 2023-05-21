@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -36,7 +36,7 @@ public interface FileListener{
 	/**
 	 * Notifies the implementation of <em>this</em> interface that {@code dirPath}
 	 * should be monitored for file system events. If the changed file matches any
-	 * of the {@code globPatterns}, <code>listener</code> should be notified.
+	 * of the {@code globPatterns}, {@code listener} should be notified.
 	 *
 	 * @param listener	The listener.
 	 * @param patterns	Zero or more file patterns to be matched against file names.
@@ -44,7 +44,7 @@ public interface FileListener{
 	 */
 	void register(FileChangeListener listener, String... patterns);
 
-	/** Removes all listeners */
+	/** Removes all listeners. */
 	void unregisterAll();
 
 }

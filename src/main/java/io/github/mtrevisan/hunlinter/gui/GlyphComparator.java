@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
 
 
 public final class GlyphComparator{
@@ -37,12 +40,12 @@ public final class GlyphComparator{
 	 * Perform glyph comparison, returning a list of matching codepoint tuples.
 	 * Stops prematurely (or never starts) if run == false.
 	 *
-	 * @param font	The font to render the character in
-	 * @param maxDifferenceThreshold	Maximum allowed difference
-	 * @param chrs	Characters to be check for equality
+	 * @param font	The font to render the character in.
+	 * @param maxDifferenceThreshold	Maximum allowed difference.
+	 * @param chrs	Characters to be checked for equality.
 	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
-	public static boolean someIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
+	public static boolean haveIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
 		final BufferedImage[] glyphs = new BufferedImage[chrs.length];
 		glyphs[0] = renderImage(font, chrs[0]);
 		for(int i = 0; i < chrs.length - 1; i ++)
@@ -74,7 +77,7 @@ public final class GlyphComparator{
 		return img;
 	}
 
-	private static float visualSimilarity(final BufferedImage img1, final BufferedImage img2){
+	private static float visualSimilarity(final RenderedImage img1, final RenderedImage img2){
 		final DataBuffer data1 = img1.getData().getDataBuffer();
 		final DataBuffer data2 = img2.getData().getDataBuffer();
 		final int size = data1.getSize();

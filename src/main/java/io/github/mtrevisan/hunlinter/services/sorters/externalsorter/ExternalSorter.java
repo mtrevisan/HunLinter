@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,16 +43,16 @@ import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * @see <a href="https://github.com/Dgleish/ExternalSort/blob/master/src/uk/ac/cam/amd96/fjava/tick0/ExternalSort.java">DGleish External Sort</a>
  * @see <a href="https://github.com/lemire/externalsortinginjava">External-Memory Sorting in Java</a>, version 0.4.4, 11/3/2020
  */
-public class ExternalSorter{
+public final class ExternalSorter{
 
-	public void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
+	private ExternalSorter(){}
+
+	public static void sort(final File inputFile, final ExternalSorterOptions options, final File outputFile) throws IOException{
 		final List<File> files = splitAndSortFiles(inputFile, options);
 
 		if(!files.isEmpty())
@@ -64,12 +64,13 @@ public class ExternalSorter{
 	 * and write the result to temporary files that have to be
 	 * merged later.
 	 *
-	 * @param file	Some flat file
-	 * @param options	Sorting options
-	 * @return a list of temporary flat files
-	 * @throws IOException generic IO exception
+	 * @param file	Some flat file.
+	 * @param options	Sorting options.
+	 * @return	A list of temporary flat files.
+	 * @throws IOException	Generic IO exception.
 	 */
-	private List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	private static List<File> splitAndSortFiles(final File file, final ExternalSorterOptions options) throws IOException{
 		//extract uncompressed file size
 		final long dataLength = FileHelper.getFileSize(file);
 		final long availableMemory = JavaHelper.estimateAvailableMemory();
@@ -77,7 +78,7 @@ public class ExternalSorter{
 
 		final List<File> files = new ArrayList<>((int)Math.ceil((double)dataLength / blockSize));
 		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize())){
-			final StringList temporaryList = new StringList(5_000_000);
+			final StringArrayList temporaryList = new StringArrayList(5_000_000);
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;
@@ -92,7 +93,7 @@ public class ExternalSorter{
 				//sort list
 				final Comparator<String> comparator = options.getComparator();
 				if(options.isSortInParallel())
-					temporaryList.sortParallel(comparator);
+					temporaryList.parallelSort(comparator);
 				else
 					temporaryList.sort(comparator);
 
@@ -100,11 +101,7 @@ public class ExternalSorter{
 				final File chunkFile = FileHelper.createDeleteOnExitFile("hunlinter-pos-chunk", ".dat");
 				OutputStream out = new FileOutputStream(chunkFile);
 				if(options.isUseTemporaryAsZip())
-					out = new GZIPOutputStream(out, options.getZipBufferSize()){
-						{
-							def.setLevel(Deflater.BEST_SPEED);
-						}
-					};
+					out = new MyGZIPOutputStream(out, options);
 				saveChunk(temporaryList, options, out);
 
 				//add chunk to list of chunks
@@ -127,7 +124,7 @@ public class ExternalSorter{
 	 * @param maxMemory Maximum memory to use (in bytes)
 	 * @return the estimate [B]
 	 */
-	private long estimateBestSizeOfBlocks(final long sizeOfFile, final ExternalSorterOptions options, final long maxMemory){
+	private static long estimateBestSizeOfBlocks(final long sizeOfFile, final ExternalSorterOptions options, final long maxMemory){
 		//we don't want to open up much more than maxTemporaryFiles temporary files, better run out of memory first
 		final long maxTemporaryFiles = options.getMaxTemporaryFiles();
 		long blockSize = sizeOfFile / maxTemporaryFiles + (sizeOfFile % maxTemporaryFiles == 0l? 0l: 1l);
@@ -152,12 +149,13 @@ public class ExternalSorter{
 	 * @param out	The output stream
 	 * @throws IOException generic IO exception
 	 */
-	private void saveChunk(final Iterable<String> sortedLines, final ExternalSorterOptions options, final OutputStream out)
+	private static void saveChunk(final StringArrayList sortedLines, final ExternalSorterOptions options, final OutputStream out)
 			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
 			String lastLine = null;
-			for(final String line : sortedLines)
+			for(int i = 0; i < sortedLines.size(); i ++){
+				final String line = sortedLines.get(i);
 				//skip duplicated lines
 				if(!removeDuplicates || !line.equals(lastLine)){
 					writer.write(line);
@@ -165,6 +163,7 @@ public class ExternalSorter{
 
 					lastLine = line;
 				}
+			}
 		}
 	}
 
@@ -176,7 +175,8 @@ public class ExternalSorter{
 	 * @param outputFile The output {@link File} to merge the results to
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	private static void mergeSortedFiles(final Collection<File> files, final ExternalSorterOptions options, final File outputFile)
 			throws IOException{
 		final Comparator<String> comparator = options.getComparator();
 		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),
@@ -196,7 +196,8 @@ public class ExternalSorter{
 		if(options.isWriteOutputAsZip())
 			out = new MyGZIPOutputStream(out, options);
 		mergeSortedFiles(out, options, queue);
-		forEach(files, File::delete);
+		for(final File file : files)
+			file.delete();
 	}
 
 	/**
@@ -207,8 +208,8 @@ public class ExternalSorter{
 	 * @param queue	Where the data should be read
 	 * @throws IOException generic IO exception
 	 */
-	private void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options,
-			final Queue<BinaryFileBuffer> queue) throws IOException{
+	private static void mergeSortedFiles(final OutputStream out, final ExternalSorterOptions options, final Queue<BinaryFileBuffer> queue)
+			throws IOException{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			mergeSort(queue, options.isRemoveDuplicates(), writer, options.getLineSeparator());
 		}
@@ -218,7 +219,7 @@ public class ExternalSorter{
 		}
 	}
 
-	private void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer,
+	private static void mergeSort(final Queue<BinaryFileBuffer> queue, final boolean removeDuplicates, final BufferedWriter writer,
 			final String lineSeparator) throws IOException{
 		String lastLine = null;
 		while(!queue.isEmpty()){
@@ -240,10 +241,12 @@ public class ExternalSorter{
 		}
 	}
 
-	private static class MyGZIPOutputStream extends GZIPOutputStream{
-		public MyGZIPOutputStream(OutputStream out, ExternalSorterOptions options) throws IOException{
+	private static final class MyGZIPOutputStream extends GZIPOutputStream{
+		private MyGZIPOutputStream(final OutputStream out, final ExternalSorterOptions options) throws IOException{
 			super(out, options.getZipBufferSize());
+
 			def.setLevel(Deflater.BEST_SPEED);
 		}
 	}
+
 }

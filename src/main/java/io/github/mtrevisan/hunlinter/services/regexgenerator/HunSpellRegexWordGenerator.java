@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,12 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.services.regexgenerator;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 import io.github.mtrevisan.hunlinter.services.log.ShortPrefixNotNullToStringStyle;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -49,37 +47,25 @@ import java.util.Queue;
  */
 public class HunSpellRegexWordGenerator{
 
-	private static class GeneratedElement{
-		private final List<String> word;
-		private final int stateIndex;
-
-		GeneratedElement(final List<String> word, final int stateIndex){
-			this.word = word;
-			this.stateIndex = stateIndex;
-		}
+	private record GeneratedElement(List<String> word, int stateIndex){
 
 		@Override
 		public boolean equals(final Object obj){
-			if(obj == this)
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			final GeneratedElement rhs = (GeneratedElement)obj;
-			return new EqualsBuilder()
-				.append(word, rhs.word)
-				.append(stateIndex, rhs.stateIndex)
-				.isEquals();
+			return (stateIndex == rhs.stateIndex && word.equals(rhs.word));
 		}
 
 		@Override
 		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(word)
-				.append(stateIndex)
-				.toHashCode();
+			int result = (word == null? 0: word.hashCode());
+			result = 31 * result + Integer.hashCode(stateIndex);
+			return result;
 		}
-
 	}
 
 
@@ -90,9 +76,9 @@ public class HunSpellRegexWordGenerator{
 	/**
 	 * Initializes the NFA from the specified regular expression.
 	 * <p>
-	 * NOTE: each element should be enclosed in parentheses (eg. {@code (as)(ert)?(b)*}), the managed operations are <code>*</code> and <code>?</code>
+	 * NOTE: each element should be enclosed in parentheses (e.g. {@code (as)(ert)?(b)*}), the managed operations are {@code *} and {@code ?}
 	 *
-	 * @param regexpParts	The regular expression already subdivided into input and modifiers (eg. ["ag", "ert", "?", "b", "*"])
+	 * @param regexpParts	The regular expression already subdivided into input and modifiers (e.g. ["ag", "ert", "?", "b", "*"])
 	 */
 	public HunSpellRegexWordGenerator(final String[] regexpParts){
 		int offset = 0;
@@ -134,7 +120,7 @@ public class HunSpellRegexWordGenerator{
 	 * @param limit	The maximum size of the list
 	 * @return	The list of words that matcher the given regex
 	 */
-	public List<List<String>> generateAll(final int minimumSubwords, final int limit){
+	public final List<List<String>> generateAll(final int minimumSubwords, final int limit){
 		final List<List<String>> matchedWords = new ArrayList<>(limit);
 
 		final Queue<GeneratedElement> queue = new LinkedList<>();
@@ -146,10 +132,10 @@ public class HunSpellRegexWordGenerator{
 
 			//final state not reached, add transitions
 			if(stateIndex < finalStateIndex){
-				final Iterable<Pair<Integer, String>> transitions = graph.adjacentVertices(stateIndex);
-				for(final Pair<Integer, String> transition : transitions){
-					final int key = transition.getKey();
-					final String value = transition.getValue();
+				final Iterable<IndexDataPair<String>> transitions = graph.adjacentVertices(stateIndex);
+				for(final IndexDataPair<String> transition : transitions){
+					final int key = transition.getIndex();
+					final String value = transition.getData();
 
 					List<String> nextWord = subword;
 					if(StringUtils.isNotBlank(value)){
@@ -173,7 +159,7 @@ public class HunSpellRegexWordGenerator{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
 			.append("graph", graph)
 			.append("finalStateIndex", finalStateIndex)

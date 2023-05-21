@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services.system;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -37,20 +34,20 @@ import java.util.concurrent.TimeUnit;
 public class Debouncer<T>{
 
 	private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-	private final ConcurrentHashMap<T, TimerTask> delayedMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<T, TimerTask> delayedMap = new ConcurrentHashMap<>(0);
 
 	private final Runnable callback;
 	private final int interval;
 
 
 	public Debouncer(final Runnable callback, final int interval){
-		Objects.requireNonNull(callback);
+		Objects.requireNonNull(callback, "Callback cannot be null");
 
 		this.callback = callback;
 		this.interval = interval;
 	}
 
-	public void call(final T key){
+	public final void call(final T key){
 		final TimerTask task = new TimerTask(key);
 
 		TimerTask prev;
@@ -62,7 +59,7 @@ public class Debouncer<T>{
 		}while(prev != null && !prev.extend());
 	}
 
-	public void terminate(){
+	public final void terminate(){
 		executorService.shutdownNow();
 	}
 
@@ -111,27 +108,23 @@ public class Debouncer<T>{
 			}
 		}
 
-
 		@Override
 		public boolean equals(final Object obj){
-			if(obj == this)
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			@SuppressWarnings("unchecked")
 			final TimerTask rhs = (TimerTask)obj;
-			return new EqualsBuilder()
-				.append(key, rhs.key)
-				.isEquals();
+			return key.equals(rhs.key);
 		}
 
 		@Override
 		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(key)
-				.toHashCode();
+			return key.hashCode();
 		}
+
 	}
 
 }

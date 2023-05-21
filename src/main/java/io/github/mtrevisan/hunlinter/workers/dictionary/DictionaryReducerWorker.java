@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,13 +25,14 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -55,10 +56,11 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(affixData);
+		Objects.requireNonNull(affixData, "Affix data cannot be null");
+		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(indexData.getData(), affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 
 //TODO
 //			for(final Inflection inflection : inflections){
@@ -74,7 +76,8 @@ public class DictionaryReducerWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 

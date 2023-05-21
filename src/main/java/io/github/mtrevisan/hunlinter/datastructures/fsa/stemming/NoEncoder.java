@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,17 +33,17 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 public class NoEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		return target;
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		return encoded;
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

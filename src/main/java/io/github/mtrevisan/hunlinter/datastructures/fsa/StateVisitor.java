@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,7 +28,7 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa;
 /**
  * State visitor.
  *
- * @see FSA#visitPostOrder(StateVisitor)
+ * @see FSAAbstract#visitPostOrder(StateVisitor)
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public interface StateVisitor{

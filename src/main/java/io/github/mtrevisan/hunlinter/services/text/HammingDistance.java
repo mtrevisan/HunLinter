@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.services.text;
 
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterIllegalArgumentException;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
  */
 public final class HammingDistance{
 
-	private static final MessageFormat DIFFERENT_LENGTHS = new MessageFormat("Strings `{0}` and `{1}` must have the same length");
+	private static final String DIFFERENT_LENGTHS = "Strings `{}` and `{}` must have the same length";
 
 
 	private HammingDistance(){}
@@ -66,10 +66,10 @@ public final class HammingDistance{
 	 * @throws IllegalArgumentException	if either input is {@code null} or if they do not have the same length
 	 */
 	public static int getDistance(final CharSequence left, final CharSequence right){
-		Objects.requireNonNull(left);
-		Objects.requireNonNull(right);
+		Objects.requireNonNull(left, "Left cannot be null");
+		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
-			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
+			throw new LinterIllegalArgumentException(DIFFERENT_LENGTHS, left, right);
 
 		return (int)IntStream.range(0, left.length())
 			.filter(idx -> left.charAt(idx) != right.charAt(idx))
@@ -81,10 +81,10 @@ public final class HammingDistance{
 	}
 
 	public static Pair<Character, Character> findFirstDifference(final CharSequence left, final CharSequence right, final int offset){
-		Objects.requireNonNull(left);
-		Objects.requireNonNull(right);
+		Objects.requireNonNull(left, "Left cannot be null");
+		Objects.requireNonNull(right, "Right cannot be null");
 		if(left.length() != right.length())
-			throw new IllegalArgumentException(DIFFERENT_LENGTHS.format(new Object[]{left, right}));
+			throw new LinterIllegalArgumentException(DIFFERENT_LENGTHS, left, right);
 
 		boolean found = false;
 		char chrLeft = 0;

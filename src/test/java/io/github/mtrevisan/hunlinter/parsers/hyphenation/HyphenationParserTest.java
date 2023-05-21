@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,13 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
+import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
+import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrieBuilder;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,7 +55,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 2");
 		optParser.parseLine("RIGHTHYPHENMIN 0");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
@@ -72,7 +72,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 0");
 		optParser.parseLine("RIGHTHYPHENMIN 2");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
@@ -89,7 +89,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 0");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "a", "bc");
@@ -106,7 +106,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 0");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "ab", "c");
@@ -140,7 +140,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
@@ -157,7 +157,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
@@ -174,7 +174,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
@@ -192,7 +192,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "ab–cd", "ab–", "–cd");
@@ -210,7 +210,7 @@ class HyphenationParserTest{
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
 		optParser.parseLine("RIGHTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "kuko–fu", "ku", "ko–", "–fu");
@@ -278,7 +278,7 @@ class HyphenationParserTest{
 		custom1stLevel.put("abcd", "ab=cd");
 		custom.put(HyphenationParser.Level.NON_COMPOUND, custom1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, custom, optParser);
 
 		check(parser, "abcd", "ab", "cd");
@@ -293,13 +293,13 @@ class HyphenationParserTest{
 		Map<HyphenationParser.Level, AhoCorasickTrie<String>> allPatterns = new HashMap<>();
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate("abcd", "a=bcd", HyphenationParser.Level.NON_COMPOUND);
 
-		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(new String[]{"a", "bcd"}, hyphenation.getSyllabes().toArray(new String[0]));
 	}
 
 	@Test
@@ -313,14 +313,14 @@ class HyphenationParserTest{
 		allPatterns.put(HyphenationParser.Level.NON_COMPOUND, patterns1stLevel);
 		HyphenationOptionsParser optParser = new HyphenationOptionsParser();
 		optParser.parseLine("LEFTHYPHENMIN 1");
-		Comparator<String> comparator = BaseBuilder.getComparator("vec-IT");
+		Comparator<String> comparator = BaseBuilder.getComparator("vec");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
 		check(parser, "abc", "abc");
 	}
 
 
-	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt */
+	/** German pre-reform hyphenation: Schiffahrt -> Schiff-fahrt. */
 	@Test
 	void germanPreReform(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -340,7 +340,7 @@ class HyphenationParserTest{
 		check(parser, "teneriffa", "tenerif", "fa");
 	}
 
-	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny */
+	/** Hungarian simplified double 2-character consonants: ssz -> sz-sz, nny -> ny-ny. */
 	@Test
 	void hungarianSimplifiedDoubleConsonants(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -357,7 +357,7 @@ class HyphenationParserTest{
 		check(parser, "asszonnyal", "asz", "szony", "nyal");
 	}
 
-	/** Dutch: omaatje -> oma-tje */
+	/** Dutch: omaatje -> oma-tje. */
 	@Test
 	void dutch1(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -373,7 +373,7 @@ class HyphenationParserTest{
 		check(parser, "omaatje", "oma", "tje");
 	}
 
-	/** Dutch: omaatje -> oma-tje */
+	/** Dutch: omaatje -> oma-tje. */
 	@Test
 	void dutch2(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -635,7 +635,7 @@ class HyphenationParserTest{
 		check(parser, "=foobara'foobarb-foo_barc\u2019foobard=", "=foobara'foobarb-foo", "_", "barc\u2019foobard=");
 	}
 
-	/** Unicode ligature hyphenation (ffi -> f=fi) */
+	/** Unicode ligature hyphenation (ffi -> f=fi). */
 	@Test
 	void ligature(){
 		Map<String, String> hyphenations = new HashMap<>();
@@ -720,7 +720,7 @@ class HyphenationParserTest{
 		HyphenatorInterface hyphenator = new Hyphenator(parser, HyphenationParser.BREAK_CHARACTER);
 		Hyphenation hyphenation = hyphenator.hyphenate(word);
 
-		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes());
+		Assertions.assertArrayEquals(hyphs, hyphenation.getSyllabes().toArray(new String[0]));
 	}
 
 }

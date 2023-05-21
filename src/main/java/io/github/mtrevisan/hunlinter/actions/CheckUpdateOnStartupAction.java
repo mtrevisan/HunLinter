@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.prefs.Preferences;
@@ -45,14 +49,33 @@ public class CheckUpdateOnStartupAction extends AbstractAction{
 	public CheckUpdateOnStartupAction(final Preferences preferences){
 		super("system.checkUpdateOnStartup");
 
-		Objects.requireNonNull(preferences);
+		Objects.requireNonNull(preferences, "Preferences cannot be null");
 
 		this.preferences = preferences;
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		preferences.putBoolean(UPDATE_STARTUP_CHECK, ((AbstractButton)event.getSource()).isSelected());
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

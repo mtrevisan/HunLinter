@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,16 +27,20 @@ package io.github.mtrevisan.hunlinter.gui.dialogs;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
+import javax.swing.JFormattedTextField;
+import javax.swing.JList;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.NumberFormatter;
 import javax.swing.text.Position;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -57,15 +61,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	@Serial
 	private static final long serialVersionUID = -4686780467476615109L;
 
-	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 15);
+	public static final Font DEFAULT_FONT = new Font("Monospaced", Font.PLAIN, 14);
 
 
-	private static class ListSearchTextFieldDocumentHandler implements DocumentListener{
-		private final JList<String> targetList;
-
-		ListSearchTextFieldDocumentHandler(final JList<String> targetList){
-			this.targetList = targetList;
-		}
+	private record ListSearchTextFieldDocumentHandler(JList<String> targetList) implements DocumentListener{
 
 		@Override
 		public void insertUpdate(final DocumentEvent e){
@@ -112,9 +111,9 @@ public class FontChooserDialog extends javax.swing.JDialog{
 	public FontChooserDialog(final Supplier<String> sampleExtractor, final Consumer<Font> onSelection, final Frame parent){
 		super(parent, "Font chooser", true);
 
-		Objects.requireNonNull(sampleExtractor);
-		Objects.requireNonNull(onSelection);
-		Objects.requireNonNull(parent);
+		Objects.requireNonNull(sampleExtractor, "Sample extractor cannot be null");
+		Objects.requireNonNull(onSelection, "On selection cannot be null");
+		Objects.requireNonNull(parent, "Parent cannot be null");
 
 		sampleText = sampleExtractor.get();
 		FontHelper.extractFonts(sampleText);
@@ -139,10 +138,10 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
       familyNameLabel = new javax.swing.JLabel();
       familyNameTextField = new javax.swing.JTextField();
-      familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       final DefaultListModel<String> model = new DefaultListModel<>();
       model.addAll(FontHelper.getFamilyNamesAll());
       familyNameList = new javax.swing.JList<>(model);
+      familyNameScrollPane = new javax.swing.JScrollPane(familyNameList);
       monospacedCheckBox = new javax.swing.JCheckBox();
       sampleLabel = new javax.swing.JLabel();
       sampleScrollPane = new javax.swing.JScrollPane();
@@ -165,7 +164,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameLabel.setText("Family name:");
 
       familyNameTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             familyNameTextFieldKeyReleased(evt);
          }
       });
@@ -176,19 +175,11 @@ public class FontChooserDialog extends javax.swing.JDialog{
       familyNameScrollPane.setViewportBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
       familyNameList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      familyNameList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-         public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-            familyNameListValueChanged(evt);
-         }
-      });
+      familyNameList.addListSelectionListener(this::familyNameListValueChanged);
       familyNameScrollPane.setViewportView(familyNameList);
 
       monospacedCheckBox.setText("Show monospaced fonts only");
-      monospacedCheckBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            monospacedCheckBoxActionPerformed(evt);
-         }
-      });
+      monospacedCheckBox.addActionListener(this::monospacedCheckBoxActionPerformed);
 
       sampleLabel.setText("Sample:");
 
@@ -204,28 +195,20 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
       okButton.setText("OK");
       okButton.setPreferredSize(new java.awt.Dimension(65, 23));
-      okButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            okButtonActionPerformed(evt);
-         }
-      });
+      okButton.addActionListener(this::okButtonActionPerformed);
 
       cancelButton.setText("Cancel");
-      cancelButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cancelButtonActionPerformed(evt);
-         }
-      });
+      cancelButton.addActionListener(this::cancelButtonActionPerformed);
 
       sizeLabel.setText("Size:");
 
       sizeTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             sizeTextFieldKeyReleased(evt);
          }
       });
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -281,7 +264,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void familyNameTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_familyNameTextFieldKeyReleased
+	private void familyNameTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_familyNameTextFieldKeyReleased
 		int index = familyNameList.getSelectedIndex();
 		switch(evt.getKeyCode()){
 			case KeyEvent.VK_UP -> {
@@ -296,12 +279,12 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		}
 	}//GEN-LAST:event_familyNameTextFieldKeyReleased
 
-	private void familyNameListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
-		if(createSelectedFont())
+	private void familyNameListValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_familyNameListValueChanged
+		if(storeSelectedFont())
 			setSelectedFont();
 	}//GEN-LAST:event_familyNameListValueChanged
 
-	private void monospacedCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
+	private void monospacedCheckBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_monospacedCheckBoxActionPerformed
 		final List<String> fonts = (monospacedCheckBox.isSelected()
 			? FontHelper.getFamilyNamesMonospaced()
 			: FontHelper.getFamilyNamesAll());
@@ -313,17 +296,17 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		setSelectedFont();
 	}//GEN-LAST:event_monospacedCheckBoxActionPerformed
 
-   private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+   private void okButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
 		onSelection.accept(selectedFont);
 
 		dispose();
    }//GEN-LAST:event_okButtonActionPerformed
 
-   private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+   private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
 		dispose();
    }//GEN-LAST:event_cancelButtonActionPerformed
 
-   private void sizeTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
+   private void sizeTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sizeTextFieldKeyReleased
 		final int code = evt.getKeyCode();
 		if(code == KeyEvent.VK_UP){
 			final int fontSize = Integer.parseInt(sizeTextField.getText()) + 1;
@@ -347,8 +330,8 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		return DEFAULT_FONT;
 	}
 
-	/** Create a new Font object to return as the selected font */
-	private boolean createSelectedFont(){
+	/** Create a new Font object to return as the selected font. */
+	private boolean storeSelectedFont(){
 		final int familyNameIndex = familyNameList.getSelectedIndex();
 		if(familyNameIndex >= 0){
 			final String fontFamily = familyNameList.getSelectedValue();
@@ -362,7 +345,7 @@ public class FontChooserDialog extends javax.swing.JDialog{
 		return fontChanged;
 	}
 
-	/** Set the controls to display the initial font */
+	/** Set the controls to display the initial font. */
 	private void setSelectedFont(){
 		setSelectedFontFamily();
 		setSampleFont();
@@ -391,13 +374,13 @@ public class FontChooserDialog extends javax.swing.JDialog{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -73,7 +73,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", "ab"};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was `ab`", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: `ab`", exception.getMessage());
 	}
 
 	@Test
@@ -91,7 +91,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", ""};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was ``", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: ``", exception.getMessage());
 	}
 
 	@Test
@@ -100,7 +100,7 @@ class ASCIIParsingStrategyTest{
 			String[] flags = new String[]{"a", null};
 			strategy.joinFlags(flags);
 		});
-		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: was `null`", exception.getMessage());
+		Assertions.assertEquals("Flag should be of length one and in US-ASCII encoding: `null`", exception.getMessage());
 	}
 
 	@Test

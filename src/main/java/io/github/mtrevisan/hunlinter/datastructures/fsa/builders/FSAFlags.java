@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,11 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 
 /**
- * FSA automaton flags. Where applicable, flags follow Daciuk's <code>fsa</code> package.
+ * FSA automaton flags. Where applicable, flags follow Daciuk's {@code fsa} package.
  *
  * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
@@ -50,7 +50,7 @@ public enum FSAFlags{
 	/**
 	 * The FSA contains right-language count numbers on states.
 	 *
-	 * @see FSA#getRightLanguageCount(int)
+	 * @see FSAAbstract#getRightLanguageCount(int)
 	 */
 	NUMBERS(0x0100),
 
@@ -72,7 +72,7 @@ public enum FSAFlags{
 
 	/**
 	 * @param flags The bitset with flags.
-	 * @return Returns <code>true</code> iff this flag is set in <code>flags</code>.
+	 * @return Returns {@code true} iff this flag is set in {@code flags}.
 	 */
 	public boolean isSet(final int flags){
 		return ((flags & bits) != 0);
@@ -80,7 +80,7 @@ public enum FSAFlags{
 
 	/**
 	 * @param flags A set of flags to encode.
-	 * @return Returns the set of flags encoded as packed <code>short</code>.
+	 * @return Returns the set of flags encoded as packed {@code short}.
 	 */
 	public static short getMask(final Iterable<FSAFlags> flags){
 		short value = 0;

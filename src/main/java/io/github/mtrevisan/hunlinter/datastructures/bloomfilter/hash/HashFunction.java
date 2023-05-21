@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -44,7 +44,7 @@ public interface HashFunction{
 	 * @param bytes	The bytes to be hashed
 	 * @return the generated hash value
 	 */
-	long hash(final byte[] bytes);
+	int hash(final byte[] bytes);
 
 	/**
 	 * Return the hash of the bytes as a long array.

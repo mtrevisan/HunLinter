@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.aid;
 
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +40,10 @@ import java.util.Scanner;
 
 public class AidParser{
 
-	private final List<String> lines = new ArrayList<>();
+	private static final Logger LOGGER = LoggerFactory.getLogger(AidParser.class);
+
+
+	private final List<String> lines = new ArrayList<>(0);
 
 
 	/**
@@ -46,12 +52,16 @@ public class AidParser{
 	 * @param aidFile	The content of the dictionary file
 	 * @throws IOException	If an I/O error occurs
 	 */
-	public void parse(final File aidFile) throws IOException{
+	public final void parse(final File aidFile) throws IOException{
 		lines.clear();
 
-		final Path path = aidFile.toPath();
-		final Charset charset = FileHelper.determineCharset(path);
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
+		final Path aidPath = aidFile.toPath();
+		final Charset charset = FileHelper.determineCharset(aidPath, -1);
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the aid file is {}", charset.name());
+		try(final Scanner scanner = FileHelper.createScanner(aidPath, charset)){
+			//skip charset
+			scanner.nextLine();
+
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				if(!line.isEmpty())
@@ -60,11 +70,11 @@ public class AidParser{
 		}
 	}
 
-	public void clear(){
+	public final void clear(){
 		lines.clear();
 	}
 
-	public List<String> getLines(){
+	public final List<String> getLines(){
 		return lines;
 	}
 

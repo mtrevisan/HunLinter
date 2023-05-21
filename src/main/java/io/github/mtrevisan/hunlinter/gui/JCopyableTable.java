@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import javax.swing.*;
+import javax.swing.JTable;
 import java.io.Serial;
 
 
@@ -34,6 +34,7 @@ public class JCopyableTable extends JTable{
 	private static final long serialVersionUID = -5693323480525777411L;
 
 
+	@SuppressWarnings("DesignForExtension")
 	public String getValueAtRow(final int row){
 		return null;
 	}

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,21 +24,31 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.LanguageChooserDialog;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LanguageNotChosenException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
 import java.util.List;
@@ -51,6 +61,8 @@ public class ProjectLoaderAction extends AbstractAction{
 
 	@Serial
 	private static final long serialVersionUID = 2457698626251961045L;
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectLoaderAction.class);
 
 
 	private final Path projectPath;
@@ -82,15 +94,17 @@ public class ProjectLoaderAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
+
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Opening project at {}", projectPath);
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createProjectLoaderWorker(worker -> {
 			try{
 				packager.reload(projectPath);
 
-				final List<String> availableLanguages = packager.getAvailableLanguages();
+				final List<String> availableLanguages = packager.getLanguages();
 				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
 				if(availableLanguages.size() > 1){
 					//choose between available languages
@@ -100,13 +114,13 @@ public class ProjectLoaderAction extends AbstractAction{
 					dialog.setLocationRelativeTo(parentFrame);
 					dialog.setVisible(true);
 
-					if(!dialog.languageChosen())
+					if(!dialog.isLanguageChosen())
 						throw new LanguageNotChosenException("Language not chosen loading " + projectPath);
 				}
 				//load appropriate files based on current language
 				packager.extractConfigurationFolders(language.get());
 
-				parentFrame.setTitle(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " : " + packager.getLanguage());
+				parentFrame.setTitle(DownloaderHelper.ARTIFACT_ID + " : " + packager.getLanguage());
 
 				//choose one font (in case of reading errors)
 				final String sampleText = packager.getSampleText();
@@ -120,9 +134,28 @@ public class ProjectLoaderAction extends AbstractAction{
 			catch(final IOException | SAXException | ProjectNotFoundException | LanguageNotChosenException e){
 				worker.cancel();
 
-				throw new RuntimeException(e);
+				throw new WorkerException(e);
 			}
 		}, completed, cancelled);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

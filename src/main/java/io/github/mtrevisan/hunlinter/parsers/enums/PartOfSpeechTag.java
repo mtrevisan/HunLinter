@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,17 +43,9 @@ public enum PartOfSpeechTag{
 	ARTICLE_PARTITIVE("article_partitive", "AT"),
 
 	//adjective
-//FIXME to be replaced
-ADJECTIVE("adjective", "JJ"),
-ADJECTIVE_QUALIFICATIVE("adjective_qualificative", "JQ"),
-//	ADJECTIVE_QUALIFICATIVE_PRIMITIVE("adjective_primitive", "JP"),
-//	ADJECTIVE_QUALIFICATIVE_DERIVED("adjective_derived", "JD"),
-//	ADJECTIVE_QUALIFICATIVE_ALTERED("adjective_altered", "JA"),
-//	ADJECTIVE_QUALIFICATIVE_COMPOUNDED("adjective_compounded", "JC"),
+	ADJECTIVE_QUALIFICATIVE("adjective_qualificative", "JQ"),
 	ADJECTIVE_DETERMINATIVE_POSSESSIVE_STRONG("adjective_possessive_strong", "JPS"),
 	ADJECTIVE_DETERMINATIVE_POSSESSIVE_WEAK("adjective_possessive_weak", "JPW"),
-//FIXME to be replaced
-ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_NEAR("adjective_demonstrative_near", "JDN"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_FAR("adjective_demonstrative_far", "JDF"),
 	ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE_WEAK("adjective_demonstrative_far_weak", "JDFW"),
@@ -117,10 +110,13 @@ ADJECTIVE_DETERMINATIVE_DEMONSTRATIVE("adjective_demonstrative", "JDEM"),
 	UNIT_OF_MEASURE("unit_of_measure", "UOM");
 
 
-	private static final Map<String, PartOfSpeechTag> VALUES = new HashMap<>();
+	private static final Map<String, PartOfSpeechTag> VALUES;
 	static{
-		for(final PartOfSpeechTag tag : EnumSet.allOf(PartOfSpeechTag.class))
-			VALUES.put(MorphologicalTag.PART_OF_SPEECH.getCode() + tag.code, tag);
+		final EnumSet<PartOfSpeechTag> tags = EnumSet.allOf(PartOfSpeechTag.class);
+		final Map<String, PartOfSpeechTag> map = new HashMap<>(tags.size());
+		for(final PartOfSpeechTag tag : tags)
+			map.put(MorphologicalTag.PART_OF_SPEECH.getCode() + tag.code, tag);
+		VALUES = Collections.unmodifiableMap(map);
 	}
 
 	private final String code;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.gui.models;
 
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,20 +39,16 @@ public class SortableListModel extends AbstractListModel<String>{
 	private static final long serialVersionUID = -2766941679426379241L;
 
 
-	private final ArrayList<String> delegate = new ArrayList<>();
+	private final ArrayList<String> delegate = new ArrayList<>(0);
 
-
-	public void ensureCapacity(final int capacity){
-		delegate.ensureCapacity(capacity);
-	}
 
 	/**
-	 * Adds all of the elements present in the collection to the list.
+	 * Adds all the elements present in the collection to the list.
 	 *
 	 * @param c	The collection which contains the elements to add
 	 * @throws NullPointerException	If {@code c} is {@code null}
 	 */
-	public void addAll(final Collection<? extends String> c){
+	public final void addAll(final Collection<String> c){
 		if(!c.isEmpty()){
 			final int startIndex = getSize();
 
@@ -60,11 +59,11 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	@Override
-	public String getElementAt(final int index){
+	public final String getElementAt(final int index){
 		return delegate.get(index);
 	}
 
-	public void replaceAll(final Collection<? extends String> c, final int startIndex){
+	public final void replaceAll(final Collection<String> c, final int startIndex){
 		if(!c.isEmpty()){
 			final int size = getSize();
 			if(startIndex >= size)
@@ -80,29 +79,42 @@ public class SortableListModel extends AbstractListModel<String>{
 	}
 
 	@Override
-	public int getSize(){
+	public final int getSize(){
 		return delegate.size();
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return delegate.isEmpty();
 	}
 
 	/**
-	 * Removes all of the elements from this list.
+	 * Removes all the elements from this list.
 	 * The list will be empty after this call returns (unless it throws an exception).
 	 */
-	public void clear(){
-		final int index1 = delegate.size() - 1;
+	public final void clear(){
+		final int index = delegate.size() - 1;
 		delegate.clear();
 
-		if(index1 >= 0)
-			fireIntervalRemoved(this, 0, index1);
+		if(index >= 0)
+			fireIntervalRemoved(this, 0, index);
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return delegate.toString();
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

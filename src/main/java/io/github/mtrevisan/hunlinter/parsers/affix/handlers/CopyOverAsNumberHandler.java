@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,24 +25,22 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.math.NumberUtils;
-import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
-
-import java.text.MessageFormat;
 
 
 public class CopyOverAsNumberHandler implements Handler{
 
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: The first parameter is not a number");
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: The first parameter is not a number";
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
 
-		affixData.addData(context.getRuleType(), Integer.parseInt(context.getAllButFirstParameter()));
+		affixData.addData(context.getRuleType(), Integer.valueOf(context.getAllButFirstParameter()));
 
 		return Integer.parseInt(context.getFirstParameter());
 	}

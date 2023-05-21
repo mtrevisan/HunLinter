@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -41,8 +41,8 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		super(workerData);
 	}
 
-	protected void processLines(final Consumer<CorrectionEntry> dataProcessor){
-		Objects.requireNonNull(dataProcessor);
+	protected final void processLines(final Consumer<CorrectionEntry> dataProcessor){
+		Objects.requireNonNull(dataProcessor, "Data processor cannot be null");
 
 		//load autocorrect
 		final List<CorrectionEntry> entries = loadAutoCorrect();
@@ -57,13 +57,14 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		try{
 			final AutoCorrectParser acoParser = workerData.getParser();
 			final List<CorrectionEntry> dictionary = acoParser.getCorrectionsDictionary();
-			for(final CorrectionEntry acoEntry : dictionary){
-				data = acoEntry;
+			for(int i = 0; i < dictionary.size(); i ++){
+				data = dictionary.get(i);
 				dataProcessor.accept(data);
 			}
 		}
-		catch(final Exception e){
-			manageException(new LinterException(e, data));
+		catch(final RuntimeException re){
+			manageException(new LinterException(re)
+				.withData(data));
 		}
 	}
 
@@ -91,15 +92,16 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 			try{
 				dataProcessor.accept(data);
 
-				setProgress(processingIndex.incrementAndGet(), totalEntries);
+				setWorkerProgress(processingIndex.incrementAndGet(), totalEntries);
 
 				sleepOnPause();
 			}
 			catch(final LinterException e){
 				throw e;
 			}
-			catch(final Exception e){
-				throw new LinterException(e, data);
+			catch(final RuntimeException re){
+				throw new LinterException(re)
+					.withData(data);
 			}
 		};
 	}

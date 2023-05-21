@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,9 +26,9 @@ package io.github.mtrevisan.hunlinter.gui.components;
 
 import io.github.mtrevisan.hunlinter.services.RecentItems;
 
-import javax.swing.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,8 +51,8 @@ public class RecentFilesMenu extends JMenu{
 
 
 	public RecentFilesMenu(final RecentItems recentItems, final Consumer<Path> onSelectFile){
-		Objects.requireNonNull(recentItems);
-		Objects.requireNonNull(onSelectFile);
+		Objects.requireNonNull(recentItems, "Recent items cannot be null");
+		Objects.requireNonNull(onSelectFile, "On select file cannot be null");
 
 		this.recentItems = recentItems;
 		this.onSelectFile = onSelectFile;
@@ -60,23 +60,23 @@ public class RecentFilesMenu extends JMenu{
 		addEntriesToMenu();
 	}
 
-	public void addEntry(final String filePath){
+	public final void addEntry(final String filePath){
 		recentItems.push(filePath);
 
 		addEntriesToMenu();
 	}
 
-	public void removeEntry(final String filePath){
+	public final void removeEntry(final String filePath){
 		recentItems.remove(filePath);
 
 		addEntriesToMenu();
 	}
 
-	public boolean hasEntries(){
+	public final boolean hasEntries(){
 		return (recentItems.size() > 0);
 	}
 
-	public void clear(){
+	public final void clear(){
 		//clear the existing items
 		removeAll();
 
@@ -108,13 +108,13 @@ public class RecentFilesMenu extends JMenu{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

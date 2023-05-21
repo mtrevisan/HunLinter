@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -22,36 +22,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
+package io.github.mtrevisan.hunlinter.workers.dictionary;
+
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 
 
-class Block<T>{
+@FunctionalInterface
+public interface InflectionReader{
 
-	final T[] data;
-	private int limit;
-
-
-	@SuppressWarnings("unchecked")
-	Block(final int capacity){
-		data = (T[])new Object[capacity];
-	}
-
-	int size(){
-		return limit;
-	}
-
-	boolean isFull(){
-		return (limit == data.length);
-	}
-
-	/** Increase the space allocated for storing elements */
-	void grow(){
-		limit ++;
-	}
-
-	/** Set the last element to null and decrease the space allocated for storing elements */
-	void shrink(){
-		data[-- limit] = null;
-	}
+	void accept(final Inflection inflection, final int index);
 
 }

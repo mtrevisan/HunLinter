@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,10 +29,11 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
  * A matching result returned from {@link FSATraversal}.
  *
  * @see FSATraversal
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public class FSAMatchResult{
 
-	/** The automaton has exactly one match for the input sequence */
+	/** The automaton has exactly one match for the input sequence. */
 	public static final int EXACT_MATCH = 0;
 
 	/**
@@ -69,9 +70,9 @@ public class FSAMatchResult{
 	 * @see #PREFIX_MATCH
 	 */
 	public int kind;
-	/** Input sequence's index, interpretation depends on {@link #kind} */
+	/** Input sequence's index, interpretation depends on {@link #kind}. */
 	public int index;
-	/** Automaton node, interpretation depends on the {@link #kind} */
+	/** Automaton node, interpretation depends on the {@link #kind}. */
 	public int node;
 
 

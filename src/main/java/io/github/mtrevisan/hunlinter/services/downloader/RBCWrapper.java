@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -48,12 +48,12 @@ class RBCWrapper implements ReadableByteChannel{
 	}
 
 	@Override
-	public boolean isOpen(){ return rbc.isOpen(); }
+	public final boolean isOpen(){ return rbc.isOpen(); }
 
 	@Override
-	public int read(final ByteBuffer bb) throws IOException{
+	public final int read(final ByteBuffer dst) throws IOException{
 		final int readBytes;
-		if((readBytes = rbc.read(bb)) > 0){
+		if((readBytes = rbc.read(dst)) > 0){
 			readSoFar += readBytes;
 
 			final double progress = (expectedSize > 0? readSoFar * 100. / expectedSize: -1.);
@@ -62,9 +62,9 @@ class RBCWrapper implements ReadableByteChannel{
 		return readBytes;
 	}
 
-	public long getReadSoFar(){ return readSoFar; }
+	public final long getReadSoFar(){ return readSoFar; }
 
 	@Override
-	public void close() throws IOException{ rbc.close(); }
+	public final void close() throws IOException{ rbc.close(); }
 
 }

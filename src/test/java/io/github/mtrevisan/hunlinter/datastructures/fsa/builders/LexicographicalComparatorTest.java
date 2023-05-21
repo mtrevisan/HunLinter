@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,10 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.builders;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSATestUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,7 +50,7 @@ class LexicographicalComparatorTest{
 		Assertions.assertEquals((byte)0xFF, input.get(2)[0]);
 
 		FSABuilder builder = new FSABuilder();
-		FSA fsa = builder.build(input);
+		FSAAbstract fsa = builder.build(input);
 
 		FSATestUtils.checkCorrect(input, fsa);
 
@@ -67,7 +67,7 @@ class LexicographicalComparatorTest{
 		List<byte[]> in = generateRandom(25_000, 1, 20, 0, 255);
 
 		FSABuilder builder = new FSABuilder();
-		FSA fsa = builder.build(in);
+		FSAAbstract fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
@@ -78,13 +78,13 @@ class LexicographicalComparatorTest{
 		List<byte[]> in = generateRandom(40, 1, 20, 0, 3);
 
 		FSABuilder builder = new FSABuilder();
-		FSA fsa = builder.build(in);
+		FSAAbstract fsa = builder.build(in);
 
 		FSATestUtils.checkCorrect(in, fsa);
 		FSATestUtils.checkMinimal(fsa);
 	}
 
-	/** Generate a sorted list of random sequences */
+	/** Generate a sorted list of random sequences. */
 	private List<byte[]> generateRandom(int count, int lengthMin, int lengthMax, int alphabetMin, int alphabetMax){
 		final List<byte[]> input = new ArrayList<>();
 		final Random rnd = new Random(System.currentTimeMillis());
@@ -94,7 +94,7 @@ class LexicographicalComparatorTest{
 		return input;
 	}
 
-	/** Generate a random string */
+	/** Generate a random string. */
 	private byte[] randomByteSequence(Random rnd, int lengthMin, int lengthMax, int alphabetMin, int alphabetMax){
 		byte[] bytes = new byte[lengthMin + rnd.nextInt(lengthMax - lengthMin + 1)];
 		for(int i = 0; i < bytes.length; i ++)

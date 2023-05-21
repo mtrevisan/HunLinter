@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,18 +24,20 @@
  */
 package io.github.mtrevisan.hunlinter.workers.core;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.system.TimeWatch;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
+import java.beans.PropertyChangeEvent;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -48,6 +50,10 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerAbstract.class);
 
+	public static final String PROPERTY_WORKER_CANCELLED = "worker-cancelled";
+
+
+	public final PropertyChangeEvent propertyChangeEventWorkerCancelled = new PropertyChangeEvent(this, PROPERTY_WORKER_CANCELLED, false, true);
 
 	protected final WD workerData;
 
@@ -76,84 +82,112 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		return workerData;
 	}
 
+	public final String getWorkerName(){
+		return workerData.getWorkerName();
+	}
+
 	@Override
+	@SuppressWarnings("DesignForExtension")
 	protected Void doInBackground(){
 		try{
 			processor.apply(null);
 		}
-		catch(final Exception e){
-			if(workerData.isCancelOnException())
-				cancel(e);
+		catch(final RuntimeException re){
+			if(workerData.isCancelOnException() && JavaHelper.isInterruptedException(re))
+				cancel(re);
+			else{
+				logExceptionError(re);
+
+				workerData.callCancelledCallback(re);
+			}
 		}
 		return null;
 	}
 
+	private static void logExceptionError(final Exception e){
+		final String errorMessage = ExceptionHelper.getMessageNoLineNumber(e);
+		LOGGER.error(ParserManager.MARKER_APPLICATION, errorMessage);
+	}
+
 	@SuppressWarnings("SameReturnValue")
-	protected Void prepareProcessing(final String message){
-		setProgress(0);
-		LOGGER.info(ParserManager.MARKER_APPLICATION, message);
+	protected final Void prepareProcessing(final String message){
+		setWorkerProgress(0);
+		if(message != null)
+			LOGGER.info(ParserManager.MARKER_APPLICATION, message);
 
 		watch.reset();
 		return null;
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected Void resetProcessing(final String message, final Object... params){
-		setProgress(0);
+	protected final Void resetProcessing(final String message, final Object... params){
+		setWorkerProgress(0);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, message, params);
 
 		return null;
 	}
 
-	protected void finalizeProcessing(final String message){
+	protected final void finalizeProcessing(final String message){
 		watch.stop();
 
-		System.gc();
-
-		setProgress(100);
+		setWorkerProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
-	public void executeSynchronously(){
+	public final void executeSynchronously(){
 		doInBackground();
 	}
 
 
-	protected void manageException(final LinterException e){
-		if(JavaHelper.isInterruptedException(e))
-			cancel(e);
-		else if(e.getData() != null){
-			final String errorMessage = ExceptionHelper.getMessage(e);
-			final IndexDataPair<?> data = e.getData();
+	protected final void manageException(final LinterException le){
+		if(JavaHelper.isInterruptedException(le))
+			cancel(le);
+		else if(le.getData() != null){
+			final String errorMessage = ExceptionHelper.getMessage(le);
+			final IndexDataPair<?> data = le.getData();
 			final int index = data.getIndex();
-			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
+			final String lineText = (index >= 0? ", line " + (index + 1): StringUtils.EMPTY);
 			LOGGER.trace("{}{}: {}", errorMessage, lineText, data.getData());
-			LOGGER.info(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), e.getMessage(),
+			LOGGER.error(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), le.getMessage(),
 				lineText, data.getData());
 		}
 		else
-			e.printStackTrace();
+			le.printStackTrace();
+	}
+
+	protected static void manageException(final LinterWarning lw){
+		if(lw.getData() != null){
+			final String warningMessage = ExceptionHelper.getMessage(lw);
+			final IndexDataPair<?> data = lw.getData();
+			final int index = data.getIndex();
+			final String lineText = (index >= 0? ", line " + (index + 1): StringUtils.EMPTY);
+			LOGGER.trace("{}{}: {}", warningMessage, lineText, data.getData());
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, (data.getData() != null? "{}{}: {}": "{}{}"), lw.getMessage(),
+				lineText, data.getData());
+		}
+		else
+			lw.printStackTrace();
 	}
 
 
-	protected void setProgress(final long index, final long total){
-		final int progress = calculateProgress(index, total);
+	protected final void setWorkerProgress(final long index, final long total){
+		final int progress = Math.min((int)Math.floor((index * 100.) / total), 100);
+		setWorkerProgress(progress);
+	}
+
+	protected final void setWorkerProgress(final int progress){
 		setProgress(Math.min(progress, 100));
 	}
 
-	private int calculateProgress(final long index, final long total){
-		return Math.min((int)Math.floor((index * 100.) / total), 100);
-	}
-
 	@Override
-	protected void done(){
+	protected final void done(){
 		if(!isCancelled())
 			workerData.callCompletedCallback();
 	}
 
 	public final void pause(){
 		if(!isDone() && paused.compareAndSet(false, true))
-			firePropertyChange("paused", false, true);
+			firePropertyChange(MainFrame.PROPERTY_NAME_PAUSED, Boolean.FALSE, Boolean.TRUE);
 	}
 
 	public final boolean isPaused(){
@@ -164,28 +198,27 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		if(!isDone() && paused.compareAndSet(true, false)){
 			PAUSE_LOCK.lock();
 			try{
-				UNPAUSE.signal();
+				UNPAUSE.signalAll();
 			}
 			finally{
 				PAUSE_LOCK.unlock();
 			}
 
-			firePropertyChange("paused", true, false);
+			firePropertyChange(MainFrame.PROPERTY_NAME_PAUSED, Boolean.TRUE, Boolean.FALSE);
 		}
 	}
 
 	/**
 	 * NOTE: this should be called inside `SwingWorker.doInBackground()` to allow process abortion
 	 */
-	protected void sleepOnPause(){
+	@SuppressWarnings("AwaitNotInLoop")
+	protected final void sleepOnPause(){
 		if(paused.get()){
 			PAUSE_LOCK.lock();
 			try{
-				try{
 					UNPAUSE.await();
-				}
-				catch(final InterruptedException ignored){}
 			}
+			catch(final InterruptedException ignored){}
 			finally{
 				PAUSE_LOCK.unlock();
 			}
@@ -197,29 +230,27 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	 *
 	 * @param exception	Exception that causes the cancellation
 	 */
-	protected void cancel(final Exception exception){
-		if(!JavaHelper.isInterruptedException(exception)){
-			if(exception != null){
-				final String errorMessage = ExceptionHelper.getMessage(exception);
-				LOGGER.error(errorMessage, exception);
+	protected final void cancel(final Exception exception){
+		if(exception != null){
+			final String errorMessage = ExceptionHelper.getMessage(exception);
+			LOGGER.error(errorMessage, exception);
 
-				JOptionPane.showOptionDialog(null,
-					"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
-					JOptionPane.ERROR_MESSAGE, null, null, null);
-			}
-			else
-				LOGGER.error("Generic error");
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
-
-			workerData.callCancelledCallback(exception);
-
-			cancel(true);
+			JOptionPane.showOptionDialog(null,
+				"Something very bad happened", "Error", JOptionPane.DEFAULT_OPTION,
+				JOptionPane.ERROR_MESSAGE, null, null, null);
 		}
+		else
+			LOGGER.error("Generic error");
+
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} stopped with error", workerData.getWorkerName());
+
+		workerData.callCancelledCallback(exception);
+
+		cancel(true);
 	}
 
-	/** User cancelled worker */
-	public void cancel(){
+	/** User cancelled worker. */
+	public final void cancel(){
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "Process {} aborted", workerData.getWorkerName());
 
 		workerData.callCancelledCallback(null);
@@ -227,25 +258,20 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		cancel(true);
 	}
 
-
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final WorkerAbstract<?> rhs = (WorkerAbstract<?>)obj;
-		return new EqualsBuilder()
-			.append(workerData.getWorkerName(), rhs.workerData.getWorkerName())
-			.isEquals();
+		return workerData.equals(rhs.workerData);
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(workerData.getWorkerName())
-			.toHashCode();
+	public final int hashCode(){
+		return workerData.hashCode();
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,8 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 
-/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a> */
+/** @see <a href="https://github.com/hunspell/hunspell/tree/master/tests/v1cmdline">Hunspell tests</a>. */
+@SuppressWarnings("ALL")
 class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 
 //FIXME
@@ -93,10 +94,10 @@ class WordGeneratorCompoundBeginMiddleEndTest extends TestBase{
 //		Assertions.assertEquals(5, words.size());
 //		//base inflections
 //		Assertions.assertEquals(createInflection("Computer", "BC-", "st:Computer"), words.get(0));
-//		//suffix inflectionss
+//		//suffix inflections
 //		Assertions.assertEquals(createInflection("Computern", "DW-", "st:Computer"), words.get(1));
-//		//prefix inflectionss
-//		//twofold inflectionss
+//		//prefix inflections
+//		//twofold inflections
 //		Assertions.assertEquals(createInflection("-Computer", "PBC", "st:Computer"), words.get(2));
 //		Assertions.assertEquals(createInflection("-Computern", "P", "st:Computer"), words.get(3));
 //		Assertions.assertEquals(createInflection("computern", "P", "st:Computer"), words.get(4));

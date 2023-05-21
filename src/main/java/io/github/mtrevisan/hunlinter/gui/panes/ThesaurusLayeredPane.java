@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,49 +25,64 @@
 package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
 import io.github.mtrevisan.hunlinter.gui.dialogs.ThesaurusMergeDialog;
 import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.gui.JCopyableTable;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
+import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.languages.Orthography;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.SynonymsEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.DefaultRowSorter;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.StringJoiner;
+import java.util.concurrent.Future;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 
 public class ThesaurusLayeredPane extends JLayeredPane{
@@ -86,6 +101,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
+	private final Future<JFileChooser> futureOpenDictionaryFSAFileChooser;
+	private DictionaryLookup dictionaryLookup;
 	private String formerFilterThesaurusText;
 
 
@@ -94,8 +111,15 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 		this.parserManager = parserManager;
 
-
 		initComponents();
+
+
+		futureOpenDictionaryFSAFileChooser = JavaHelper.executeFuture(() -> {
+			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
+			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return openPoSDictionaryFileChooser;
+		});
 
 
 		//add "fontable" property
@@ -104,28 +128,22 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(synonymsTextField);
 
 		try{
-			//FIXME
-//			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, synonymsRecordedValueLabel);
 
 			final JPopupMenu mergeCopyRemovePopupMenu = new JPopupMenu();
-			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(iconSize, mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
+			popupMergeMenuItem = GUIHelper.createPopupMergeMenu(mergeCopyRemovePopupMenu, this::mergeThesaurusRow);
 			popupMergeMenuItem.setEnabled(false);
 			mergeCopyRemovePopupMenu.add(popupMergeMenuItem);
-			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, mergeCopyRemovePopupMenu, GUIHelper::copyCallback));
-			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, mergeCopyRemovePopupMenu, this::removeSelectedRows));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(mergeCopyRemovePopupMenu, GUIHelper::copyCallback));
+			mergeCopyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(mergeCopyRemovePopupMenu, this::removeSelectedRows));
 			final JPopupMenu copyRemovePopupMenu = new JPopupMenu();
-			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyRemovePopupMenu, GUIHelper::copyCallback));
-			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(iconSize, copyRemovePopupMenu, this::removeSelectedRows));
+			copyRemovePopupMenu.add(GUIHelper.createPopupCopyMenu(copyRemovePopupMenu, GUIHelper::copyCallback));
+			copyRemovePopupMenu.add(GUIHelper.createPopupRemoveMenu(copyRemovePopupMenu, this::removeSelectedRows));
 			GUIHelper.addPopupMenu(mergeCopyRemovePopupMenu, table);
 		}
 		catch(final IOException ignored){}
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -135,19 +153,7 @@ final int iconSize = 17;
       synonymsTextField = new javax.swing.JTextField();
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String definition = (String)model.getValueAt(row, 0);
-            final String synonyms = (String)model.getValueAt(row, 1);
-            final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
-            return Arrays.stream(synonymsByDefinition)
-            .map(GUIHelper::removeHTMLCode)
-            .map(syns -> definition + ": " + syns)
-            .collect(Collectors.joining("\r\n"));
-         }
-      };
+      table = new MyJCopyableTable();
       synonymsRecordedLabel = new javax.swing.JLabel();
       synonymsRecordedValueLabel = new javax.swing.JLabel();
 
@@ -157,7 +163,7 @@ final int iconSize = 17;
 
 		synonymsTextField.setFont(currentFont);
       synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             synonymsTextFieldKeyReleased(evt);
          }
       });
@@ -165,15 +171,10 @@ final int iconSize = 17;
       addButton.setMnemonic('A');
       addButton.setText("Add");
       addButton.setEnabled(false);
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       table.setFont(currentFont);
       table.setModel(new ThesaurusTableModel());
-      table.setRowHeight(24);
       table.setRowSorter(new TableRowSorter<>((ThesaurusTableModel)table.getModel()));
       table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       table.setShowHorizontalLines(false);
@@ -204,8 +205,8 @@ final int iconSize = 17;
       setLayer(synonymsRecordedLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(synonymsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -242,27 +243,30 @@ final int iconSize = 17;
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void synonymsTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_synonymsTextFieldKeyReleased
+   private void synonymsTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_synonymsTextFieldKeyReleased
       debouncer.call(this);
    }//GEN-LAST:event_synonymsTextFieldKeyReleased
 
-   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
+			addButton.setEnabled(false);
+
          //try adding the synonyms
-         final String synonyms = synonymsTextField.getText();
+			final String synonyms = synonymsTextField.getText().trim();
          final Predicate<String> duplicatesDiscriminator = message -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is some duplicates with same part-of-speech and definition(s) '" + message
                + "'.\nForce insertion?", "Duplicate detected",
                JOptionPane.YES_NO_OPTION);
+				addButton.setEnabled(true);
             return (responseOption == JOptionPane.YES_OPTION);
          };
-         final DuplicationResult<ThesaurusEntry> duplicationResult = parserManager.getTheParser()
-         .insertSynonyms(synonyms, duplicatesDiscriminator);
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			final DuplicationResult<ThesaurusEntry> duplicationResult = theParser.insertSynonyms(synonyms, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
             final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
-            dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
+            dm.setSynonyms(theParser.getSynonymsDictionary());
             dm.fireTableDataChanged();
 
             formerFilterThesaurusText = null;
@@ -281,19 +285,21 @@ final int iconSize = 17;
          else{
             synonymsTextField.requestFocusInWindow();
 
-            final String duplicatedWords = duplicationResult.getDuplicates().stream()
-            .map(ThesaurusEntry::getDefinition)
-            .collect(Collectors.joining(", "));
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
+				final StringJoiner duplicatedWords = new StringJoiner(", ");
+				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
+				for(int i = 0; i < duplicates.size(); i ++)
+					duplicatedWords.add(duplicates.get(i).getDefinition());
+            LOGGER.warn(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      catch(final IOException | LinterException e){
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -306,32 +312,29 @@ final int iconSize = 17;
 		GUIHelper.addSorterToTable(table, comparator, comparatorAffix);
 
 		try{
-			final AffixData affixData = parserManager.getAffixData();
-			final Set<String> compoundRules = affixData.getCompoundRules();
-
-
 			//thesaurus file:
-			if(parserManager.getTheParser().getSynonymsCount() > 0){
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			if(theParser != null && theParser.getSynonymsCount() > 0){
 				GUIHelper.addSorterToTable(table, comparator, null);
 
-				final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
-				dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
-				updateSynonymsCounter();
+				//NOTE: this could take a while, so it's done in a separate thread
+				new Thread(() -> {
+					final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
+					dm.setSynonyms(theParser.getSynonymsDictionary());
+					updateSynonymsCounter();
+				}).start();
 			}
 		}
-		catch(final IndexOutOfBoundsException e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
-		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		catch(final RuntimeException re){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", re.getMessage());
 
-			LOGGER.error("A bad error occurred", e);
+			LOGGER.error("A bad error occurred", re);
 		}
 	}
 
 	@EventHandler
-	@SuppressWarnings("unchecked")
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality", "unchecked"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_THESAURUS)
 			return;
 
@@ -349,12 +352,14 @@ final int iconSize = 17;
 
 		popupMergeMenuItem.setEnabled(StringUtils.isNotBlank(unmodifiedSearchText));
 
-		if(formerFilterThesaurusText != null && formerFilterThesaurusText.equals(unmodifiedSearchText))
+		if(unmodifiedSearchText.equals(formerFilterThesaurusText))
 			return;
 
 		formerFilterThesaurusText = unmodifiedSearchText;
 
-		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+		final String language = parserManager.getLanguage();
+		final Orthography orthography = BaseBuilder.getOrthography(language);
+		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, orthography);
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
 		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
 		addButton.setEnabled(!alreadyContained);
@@ -365,20 +370,27 @@ final int iconSize = 17;
 			final Pair<String, String> searchText = ThesaurusParser.prepareTextForFilter(pair.getLeft(), pair.getRight());
 			JavaHelper.executeOnEventDispatchThread(() -> sorter.setRowFilter(RowFilter.regexFilter(searchText.getRight())));
 		}
-		else
+		else{
 			sorter.setRowFilter(null);
+
+			addButton.setEnabled(false);
+		}
 	}
 
-	public void mergeThesaurusRow(final Component invoker){
+	public final void mergeThesaurusRow(final Component invoker){
 		final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 		final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 		final ThesaurusEntry synonyms = dm.getSynonymsAt(selectedRow);
 		final SynonymsEntry newSynonyms = new SynonymsEntry(synonymsTextField.getText());
 
 		//filter synonyms with same part-of-speech
-		final List<SynonymsEntry> filteredSynonymsEntries = synonyms.getSynonyms().stream()
-			.filter(syns -> syns.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
-			.collect(Collectors.toList());
+		final List<SynonymsEntry> filteredSynonymsEntries = new ArrayList<>(0);
+		final List<SynonymsEntry> syns = synonyms.getSynonyms();
+		for(int i = 0; i < syns.size(); i ++){
+			final SynonymsEntry syn = syns.get(i);
+			if(syn.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
+				filteredSynonymsEntries.add(syn);
+		}
 		if(filteredSynonymsEntries.isEmpty())
 			JOptionPane.showMessageDialog(null,
 				"No synonyms with same part-of-speech present.\r\nCannot merge automatically, do it manually.",
@@ -396,20 +408,20 @@ final int iconSize = 17;
 		}
 	}
 
-	public void removeSelectedRows(final Component invoker){
+	public final void removeSelectedRows(final Component invoker){
 		removeSelectedRowsFromThesaurus();
 	}
 
-	public void removeSelectedRowsFromThesaurus(){
+	public final void removeSelectedRowsFromThesaurus(){
 		try{
 			final int selectedRow = table.convertRowIndexToModel(table.getSelectedRow());
 			final ThesaurusTableModel dm = (ThesaurusTableModel)table.getModel();
 			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
 			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
-			parserManager.getTheParser()
-				.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			theParser.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
 
-			dm.setSynonyms(parserManager.getTheParser().getSynonymsDictionary());
+			dm.setSynonyms(theParser.getSynonymsDictionary());
 			updateSynonymsCounter();
 
 			//… and save the files
@@ -419,14 +431,16 @@ final int iconSize = 17;
 			//redo filtering, that is re-set the state of the button (it may have changed)
 			final String unmodifiedSearchText = synonymsTextField.getText();
 			if(StringUtils.isNotBlank(unmodifiedSearchText)){
-				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText);
+				final String language = parserManager.getLanguage();
+				final Orthography orthography = BaseBuilder.getOrthography(language);
+				final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, orthography);
 				//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-				final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
+				final boolean alreadyContained = theParser.contains(pair.getLeft(), pair.getRight());
 				addButton.setEnabled(!alreadyContained);
 			}
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		catch(final IOException ioe){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", ioe.getMessage());
 		}
 	}
 
@@ -435,15 +449,55 @@ final int iconSize = 17;
 	}
 
 
+	public final void openDictionaryFSAActionPerformed(final ActionEvent evt){
+		dictionaryLookup = null;
+
+		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenDictionaryFSAFileChooser);
+		final int projectSelected = openPoSFSAFileChooser.showOpenDialog(this);
+		if(projectSelected == JFileChooser.APPROVE_OPTION){
+			final File baseFile = openPoSFSAFileChooser.getSelectedFile();
+			loadFSAFile(baseFile.toPath());
+		}
+	}
+
+	private void loadFSAFile(final Path basePath){
+		try{
+			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
+		}
+		catch(final IllegalArgumentException | IOException e){
+			JOptionPane.showMessageDialog(this, "Error while loading Dictionary FSA\n\n"
+				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	public final DictionaryLookup getDictionaryLookup(){
+		return dictionaryLookup;
+	}
+
+	private static final class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final ThesaurusTableModel model = (ThesaurusTableModel)getModel();
+			final String definition = model.getDefinition(row);
+			final String synonyms = model.getSynonyms(row);
+			final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
+			final StringJoiner sj = new StringJoiner("\r\n");
+			for(int i = 0; i < synonymsByDefinition.length; i ++)
+				sj.add(definition + ": " + GUIHelper.removeHTMLCode(synonymsByDefinition[i]));
+			return sj.toString();
+		}
+	}
+
+
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

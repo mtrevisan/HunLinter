@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,22 +26,24 @@ package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public final class ParsingStrategyFactory{
 
-	private static final MessageFormat UNKNOWN_TYPE = new MessageFormat("Unknown strategy type: {0}");
+	private static final String UNKNOWN_TYPE = "Unknown strategy type: {}";
 
 
-	private static final Map<String, FlagParsingStrategy> STRATEGIES = new HashMap<>(4);
+	private static final Map<String, FlagParsingStrategy> STRATEGIES;
 	static{
-		STRATEGIES.put(null, CharsetParsingStrategy.getASCIIInstance());
-		STRATEGIES.put("UTF-8", CharsetParsingStrategy.getUTF8Instance());
-		STRATEGIES.put("long", DoubleASCIIParsingStrategy.getInstance());
-		STRATEGIES.put("num", NumericalParsingStrategy.getInstance());
+		final Map<String, FlagParsingStrategy> map = new HashMap<>(4);
+		map.put(null, CharsetParsingStrategy.getASCIIInstance());
+		map.put("UTF-8", CharsetParsingStrategy.getUTF8Instance());
+		map.put("long", DoubleASCIIParsingStrategy.getInstance());
+		map.put("num", NumericalParsingStrategy.getInstance());
+		STRATEGIES = Collections.unmodifiableMap(map);
 	}
 
 
@@ -50,7 +52,7 @@ public final class ParsingStrategyFactory{
 	public static FlagParsingStrategy createFromFlag(final String flag){
 		final FlagParsingStrategy strategy = STRATEGIES.get(flag);
 		if(strategy == null)
-			throw new LinterException(UNKNOWN_TYPE.format(new Object[]{flag}));
+			throw new LinterException(UNKNOWN_TYPE, flag);
 
 		return strategy;
 	}

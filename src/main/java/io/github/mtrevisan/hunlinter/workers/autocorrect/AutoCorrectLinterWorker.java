@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.workers.autocorrect;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
+import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
@@ -36,6 +37,7 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAutoCorrect;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
@@ -46,9 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -61,7 +61,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 	public static final String WORKER_NAME = "AutoCorrect linter";
 
-	private static final MessageFormat ENTRY_NOT_IN_DICTIONARY = new MessageFormat("Dictionary doesn''t contain correct entry {0} (from entry {1})");
+	private static final String CORRECT_WORD_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
 	private final BloomFilterInterface<String> bloomFilter;
@@ -83,38 +83,37 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
 		final Consumer<CorrectionEntry> dataProcessor = data -> {
-			final String correctForm = data.getCorrectForm()
-				.toLowerCase(Locale.ROOT);
+			final String correctForm = data.getCorrectForm();
 
-			boolean containsSpecialChars = false;
-			int bound = correctForm.length();
+			boolean correctWordContainsSpecialChars = false;
+			final int bound = correctForm.length();
 			for(int i = 0; i < bound; i ++){
 				final char chr = correctForm.charAt(i);
 				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
-					containsSpecialChars = true;
+					correctWordContainsSpecialChars = true;
 					break;
 				}
 			}
 
-			if(!containsSpecialChars){
-				//check if the word is present in the dictionary
+			if(!correctWordContainsSpecialChars){
+				//check if the (correct) word is present in the dictionary
 				final String[] words = StringUtils.split(correctForm, " –");
-				for(final String word : words)
-					if(!bloomFilter.contains(word))
-						LOGGER.info(ParserManager.MARKER_APPLICATION, ENTRY_NOT_IN_DICTIONARY.format(
-							new Object[]{word, correctForm}));
+				for(int i = 0; i < words.length; i ++)
+					if(!bloomFilter.contains(words[i]))
+						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(CORRECT_WORD_NOT_IN_DICTIONARY, words[i], correctForm));
 			}
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
-			prepareProcessing("Reading dictionary file (step 1/2)");
+			prepareProcessing("Execute " + workerData.getWorkerName());
+			resetProcessing("Reading dictionary file (step 1/2)");
 
 			collectWords(dicParser, wordGenerator);
 
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<CorrectionEntry>>> step2 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
+			resetProcessing("Execute " + workerData.getWorkerName() + " (step 2/2)");
 
 			processLines(dataProcessor);
 
@@ -132,24 +131,23 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(final Inflection inflection : inflections){
-					final String str = inflection.getWord().toLowerCase(Locale.ROOT);
+				for(int i = 0; i < inflections.size(); i ++){
+					final String str = inflections.get(i).getWord();
 					bloomFilter.add(str);
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex, line);
+				LOGGER.error(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
 			}
 		};
-		final Consumer<Integer> progressCallback = lineIndex -> {
-			setProgress(Math.min(lineIndex, 100));
+		final ProgressCallback progressCallback = lineIndex -> {
+			setWorkerProgress(lineIndex);
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachLine(dicFile, charset, fun, progressCallback,
-			ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH);
+		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
 
 		bloomFilter.close();
 

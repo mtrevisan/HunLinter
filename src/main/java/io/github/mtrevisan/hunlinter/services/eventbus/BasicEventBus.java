@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,12 +29,14 @@ import io.github.mtrevisan.hunlinter.services.eventbus.events.VetoEvent;
 import io.github.mtrevisan.hunlinter.services.eventbus.exceptions.VetoException;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -78,7 +80,10 @@ public class BasicEventBus implements EventBusInterface{
 	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
 	private final BlockingQueue<HandlerInfo> killQueue = new LinkedBlockingQueue<>();
 
-	/** The ExecutorService used to handle event delivery to the event handlers */
+	private final Thread eventQueueThread;
+	private final Thread killQueueThread;
+
+	/** The ExecutorService used to handle event delivery to the event handlers. */
 	private final ExecutorService executorService;
 
 	/**
@@ -108,31 +113,36 @@ public class BasicEventBus implements EventBusInterface{
 	 * 	continuing to the next event.
 	 */
 	public BasicEventBus(final boolean waitForHandlers){
-		this(Executors.newCachedThreadPool(new ThreadFactory(){
+		this(Executors.newCachedThreadPool(new MyThreadFactory()), waitForHandlers);
+	}
 
-			private final ThreadFactory delegate = Executors.defaultThreadFactory();
+	private static final class MyThreadFactory implements ThreadFactory{
+		private final ThreadFactory delegate = Executors.defaultThreadFactory();
 
-			@Override
-			public Thread newThread(final Runnable r){
-				final Thread t = delegate.newThread(r);
-				t.setDaemon(true);
-				return t;
-			}
-		}), waitForHandlers);
+		@Override
+		public Thread newThread(final Runnable r){
+			final Thread t = delegate.newThread(r);
+			t.setDaemon(true);
+			return t;
+		}
 	}
 
 	public BasicEventBus(final ExecutorService executorService, final boolean waitForHandlers){
 		//start the background daemon consumer thread
-		final Thread eventQueueThread = new Thread(new EventQueueRunner(), "EventQueue Consumer Thread");
+		eventQueueThread = new Thread(new EventQueueRunner(), "EventQueue Consumer Thread");
 		eventQueueThread.setDaemon(true);
-		eventQueueThread.start();
 
-		final Thread killQueueThread = new Thread(new KillQueueRunner(), "KillQueue Consumer Thread");
+		killQueueThread = new Thread(new KillQueueRunner(), "KillQueue Consumer Thread");
 		killQueueThread.setDaemon(true);
-		killQueueThread.start();
 
 		this.executorService = executorService;
 		this.waitForHandlers = waitForHandlers;
+	}
+
+	@Override
+	public final void start(){
+		eventQueueThread.start();
+		killQueueThread.start();
 	}
 
 
@@ -148,7 +158,7 @@ public class BasicEventBus implements EventBusInterface{
 	 * @param subscriber	The subscriber object which will receive notifications on {@link EventHandler}
 	 * 	annotated methods.
 	 */
-	public void subscribe(final Object subscriber){
+	public final void subscribe(final Object subscriber){
 		//lookup to see if we have any subscriber instances already
 		final boolean subscribedAlready = loadHandlerIntoQueue(subscriber);
 		if(!subscribedAlready)
@@ -163,8 +173,8 @@ public class BasicEventBus implements EventBusInterface{
 				try{
 					killQueue.put(info);
 				}
-				catch(final InterruptedException e){
-					e.printStackTrace();
+				catch(final InterruptedException ie){
+					ie.printStackTrace();
 				}
 
 				continue;
@@ -179,7 +189,7 @@ public class BasicEventBus implements EventBusInterface{
 		final Method[] methods = subscriber.getClass().getDeclaredMethods();
 		for(final Method method : methods){
 			//look for the EventHandler annotation on the method, if it exists
-			//if not, this returns null, and go to the next method
+			//if it doesn't exist, this returns null, and go to the next method
 			final EventHandler eh = method.getAnnotation(EventHandler.class);
 			if(eh == null)
 				continue;
@@ -202,7 +212,7 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @param subscriber	The object to unsubscribe from future events.
 	 */
-	public void unsubscribe(final Object subscriber){
+	public final void unsubscribe(final Object subscriber){
 		//remove handler from queue
 		final Collection<HandlerInfo> killList = new ArrayList<>(handlers.size());
 		for(final HandlerInfo info : handlers){
@@ -220,14 +230,14 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @param event	The event to publish on the event bus.
 	 */
-	public void publish(final Object event){
+	public final void publish(final Object event){
 		try{
 			queue.put(event);
 		}
-		catch(final InterruptedException e){
-			e.printStackTrace();
+		catch(final InterruptedException ie){
+			ie.printStackTrace();
 
-			throw new RuntimeException(e);
+			throw new Error("Error using event bus", ie);
 		}
 	}
 
@@ -238,7 +248,7 @@ public class BasicEventBus implements EventBusInterface{
 	 * @param event	The event to query for.
 	 * @return	If the event bus has pending events of given type to publish.
 	 */
-	public boolean hasPendingEvents(final Object event){
+	public final boolean hasPendingEvents(final Object event){
 		return queue.contains(event);
 	}
 
@@ -247,7 +257,7 @@ public class BasicEventBus implements EventBusInterface{
 	 *
 	 * @return	Returns true if the event bus has pending events to publish.
 	 */
-	public boolean hasPendingEvents(){
+	public final boolean hasPendingEvents(){
 		return !queue.isEmpty();
 	}
 
@@ -256,15 +266,15 @@ public class BasicEventBus implements EventBusInterface{
 	private class EventQueueRunner implements Runnable{
 		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
-		public void run(){
+		public final void run(){
 			try{
 				while(true)
 					notifySubscribers(queue.take());
 			}
-			catch(final InterruptedException e){
-				e.printStackTrace();
+			catch(final InterruptedException ie){
+				ie.printStackTrace();
 
-				throw new RuntimeException(e);
+				throw new Error("Error using event bus", ie);
 			}
 		}
 
@@ -282,7 +292,7 @@ public class BasicEventBus implements EventBusInterface{
 		}
 
 		private void subdivideHandlers(final Object evt, final Collection<HandlerInfoCallable> vetoHandlers,
-												 final Collection<HandlerInfoCallable> regularHandlers){
+				final Collection<HandlerInfoCallable> regularHandlers){
 			for(final HandlerInfo info : handlers){
 				if(!info.matchesEvent(evt))
 					continue;
@@ -305,7 +315,7 @@ public class BasicEventBus implements EventBusInterface{
 					if(f.get())
 						vetoCalled = true;
 			}
-			catch(final Exception e){
+			catch(final InterruptedException | ExecutionException e){
 				//this only happens if the executorService is interrupted, and by default, that shouldn't
 				//really ever happen; or, if the callable sneaks out an exception, which again shouldn't happen
 				vetoCalled = true;
@@ -323,15 +333,15 @@ public class BasicEventBus implements EventBusInterface{
 
 		private void dispatchToRegularHandlers(final Collection<HandlerInfoCallable> regularHandlers){
 			//ExecutorService.invokeAll() in dispatchToVetoableHandlers blocks until all the results are computed.
-			//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise
+			//For the regular handlers, we need to check if the waitForHandlers property is `true`. Otherwise,
 			//(by default) we don't want invokeAll() to block. We don't care about the results, because no vetoes
 			//are accounted for here and exceptions really shouldn't be thrown.
 			if(waitForHandlers){
 				try{
 					executorService.invokeAll(regularHandlers);
 				}
-				catch(final Exception e){
-					e.printStackTrace();
+				catch(final InterruptedException ie){
+					ie.printStackTrace();
 				}
 			}
 			else
@@ -339,8 +349,8 @@ public class BasicEventBus implements EventBusInterface{
 					try{
 						executorService.invokeAll(regularHandlers);
 					}
-					catch(final Exception e){
-						e.printStackTrace();
+					catch(final InterruptedException ie){
+						ie.printStackTrace();
 					}
 				});
 		}
@@ -351,7 +361,7 @@ public class BasicEventBus implements EventBusInterface{
 	private class KillQueueRunner implements Runnable{
 		@SuppressWarnings("InfiniteLoopStatement")
 		@Override
-		public void run(){
+		public final void run(){
 			try{
 				while(true){
 					final HandlerInfo info = killQueue.take();
@@ -359,10 +369,10 @@ public class BasicEventBus implements EventBusInterface{
 						handlers.remove(info);
 				}
 			}
-			catch(final InterruptedException e){
-				e.printStackTrace();
+			catch(final InterruptedException ie){
+				ie.printStackTrace();
 
-				throw new RuntimeException(e);
+				throw new Error("Error using event bus", ie);
 			}
 		}
 	}
@@ -390,7 +400,7 @@ public class BasicEventBus implements EventBusInterface{
 		 * The call has been modified to not throw any Exceptions. It will not, unlike the interface definition,
 		 * throw an exception. All exceptions are handled locally.
 		 *
-		 * @return	If the invoke was vetoed.
+		 * @return	If the event was vetoed.
 		 */
 		@Override
 		public Boolean call(){
@@ -398,15 +408,15 @@ public class BasicEventBus implements EventBusInterface{
 				final Object subscriber = handlerInfo.getSubscriber();
 				if(subscriber == null){
 					killQueue.put(handlerInfo);
-					return false;
+					return Boolean.FALSE;
 				}
 
 				final Method m = handlerInfo.getMethod();
 				m.setAccessible(true);
 				m.invoke(subscriber, event);
-				return false;
+				return Boolean.FALSE;
 			}
-			catch(final Exception e){
+			catch(final InterruptedException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e){
 				Throwable cause = e;
 
 				//find the root cause
@@ -414,11 +424,11 @@ public class BasicEventBus implements EventBusInterface{
 					cause = cause.getCause();
 				if(cause instanceof VetoException){
 					publish(new VetoEvent(event));
-					return true;
+					return Boolean.TRUE;
 				}
 
 				publish(new BusExceptionEvent(handlerInfo, cause));
-				return false;
+				return Boolean.FALSE;
 			}
 		}
 

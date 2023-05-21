@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,9 +27,11 @@ package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 
+import java.io.EOFException;
+
 
 public interface Handler{
 
-	int parse(final ParsingContext context, final AffixData affixData);
+	int parse(final ParsingContext context, final AffixData affixData) throws EOFException;
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,8 +29,6 @@ import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParam
 import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
@@ -38,9 +36,12 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -68,7 +69,7 @@ public class WordCountWorker extends WorkerDictionary{
 			.withParallelProcessing()
 			.withCancelOnException();
 
-		Objects.requireNonNull(wordGenerator);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
@@ -76,11 +77,11 @@ public class WordCountWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			totalInflections.addAndGet(inflections.length);
-			for(final Inflection inflection : inflections)
-				dictionary.add(inflection.getWord());
+			totalInflections.addAndGet(inflections.size());
+			for(int i = 0; i < inflections.size(); i ++)
+				dictionary.add(inflections.get(i).getWord());
 		};
 		final Consumer<Exception> cancelled = exception -> dictionary.close();
 
@@ -90,7 +91,8 @@ public class WordCountWorker extends WorkerDictionary{
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 

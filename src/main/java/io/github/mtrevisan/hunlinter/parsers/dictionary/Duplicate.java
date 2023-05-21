@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,10 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -35,48 +34,54 @@ public class Duplicate{
 
 	private final Inflection inflection;
 	private final String word;
+	private final List<String> continuationFlags;
 	private final int lineIndex;
 
 
-	public Duplicate(final Inflection inflection, final String word, final int lineIndex){
+	public Duplicate(final Inflection inflection, final String word, final List<String> continuationFlags, final int lineIndex){
 		Objects.requireNonNull(inflection, "Inflection cannot be null");
 		Objects.requireNonNull(word, "Word cannot be null");
 
 		this.inflection = inflection;
 		this.word = word;
+		this.continuationFlags = continuationFlags;
 		this.lineIndex = lineIndex;
 	}
 
-	public Inflection getInflection(){
+	public final Inflection getInflection(){
 		return inflection;
 	}
 
-	public String getWord(){
+	public final String getWord(){
 		return word;
 	}
 
-	public int getLineIndex(){
+	public List<String> getContinuationFlags(){
+		return continuationFlags;
+	}
+
+	public final int getLineIndex(){
 		return lineIndex;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final Duplicate rhs = (Duplicate)obj;
-		return new EqualsBuilder()
-			.append(lineIndex, rhs.lineIndex)
-			.isEquals();
+		return (lineIndex == rhs.lineIndex);
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(lineIndex)
-			.toHashCode();
+	public final int hashCode(){
+		return Integer.hashCode(lineIndex);
+	}
+
+	public int compareTo(final Duplicate other){
+		return 0;
 	}
 
 }

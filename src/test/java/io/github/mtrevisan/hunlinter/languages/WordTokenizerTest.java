@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -98,12 +98,11 @@ class WordTokenizerTest{
 		Assertions.assertEquals(Arrays.asList("Here", " ", "bla@blah.com", " ", "is", " ", "my", " ", "email", "."), tokens);
 	}
 
-	//FIXME
-//	@Test
-//	void url(){
-//		List<String> tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
-//
-//		Assertions.assertEquals(Arrays.asList("Here", " ", "http://www.bla.com", " ", "is", " ", "another", " ", "url", "."), tokens);
-//	}
+	@Test
+	void url(){
+		List<String> tokens = tokenizer.tokenize("Here http://www.bla.com is another url.");
+
+		Assertions.assertEquals(Arrays.asList("Here", " ", "http://www.bla.com", " ", "is", " ", "another", " ", "url", "."), tokens);
+	}
 
 }

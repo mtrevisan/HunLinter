@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,12 +25,9 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,7 +42,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-class RulesReducerTest{
+@SuppressWarnings("ALL")
+class RulesReducerSuffixTest{
 
 	/**
 	[rem= o,add=[‘],cond= o,from=[koarto, kuinto, kuarto, sèsto, tèrso, tuto, tèrŧo, so, sto]]	=> [s, t, ŧ]
@@ -62,7 +60,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix1() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -80,7 +78,7 @@ class RulesReducerTest{
 			"SFX '0 o ‘ [^d]o",
 			"SFX '0 ove ó‘ ove"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
@@ -92,7 +90,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -105,7 +103,7 @@ class RulesReducerTest{
 			new LineEntry("te", "‘", "te", "frate"),
 			new LineEntry("do", "‘", "do", Arrays.asList("nudo", "komòdo", "kuando")),
 			new LineEntry("a", "‘", "[^rx]a", Arrays.asList("senŧa", "na", "la", "sensa")),
-			new LineEntry("e", "‘", "[^mtv]e", Arrays.asList("de", "ge")),
+			new LineEntry("e", "‘", "[dg]e", Arrays.asList("de", "ge")),
 			new LineEntry("o", "‘", "[^d]o", Arrays.asList("koarto", "kuinto", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
 			new LineEntry("ove", "ó‘", "ove", Arrays.asList("indove", "adove"))
 		);
@@ -122,13 +120,13 @@ class RulesReducerTest{
 			"SFX '0 te ‘ te",
 			"SFX '0 do ‘ do",
 			"SFX '0 a ‘ [^rx]a",
-			"SFX '0 e ‘ [^mtv]e",
+			"SFX '0 e ‘ [dg]e",
 			"SFX '0 o ‘ [^d]o",
 			"SFX '0 ove ó‘ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -140,7 +138,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix2() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -152,7 +150,7 @@ class RulesReducerTest{
 			"SFX &1 èƚo eƚato èƚo",
 			"SFX &1 o ato [^è]ƚo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "&1";
@@ -164,7 +162,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -188,7 +186,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -212,7 +210,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix3() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -237,7 +235,7 @@ class RulesReducerTest{
 			"SFX &0 o ato [^ò]ko",
 			"SFX &0 0 ta [^ò][kns]a"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "&0";
@@ -249,7 +247,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -293,7 +291,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -312,7 +310,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix4() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -329,7 +327,7 @@ class RulesReducerTest{
 			"SFX v1 òda odista òda",
 			"SFX v1 ònia onista ònia"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v1";
@@ -341,7 +339,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -375,7 +373,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -398,7 +396,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix5() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -478,7 +476,7 @@ class RulesReducerTest{
 			"SFX v0 ería aría ería",
 			"SFX v0 ería arieta ería"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v0";
@@ -490,7 +488,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -596,12 +594,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix6() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -611,7 +609,7 @@ class RulesReducerTest{
 			"SFX s1 ía ixmo ía",
 			"SFX s1 òmo omixmo òmo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s1";
@@ -623,7 +621,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -643,12 +641,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix7() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -661,7 +659,7 @@ class RulesReducerTest{
 			"SFX s0 òmo omixmo òmo",
 			"SFX s0 òto otixmo òto"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s0";
@@ -673,7 +671,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -682,7 +680,7 @@ class RulesReducerTest{
 			new LineEntry("òko", "okixmo", "òko", "pitòko"),
 			new LineEntry("òto", "otixmo", "òto", "bigòto"),
 			new LineEntry("ía", "ixmo", "ía", "malinkonía"),
-			new LineEntry("0", "ixmo", "[nr]", Arrays.asList("baron", "kokon", "konpar", "luminar")),
+			new LineEntry("0", "ixmo", "[^ao]", Arrays.asList("baron", "kokon", "konpar", "luminar")),
 			new LineEntry("a", "ixmo", "[^í]a", Arrays.asList("franŧexa", "fransexa"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
@@ -690,7 +688,7 @@ class RulesReducerTest{
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX s0 Y 6",
-			"SFX s0 0 ixmo [nr]",
+			"SFX s0 0 ixmo [^ao]",
 			"SFX s0 ía ixmo ía",
 			"SFX s0 a ixmo [^í]a",
 			"SFX s0 òko okixmo òko",
@@ -699,12 +697,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix8() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -723,7 +721,7 @@ class RulesReducerTest{
 			"SFX r8 r doreto r",
 			"SFX r8 r toreto r"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r8";
@@ -735,7 +733,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -762,12 +760,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix9() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -808,7 +806,7 @@ class RulesReducerTest{
 			"SFX r7 dora oreta dora",
 			"SFX r7 dora toreta dora"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r7";
@@ -820,7 +818,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -872,12 +870,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix10() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -892,7 +890,7 @@ class RulesReducerTest{
 			"SFX r6 dura ura dura",
 			"SFX r6 dura ureta dura"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r6";
@@ -904,7 +902,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -929,12 +927,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix11() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -953,7 +951,7 @@ class RulesReducerTest{
 			"SFX r5 dura ura dura",
 			"SFX r5 dura ureta dura"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r5";
@@ -965,7 +963,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -995,12 +993,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix12() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1011,7 +1009,7 @@ class RulesReducerTest{
 			"SFX r4 lderò ƚusion lderò",
 			"SFX r4 lverò ƚusion lverò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r4";
@@ -1023,7 +1021,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1045,7 +1043,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -1058,21 +1056,21 @@ class RulesReducerTest{
 	[rem=orxerò,add=[uresion],cond=orxerò,from=[sorxerò]]																												=> [x]
 
 	[rem=  r,add=[ sion],cond=  r,from=[kavar, fermentar, notar, sastufar, strologar, inpedir, aplikar, exibir, traxlokar, komodar, permutar, suparar, …]] => [a, i]
-	[rem= ir,add=[ sion],cond= ir,from=[konstituir, atribuir, kostituir, kostruir, deminuir, sostituir, instruir, destribuir, diminuir, lokuir]]					=> [i]
+	[rem= ir,add=[ sion],cond= ir,from=[konstitüir, atribüir, kostitüir, kostrüir, deminüir, sostitüir, instrüir, destribüir, diminüir, lokuir]]					=> [i]
 	[rem=àer,add=[asion],cond=àer,from=[tràer, estràer]]																																		=> [e]
 	*/
 	@Test
 	void caseSuffix13() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
 			"SFX r3 Y 17",
-			"SFX r3 ir sion uir",
+			"SFX r3 ir sion [uü]ir",
 			"SFX r3 àer asion àer",
 			"SFX r3 r sion [^t]ar",
-			"SFX r3 r sion [^u]ir",
+			"SFX r3 r sion [^uü]ir",
 			"SFX r3 erò ision terò",
 			"SFX r3 merò nsion merò",
 			"SFX r3 nerò xision nerò",
@@ -1087,19 +1085,19 @@ class RulesReducerTest{
 			"SFX r3 xerò sion [^r]xerò",
 			"SFX r3 orxerò uresion orxerò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r3";
 		AffixType affixType = AffixType.SUFFIX;
-		List<String> words = Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "destinguerò", "solderò", "kavar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "autorixar", "provokar", "petir", "satisfar", "notifegar", "akuixir", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "partir", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "fenir", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "benedir", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "lenir", "nomenar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "sorxerò", "prexentar", "exentar", "ventar", "sospetar", "repeterò", "estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "asumerò", "prexumerò", "konsumerò", "koskriverò", "sotoskriverò", "skriverò", "iskriverò", "tràer", "estràer", "konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò", "lokuir", "inpenir");
+		List<String> words = Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "destinguerò", "solderò", "kavar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "autorixar", "provokar", "petir", "satisfar", "notifegar", "akuixir", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "partir", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "fenir", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "benedir", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "lenir", "nomenar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "sorxerò", "prexentar", "exentar", "ventar", "sospetar", "repeterò", "estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "asumerò", "prexumerò", "konsumerò", "koskriverò", "sotoskriverò", "skriverò", "iskriverò", "tràer", "estràer", "konstitüir", "atribüir", "kostitüir", "kostrüir", "deminüir", "sostitüir", "instrüir", "destribüir", "diminüir", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò", "lokuir", "inpenir");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1109,8 +1107,8 @@ class RulesReducerTest{
 			new LineEntry("derò", "usion", "lderò", "solderò"),
 			new LineEntry("derò", "sion", "nderò", Arrays.asList("estenderò", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
 			new LineEntry("r", "sion", "ar", Arrays.asList("kavar", "fermentar", "notar", "sastufar", "strologar", "aplikar", "traxlokar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "eskorporar", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "presixar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "xenarar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "konvokar", "bitar", "numarar", "reputar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "sinserar", "peñorar", "naturalixar", "vendegar", "esterminar", "valutar", "sekurar", "ostentar", "ultimar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "krear", "setar", "akuxar", "legar", "oblar", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "ventar", "xenerar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "sospetar", "autorixar", "provokar", "prexentar", "satisfar", "exentar", "notifegar", "artikolar", "legalixar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "remunerar", "binar", "spetorar", "salutar", "ordenar", "redar", "sinsierar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "raprexar", "eskavar", "ministrar", "sitar", "sarvar", "saluar", "malversar", "skalinar", "terminar", "vasinar", "far", "desimilar", "vidimar", "ondar", "interogar", "augumentar", "emular", "strukar", "mansipar", "rasionar", "levar", "malfar", "mirar", "palpitar", "deputar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "fetar", "salvar", "spesifegar", "xetar", "limitar", "depoxitar", "sikurar", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "obligar", "straxordenar", "rapatumar", "partesipar", "superar", "ostinar", "strakolar", "subarendar", "vokalixar", "fisar", "suplegar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "kanselar", "cetar", "manipolar", "revokar", "sigurar", "filtrar", "supurar", "formar", "balotar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "deletar", "proar", "panixar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "kalsinar", "soporar", "tentar", "nomenar", "exaltar", "exortar", "rivar", "butar", "sperar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar")),
-			new LineEntry("ir", "sion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir")),
-			new LineEntry("r", "sion", "[^u]ir", Arrays.asList("inpenir", "proibir", "rekuixir", "monir", "kondir", "inkuixir", "benedir", "nudrir", "inibir", "tradir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir", "punir", "fenir", "akuixir", "partir", "vestir", "munir", "finir", "lenir")),
+			new LineEntry("ir", "sion", "[uü]ir", Arrays.asList("konstitüir", "atribüir", "kostitüir", "kostrüir", "deminüir", "sostitüir", "instrüir", "destribüir", "diminüir", "lokuir")),
+			new LineEntry("r", "sion", "[^uü]ir", Arrays.asList("inpenir", "proibir", "rekuixir", "monir", "kondir", "inkuixir", "benedir", "nudrir", "inibir", "tradir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir", "punir", "fenir", "akuixir", "partir", "vestir", "munir", "finir", "lenir")),
 			new LineEntry("àer", "asion", "àer", Arrays.asList("tràer", "estràer")),
 			new LineEntry("erò", "ision", "terò", "repeterò"),
 			new LineEntry("xerò", "sion", "[^r]xerò", Arrays.asList("duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò")),
@@ -1127,9 +1125,9 @@ class RulesReducerTest{
 		List<String> expectedRules = Arrays.asList(
 			"SFX r3 Y 15",
 			"SFX r3 r sion ar",
-			"SFX r3 ir sion uir",
 			"SFX r3 àer asion àer",
-			"SFX r3 r sion [^u]ir",
+			"SFX r3 r sion [^uü]ir",
+			"SFX r3 ir sion [uü]ir",
 			"SFX r3 erò ision terò",
 			"SFX r3 merò nsion merò",
 			"SFX r3 nerò xision nerò",
@@ -1144,12 +1142,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix14() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1174,19 +1172,19 @@ class RulesReducerTest{
 			"SFX r2 xerò ŧion [^r]xerò",
 			"SFX r2 orxerò ureŧion orxerò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r2";
 		AffixType affixType = AffixType.SUFFIX;
-		List<String> words = Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò", "sorxerò", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò", "tràer", "estràer", "prexentar", "exentar", "ventar", "sospetar", "destinguerò", "konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir", "raserò", "faserò", "struđerò", "raŧerò", "repeterò", "kavar", "đenerar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "galidar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "kanŧelar", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "realiđar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "sonoriđar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar", "valutar", "palatiđar", "sekurar", "ostentar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar", "krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "provokar", "petir", "satisfar", "notifegar", "akuixir", "panidar", "artikolar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar", "salutar", "ŧetar", "ordenar", "partir", "redar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "autoriđar", "skalinar", "terminar", "far", "desimilar", "rekuiđir", "vidimar", "ondar", "parteŧipar", "interogar", "augumentar", "emular", "strukar", "sonoridar", "levar", "legaliđar", "fenir", "malfar", "mirar", "palpitar", "deputar", "galixar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "đeneraliđar", "đenaraliđar", "fetar", "salvar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "ŧitar", "obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar", "denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "cetar", "manipolar", "revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "benedir", "formar", "vaŧinar", "balotar", "denerar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "rekuidir", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "soporar", "tentar", "lenir", "nomenar", "vokaliđar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "asumerò", "prexumerò", "konsumerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "solderò");
+		List<String> words = Arrays.asList("koskriverò", "sotoskriverò", "skriverò", "iskriverò", "sorxerò", "konveñerò", "solverò", "evolverò", "revolverò", "rexolverò", "tràer", "estràer", "prexentar", "exentar", "ventar", "sospetar", "destinguerò", "konstitüir", "atribüir", "kostitüir", "kostrüir", "deminüir", "sostitüir", "instrüir", "destribüir", "diminüir", "lokuir", "raserò", "faserò", "struđerò", "raŧerò", "repeterò", "kavar", "đenerar", "fermentar", "notar", "sastufar", "strologar", "inpedir", "aplikar", "exibir", "traxlokar", "galidar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kondir", "kanŧelar", "eskorporar", "nudrir", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "realiđar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "sonoriđar", "konvokar", "bitar", "numarar", "reputar", "tradir", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar", "valutar", "palatiđar", "sekurar", "ostentar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar", "krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "rekuixir", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "ativar", "mutar", "segurar", "maledir", "provokar", "petir", "satisfar", "notifegar", "akuixir", "panidar", "artikolar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar", "salutar", "ŧetar", "ordenar", "partir", "redar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "monir", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "autoriđar", "skalinar", "terminar", "far", "desimilar", "rekuiđir", "vidimar", "ondar", "parteŧipar", "interogar", "augumentar", "emular", "strukar", "sonoridar", "levar", "legaliđar", "fenir", "malfar", "mirar", "palpitar", "deputar", "galixar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "đeneraliđar", "đenaraliđar", "fetar", "salvar", "xetar", "limitar", "depoxitar", "sikurar", "vestir", "munir", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "ŧitar", "obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar", "denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "punir", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "proibir", "cetar", "manipolar", "revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "benedir", "formar", "vaŧinar", "balotar", "denerar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "rekuidir", "varsar", "sodisfar", "finir", "kapitolar", "skaldar", "deletar", "proar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar", "inibir", "malvarsar", "examinar", "guarnir", "suporar", "pelar", "espurgar", "parir", "palatixar", "mortifegar", "soporar", "tentar", "lenir", "nomenar", "vokaliđar", "exaltar", "exortar", "inkuixir", "rivar", "butar", "sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar", "fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò", "prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò", "asumerò", "prexumerò", "konsumerò", "duxerò", "elexerò", "estraxerò", "lexerò", "faxerò", "korexerò", "aflixerò", "struxerò", "produxerò", "introduxerò", "solderò");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1198,7 +1196,7 @@ class RulesReducerTest{
 			new LineEntry("derò", "uŧion", "lderò", "solderò"),
 			new LineEntry("derò", "ŧion", "nderò", Arrays.asList("fenderò", "sospenderò", "espanderò", "suspenderò", "tenderò")),
 			new LineEntry("r", "ŧion", "ar", Arrays.asList("kavar", "đenerar", "fermentar", "notar", "sastufar", "strologar", "aplikar", "traxlokar", "galidar", "komodar", "permutar", "suparar", "komunegar", "spekular", "kostipar", "velar", "destinar", "kanŧelar", "eskorporar", "danar", "konmixerar", "tribolar", "vokar", "markar", "sagurar", "piñorar", "stelar", "raŧionar", "lamentar", "sonorixar", "fidar", "sostentar", "subordenar", "liberar", "oparar", "versar", "prosimar", "koniugar", "klasifegar", "kuantifegar", "realiđar", "tonar", "sklamar", "vixitar", "torefar", "mexurar", "koordenar", "sonoriđar", "konvokar", "bitar", "numarar", "reputar", "satusfar", "putrefar", "insinuar", "intimar", "edukar", "peñorar", "vendegar", "esterminar", "valutar", "palatiđar", "sekurar", "ostentar", "denbrar", "ultimar", "deneralidar", "frankar", "trobolar", "simular", "kolaudar", "termenar", "naturaliđar", "krear", "paniđar", "vokalidar", "akuxar", "legar", "oblar", "sindikar", "stilar", "soportar", "konmixarar", "verifegar", "opinar", "privar", "ventar", "sinŧierar", "xeneralixar", "provar", "torbolar", "saludar", "servar", "perlustrar", "solevar", "parar", "sospetar", "ativar", "mutar", "segurar", "provokar", "prexentar", "exentar", "satisfar", "notifegar", "panidar", "artikolar", "piegar", "mormolar", "alterar", "numerar", "ubigar", "luminar", "vibrar", "sorafar", "palatidar", "remunerar", "binar", "spetorar", "speŧifegar", "salutar", "ŧetar", "ordenar", "redar", "estermenar", "prevarikar", "trasformar", "realixar", "skriturar", "skorporar", "votar", "naturalidar", "raprexar", "eskavar", "ministrar", "sarvar", "saluar", "malversar", "autoriđar", "skalinar", "terminar", "far", "desimilar", "vidimar", "ondar", "parteŧipar", "interogar", "augumentar", "emular", "strukar", "sonoridar", "levar", "legaliđar", "malfar", "mirar", "palpitar", "deputar", "galixar", "variar", "operar", "exborsar", "mormorar", "tesar", "konsumar", "tratar", "đeneraliđar", "đenaraliđar", "fetar", "salvar", "xetar", "limitar", "depoxitar", "sikurar", "legrar", "orar", "traversar", "pernotar", "identifegar", "radar", "dexertar", "rafinar", "asimilar", "ŧitar", "obligar", "straxordenar", "rapatumar", "kalŧinar", "superar", "ostinar", "strakolar", "subarendar", "galiđar", "vokalixar", "denaralidar", "fisar", "sinŧerar", "suplegar", "preŧixar", "esklamar", "inkonbinar", "fregar", "turbular", "separar", "cetar", "manipolar", "revokar", "autoridar", "manŧipar", "sigurar", "filtrar", "supurar", "formar", "vaŧinar", "balotar", "denerar", "interpretar", "kolar", "xrenar", "stalar", "elevar", "varsar", "sodisfar", "kapitolar", "skaldar", "deletar", "proar", "substentar", "legalidar", "iluminar", "kontaminar", "libarar", "xenaralixar", "malvarsar", "examinar", "suporar", "pelar", "espurgar", "palatixar", "mortifegar", "soporar", "tentar", "nomenar", "vokaliđar", "exaltar", "exortar", "rivar", "butar", "sperar", "realidar", "mixurar", "senplifegar", "situar", "sistemar", "testar", "xmenbrar", "strolegar", "tranxar", "negar")),
-			new LineEntry("ir", "ŧion", "uir", Arrays.asList("konstituir", "atribuir", "kostituir", "kostruir", "deminuir", "sostituir", "instruir", "destribuir", "diminuir", "lokuir")),
+			new LineEntry("ir", "ŧion", "uir", Arrays.asList("konstitüir", "atribüir", "kostitüir", "kostrüir", "deminüir", "sostitüir", "instrüir", "destribüir", "diminüir", "lokuir")),
 			new LineEntry("r", "ŧion", "[^u]ir", Arrays.asList("monir", "inibir", "guarnir", "inpedir", "maledir", "exibir", "petir", "parir", "punir", "akuixir", "rekuiđir", "vestir", "munir", "lenir", "proibir", "rekuixir", "kondir", "inkuixir", "benedir", "nudrir", "tradir", "rekuidir", "fenir", "partir", "finir")),
 			new LineEntry("àer", "aŧion", "àer", Arrays.asList("tràer", "estràer")),
 			new LineEntry("nerò", "xiŧion", "nerò", Arrays.asList("prexuponerò", "posponerò", "esponerò", "oponerò", "ponerò", "konponerò", "proponerò", "xustaponerò")),
@@ -1232,12 +1230,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix15() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1246,7 +1244,7 @@ class RulesReducerTest{
 			"SFX r1 r mento r",
 			"SFX r1 rò mento arò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r1";
@@ -1258,7 +1256,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1276,12 +1274,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix16() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1295,26 +1293,26 @@ class RulesReducerTest{
 			"SFX r0 rò mento arò",
 			"SFX r0 erò imento erò"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r0";
 		AffixType affixType = AffixType.SUFFIX;
-		List<String> words = Arrays.asList("baŧilar", "ŧigalar", "skriŧolar", "pentir", "tarar", "xiovar", "furigar", "inpedir", "latar", "rudar", "favorir", "savatar", "traxlokar", "komodar", "baxotar", "komandar", "stornir", "bonar", "kanonar", "pedorar", "buelar", "ɉosolar", "indebolir", "piŧegar", "ronkexar", "iskurir", "farar", "trasferir", "durar", "suɉerir", "logar", "palar", "skuinternar", "ronkiđar", "strigar", "lanpixar", "muxegar", "striar", "insokir", "loxar", "kurar", "boɉir", "bađotar", "tradir", "trapar", "inkroxar", "ŧonkar", "tenparar", "semenar", "skorabiar", "ordar", "skurir", "raforsar", "taɉusar", "trobolar", "traxlatar", "skarpasar", "đirar", "ñaolar", "skorajar", "tejar", "inkoraxar", "trair", "skarpaŧar", "matir", "sobojir", "gravar", "sojar", "raforŧar", "lanpeđar", "deŧervelar", "dexsarvelar", "fogar", "ondixar", "torbiar", "stravinar", "susurar", "sentir", "ŧavariar", "pensar", "dirar", "sekar", "voltolar", "egreɉar", "ŧensir", "spolvarar", "formigar", "cicolar", "ŧukar", "inbriagar", "xbeŧolar", "biskolar", "josolar", "kasar", "mañar", "desarvelar", "fufiñar", "konŧar", "straviar", "tarmar", "bajar", "fondar", "fornir", "botidar", "degladiar", "jurar", "scantidar", "sfredir", "partir", "taɉuŧar", "tikiñar", "xontar", "konsar", "jadar", "sensir", "orbar", "spegaŧar", "portar", "badotar", "konpañar", "malsontar", "karesar", "rakoŧar", "pagar", "kareŧar", "rakosar", "lodar", "ansar", "vanir", "xenocar", "rasar", "pestar", "strukar", "rascar", "borar", "ondexar", "spegasar", "fenir", "roxar", "galdir", "stusegar", "skaltrir", "vertir", "kaɉar", "ruspar", "bolegar", "vesinar", "jaŧar", "cacarar", "korteɉar", "lanpidar", "jasar", "vestir", "bagolar", "xirar", "peđorar", "đenocar", "perir", "fojar", "moɉar", "xlanbanar", "pastiŧar", "griñar", "spigaŧar", "spigasar", "pastisar", "skoređar", "riondar", "skonkasar", "strakolar", "propiar", "intronar", "dindolar", "sonkar", "rebaltar", "fardir", "furegar", "braŧar", "sarar", "ordir", "brasar", "ruđar", "ronkidar", "kordar", "abokar", "stordir", "lanbikar", "inviar", "pastrocar", "andar", "substentar", "ɉaŧar", "sujerir", "sortir", "ondedar", "guarnir", "ɉasar", "interesar", "ronkeđar", "dexservelar", "skorlar", "insurir", "regolar", "dormenŧar", "raspar", "savariar", "kokonar", "koŧar", "dormensar", "gonfiar", "morsegar", "xñikar", "inŧokir", "krikolar", "armar", "baɉar", "granfir", "sasinar", "trabakolar", "điovar", "kustionar", "skorkolar", "devorar", "roxegar", "serar", "tosir", "denocar", "kanar", "kosar", "ligar", "seneɉar", "xovar", "ingropar", "joŧolar", "tramortir", "danar", "indolentrar", "ferir", "falir", "tribolar", "inkarir", "malŧontar", "maistrar", "xjonfar", "kabalar", "stupidir", "sostentar", "lanpiđar", "bojir", "prolongar", "lontanar", "tremar", "alŧar", "rodar", "skantinar", "strasar", "ŧifolar", "scantiđar", "mejorar", "deservelar", "meɉorar", "bagordar", "ɉoŧolar", "moxegar", "spolverar", "voltar", "straŧar", "botiđar", "spigolar", "desipar", "pispolar", "sposar", "viŧinar", "indupionar", "sujarir", "sofegar", "terar", "skrisolar", "basilar", "xbregar", "pisegar", "sarir", "ŧavatar", "inpietrir", "kapir", "stuŧegar", "kalar", "miɉorar", "skorexar", "intaresar", "soboɉir", "skuintarnar", "batocar", "valir", "egrejar", "menar", "kopar", "teɉar", "sukar", "skoraɉar", "suɉarir", "lođar", "exaurir", "ronkixar", "naspar", "stomegar", "travar", "veŧinar", "torbolar", "ferar", "parar", "ruspiar", "rengrasiar", "kavalkar", "sorar", "duplikar", "kanpanar", "lanpexar", "soɉar", "cacerar", "basar", "xurar", "xɉonfar", "strukolar", "đontar", "takar", "predegar", "ondiđar", "brontolar", "dexŧervelar", "inkoraɉar", "ruelar", "formigolar", "diovar", "tenperar", "bixegar", "moroxar", "xvegrar", "inpinir", "inkorajar", "dovar", "foɉar", "sitar", "mojar", "kavalar", "kajar", "pexorar", "skonbusolar", "tirar", "đurar", "inserir", "futiñar", "ronkedar", "kortejar", "saldar", "bonir", "baŧixar", "drapar", "rekordar", "asokir", "muñegar", "indurir", "agravar", "fumegar", "tratar", "inkrikar", "ondidar", "farir", "sfegatar", "gualivar", "salvar", "patir", "aŧokir", "ondeđar", "divertir", "teñir", "misiar", "lisar", "kanbiar", "dontar", "xbesolar", "ŧitar", "biankir", "kaxar", "insukir", "tajusar", "tajuŧar", "provixionar", "skoredar", "dilatar", "xlanbar", "pesar", "pontar", "basixar", "nuvolar", "fregar", "xlavacar", "turbular", "peŧar", "arsar", "mijorar", "deŧipar", "bulegar", "speŧar", "spesar", "kolar", "infiar", "finir", "trovar", "ronkir", "botixar", "ferdir", "petar", "sonar", "lanpedar", "đovar", "rexegar", "kagar", "panar", "rođar", "bruxar", "trasinar", "trasfarir", "akorar", "scantixar", "visinar", "divinar", "arpentir", "senejar", "krokolar", "rengraŧiar", "maŧar", "delinear", "ruxar", "masar", "kanbio", "baso", "ordo", "bojerò", "fenderò", "moverò", "naserò", "sebaterò", "renkreserò", "torđerò", "meterò", "manteñerò", "sobaterò", "akorxerò", "skoderò", "ponxerò", "sorxerò", "skonbaterò", "veñerò", "galderò", "sparxerò", "akorderò", "goderò", "vederò", "boɉerò", "ponđerò", "roderò", "rexerò", "ponderò", "rinkreserò", "baterò", "kreserò", "provederò", "akorđerò", "korerò", "torxerò", "sialakuar", "fruar", "arguar", "vexin", "visin", "vesin", "viŧin", "xgrendarò", "xgrenđarò", "xgrenxarò", "luxarò");
+		List<String> words = Arrays.asList("baŧilar", "ŧigalar", "skriŧolar", "pentir", "tarar", "xiovar", "furigar", "inpedir", "latar", "rudar", "favorir", "savatar", "traxlokar", "komodar", "baxotar", "komandar", "stornir", "bonar", "kanonar", "pedorar", "buelar", "ɉosolar", "indebolir", "piŧegar", "ronkexar", "iskurir", "farar", "trasferir", "durar", "suɉerir", "logar", "palar", "skuinternar", "ronkiđar", "strigar", "lanpixar", "muxegar", "striar", "insokir", "loxar", "kurar", "boɉir", "bađotar", "tradir", "trapar", "inkroxar", "ŧonkar", "tenparar", "semenar", "skorabiar", "ordar", "skurir", "raforsar", "taɉusar", "trobolar", "traxlatar", "skarpasar", "đirar", "ñaolar", "skorajar", "tejar", "inkoraxar", "trair", "skarpaŧar", "matir", "sobojir", "gravar", "sojar", "raforŧar", "lanpeđar", "deŧervelar", "dexsarvelar", "fogar", "ondixar", "torbiar", "stravinar", "susurar", "sentir", "ŧavariar", "pensar", "dirar", "sekar", "voltolar", "egreɉar", "ŧensir", "spolvarar", "formigar", "cicolar", "ŧukar", "inbriagar", "xbeŧolar", "biskolar", "josolar", "kasar", "mañar", "desarvelar", "fufiñar", "konŧar", "straviar", "tarmar", "bajar", "fondar", "fornir", "botidar", "degladiar", "jurar", "scantidar", "sfredir", "partir", "taɉuŧar", "tikiñar", "xontar", "konsar", "jadar", "sensir", "orbar", "spegaŧar", "portar", "badotar", "konpañar", "malsontar", "karesar", "rakoŧar", "pagar", "kareŧar", "rakosar", "lodar", "ansar", "vanir", "xenocar", "rasar", "pestar", "strukar", "rascar", "borar", "ondexar", "spegasar", "fenir", "roxar", "galdir", "stusegar", "skaltrir", "vertir", "kaɉar", "ruspar", "bolegar", "vesinar", "jaŧar", "cacarar", "korteɉar", "lanpidar", "jasar", "vestir", "bagolar", "xirar", "peđorar", "đenocar", "perir", "fojar", "moɉar", "xlanbanar", "pastiŧar", "griñar", "spigaŧar", "spigasar", "pastisar", "skoređar", "riondar", "skonkasar", "strakolar", "propiar", "intronar", "dindolar", "sonkar", "rebaltar", "fardir", "furegar", "braŧar", "sarar", "ordir", "brasar", "ruđar", "ronkidar", "kordar", "abokar", "stordir", "lanbikar", "inviar", "pastrocar", "andar", "substentar", "ɉaŧar", "sujerir", "sortir", "ondedar", "guarnir", "ɉasar", "interesar", "ronkeđar", "dexservelar", "skorlar", "insurir", "regolar", "dormenŧar", "raspar", "savariar", "kokonar", "koŧar", "dormensar", "gonfiar", "morsegar", "xñikar", "inŧokir", "krikolar", "armar", "baɉar", "granfir", "sasinar", "trabakolar", "điovar", "kustionar", "skorkolar", "devorar", "roxegar", "serar", "tosir", "denocar", "kanar", "kosar", "ligar", "seneɉar", "xovar", "ingropar", "joŧolar", "tramortir", "danar", "indolentrar", "ferir", "falir", "tribolar", "inkarir", "malŧontar", "maistrar", "xjonfar", "kabalar", "stupidir", "sostentar", "lanpiđar", "bojir", "prolongar", "lontanar", "tremar", "alŧar", "rodar", "skantinar", "strasar", "ŧifolar", "scantiđar", "mejorar", "deservelar", "meɉorar", "bagordar", "ɉoŧolar", "moxegar", "spolverar", "voltar", "straŧar", "botiđar", "spigolar", "desipar", "pispolar", "sposar", "viŧinar", "indupionar", "sujarir", "sofegar", "terar", "skrisolar", "basilar", "xbregar", "pisegar", "sarir", "ŧavatar", "inpietrir", "kapir", "stuŧegar", "kalar", "miɉorar", "skorexar", "intaresar", "soboɉir", "skuintarnar", "batocar", "valir", "egrejar", "menar", "kopar", "teɉar", "sukar", "skoraɉar", "suɉarir", "lođar", "exaurir", "ronkixar", "naspar", "stomegar", "travar", "veŧinar", "torbolar", "ferar", "parar", "ruspiar", "rengrasiar", "kavalkar", "sorar", "duplikar", "kanpanar", "lanpexar", "soɉar", "cacerar", "basar", "xurar", "xɉonfar", "strukolar", "đontar", "takar", "predegar", "ondiđar", "brontolar", "dexŧervelar", "inkoraɉar", "ruelar", "formigolar", "diovar", "tenperar", "bixegar", "moroxar", "xvegrar", "inpinir", "inkorajar", "dovar", "foɉar", "sitar", "mojar", "kavalar", "kajar", "pexorar", "skonbusolar", "tirar", "đurar", "inserir", "futiñar", "ronkedar", "kortejar", "saldar", "bonir", "baŧixar", "drapar", "rekordar", "asokir", "muñegar", "indurir", "agravar", "fumegar", "tratar", "inkrikar", "ondidar", "farir", "sfegatar", "gualivar", "salvar", "patir", "aŧokir", "ondeđar", "divertir", "teñir", "misiar", "lisar", "kanbiar", "dontar", "xbesolar", "ŧitar", "biankir", "kaxar", "insukir", "tajusar", "tajuŧar", "provixionar", "skoredar", "dilatar", "xlanbar", "pesar", "pontar", "basixar", "nuvolar", "fregar", "xlavacar", "turbular", "peŧar", "arsar", "mijorar", "deŧipar", "bulegar", "speŧar", "spesar", "kolar", "infiar", "finir", "trovar", "ronkir", "botixar", "ferdir", "petar", "sonar", "lanpedar", "đovar", "rexegar", "kagar", "panar", "rođar", "bruxar", "trasinar", "trasfarir", "akorar", "scantixar", "visinar", "divinar", "arpentir", "senejar", "krokolar", "rengraŧiar", "maŧar", "delinear", "ruxar", "masar", "kanbio", "baso", "ordo", "bojerò", "fenderò", "moverò", "naserò", "sebaterò", "renkreserò", "torđerò", "meterò", "manteñerò", "sobaterò", "akorxerò", "skoderò", "ponxerò", "sorxerò", "skonbaterò", "veñerò", "galderò", "sparxerò", "akorderò", "goderò", "vederò", "boɉerò", "ponđerò", "roderò", "rexerò", "ponderò", "rinkreserò", "baterò", "kreserò", "provederò", "akorđerò", "korerò", "torxerò", "sialakuar", "fruar", "argüar", "vexin", "visin", "vesin", "viŧin", "xgrendarò", "xgrenđarò", "xgrenxarò", "luxarò");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("erò", "imento", "erò", Arrays.asList("bojerò", "fenderò", "moverò", "naserò", "sebaterò", "renkreserò", "torđerò", "meterò", "manteñerò", "sobaterò", "akorxerò", "skoderò", "ponxerò", "sorxerò", "skonbaterò", "veñerò", "galderò", "sparxerò", "akorderò", "goderò", "vederò", "boɉerò", "ponđerò", "roderò", "rexerò", "ponderò", "rinkreserò", "baterò", "kreserò", "provederò", "akorđerò", "korerò", "torxerò")),
 			new LineEntry("o", "amento", "o", Arrays.asList("kanbio", "baso", "ordo")),
-			new LineEntry("uar", "omento", "uar", Arrays.asList("sialakuar", "fruar", "arguar")),
+			new LineEntry("uar", "omento", "uar", Arrays.asList("sialakuar", "fruar", "argüar")),
 			new LineEntry("0", "amento", "n", Arrays.asList("vexin", "visin", "vesin", "viŧin")),
 			new LineEntry("r", "mento", "[^a]r", Arrays.asList("sensir", "granfir", "insukir", "pentir", "skurir", "inpinir", "fardir", "inpedir", "sarir", "inpietrir", "kapir", "favorir", "tosir", "trair", "ordir", "soboɉir", "vanir", "stornir", "inserir", "matir", "sobojir", "tramortir", "valir", "ferir", "falir", "bonir", "fenir", "suɉarir", "inkarir", "indebolir", "galdir", "stordir", "asokir", "skaltrir", "vertir", "finir", "ronkir", "stupidir", "exaurir", "indurir", "bojir", "iskurir", "sentir", "trasferir", "sujerir", "sortir", "ferdir", "suɉerir", "farir", "guarnir", "ŧensir", "patir", "aŧokir", "vestir", "insurir", "divertir", "teñir", "trasfarir", "insokir", "perir", "boɉir", "tradir", "arpentir", "fornir", "sujarir", "sfredir", "partir", "biankir", "inŧokir")),
 			new LineEntry("rò", "mento", "[^e]rò", Arrays.asList("xgrendarò", "xgrenđarò", "xgrenxarò", "luxarò")),
@@ -1335,17 +1333,17 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix17() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"SFX q1 Y 14",
+			"SFX q1 Y 13",
 			"SFX q1 0 sa [^d]e",
 			"SFX q1 0 sa [^ò]de",
 			"SFX q1 òde odesa òde",
@@ -1354,14 +1352,13 @@ class RulesReducerTest{
 			"SFX q1 òdo odesa òdo",
 			"SFX q1 òso osesa òso",
 			"SFX q1 0 esa n",
-			"SFX q1 0 esa [^è]l",
+			"SFX q1 0 esa [^è][lr]",
 			"SFX q1 èl elesa èl",
-			"SFX q1 0 esa [^è]r",
 			"SFX q1 èr eresa èr",
 			"SFX q1 o esa [^è]ƚo",
 			"SFX q1 èƚo eƚesa èƚo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "q1";
@@ -1373,7 +1370,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1411,7 +1408,7 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	/**
@@ -1422,7 +1419,7 @@ class RulesReducerTest{
 	*/
 	@Test
 	void caseSuffix18() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1485,7 +1482,7 @@ class RulesReducerTest{
 			"SFX mf obrioxo ubriuxi obrioxo",
 			"SFX mf ordioxo urdiuxi ordioxo"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "mf";
@@ -1497,7 +1494,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1621,12 +1618,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix19() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1647,7 +1644,7 @@ class RulesReducerTest{
 			"SFX V0 èr iereto [^aeoucijɉñ]èr",
 			"SFX V0 èr iareto [^aeoucijɉñ]èr"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "V0";
@@ -1659,7 +1656,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1693,12 +1690,12 @@ class RulesReducerTest{
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
 	void caseSuffix20() throws IOException{
-		String language = "vec-IT";
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -1715,7 +1712,7 @@ class RulesReducerTest{
 			"SFX U0 ul úi ul",
 			"SFX U0 un úi un"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "U0";
@@ -1727,7 +1724,7 @@ class RulesReducerTest{
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
@@ -1740,8 +1737,8 @@ class RulesReducerTest{
 			new LineEntry("ol", "ói", "ol", Arrays.asList("skol", "pisarol", "skodarol", "sotarol", "rovejol", "garxiñol", "solŧarol", "rixarol", "ucarol", "spondol", "vovarol", "boarol", "roveɉol", "rosiñol", "fisol", "ovarol", "xjoŧarol", "ranarol", "pođol", "bavarol", "fiŧol", "libarol", "storol", "spiansarol", "kaxarol", "bronbejol", "skapuŧiol", "korexol", "saldarol", "kordarol", "beđarol", "tastarol", "kamixol", "navarol", "ponterol", "erbarol", "faxiol", "xɉosarol", "stentarol", "kanarol", "skapusiol", "supiarol", "biavarol", "fondarol", "parol", "liŧarol", "letexol", "bruxarol", "bronbeɉol", "sordarol", "garofol", "faŧiol", "faxol", "braŧarol", "fasiol", "ŧendrarol", "pesarol", "tersol", "terŧol", "bañarol", "kroxol", "bisol", "rafiol", "kuajarol", "laudevol", "porixol", "viscarol", "sturiol", "barkarol", "kolarol", "grandiol", "vedol", "cavarol", "laxarol", "revendarol", "pipirol", "kivol", "besarol", "rusiñol", "ganxarol", "korparol", "telarol", "garđiñol", "bexarol", "karol", "tersarol", "đontarol", "studiol", "semenŧarol", "tajol", "koređol", "cijarol", "pexarol", "đornarol", "ranpegarol", "reditarol", "beverarol", "skuerarol", "podol", "picol", "portarol", "garŧiñol", "ponarol", "piasarol", "bronbijol", "montixol", "frutarol", "pradarol", "fiabarol", "draparol", "ŧernierol", "latarol", "tratarol", "kuartarol", "miedarol", "gaxol", "artarol", "boskarol", "poriđol", "balanŧiol", "paɉarol", "pontirol", "bronbiɉol", "sponđol", "introl", "xatarol", "kairol", "sponxol", "coarol", "gardiñol", "parasol", "kanapiol", "kanpañarol", "skuderol", "kanevarol", "guxarol", "borsarol", "rubarol", "skodirol", "primarol", "gatarol", "bokarol", "venol", "seseɉol", "semensarol", "ninsiol", "gratarol", "stiŧarol", "feraŧol", "ganŧarol", "ninŧiol", "pesol", "strasarol", "ninŧol", "lumarol", "penarol", "pekol", "ferasol", "tirafol", "ninsol", "ŧimarol", "veđol", "kiɉarol", "sorđarol", "peŧol", "lodevol", "jarol", "sorxarol", "beŧarol", "figaŧol", "piaŧarol", "garsiñol", "dentarol", "skondarol", "rofiol", "koredol", "spianŧarol", "figasol", "linarol", "niŧiol", "nisiol", "roxiñol", "gansarol", "ruxiñol", "terŧarol", "stradarol", "ŧestarol", "codarol", "ferarol", "sesejol", "gucarol", "sportarol", "spigarol", "merdarol", "rasarol", "koresol", "pegorarol", "ŧerarol", "rufiol", "boŧol", "ladarol", "scoparol", "panarol", "poridol", "brasarol", "granđiol", "masarol", "kanol", "pajarol", "straŧarol", "akuarol", "poxol", "niŧol", "speriol", "đirasol", "stisarol", "xɉoŧarol", "ganđarol", "lisarol", "broñol", "bosol", "salarol", "latexiol", "pestarol", "balansiol", "skonbrarol", "orxol", "basarol", "bevarol", "nisol", "luxarol", "kontarol", "fiol", "pontarol", "farinarol", "agostarol", "lađarol", "viñarol", "mañarol", "mokarol", "armarol", "polarol", "fumarol", "maŧarol", "bugarol", "peŧarol", "bedarol", "verlol", "pixol", "gandarol", "vexol", "muxarol", "xjosarol", "peñarol", "kijarol", "solsarol")),
 			new LineEntry("al", "ài", "al", Arrays.asList("kapusal", "parameđal", "anoal", "naŧional", "bal", "perpetual", "trionfal", "sokorsal", "masakaval", "infernal", "dental", "megal", "kaval", "lonđitudenal", "spisial", "substanŧial", "personal", "lidial", "aspetual", "làvar–dental", "kurial", "kapuŧal", "prepoxiŧional", "skinal", "sotogrondal", "malugual", "kauxal", "siñal", "deal", "piasal", "logativa–direŧional", "dixial", "strajudisial", "manual", "tribunal", "stamenal", "pontekanal", "komunal", "logativo–direŧional", "matrikal", "kriminal", "piaŧal", "vesal", "muxegal", "deŧimal", "averbial", "sostanŧial", "autonal", "veŧal", "oriđenal", "labial", "gronbial", "ospedal", "frontal", "saondal", "piantal", "sagramental", "kontestual", "dexegual", "estrajudisial", "komersal", "modal", "bakanal", "sonđal", "komerŧal", "verdoxal", "maregal", "inpal", "sojal", "internasional", "final", "ibernal", "vental", "amoral", "orixenal", "internaŧional", "ofesial", "solkal", "ocal", "subafitual", "pioval", "bilabial", "nabukal", "kaotonal", "prinsipal", "artifisial", "kuintal", "luminal", "badial", "inlegal", "material", "ordenal", "agual", "sforsanal", "karamal", "moral", "ŧerforal", "soŧial", "prepoxisional", "batipal", "bati–pal", "nasional", "fraimal", "metal", "oriental", "korporal", "stival", "boral", "ugual", "tenporal", "skosal", "prexidenŧial", "inbal", "anal", "konfesional", "teritorial", "subtropegal", "pedestal", "kantonal", "diđial", "vertegal", "meridional", "petoral", "vidal", "faval", "pontual", "kaveal", "fonŧional", "speal", "sonxal", "penal", "làvaro–dental", "argomental", "presidenŧial", "femenal", "mesal", "londitudenal", "brunal", "reversal", "logativo–diresional", "ŧinɉal", "soŧal", "prinŧipal", "đudiŧial", "dimisorial", "brasal", "estraɉudiŧial", "speŧial", "grinbial", "rumegal", "sforŧanal", "gardinal", "gramadegal", "braŧal", "predial", "saonxal", "estrajudiŧial", "ŧenjal", "retikal", "noal", "vixal", "fitual", "fonsional", "gual", "real", "maŧakaval", "pertegal", "sponsal", "seraval", "postal", "verdodal", "onbrinal", "piantanemal", "ufisial", "vetural", "kavaŧal", "dorsal", "kultural", "kavastival", "serviŧial", "đornal", "xornal", "mental", "regal", "setemanal", "kavasal", "total", "inŧidental", "universal", "utunal", "sureal", "nomenal", "fraxal", "barbusal", "ofeŧial", "didial", "kristal", "tirastival", "ganbal", "barbuŧal", "iniŧial", "ŧentral", "đeneral", "kardenal", "aɉetival", "kanal", "dukal", "bordenal", "xmerdagal", "presidial", "afitual", "somensal", "koral", "kornal", "ajetival", "vial", "naxal", "verdođal", "gardenal", "sondal", "nadural", "ferial", "ufiŧial", "kaporal", "autunal", "animal", "destretual", "stromental", "arsanal", "grondal", "orixinal", "sostansial", "xendal", "substansial", "bordonal", "inperial", "nominal", "paramexal", "parangal", "somenŧal", "lial", "saonđal", "stal", "strajudiŧial", "nemal", "dornal", "kavedal", "sosal", "pivial", "lateral", "karneval", "skarkaval", "invernal", "lengual", "skartakaval", "lesegal", "kondisional", "vernegal", "kopal", "abitual", "referensial", "kondiŧional", "verbal", "estraɉudisial", "ofisial", "menal", "dexial", "oridontal", "farnimal", "skenal", "sirkostansial", "pòrta–penal", "ilegal", "egual", "plural", "straɉudiŧial", "inisial", "koronal", "nadal", "manoal", "baoral", "vokal", "minimal", "fardimal", "puñal", "kanocal", "insial", "soɉal", "lonxitudenal", "feminal", "numeral", "memorial", "dedal", "mortal", "servisial", "normal", "skritural", "palatal", "insidental", "baxoal", "stradal", "solidal", "aramal", "pontifegal", "gramal", "bestial", "traval", "spesial", "babal", "sperimental", "senal", "pòrta–mesal", "interinal", "presidensial", "traversal", "superfiŧial", "baroal", "xguinsal", "natural", "xudisial", "karnaval", "existensial", "feral", "xguinŧal", "grenbial", "konvensional", "ospeal", "tinbal", "orixontal", "portegal", "doxenal", "portapenal", "mural", "anemal", "referenŧial", "unilateral", "vakasal", "vakaŧal", "existenŧial", "plateal", "kavesal", "lokal", "semi–lateral", "madregal", "engual", "portamesal", "dudiŧial", "setimanal", "ŧinjal", "kaveŧal", "dial", "ŧendal", "fortunal", "papagal", "paramedal", "kapital", "modegal", "logativa–diresional", "patual", "portogal", "uxual", "kanbial", "ŧenɉal", "noval", "skarta–kaval", "xguansal", "ŧirkostanŧial", "orinal", "pòst–àlveo–palatal", "katredal", "frimal", "konvenŧional", "pontal", "bankal", "krestal", "individual", "sakramental", "konetral", "desimal", "ofiŧial", "dexeal", "fanal", "xguanŧal", "arsenal", "prexidensial", "orial", "grenal", "kuartal", "mantexenal", "minal", "semi–naxal", "señal", "distretual", "fiskal", "spiŧial", "sosial", "oridenal", "pronomenal", "straɉudisial", "superfisial", "xlibral", "oriđontal", "fondamental", "aŧal", "kordial", "kokal", "ministerial", "otunal", "inŧial", "parsonal", "bokal", "asal", "meal", "dotoral", "viñal", "rival")),
 			new LineEntry("an", "ài", "an", Arrays.asList("malsan", "tulipan", "bonvivan", "pastran", "borgexan", "đoldan", "baɉan", "segrestan", "deretan", "pisakan", "bresan", "tajan", "vineŧian", "taja–pan", "vinesian", "ŧarabaldan", "nostran", "mexan", "taɉapan", "itaɉan", "maran", "katalan", "lotregan", "turbian", "bekaran", "trivixan", "ragan", "bigaran", "pantegan", "arlan", "patan", "romitan", "skalŧakan", "skrivan", "kavian", "trevixan", "bran", "marabolan", "padan", "međan", "vinisian", "kavarđaran", "marostegan", "brixan", "bragolan", "palandran", "tajapan", "viniŧian", "pacan", "ŧanbelan", "kuran", "balŧan", "ingan", "barakan", "balsan", "anbrakan", "ŧerlatan", "itajan", "lateran", "medolan", "eraklean", "barbasan", "sopran", "sakrestan", "barbakan", "barbaŧan", "padovan", "roskan", "pojapian", "malsakan", "pulitan", "caran", "violipan", "bakan", "mundan", "skan", "venesian", "rodolan", "ŧapa–pian", "vilan", "detregan", "drian", "rabikan", "kordovan", "antian", "famalan", "ostregan", "maturlan", "piovexan", "soran", "barbajan", "kavardaran", "takapan", "vulkan", "sovran", "medan", "pikapan", "piovan", "polikan", "borean", "kastelan", "baban", "surian", "piovegan", "pesekan", "kristian", "tralian", "bajan", "uragan", "lontan", "urban", "anpesan", "barbaɉan", "taɉa–pan", "anpeŧan", "anglekan", "degan", "anŧian", "arteđan", "marobolan", "tavan", "mañapan", "valexan", "lavran", "bastran", "pagan", "morian", "languisan", "ŧapapian", "tiran", "roan", "detragan", "pedan", "agortan", "carabaldan", "katapan", "talian", "gaban", "tandan", "kaopian", "paexan", "solan", "carlan", "afan", "montan", "graexan", "domenikan", "furian", "grosolan", "pantan", "pelikan", "liban", "artexan", "ŧinban", "međolan", "ledan", "burlan", "anglo–meregan", "guardian", "xletran", "kafetan", "mataran", "kapitan", "marŧapan", "intian", "altopian", "ansian", "indian", "altivolan", "furlan", "ixolan", "mexolan", "agostan", "arkan", "malxapan", "paltan", "konplean", "peskapian", "bevan", "karantan", "parocan", "ŧarlatan", "bean", "molnan", "parabolan", "galan", "bagan", "malan", "polexan", "bon–vivan", "ŧaratan", "spiantan", "kapotan", "dulipan", "forean", "artedan", "pepian", "rafakan", "tanburlan", "masakan", "veneŧian", "portolan", "krestian", "faxan", "arŧaran", "skalsakan", "toskan", "torexan", "gabian", "arsaran", "ortolan", "pavan", "kortexan", "divan", "padoan", "kastrakan", "axolan", "marsapan", "maŧakan", "kan", "rufian", "barban", "kavarxaran", "antan", "prusian", "matapan", "italian", "korean", "vigan", "sotodegan", "mean", "pedemontan", "poɉapian", "ostegan")),
-			new LineEntry("n", "i", "[^aeou]n", Arrays.asList("bixnòn", "bontòn", "patròn", "mexèn", "pièn", "međèn", "alièn", "armèn", "sòn", "tòn", "trèn", "bonbòn", "spròn", "òn", "medèn", "saòn", "kakasèn")),
-			new LineEntry("l", "i", "[^aeou]l", Arrays.asList("kojonŧèl", "xbarbatèl", "ranaròl", "soriòl", "ovaròl", "seconŧèl", "tenpexèl", "kastañòl", "karagòl", "liŧaròl", "masèl", "braŧaròl", "ŧigaròl", "redexèl", "albòl", "bertevèl", "kokajòl", "barbisòl", "flajèl", "ruxiòl", "skodaròl", "krudèl", "tastaròl", "monexèl", "pisaròl", "lionŧèl", "garxonsèl", "koɉonŧèl", "miedaròl", "armakòl", "fainèl", "buèl", "kaxonŧèl", "bativèl", "faxiòl", "lađaròl", "artedanèl", "tinasòl", "lusatèl", "ventexèl", "gostaròl", "libaròl", "kuintèl", "bañòl", "formentèl", "novèl", "faxòl", "ŧendraròl", "menoèl", "ganbèl", "kavriòl", "fosatèl", "dakòl", "bocòl", "fornèl", "brikonŧèl", "kanpañòl", "barbuŧòl", "poridòl", "porsèl", "manevèl", "bexaròl", "đemèl", "bardevèl", "kroñòl", "borèl", "galiotèl", "korparòl", "santarèl", "boriñòl", "toajòl", "oridèl", "osakòl", "pursinèl", "barixèl", "timonsèl", "menedèl", "kontarèl", "burcèl", "fogerèl", "raixèl", "roviɉòl", "gomisièl", "filŧòl", "arditèl", "bindèl", "bronbijòl", "kartèl", "korexiòl", "buratèl", "rièl", "kaveŧòl", "ŧarlatanèl", "bolsanèl", "grajotèl", "kortexanèl", "pasarèl", "valonsèl", "stanpatèl", "staterèl", "palasòl", "fatarèl", "beveraròl", "apèl", "kuariŧèl", "rovejòl", "borsaròl", "kavièl", "rudiòl", "bardòl", "mexadèl", "ranpegaròl", "antianèl", "arteđanèl", "ladronŧèl", "korñòl", "tornèl", "trataròl", "intianèl", "solexèl", "maŧaròl", "gransiòl", "gatèl", "penaròl", "đoɉèl", "alberèl", "arxonèl", "boŧèl", "ruviɉòl", "figadèl", "kasèl", "sportaròl", "bajardèl", "infogadèl", "kovièl", "kaecòl", "linaròl", "bastonŧèl", "paŧarèl", "kortèl", "kaŧonèl", "violonŧèl", "fraxèl", "periòl", "piòl", "xgabèl", "luŧatèl", "sonaɉòl", "biviòl", "soldadèl", "furtarèl", "barđòl", "dindiotèl", "baɉardèl", "rovijòl", "krivèl", "purŧinèl", "anèl", "fondèl", "korniòl", "tariòl", "poŧòl", "pontexèl", "faganèl", "franguèl", "oropèl", "andiòl", "masòl", "spianŧaròl", "putatèl", "karetèl", "picarèl", "kapuŧòl", "fidèl", "vexòl", "sigaròl", "bordèl", "xɉoŧaròl", "moèl", "xbardavèl", "salaròl", "gavinèl", "marŧèl", "morèl", "kolomèl", "risòl", "banbinèl", "brasadèl", "luxaròl", "ròl", "putèl", "mantexèl", "fumaròl", "orđiòl", "granđiòl", "skartabèl", "đanbèl", "solaròl", "fijòl", "kantonŧèl", "kokoñèl", "sorđaròl", "borsèl", "matuxèl", "menuèl", "ŧestèl", "xolariòl", "piegadèl", "tovaɉòl", "sexèl", "đenocèl", "baronŧèl", "purisinèl", "tondèl", "saltarèl", "ferasòl", "viñaròl", "bruɉèl", "agostaròl", "đovèl", "gardòl", "sordaròl", "kanpièl", "terŧòl", "takakapèl", "bokonŧèl", "meɉaròl", "skansèl", "konterèl", "brokadèl", "pontèl", "xguaɉatèl", "skopèl", "sponsòl", "pòl", "gonfiadèl", "detreganiòl", "rixaròl", "roveɉòl", "solŧaròl", "balkonsèl", "xɉosaròl", "ardarèl", "viŧinèl", "vovaròl", "sparsèl", "rosiñòl", "kavicòl", "vetriòl", "mariòl", "pajòl", "pođòl", "kanèl", "bemòl", "lekapestèl", "kusinèl", "martèl", "statarèl", "codèl", "kaŧòl", "orpèl", "kordaròl", "braŧadèl", "fiumexèl", "kamixòl", "linbèl", "kokaɉòl", "stentaròl", "lovastrèl", "pediŧèl", "spondòl", "viscaròl", "lixèl", "biskotèl", "brandèl", "paɉaròl", "somarèl", "skapusiòl", "ŧestaròl", "fondaròl", "karòl", "trabukèl", "ŧarvèl", "torèl", "remendèl", "ganxaròl", "bisinèl", "kainèl", "rejotèl", "forsèl", "ordiòl", "guardòl", "batèl", "kagonŧèl", "poriđòl", "jaŧòl", "sedèl", "xataròl", "burèl", "spiansaròl", "kanpañaròl", "guxaròl", "turkèl", "bixinèl", "kairòl", "panexèl", "polesòl", "burlèl", "fiabaròl", "kolaròl", "carèl", "rigabèl", "faɉòl", "boaròl", "livèl", "korixiòl", "sfasèl", "stra-bèl", "faŧòl", "penonŧèl", "mièl", "molexèl", "restèl", "tovajòl", "ŧaratanèl", "fanèl", "sonèl", "bagèl", "kiɉaròl", "orxiòl", "rebèl", "skondaròl", "kapriòl", "kavedèl", "kuadrèl", "semensaròl", "intrigadèl", "storđikòl", "stuèl", "primaròl", "xmardèl", "grataròl", "veèl", "ganŧaròl", "seđèl", "terŧaròl", "sukòl", "soranèl", "kanevaròl", "menevèl", "piñatèl", "vecexòl", "đornaròl", "gardèl", "porixòl", "vedriòl", "betinèl", "dragonŧèl", "kanpanèl", "artexanèl", "moskatèl", "ruvijòl", "niŧiòl", "rapanèl", "bekiñòl", "linsòl", "ninsiòl", "martarèl", "subiòl", "spigaròl", "kanòl", "niŧòl", "korbatèl", "osokòl", "bigorèl", "poxòl", "brujèl", "lisaròl", "fapèl", "barbusòl", "merdaròl", "bonèl", "montexèl", "bisterèl", "rufiòl", "sediòl", "pontaròl", "ŧivèl", "gropèl", "scoparòl", "oripèl", "panaròl", "indovinèl", "konsapèl", "bugaròl", "medadèl", "majòl", "stentarèl", "garbèl", "peñaròl", "torsèl", "grinxòl", "xjosaròl", "arxarèl", "mantèl", "kapitèl", "gròl", "bertovèl", "menarèl", "noxèl", "ninŧòl", "minuèl", "kontaròl", "listèl", "panetèl", "brasaròl", "bokaròl", "barxòl", "vanarèl", "durèl", "stiŧaròl", "lionsèl", "brikonsèl", "ardonèl", "kojonsèl", "barbiŧòl", "brasiòl", "trapèl", "palaŧòl", "oxèl", "portakapèl", "remondèl", "ponaròl", "maŧèl", "ŧixèl", "brentèl", "karoxèl", "ponteròl", "peterèl", "garxonŧèl", "koɉonsèl", "kaxonsèl", "tasèl", "pòrta–kapèl", "paròl", "skarpèl", "fasinèl", "tinèl", "bulièl", "kanpanièl", "tornexèl", "bronbeɉòl", "marèl", "maŧaporŧèl", "kosinèl", "bustarèl", "pesaròl", "bigarèl", "faŧiòl", "albuòl", "rafiòl", "piatèl", "bèl", "beđaròl", "barkaròl", "raganèl", "paɉòl", "supiaròl", "međadèl", "vedèl", "filixèl", "bestiòl", "seconsèl", "skarkaɉòl", "ucaròl", "kanaròl", "peŧarèl", "ruđiòl", "konastrèl", "kojonèl", "tajòl", "finestrèl", "lenŧiòl", "kuarisèl", "timonŧèl", "laxaròl", "ravanèl", "arđonèl", "perpetuèl", "ŧexendèl", "kavesòl", "kankarèl", "rokèl", "dentèl", "referatèl", "bronbiòl", "buricinèl", "biavaròl", "fièl", "manipòl", "ŧernieròl", "cavaròl", "storxikòl", "ŧimaròl", "fajòl", "baketèl", "boskaròl", "besaròl", "kasiòl", "ŧervèl", "đirèl", "tinaŧòl", "karaguòl", "mapèl", "batibèl", "spañòl", "ŧenocèl", "sponđòl", "marexèl", "kastèl", "sanbuèl", "reditaròl", "kuajaròl", "podòl", "frutaròl", "barbastèl", "remandèl", "xbrindèl", "deèl", "piasaròl", "ladronsèl", "pradaròl", "filivèl", "akuarèl", "skabèl", "salbanèl", "tersaròl", "priòl", "bikiñòl", "sorxaròl", "penèl", "pesarèl", "filexèl", "muxaròl", "riganèl", "peŧòl", "fagotèl", "kokonèl", "añèl", "strasaròl", "kavrinòl", "bulèl", "bastonsèl", "buxnèl", "modèl", "bartavèl", "buɉòl", "ŧercèl", "ñèl", "feraròl", "skuderòl", "skavesakòl", "polaròl", "montèl", "orxòl", "recotèl", "rasaròl", "beŧaròl", "tristarèl", "xbrindakòl", "posòl", "trabokèl", "bosèl", "puriŧinèl", "forkamèl", "lumaròl", "nixèl", "stornèl", "ninŧiòl", "piaŧaròl", "đinbèl", "rusèl", "ocèl", "palixèl", "sponxòl", "konostrèl", "cavexèl", "menestròl", "rimandèl", "maŧòl", "violonsèl", "xenocèl", "pesatèl", "straŧaròl", "gandaròl", "masaròl", "trivèl", "kalkañòl", "pajaròl", "gucaròl", "fraèl", "porŧèl", "ruxiñòl", "fiòl", "baronsèl", "kapusòl", "rantegèl", "marsèl", "lensiòl", "maɉòl", "ŧokatèl", "farinaròl", "ŧexèl", "saldaròl", "kanarèl", "riŧòl", "mastèl", "portèl", "mokaròl", "karamèl", "bekonèl", "kantonsèl", "xnèl", "guèl", "strabèl", "solsaròl", "ŧerlatanèl", "akuaròl", "kolmèl", "filandèl", "kapèl", "kunèl", "skañèl", "xugèl", "garđòl", "kolonèl", "latexiòl", "rededèl", "gratarèl", "kanapiòl", "pestaròl", "kuarèl", "bolsonèl", "vedovèl", "armaròl", "priastèl", "feraŧòl", "krièl", "đimèl", "kaxaròl", "ortexèl", "tritèl", "ordòl", "braŧiòl", "filièl", "bufonèl", "secèl", "kalastrèl", "bakariòl", "boxèl", "vixinèl", "bavaròl", "bokonsèl", "skanŧèl", "skarkajòl", "mejaròl", "fuxèl", "tersòl", "balkonŧèl", "bròl", "skonbraròl", "skòl", "bañaròl", "kananiòl", "bronbejòl", "matonèl", "fradèl", "xbrefèl", "draparòl", "batarèl", "mañaputèl", "radixèl", "sponŧòl", "trufèl", "patèl", "veriòl", "martorèl", "kasòl", "pijakaragòl", "kasonèl", "buranèl", "fasiòl", "toxatèl", "đontaròl", "ŧeraròl", "cijaròl", "ganđaròl", "bastardèl", "frèl", "sixèl", "sturiòl", "masaporsèl", "bolŧonèl", "vedoèl", "flaɉèl", "kogòl", "tinpanèl", "navaròl", "denocèl", "erbaròl", "redeđèl", "pedisèl", "karuxèl", "skaveŧakòl", "polastrèl", "stañòl", "spasèl", "telaròl", "kamèl", "bixatèl", "pexaròl", "manganèl", "semenŧaròl", "saltèl", "forŧèl", "taɉòl", "siòl", "guarnèl", "medòl", "kagonsèl", "sorakòl", "grandiòl", "rostèl", "dovèl", "revendaròl", "infiadèl", "kadenèl", "bronbiɉòl", "garnèl", "jasòl", "skueraròl", "daòl", "sfrasèl", "artaròl", "spinèl", "kavestrèl", "poleŧòl", "tabarèl", "mòl", "travexèl", "xguajatèl", "granèl", "kruèl", "fardèl", "montixòl", "garangèl", "storiòl", "sfaŧèl", "sapientèl", "vesinèl", "buxinèl", "lataròl", "peloxèl", "vasèl", "codaròl", "roxiñòl", "konŧapèl", "pekòl", "đojèl", "pòrta–mantèl", "gavitèl", "dragonsèl", "garxòl", "barexèl", "fanfarièl", "fasòl", "kijaròl", "paganèl", "penonsèl", "sonajòl", "granxiòl", "kaniòl", "bigòl", "budèl", "coaròl", "bokardèl", "kuartaròl", "gataròl", "stradaròl", "kañòl", "gansaròl", "rusiñòl", "skankòl", "ŧukòl", "tirafòl", "dukatèl", "visinèl", "stisaròl", "karavèl", "salbrunèl", "kòl", "rubaròl", "pividèl", "koresòl", "portamantèl", "karièl", "tirèl", "karakòl", "nisiòl", "linŧòl", "tornakòl", "konkòl", "gaitèl", "filèl", "gabanèl", "koɉonèl", "altarèl", "bedaròl", "betarèl", "kormèl", "arđarèl", "trinèl", "piñòl", "basaròl", "manuèl", "albarèl", "bevaròl", "skirèl", "drapèl", "orđòl", "bruñòl", "asexèl", "spinièl", "koruxiòl", "ronpikòl", "kanestrèl", "fròl", "bertoèl", "panèl", "peŧaròl", "petèl", "pipistrèl", "tramandèl", "kamòl", "pandòl", "matarèl", "xjoŧaròl", "ninsòl", "graɉotèl", "reɉotèl", "kaŧiòl", "karatèl", "molinèl", "pegoraròl", "stordikòl", "libèl", "bujòl", "ladaròl", "xovèl", "nisòl", "axenèl", "fiɉòl", "kaxèl", "murèl", "mestèl", "lavèl", "ŧopèl", "barbarinèl", "ŧinbanèl", "spinarèl"))
+			new LineEntry("n", "i", "[èò]n", Arrays.asList("bixnòn", "bontòn", "patròn", "mexèn", "pièn", "međèn", "alièn", "armèn", "sòn", "tòn", "trèn", "bonbòn", "spròn", "òn", "medèn", "saòn", "kakasèn")),
+			new LineEntry("l", "i", "[èò]l", Arrays.asList("kojonŧèl", "xbarbatèl", "ranaròl", "soriòl", "ovaròl", "seconŧèl", "tenpexèl", "kastañòl", "karagòl", "liŧaròl", "masèl", "braŧaròl", "ŧigaròl", "redexèl", "albòl", "bertevèl", "kokajòl", "barbisòl", "flajèl", "ruxiòl", "skodaròl", "krudèl", "tastaròl", "monexèl", "pisaròl", "lionŧèl", "garxonsèl", "koɉonŧèl", "miedaròl", "armakòl", "fainèl", "buèl", "kaxonŧèl", "bativèl", "faxiòl", "lađaròl", "artedanèl", "tinasòl", "lusatèl", "ventexèl", "gostaròl", "libaròl", "kuintèl", "bañòl", "formentèl", "novèl", "faxòl", "ŧendraròl", "menoèl", "ganbèl", "kavriòl", "fosatèl", "dakòl", "bocòl", "fornèl", "brikonŧèl", "kanpañòl", "barbuŧòl", "poridòl", "porsèl", "manevèl", "bexaròl", "đemèl", "bardevèl", "kroñòl", "borèl", "galiotèl", "korparòl", "santarèl", "boriñòl", "toajòl", "oridèl", "osakòl", "pursinèl", "barixèl", "timonsèl", "menedèl", "kontarèl", "burcèl", "fogerèl", "raixèl", "roviɉòl", "gomisièl", "filŧòl", "arditèl", "bindèl", "bronbijòl", "kartèl", "korexiòl", "buratèl", "rièl", "kaveŧòl", "ŧarlatanèl", "bolsanèl", "grajotèl", "kortexanèl", "pasarèl", "valonsèl", "stanpatèl", "staterèl", "palasòl", "fatarèl", "beveraròl", "apèl", "kuariŧèl", "rovejòl", "borsaròl", "kavièl", "rudiòl", "bardòl", "mexadèl", "ranpegaròl", "antianèl", "arteđanèl", "ladronŧèl", "korñòl", "tornèl", "trataròl", "intianèl", "solexèl", "maŧaròl", "gransiòl", "gatèl", "penaròl", "đoɉèl", "alberèl", "arxonèl", "boŧèl", "ruviɉòl", "figadèl", "kasèl", "sportaròl", "bajardèl", "infogadèl", "kovièl", "kaecòl", "linaròl", "bastonŧèl", "paŧarèl", "kortèl", "kaŧonèl", "violonŧèl", "fraxèl", "periòl", "piòl", "xgabèl", "luŧatèl", "sonaɉòl", "biviòl", "soldadèl", "furtarèl", "barđòl", "dindiotèl", "baɉardèl", "rovijòl", "krivèl", "purŧinèl", "anèl", "fondèl", "korniòl", "tariòl", "poŧòl", "pontexèl", "faganèl", "franguèl", "oropèl", "andiòl", "masòl", "spianŧaròl", "putatèl", "karetèl", "picarèl", "kapuŧòl", "fidèl", "vexòl", "sigaròl", "bordèl", "xɉoŧaròl", "moèl", "xbardavèl", "salaròl", "gavinèl", "marŧèl", "morèl", "kolomèl", "risòl", "banbinèl", "brasadèl", "luxaròl", "ròl", "putèl", "mantexèl", "fumaròl", "orđiòl", "granđiòl", "skartabèl", "đanbèl", "solaròl", "fijòl", "kantonŧèl", "kokoñèl", "sorđaròl", "borsèl", "matuxèl", "menuèl", "ŧestèl", "xolariòl", "piegadèl", "tovaɉòl", "sexèl", "đenocèl", "baronŧèl", "purisinèl", "tondèl", "saltarèl", "ferasòl", "viñaròl", "bruɉèl", "agostaròl", "đovèl", "gardòl", "sordaròl", "kanpièl", "terŧòl", "takakapèl", "bokonŧèl", "meɉaròl", "skansèl", "konterèl", "brokadèl", "pontèl", "xguaɉatèl", "skopèl", "sponsòl", "pòl", "gonfiadèl", "detreganiòl", "rixaròl", "roveɉòl", "solŧaròl", "balkonsèl", "xɉosaròl", "ardarèl", "viŧinèl", "vovaròl", "sparsèl", "rosiñòl", "kavicòl", "vetriòl", "mariòl", "pajòl", "pođòl", "kanèl", "bemòl", "lekapestèl", "kusinèl", "martèl", "statarèl", "codèl", "kaŧòl", "orpèl", "kordaròl", "braŧadèl", "fiumexèl", "kamixòl", "linbèl", "kokaɉòl", "stentaròl", "lovastrèl", "pediŧèl", "spondòl", "viscaròl", "lixèl", "biskotèl", "brandèl", "paɉaròl", "somarèl", "skapusiòl", "ŧestaròl", "fondaròl", "karòl", "trabukèl", "ŧarvèl", "torèl", "remendèl", "ganxaròl", "bisinèl", "kainèl", "rejotèl", "forsèl", "ordiòl", "guardòl", "batèl", "kagonŧèl", "poriđòl", "jaŧòl", "sedèl", "xataròl", "burèl", "spiansaròl", "kanpañaròl", "guxaròl", "turkèl", "bixinèl", "kairòl", "panexèl", "polesòl", "burlèl", "fiabaròl", "kolaròl", "carèl", "rigabèl", "faɉòl", "boaròl", "livèl", "korixiòl", "sfasèl", "stra-bèl", "faŧòl", "penonŧèl", "mièl", "molexèl", "restèl", "tovajòl", "ŧaratanèl", "fanèl", "sonèl", "bagèl", "kiɉaròl", "orxiòl", "rebèl", "skondaròl", "kapriòl", "kavedèl", "kuadrèl", "semensaròl", "intrigadèl", "storđikòl", "stuèl", "primaròl", "xmardèl", "grataròl", "veèl", "ganŧaròl", "seđèl", "terŧaròl", "sukòl", "soranèl", "kanevaròl", "menevèl", "piñatèl", "vecexòl", "đornaròl", "gardèl", "porixòl", "vedriòl", "betinèl", "dragonŧèl", "kanpanèl", "artexanèl", "moskatèl", "ruvijòl", "niŧiòl", "rapanèl", "bekiñòl", "linsòl", "ninsiòl", "martarèl", "subiòl", "spigaròl", "kanòl", "niŧòl", "korbatèl", "osokòl", "bigorèl", "poxòl", "brujèl", "lisaròl", "fapèl", "barbusòl", "merdaròl", "bonèl", "montexèl", "bisterèl", "rufiòl", "sediòl", "pontaròl", "ŧivèl", "gropèl", "scoparòl", "oripèl", "panaròl", "indovinèl", "konsapèl", "bugaròl", "medadèl", "majòl", "stentarèl", "garbèl", "peñaròl", "torsèl", "grinxòl", "xjosaròl", "arxarèl", "mantèl", "kapitèl", "gròl", "bertovèl", "menarèl", "noxèl", "ninŧòl", "minuèl", "kontaròl", "listèl", "panetèl", "brasaròl", "bokaròl", "barxòl", "vanarèl", "durèl", "stiŧaròl", "lionsèl", "brikonsèl", "ardonèl", "kojonsèl", "barbiŧòl", "brasiòl", "trapèl", "palaŧòl", "oxèl", "portakapèl", "remondèl", "ponaròl", "maŧèl", "ŧixèl", "brentèl", "karoxèl", "ponteròl", "peterèl", "garxonŧèl", "koɉonsèl", "kaxonsèl", "tasèl", "pòrta–kapèl", "paròl", "skarpèl", "fasinèl", "tinèl", "bulièl", "kanpanièl", "tornexèl", "bronbeɉòl", "marèl", "maŧaporŧèl", "kosinèl", "bustarèl", "pesaròl", "bigarèl", "faŧiòl", "albuòl", "rafiòl", "piatèl", "bèl", "beđaròl", "barkaròl", "raganèl", "paɉòl", "supiaròl", "međadèl", "vedèl", "filixèl", "bestiòl", "seconsèl", "skarkaɉòl", "ucaròl", "kanaròl", "peŧarèl", "ruđiòl", "konastrèl", "kojonèl", "tajòl", "finestrèl", "lenŧiòl", "kuarisèl", "timonŧèl", "laxaròl", "ravanèl", "arđonèl", "perpetuèl", "ŧexendèl", "kavesòl", "kankarèl", "rokèl", "dentèl", "referatèl", "bronbiòl", "buricinèl", "biavaròl", "fièl", "manipòl", "ŧernieròl", "cavaròl", "storxikòl", "ŧimaròl", "fajòl", "baketèl", "boskaròl", "besaròl", "kasiòl", "ŧervèl", "đirèl", "tinaŧòl", "karaguòl", "mapèl", "batibèl", "spañòl", "ŧenocèl", "sponđòl", "marexèl", "kastèl", "sanbuèl", "reditaròl", "kuajaròl", "podòl", "frutaròl", "barbastèl", "remandèl", "xbrindèl", "deèl", "piasaròl", "ladronsèl", "pradaròl", "filivèl", "akuarèl", "skabèl", "salbanèl", "tersaròl", "priòl", "bikiñòl", "sorxaròl", "penèl", "pesarèl", "filexèl", "muxaròl", "riganèl", "peŧòl", "fagotèl", "kokonèl", "añèl", "strasaròl", "kavrinòl", "bulèl", "bastonsèl", "buxnèl", "modèl", "bartavèl", "buɉòl", "ŧercèl", "ñèl", "feraròl", "skuderòl", "skavesakòl", "polaròl", "montèl", "orxòl", "recotèl", "rasaròl", "beŧaròl", "tristarèl", "xbrindakòl", "posòl", "trabokèl", "bosèl", "puriŧinèl", "forkamèl", "lumaròl", "nixèl", "stornèl", "ninŧiòl", "piaŧaròl", "đinbèl", "rusèl", "ocèl", "palixèl", "sponxòl", "konostrèl", "cavexèl", "menestròl", "rimandèl", "maŧòl", "violonsèl", "xenocèl", "pesatèl", "straŧaròl", "gandaròl", "masaròl", "trivèl", "kalkañòl", "pajaròl", "gucaròl", "fraèl", "porŧèl", "ruxiñòl", "fiòl", "baronsèl", "kapusòl", "rantegèl", "marsèl", "lensiòl", "maɉòl", "ŧokatèl", "farinaròl", "ŧexèl", "saldaròl", "kanarèl", "riŧòl", "mastèl", "portèl", "mokaròl", "karamèl", "bekonèl", "kantonsèl", "xnèl", "guèl", "strabèl", "solsaròl", "ŧerlatanèl", "akuaròl", "kolmèl", "filandèl", "kapèl", "kunèl", "skañèl", "xugèl", "garđòl", "kolonèl", "latexiòl", "rededèl", "gratarèl", "kanapiòl", "pestaròl", "kuarèl", "bolsonèl", "vedovèl", "armaròl", "priastèl", "feraŧòl", "krièl", "đimèl", "kaxaròl", "ortexèl", "tritèl", "ordòl", "braŧiòl", "filièl", "bufonèl", "secèl", "kalastrèl", "bakariòl", "boxèl", "vixinèl", "bavaròl", "bokonsèl", "skanŧèl", "skarkajòl", "mejaròl", "fuxèl", "tersòl", "balkonŧèl", "bròl", "skonbraròl", "skòl", "bañaròl", "kananiòl", "bronbejòl", "matonèl", "fradèl", "xbrefèl", "draparòl", "batarèl", "mañaputèl", "radixèl", "sponŧòl", "trufèl", "patèl", "veriòl", "martorèl", "kasòl", "pijakaragòl", "kasonèl", "buranèl", "fasiòl", "toxatèl", "đontaròl", "ŧeraròl", "cijaròl", "ganđaròl", "bastardèl", "frèl", "sixèl", "sturiòl", "masaporsèl", "bolŧonèl", "vedoèl", "flaɉèl", "kogòl", "tinpanèl", "navaròl", "denocèl", "erbaròl", "redeđèl", "pedisèl", "karuxèl", "skaveŧakòl", "polastrèl", "stañòl", "spasèl", "telaròl", "kamèl", "bixatèl", "pexaròl", "manganèl", "semenŧaròl", "saltèl", "forŧèl", "taɉòl", "siòl", "guarnèl", "medòl", "kagonsèl", "sorakòl", "grandiòl", "rostèl", "dovèl", "revendaròl", "infiadèl", "kadenèl", "bronbiɉòl", "garnèl", "jasòl", "skueraròl", "daòl", "sfrasèl", "artaròl", "spinèl", "kavestrèl", "poleŧòl", "tabarèl", "mòl", "travexèl", "xguajatèl", "granèl", "kruèl", "fardèl", "montixòl", "garangèl", "storiòl", "sfaŧèl", "sapientèl", "vesinèl", "buxinèl", "lataròl", "peloxèl", "vasèl", "codaròl", "roxiñòl", "konŧapèl", "pekòl", "đojèl", "pòrta–mantèl", "gavitèl", "dragonsèl", "garxòl", "barexèl", "fanfarièl", "fasòl", "kijaròl", "paganèl", "penonsèl", "sonajòl", "granxiòl", "kaniòl", "bigòl", "budèl", "coaròl", "bokardèl", "kuartaròl", "gataròl", "stradaròl", "kañòl", "gansaròl", "rusiñòl", "skankòl", "ŧukòl", "tirafòl", "dukatèl", "visinèl", "stisaròl", "karavèl", "salbrunèl", "kòl", "rubaròl", "pividèl", "koresòl", "portamantèl", "karièl", "tirèl", "karakòl", "nisiòl", "linŧòl", "tornakòl", "konkòl", "gaitèl", "filèl", "gabanèl", "koɉonèl", "altarèl", "bedaròl", "betarèl", "kormèl", "arđarèl", "trinèl", "piñòl", "basaròl", "manuèl", "albarèl", "bevaròl", "skirèl", "drapèl", "orđòl", "bruñòl", "asexèl", "spinièl", "koruxiòl", "ronpikòl", "kanestrèl", "fròl", "bertoèl", "panèl", "peŧaròl", "petèl", "pipistrèl", "tramandèl", "kamòl", "pandòl", "matarèl", "xjoŧaròl", "ninsòl", "graɉotèl", "reɉotèl", "kaŧiòl", "karatèl", "molinèl", "pegoraròl", "stordikòl", "libèl", "bujòl", "ladaròl", "xovèl", "nisòl", "axenèl", "fiɉòl", "kaxèl", "murèl", "mestèl", "lavèl", "ŧopèl", "barbarinèl", "ŧinbanèl", "spinarèl"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
@@ -1756,402 +1753,204 @@ class RulesReducerTest{
 			"SFX U0 en éi en",
 			"SFX U0 on ói on",
 			"SFX U0 un úi un",
-			"SFX U0 l i [^aeou]l",
-			"SFX U0 n i [^aeou]n"
+			"SFX U0 l i [èò]l",
+			"SFX U0 n i [èò]n"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
-
 	@Test
-	void casePrefix1() throws IOException{
-		String language = "vec-IT";
+	void caseSuffix21() throws IOException{
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"PFX '0 Y 9",
-			"PFX '0 a ‘ a",
-			"PFX '0 d ‘ d",
-			"PFX '0 ga ‘ ga",
-			"PFX '0 g ‘ go",
-			"PFX '0 i ‘ i",
-			"PFX '0 in ‘ int",
-			"PFX '0 kò ‘ kò",
-			"PFX '0 l ‘ l",
-			"PFX '0 v ‘ v"
+			"SFX F0 Y 1",
+			"SFX F0 a e a",
+			"SFX %0 Y 3",
+			"SFX %0 ète etena/F0 ète",
+			"SFX %0 ète eteneta/F0 ète	ds:eto",
+			"SFX %0 ète etèna/F0 ète"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "'0";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("gonfio", "gonfieŧa", "gonfiesa", "intanto", "inté", "int‘", "làrexe", "gaveta", "ankora", "aƚora", "alora", "al", "an", "kòsa", "indrío", "inpresta", "volsuda", "vòtu", "vòlo", "vòlvo", "vúdoe", "vosudo", "vòƚega", "vóloe", "vui", "voxaŧa", "voƚentièra", "voƚèga", "vóxoe", "varo", "vokato", "volèga", "vara", "vòlega", "varar", "vòlva", "vosuda", "vutu", "vàroe", "voƚo", "volto", "vudo", "voƚintièra", "voltadina", "vudar", "voƚar", "vòlto", "voxo", "volo", "voltada", "voxon", "voxe", "vàrdoe", "voltar", "voƚer", "vardo", "vò-tu", "vóƚoe", "vídola", "voxar", "volentièra", "vardar", "vòƚo", "voƚàdego", "voxada", "volsudo", "voler", "vòlta", "volintièra", "volar", "vòltoe", "vu-tu", "volàdego", "vòstro", "dito");
+		String flag = "%0";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("sète");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("g", "‘", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
-			new LineEntry("ag", "‘", "ag", "atevag"),
-			new LineEntry("l", "‘", "l", "exeràl"),
-			new LineEntry("a", "‘", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
-			new LineEntry("i", "‘", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "‘tni", "étni")),
-			new LineEntry("ni", "‘", "tni", Arrays.asList("otnatni", "‘tni", "étni")),
-			new LineEntry("v", "‘", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
-			new LineEntry("d", "‘", "d", "otid"),
-			new LineEntry("òk", "‘", "òk", "asòk")
+			new LineEntry("ète", SetHelper.setOf("etèna/F0", "eteneta/F0\tds:eto", "etena/F0"), "ète", Arrays.asList("sète"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX '0 Y 9",
-			"PFX '0 a ‘ a",
-			"PFX '0 d ‘ d",
-			"PFX '0 i ‘ i",
-			"PFX '0 l ‘ l",
-			"PFX '0 v ‘ v",
-			"PFX '0 ga ‘ ga",
-			"PFX '0 kò ‘ kò",
-			"PFX '0 g ‘ g[^a]",
-			"PFX '0 in ‘ int"
+			"SFX %0 Y 3",
+			"SFX %0 ète etena/F0 ète",
+			"SFX %0 ète etèna/F0 ète",
+			"SFX %0 ète eteneta/F0 ète	ds:eto"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 	@Test
-	void casePrefix2() throws IOException{
-		String language = "vec-IT";
+	void caseSuffix22() throws IOException{
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"PFX vs Y 20",
-			"PFX vs be ba ber",
-			"PFX vs bè bà bèr",
-			"PFX vs bé bà bér",
-			"PFX vs fe fa fer",
-			"PFX vs fè fà fèr",
-			"PFX vs fé fà fér",
-			"PFX vs pe pa per",
-			"PFX vs pè pà pèr",
-			"PFX vs pé pà pér",
-			"PFX vs re ra re",
-			"PFX vs rè rà rè",
-			"PFX vs ré rà ré",
-			"PFX vs se sa se",
-			"PFX vs sè sà sè",
-			"PFX vs sé sà sé",
-			"PFX vs Se Sa Se",
-			"PFX vs te ta te",
-			"PFX vs tè tà tè",
-			"PFX vs té tà té",
-			"PFX vs ve va ver"
+			"SFX %2 Y 10",
+			"SFX %2 0 i [ivxlcdm]",
+			"SFX %2 0 ii [ivxlcdm]",
+			"SFX %2 0 iii [ivxlcdm]",
+			"SFX %2 0 iv [xlcdm]",
+			"SFX %2 0 v [ixlcdm]",
+			"SFX %2 0 vi [xlcdm]",
+			"SFX %2 0 vii [xlcdm]",
+			"SFX %2 0 viii [xlcdm]",
+			"SFX %2 0 ix [xlcdm]",
+			"SFX %2 0 x i"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "vs";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("Seravaƚe", "Seraval", "réngoe", "récoe", "tersaròƚoe", "tenaɉar", "tenajar", "terŧaròloe", "texin", "tersaròloe", "teràsoe", "tersariòƚo", "terŧaròlo", "tersaroƚar", "terapieno", "tersariòƚoe", "teraso", "tersariòloe", "tersarolar", "testada", "teraŧo", "teto", "tetar", "terŧariolar", "tenaɉo", "terapiénoe", "testièra", "tenajo", "terŧariòlo", "teràŧoe", "tersaròlo", "terapienar", "tenaja", "teriŧia", "terasar", "teraxina", "tersarioƚar", "tersariòlo", "tenàɉoe", "teraŧar", "tersariolar", "tenaɉa", "tersaròƚo", "terŧarolar", "terŧariòloe", "tenàjoe", "terina", "rèoe", "férmoe", "vergixar", "verífegoe", "vereno", "versor", "veròƚo", "vergíxoe", "verenar", "versurar", "veròloe", "veriòl", "veroƚar", "vergixo", "verígola", "versúroe", "verénoe", "verífego", "verifegar", "veròlo", "verolar", "veròƚoe", "versuro", "péroro", "péroroe", "pérol", "perkotar", "periodar", "perŧepiŧio", "períkolo", "perorar", "perlústroe", "perveño", "persar", "perikoƚoxo", "perintexo", "perkolo", "perifraxar", "persor", "personajo", "pervèrtoe", "permudar", "pernòto", "pernixòto", "perfòroe", "perkoƚo", "perfúmoe", "pervèñoe", "percò", "persugar", "período", "permaloxo", "perké", "perkome", "perfina", "permeto", "perfòro", "perteño", "pernòtoe", "persò", "perseguitar", "perkurador", "persuàdoe", "perukèra", "perikolar", "perkoƚar", "perukon", "pernotar", "peritar", "perúsola", "pervèrso", "personaƚixar", "personalíxoe", "perítoe", "perífraxoe", "perkoro", "peruka", "peròmo", "períkoloe", "perteñir", "persenar", "pertèñoe", "permaxo", "perkóloe", "permaƚoxo", "períkoƚoe", "persuaxion", "personaƚixo", "perpetuar", "perikoƚar", "pernixa", "permúdaroe", "perukèr", "perkóroe", "persémol", "perforar", "persona", "persèguoe", "permaner", "persénbol", "perfino", "perlustro", "pertèño", "permano", "personaxo", "persekutor", "pervéñoe", "perkòtoe", "persugo", "persekudor", "perikoloxo", "perkolar", "perkuradora", "perífraxo", "permudarar", "perseguir", "perinténdoe", "permúdaro", "permudo", "peruŧoleta", "perkóƚoe", "perveñir", "perusoleta", "perŧepir", "permeso", "perpètuo", "perŧò", "pervèño", "perfumo", "pervèrto", "persin", "pertanto", "perúŧola", "perkòto", "períkoƚo", "persepir", "perukin", "persuado", "perfumar", "perpètuoe", "perlustrato", "perminir", "persòndena", "personalixar", "pertéñoe", "períodoe", "persuaxo", "personaƚíxoe", "perpetrato", "permutar", "perlustrar", "persuto", "permúdoe", "perkorso", "pernixe", "persèguito", "permétoe", "perŧòndena", "personalixo", "persèguo", "perito", "persèguitoe", "perpetrar", "perviñir", "períkol", "però", "perintendo", "persúgoe", "feraƚe", "ferméntoe", "feràƚoe", "fermo", "fermentar", "feraƚar", "fernabuko", "feraƚo", "fersorin", "fersorar", "fermento", "feràloe", "feràxin", "fersora", "fermar", "feralo", "feralar", "fersóroe", "fersoro", "fersorada", "feral", "pèrpetroe", "pèrmutoe", "pèrmuto", "pèrpetro", "tétoe", "resente", "relojèra", "regasar", "rejòto", "reŧeđo", "reɉono", "rebaltela", "relòjo", "regaŧada", "rebégol", "rexónoe", "rekuajo", "rekòlto", "reŧédoe", "rebalta", "reŧente", "refesio", "revolton", "resteƚièra", "revendígola", "regaso", "refréskoe", "remandèl", "reŧeđar", "reɉonar", "retré", "refresko", "rebalto", "reloɉèr", "rejotar", "resteƚèra", "regasame", "relojèr", "refésioe", "restelar", "rejéstola", "rededèl", "renkuro", "rexonar", "rexentar", "reloɉèra", "recar", "remanxina", "restelada", "reco", "renkurar", "relòɉo", "reɉòto", "reɉéstola", "reŧedar", "rebàltoe", "rekuesta", "regal", "reséxoe", "remenato", "resteƚada", "redeđèl", "regàŧoe", "reɉòtoe", "regaŧar", "rendevú", "rengo", "regasa", "restèlo", "rengar", "rejono", "restelièra", "rexon", "rebàrbar", "reboba", "rejòtoe", "reɉotèl", "revoltolon", "regaŧame", "rejónoe", "rejon", "refudo", "regaŧo", "resexo", "restèƚoe", "rebufin", "rebonbo", "renkúroe", "restèloe", "reƚoɉèra", "rebaltar", "refúdoe", "remendèl", "rejotèl", "restèƚo", "refoso", "reparèla", "revendígol", "refudar", "rexéntoe", "resexar", "rexento", "redexèl", "reŧéđoe", "refreskar", "remengo", "reŧedo", "rebaltaiŧa", "reolton", "restèl", "refredo", "rejonar", "rear", "remengar", "reɉotar", "reteño", "respir", "reɉónoe", "reƚojèra", "regasada", "rejèstola", "reƚoɉèr", "rexono", "restelèra", "reƚojèr", "refesiar", "regaŧa", "resteƚar", "reɉèstola", "regàsoe", "reméngoe", "reina", "repeton", "sèra–vèrđi", "sèra–vèrxi", "sèra–vèrdi", "sèrboe", "berikòkola", "berekino", "bertoèl", "berekin", "beroèr", "bersajar", "berekinar", "bersaɉar", "bertovèla", "beretin", "bersàɉoe", "bersàjoe", "beroèra", "bereta", "bertoèla", "bertovèl", "berekínoe", "bersaɉo", "bersajo", "segretario", "sebatarò", "seravèrdi", "sebàter", "serada", "segretería", "sebàtoe", "sebaterò", "selvàrego", "serenada", "segramento", "serxente", "seravèrxi", "serbar", "seravèrđi", "segrestan", "serajo", "servisio", "seraval", "seraɉo", "sebato", "serviŧio", "segrado", "seraponto", "segreto", "serata", "segrestía", "sebàtar");
+		String flag = "%2";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("i", "v", "x", "xx", "xxx", "l", "c", "d", "m");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("es", "as", "es", Arrays.asList("ratàbes", "atares", "aítserges", "oterges", "otnopares", "odarges", "oiŧivres", "otabes", "oɉares", "lavares", "ojares", "oisivres", "natserges", "iđrèvares", "rabres", "ixrèvares", "etnexres", "otnemarges", "adaneres", "ogeràvles", "òretabes", "aíreterges", "eotàbes", "adares", "retàbes", "idrèvares", "òratabes", "oiraterges")),
-			new LineEntry("eb", "ab", "eb", Arrays.asList("oɉasreb", "ojasreb", "lèvotreb", "eoníkereb", "alèotreb", "atereb", "arèoreb", "eoɉàsreb", "eojàsreb", "nitereb", "alèvotreb", "raɉasreb", "ranikereb", "rajasreb", "nikereb", "rèoreb", "lèotreb", "onikereb", "alokòkireb")),
-			new LineEntry("ès", "às", "ès", Arrays.asList("idrèv–arès", "eobrès", "ixrèv–arès", "iđrèv–arès")),
-			new LineEntry("er", "ar", "er", Arrays.asList("noteper", "anier", "eognémer", "eosàger", "alotsèɉer", "raƚetser", "aŧager", "rèjoƚer", "raisefer", "arèletser", "onoxer", "rèɉoƚer", "alotsèjer", "arèjoƚer", "adasager", "oñeter", "ripser", "eonóɉer", "ratoɉer", "ragnemer", "ranojer", "raer", "oderfer", "notloer", "lètser", "aŧiatlaber", "odeŧer", "ognemer", "lèxeder", "eođéŧer", "rakserfer", "otnexer", "raxeser", "eotnéxer", "radufer", "logídnever", "osofer", "alèraper", "oƚètser", "lètojer", "lèdnemer", "eodúfer", "ratlaber", "arèɉoƚer", "eolètser", "eorúkner", "nifuber", "obnober", "eoƚètser", "oxeser", "oŧager", "odufer", "nojer", "nolotlover", "emaŧager", "eonójer", "lètoɉer", "abober", "eotòjer", "rabràber", "noxer", "arèiletser", "onojer", "ragner", "asager", "olètser", "ogner", "úvedner", "eotòɉer", "raŧager", "eoŧàger", "lèđeder", "adaƚetser", "otanemer", "atseuker", "lager", "eoxéser", "radeŧer", "eotlàber", "alotséɉer", "otòɉer", "oɉòler", "rarukner", "adaletser", "ocer", "anixnamer", "racer", "arèɉoler", "ranoxer", "ratnexer", "orukner", "lèdeder", "alotséjer", "raletser", "eoiséfer", "rèjoler", "emasager", "arèƚetser", "ratojer", "rèɉoler", "érter", "okserfer", "otlaber", "ranoɉer", "rađeŧer", "lèdnamer", "osager", "eoksérfer", "arèiƚetser", "alogídnever", "notlover", "oisefer", "etneŧer", "atlaber", "ojauker", "otlòker", "eodéŧer", "adaŧager", "logéber", "eonóxer", "ojòler", "aletlaber", "ođeŧer", "onoɉer", "otòjer", "rasager", "arèjoler", "etneser")),
-			new LineEntry("ét", "àt", "ét", "eotét"),
-			new LineEntry("èp", "àp", "èp", Arrays.asList("orteprèp", "otumrèp", "eotumrèp", "eorteprèp")),
-			new LineEntry("ef", "af", "ef", Arrays.asList("adarosref", "laref", "eorósref", "orosref", "ralaref", "olaref", "ramref", "arosref", "nixàref", "eolàref", "otnemref", "rarosref", "nirosref", "oƚaref", "okubanref", "raƚaref", "ratnemref", "omref", "eotnémref", "eoƚàref", "eƚaref")),
-			new LineEntry("ép", "àp", "ép", Arrays.asList("lorép", "eororép", "ororép")),
-			new LineEntry("ep", "ap", "ep", Arrays.asList("odnetnirep", "eogúsrep", "lokírep", "òrep", "riñivrep", "eotiugèsrep", "rarteprep", "otirep", "ougèsrep", "oxilanosrep", "anednòŧrep", "eotémrep", "otiugèsrep", "exinrep", "eodúmrep", "osrokrep", "otusrep", "ratumrep", "rartsulrep", "oxausrep", "eoxíƚanosrep", "otarteprep", "eodoírep", "eoñétrep", "anednòsrep", "raxilanosrep", "rinimrep", "otartsulrep", "eoutèprep", "nikurep", "odausrep", "ramufrep", "ripesrep", "oƚokírep", "aloŧúrep", "otòkrep", "otnatrep", "nisrep", "otrèvrep", "omufrep", "oñèvrep", "òŧrep", "outèprep", "osemrep", "atelosurep", "ripeŧrep", "riñevrep", "eoƚókrep", "ateloŧurep", "odumrep", "oradúmrep", "eodnétnirep", "riugesrep", "raradumrep", "oxarfírep", "arodarukrep", "rodukesrep", "oxolokirep", "ralokrep", "ogusrep", "eotòkrep", "eoñévrep", "oxanosrep", "rotukesrep", "oñètrep", "onamrep", "onifrep", "ortsulrep", "lobnésrep", "renamrep", "anosrep", "eougèsrep", "rarofrep", "lomésrep", "rèkurep", "eorókrep", "axinrep", "eoradúmrep", "rauteprep", "raƚokirep", "oxiƚanosrep", "noixausrep", "oxoƚamrep", "eoƚokírep", "oxamrep", "eolókrep", "ranesrep", "eoñètrep", "riñetrep", "omòrep", "eolokírep", "akurep", "orokrep", "osrèvrep", "raxiƚanosrep", "eoxílanosrep", "eotírep", "eoxarfírep", "alosúrep", "ratirep", "ratonrep", "nokurep", "raƚokrep", "ralokirep", "arèkurep", "eodàusrep", "rodarukrep", "ratiugesrep", "òsrep", "oñetrep", "eotònrep", "otemrep", "oròfrep", "anifrep", "emokrep", "ékrep", "oxolamrep", "ragusrep", "odoírep", "òcrep", "eoñèvrep", "oƚokrep", "eomúfrep", "otòxinrep", "eoròfrep", "otònrep", "radumrep", "rosrep", "ojanosrep", "eotrèvrep", "raxarfirep", "olokrep", "oxetnirep", "rasrep", "oxoƚokirep", "oñevrep", "eortsúlrep", "rarorep", "oiŧipeŧrep", "olokírep", "radoirep", "ratokrep")),
-			new LineEntry("ev", "av", "ev", Arrays.asList("orusrev", "eoƚòrev", "ralorev", "olòrev", "ragefirev", "eonérev", "ogefírev", "eorúsrev", "alogírev", "raƚorev", "oxigrev", "lòirev", "rarusrev", "eolòrev", "rosrev", "oƚòrev", "eoxígrev", "ranerev", "onerev", "raxigrev", "eogefírev")),
-			new LineEntry("éf", "àf", "éf", "eomréf"),
-			new LineEntry("èr", "àr", "èr", "eoèr"),
-			new LineEntry("et", "at", "et", Arrays.asList("aniret", "eojànet", "raloraŧret", "eolòiraŧret", "aɉanet", "oƚòrasret", "raloirasret", "raŧaret", "eoɉànet", "olòirasret", "anixaret", "raƚoirasret", "aiŧiret", "rasaret", "ajanet", "raneiparet", "olòrasret", "eoŧàret", "olòiraŧret", "arèitset", "ojanet", "eonéiparet", "oɉanet", "raloiraŧret", "otet", "ratet", "adatset", "oŧaret", "ralorasret", "eolòirasret", "eoƚòirasret", "osaret", "oneiparet", "raƚorasret", "olòraŧret", "oƚòirasret", "eosàret", "nixet", "eolòrasret", "eolòraŧret", "rajanet", "raɉanet", "eoƚòrasret")),
-			new LineEntry("ér", "àr", "ér", Arrays.asList("eocér", "eognér")),
-			new LineEntry("eS", "aS", "eS", Arrays.asList("lavareS", "eƚavareS"))
+			new LineEntry("0", "x", "i", Arrays.asList("i")),
+			new LineEntry("0", Set.of("i", "ii", "iii"), ".", Arrays.asList("i", "v", "x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", Set.of("iv", "vi", "vii", "viii", "ix"), "[^iv]", Arrays.asList("x", "xx", "xxx", "d", "c", "l", "m")),
+			new LineEntry("0", "v", "[^v]", Arrays.asList("i", "x", "xx", "xxx", "d", "c", "l", "m"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX vs Y 15",
-			"PFX vs be ba be",
-			"PFX vs fe fa fe",
-			"PFX vs pe pa pe",
-			"PFX vs re ra re",
-			"PFX vs se sa se",
-			"PFX vs Se Sa Se",
-			"PFX vs te ta te",
-			"PFX vs ve va ve",
-			"PFX vs fé fà fé",
-			"PFX vs pé pà pé",
-			"PFX vs ré rà ré",
-			"PFX vs té tà té",
-			"PFX vs pè pà pè",
-			"PFX vs rè rà rè",
-			"PFX vs sè sà sè"
+			"SFX %2 Y 10",
+			"SFX %2 0 x i",
+			"SFX %2 0 i .",
+			"SFX %2 0 ii .",
+			"SFX %2 0 iii .",
+			"SFX %2 0 iv [^iv]",
+			"SFX %2 0 ix [^iv]",
+			"SFX %2 0 vi [^iv]",
+			"SFX %2 0 vii [^iv]",
+			"SFX %2 0 viii [^iv]",
+			"SFX %2 0 v [^v]"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
-	@Test
-	void casePrefix3() throws IOException{
-		String language = "vec-IT";
+//	@Test
+	//FIXME
+	void caseSuffix23() throws IOException{
+		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
 			"FLAG long",
-			"PFX ^0 Y 1",
-			"PFX ^0 0 anti ."
+			"FULLSTRIP",
+			"SFX '9 Y 19",
+			"SFX '9 r ʼ r",
+			"SFX '9 u ʼ u",
+			"SFX '9 ra ʼ ra",
+			"SFX '9 axa àʼ axa",
+			"SFX '9 èđa àʼ èđa",
+			"SFX '9 èxa àʼ èxa",
+			"SFX '9 de ʼ .de",
+			"SFX '9 me ʼ me",
+			"SFX '9 te ʼ te",
+			"SFX '9 do ʼ do",
+			"SFX '9 ko ʼ ko",
+			"SFX '9 to ʼ nto",
+			"SFX '9 to ʼ tuto",
+			"SFX '9 to ʼ sto",
+			"SFX '9 o ʼ [^n]to",
+			"SFX '9 a ʼ [^rx]a",
+			"SFX '9 e ʼ [^mt]e",
+			"SFX '9 o ʼ [^dkt]o",
+			"SFX '9 ove óʼ ove"
 		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
-		String flag = "^0";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("pasto", "suixmo", "vixilia", "pèto", "kàmera", "viđilia", "mama", "kàmara", "pato", "soŧial", "sosial", "vidilia");
+		String flag = "'9";
+		AffixType affixType = AffixType.SUFFIX;
+		List<String> words = Arrays.asList("komòdo", "kuando", "sta", "tèrsa", "kuinta", "sènŧa", "sensa", "pòka", "bona", "anka", "santa", "senŧa", "na", "sèsta", "la", "tèrŧa", "tuta", "sènsa", "kuarta", "mèđa", "mèđa", "kaxa", "no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto", "mèxa", "dexe", "de", "pede", "kuatòrdexe", "dièxe", "trédexe", "andove", "dódexe", "óndexe", "fede", "se", "dove", "indove", "ne", "trèdexe", "kuíndexe", "úndexe", "sédexe", "adove", "ge", "diexe", "nu", "vu", "kome", "sèsto", "santo", "tuto", "tanto", "sto", "andove", "dove", "indove", "adove", "sèsto", "tuto", "sto", "pòko", "puòko", "poko", "par", "de", "pede", "fede", "sora", "intendènte", "brasènte", "reŧènte", "sufiŧiènte", "rovènte", "sapiènte", "filperdènte", "evidènte", "dogorènte", "desfidènte", "stuŧegadènte", "sexènte", "ponxènte", "brigènte", "valènte", "kuradènte", "viŧe–rexènte", "stekadènte", "splendènte", "kliènte", "studènte", "fasiènte", "vivènte", "onipotènte", "defidènte", "tenènte", "raxènte", "takènte", "franjènte", "dènte", "maxenènte", "ruđènte", "pikènte", "eŧedènte", "strenxènte", "insolènte", "atinènte", "susintamènte", "pesènte", "ñènte", "okorènte", "molènte", "interveniènte", "korènte", "stènte", "stusegadènte", "nosènte", "asolutamènte", "bivalènte", "resipiènte", "semènte", "ponđènte", "soradènte", "intreveniènte", "solvènte", "pusolènte", "aparesènte", "rexènte", "languènte", "taɉènte", "tajènte", "novènte", "ekuivalènte", "monovalènte", "pestilènte", "pixnènte", "pendènte", "maldisènte", "rexidènte", "axènte", "kiesènte", "pixinènte", "sofiŧiènte", "intelijènte", "logotenènte", "strafotènte", "deferènte", "pertinènte", "noŧènte", "reŧipiènte", "tientamènte", "inŧidènte", "diliɉènte", "ruxènte", "sokonbènte", "komitènte", "preminènte", "sorintendènte", "tanjènte", "maldiŧènte", "osidènte", "referènte", "servènte", "difarènte", "ajènte", "kura–dènte", "asendènte", "sofisiènte", "inponènte", "intraprendènte", "saŧènte", "prexidènte", "radènte", "ruđenènte", "polivalènte", "asistènte", "mađorènte", "paŧiènte", "speriènte", "serxènte", "bondañènte", "intarveniènte", "mañolènte", "dormiènte", "sfadigènte", "trivalènte", "asidènte", "perdènte", "faŧiènte", "semovènte", "ènte", "kostitüènte", "torènte", "brovènte", "broènte", "puŧolènte", "straluxènte", "trasparènte", "eselènte", "konosènte", "logarènte", "parisènte", "boɉènte", "benvoɉènte", "eminènte", "dexènte", "neglijènte", "maxorènte", "redènte", "prexènte", "negliɉènte", "distintamènte", "inkontenènte", "dependènte", "esedènte", "sarjènte", "atendènte", "aparènte", "ruxenènte", "ŧelènte", "sarɉènte", "rasènte", "evenènte", "aɉènte", "obediènte", "residènte", "sufisiènte", "parènte", "sasènte", "oŧidènte", "benvojènte", "asalènte", "bojènte", "permanènte", "đènte", "batènte", "reverènte", "posidènte", "braŧènte", "fendènte", "kavadènte", "ingrediènte", "soferènte", "resènte", "ŧenarènte", "vise–rexènte", "koñosènte", "dolènte", "sorxènte", "bixnènte", "prudènte", "viŧerexènte", "patènte", "ridènte", "serpènte", "evanesènte", "nasènte", "malfidènte", "tanɉènte", "eŧelènte", "seguènte", "skotènte", "viserexènte", "plurivalènte", "presidènte", "sfredolènte", "diferènte", "potènte", "lènte", "pretendènte", "desposènte", "klemènte", "luxènte", "peŧènte", "suŧintamènte", "pasiènte", "ubediènte", "penitènte", "insidènte", "konfidènte", "aŧalènte", "sensiènte", "kontinènte", "parvènte", "mordènte", "senŧiènte", "ređènte", "defarènte", "kadènte", "frekuènte", "strenđènte", "inteliɉènte", "ŧevènte", "aŧidènte", "spiandorènte", "exènte", "konveniènte", "dilijènte", "korespondènte", "ardènte", "franɉènte");
 		List<String> originalLines = words.stream()
 			.map(word -> word + "/" + flag)
 			.collect(Collectors.toList());
 		List<LineEntry> originalRules = originalLines.stream()
 			.map(wordGenerator::createFromDictionaryLine)
 			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.collect(Collectors.toList());
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "itna", StringUtils.EMPTY, Arrays.asList("otap", "laiŧos", "laisos", "ailidiv", "aramàk", "amam", "ailiđiv", "aremàk", "otèp", "ailixiv", "otsap", "omxius"))
+			new LineEntry("to", "ʼ", "nto", Arrays.asList("santo", "tanto")),
+			new LineEntry("o", "ʼ", "[^n]to", Arrays.asList("kuarto", "sèsto", "tuto", "sto")),
+			new LineEntry("do", "ʼ", "do", Arrays.asList("komòdo", "kuando")),
+			new LineEntry("o", "ʼ", "[^dkt]o", Arrays.asList("no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("ko", "ʼ", "ko", Arrays.asList("pòko", "puòko", "poko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
-			"PFX ^0 Y 1",
-			"PFX ^0 0 anti ."
+			"SFX '9 Y 19",
+			"SFX '9 r ʼ r",
+			"SFX '9 u ʼ u",
+			"SFX '9 ra ʼ ra",
+			"SFX '9 axa àʼ axa",
+			"SFX '9 èđa àʼ èđa",
+			"SFX '9 èxa àʼ èxa",
+			"SFX '9 de ʼ .de",
+			"SFX '9 me ʼ me",
+			"SFX '9 te ʼ te",
+			"SFX '9 do ʼ do",
+			"SFX '9 ko ʼ ko",
+			"SFX '9 to ʼ nto",
+			"SFX '9 to ʼ tuto",
+			"SFX '9 to ʼ sto",
+			"SFX '9 o ʼ [^n]to",
+			"SFX '9 a ʼ [^rx]a",
+			"SFX '9 e ʼ [^mt]e",
+			"SFX '9 o ʼ [^dkt]o",
+			"SFX '9 ove óʼ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
-	}
-
-	@Test
-	void casePrefix4() throws IOException{
-		String language = "vec-IT";
-		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
-			"SET UTF-8",
-			"LANG " + language,
-			"FLAG long",
-			"PFX .0 Y 3",
-			"PFX .0 0 re .",
-			"PFX .0 0 ra [^a]",
-			"PFX .0 0 ar [^ƚ]"
-		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
-		WordGenerator wordGenerator = pair.getRight();
-		String flag = ".0";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("eƚixo", "tràoe", "spénxar", "velar", "tajar", "teñerò", "strenđo", "menado", "veñerò", "skaldo", "kuadro", "mòver", "ceñerò", "màndoe", "leđerò", "posto", "prométer", "ànemoe", "sentir", "subveño", "kàtoe", "trađarò", "móntoe", "lèxoe", "bàtoe", "móver", "soƚuto", "saƚir", "batixo", "dono", "graŧio", "súsitoe", "kúñoe", "dente", "devento", "tenxerò", "ítaroe", "èstre", "lexarò", "fuđir", "elèđoe", "uxo", "koverđarò", "spenderò", "coƚer", "xbalso", "gaƚixo", "toƚer", "inestar", "strapien", "voƚer", "filo", "filar", "elèxo", "eƚèxoe", "kamin", "pòvoloe", "lègoe", "fríđar", "elèxar", "nègoe", "tràđar", "vixiónoe", "víver", "velo", "tajo", "vèƚoe", "tàɉoe", "ŧitar", "sorxerò", "kòltoe", "galar", "krederò", "komando", "vàrsoe", "ŧapar", "sòldo", "méter", "menar", "vòldo", "torxerò", "fođir", "kòxer", "ténxoe", "díxoe", "vòltoƚoe", "tradre", "tókoe", "kalso", "đirar", "balŧa", "spenxo", "pàroe", "púđoe", "konposto", "xente", "fúđoe", "piègoe", "lèvoe", "konponerò", "kórar", "sovèño", "pesko", "tòrxoe", "vòltoe", "fórmoe", "sòrxoe", "torđarò", "konponarò", "nunsiar", "soviñir", "pòsto", "gaƚixar", "stra-piena", "korso", "súsito", "nonŧio", "boɉo", "tenderò", "gatu", "konosenŧa", "bóɉar", "sovèñar", "konoserò", "nónŧioe", "kovèrxar", "tiòrmene", "fondamento", "bekolar", "tòrđer", "vèlo", "prendre", "dúpioe", "mòrso", "véƚoe", "uso", "galiđar", "ténđer", "krédoe", "domando", "menada", "sponsal", "strénxar", "venderò", "buto", "butar", "patriar", "eso", "volđerò", "batido", "elexarò", "salo", "morderò", "tirar", "ŧito", "sétoe", "galo", "vívoe", "sòldar", "vòlxo", "ŧetar", "ŧapo", "mirar", "meno", "torderò", "pétoe", "skaldar", "kàlkoe", "vendedora", "strénđoe", "puxar", "lúxar", "đente", "kúxar", "métoe", "gétoe", "vàrdoe", "tàrdoe", "kalsar", "dúxar", "xirar", "traxerò", "téntoe", "stímoe", "séntoe", "fúxar", "buƚo", "sàlvoe", "vòlđoe", "sàpoe", "prometarò", "xètoe", "sètoe", "peskar", "pòvolo", "folada", "pètoe", "batíxoe", "spéndar", "kasko", "solverò", "konvínŧar", "koro", "pòrtoe", "vòltoƚo", "konsiderar", "spendarò", "balotar", "kaskado", "prométar", "íteroe", "frixarò", "fríxoe", "krear", "metarò", "galiđo", "póxoe", "kreso", "dresar", "péŧoe", "dreso", "nonsiar", "fondar", "mondo", "fondo", "mondar", "speso", "prendo", "spesar", "pòxoe", "fíƚoe", "préndar", "vivarò", "someɉo", "visto", "kòxoe", "konósoe", "bèkoƚoe", "fóndar", "gaver", "sitar", "tiro", "tràer", "elèder", "konpóner", "luxo", "sítoe", "miro", "vòlxar", "konvinso", "puxo", "vèsto", "kòpioe", "kòto", "kredre", "eledarò", "sapar", "spenxerò", "prenderò", "saver", "bòto", "soluda", "skrivarò", "volsudo", "fuderò", "mòvar", "spléndoe", "ào", "kaskar", "vèrso", "traderò", "doto", "nunŧio", "fuđarò", "skontrato", "ŧérkoe", "dópioe", "bonbo", "vàtu", "strendarò", "viñir", "batarò", "dixarò", "còrme", "sidio", "mòrdre", "bóƚoe", "vòƚo", "sòƚoe", "tòƚo", "móvar", "sòƚo", "tòrdre", "novar", "movo", "vu-tu", "tendre", "krésar", "fudir", "fridarò", "vendre", "coƚo", "boƚo", "boƚar", "trado", "móvoe", "àtu", "filada", "gríñoe", "foƚar", "konvinsarò", "soƚar", "sémeno", "grasiar", "spénxer", "fúđer", "ŧèto", "guxo", "guxar", "eleđarò", "fuxo", "gaƚíxoe", "duxo", "nòvoe", "kuxo", "voƚo", "flètar", "dirar", "díxer", "flèto", "toƚo", "strenxerò", "elèto", "prendarò", "baƚòtoe", "mòvoe", "tiòrme", "frídoe", "konvinŧarò", "sito", "pòdoe", "movarò", "trovo", "splenderò", "védar", "dito", "krèoe", "fuđerò", "vàoe", "versar", "sapo", "kàlsoe", "sovéñer", "torno", "nòvo", "mòvo", "fornir", "visuda", "vòlxoe", "konsídero", "póner", "elèxer", "konósar", "spenxarò", "còƚo", "bonbar", "konvínŧer", "ŧolar", "stréndar", "semenar", "kovèrdar", "dreŧo", "poxo", "fòsoe", "partiso", "skríver", "pesar", "skontrar", "baterò", "téñoe", "flètoe", "peŧo", "tràđer", "pasada", "véñoe", "sòlvar", "duxarò", "batídoe", "spésoe", "lèđoe", "flèso", "mèritoe", "kàpito", "skontro", "luxarò", "sesar", "kuxarò", "dixerò", "céñoe", "nunŧiar", "mediar", "xbalŧar", "vesar", "fuxarò", "fàoe", "drésoe", "konosarò", "konvínsoe", "povolar", "varsar", "tèñoe", "bekoƚar", "pódoe", "krésoe", "vèñoe", "speŧo", "ŧèsoe", "cèñoe", "inèstoe", "kalŧo", "gràsioe", "àlsoe", "koxarò", "elèdre", "meto", "mòrdar", "fríđer", "geto", "voltolar", "mendar", "àndoe", "soveño", "téndar", "véndar", "tòrđo", "seto", "konpòsto", "búfoe", "paro", "peto", "partir", "vivo", "bójar", "konsidarar", "uxar", "nonŧiar", "sòldoe", "taɉo", "kòxo", "stréndoe", "pòxo", "vòldoe", "fiƚo", "gabiendo", "konsídaro", "konvínsar", "vendedor", "tenđo", "splendarò", "lasar", "spiro", "volsuda", "soludo", "basar", "lexerò", "mèrito", "lèdar", "pòpolo", "móndoe", "kapítoƚo", "síñoe", "pasar", "fóndoe", "vòltoloe", "vòltolo", "piantar", "lèto", "voltar", "pèto", "poƚir", "sovèñoe", "splendo", "koltar", "péskoe", "kuxir", "kanbio", "fuxir", "sèto", "pòpoloe", "xèto", "fifar", "fato", "sòrxar", "tòrxar", "méndoe", "koñóser", "téndoe", "kato", "òrdoe", "frixerò", "formar", "kuadrar", "farir", "pijar", "toko", "strenxarò", "strenderò", "boɉarò", "púdoe", "bato", "núnŧioe", "tiòlo", "dixo", "batixar", "mandar", "stelo", "konvínŧoe", "nato", "koxerò", "fúdoe", "stanŧa", "korarò", "vèƚo", "tòrdoe", "spénđoe", "mòrdoe", "fónder", "galíxoe", "graŧiar", "stabiƚir", "ténxar", "énsoe", "nàsar", "véndoe", "pòpoƚo", "veƚo", "bolar", "galido", "kórer", "fondre", "folar", "foxir", "krédar", "sòlder", "vòlder", "elexerò", "bóɉer", "solar", "dupiar", "streto", "batiđo", "puđo", "sékoe", "kovèrdoe", "lèvo", "békoe", "vosuda", "montar", "pàgoe", "spéndoe", "kovèrdo", "ferir", "konosanŧa", "visudo", "èser", "vèrsoe", "dúxer", "fletarò", "friderò", "balòtoe", "soveñerò", "gàƚoe", "flèter", "texo", "nègo", "tiòƚo", "lègo", "fúxer", "trào", "bónboe", "kavo", "kànbioe", "steƚo", "lúxer", "pòđoe", "kúxer", "beƚir", "vèstoe", "koñoso", "kàvoe", "kuño", "susitar", "boɉida", "gaƚo", "skrito", "pónar", "préndoe", "saƚo", "sào", "donar", "meterò", "xbalsar", "ponso", "piko", "gào", "ŧiño", "kàskoe", "elederò", "viverò", "konso", "fào", "pago", "eƚèxar", "griñar", "kàpitoe", "koverđerò", "mèdioe", "sémenoe", "píkoe", "vòlxer", "ŧíñoe", "elèdo", "pròboe", "prexentar", "konpariso", "lèxo", "fíkoe", "montada", "tratin", "tiòre", "strendo", "skóntroe", "sòlvoe", "kréser", "tratar", "àndomene", "stabilir", "sàƚoe", "subviño", "friđo", "salvar", "póđoe", "elèđar", "tardar", "tòrto", "vardar", "sòrto", "dopiar", "pòrto", "bul", "vòlđo", "pòđo", "fúdar", "kapítolo", "koñosenŧa", "spenđerò", "fudre", "kalkar", "ŧerkar", "friđerò", "ponarò", "sòlver", "komandar", "kopiar", "píjoe", "kovèrto", "bekada", "tiòr", "stimar", "spenđo", "pođo", "konparso", "fiko", "bekar", "stéƚoe", "salto", "tento", "strenxo", "tòrder", "sento", "polir", "seko", "sekar", "subvíñoe", "frídar", "kónsoe", "fondarò", "fada", "skàldoe", "galidar", "portar", "pàsoe", "konsídaroe", "meritar", "làsoe", "kapitar", "kresarò", "voltoƚar", "nàsoe", "bóloe", "pónsoe", "somejo", "bàsoe", "itarar", "kapitoƚar", "elèdoe", "sòloe", "frixo", "vosudo", "kostruir", "tràtoe", "skrívoe", "subveñir", "koñoserò", "ordar", "sèrvo", "moverò", "gràŧioe", "pòvoƚo", "splénder", "vòlva", "galídoe", "sovéñar", "tentar", "elixo", "beko", "saltar", "konvínser", "tróvoe", "koverxarò", "fuxion", "soldarò", "lèdoe", "siño", "siñar", "konsíderoe", "mòrder", "còre", "ténder", "fuxerò", "popolar", "vénder", "kuàdroe", "duxerò", "kuxerò", "bufada", "luxerò", "xbàlsoe", "domandar", "serkar", "konpono", "pòvoƚoe", "servar", "skrívar", "bójoe", "boɉido", "kreto", "serko", "ítero", "spíroe", "pudar", "strénđar", "pudo", "povoƚar", "fríxar", "tòre", "spléndar", "tràdar", "esir", "balòto", "kréder", "nasarò", "ŧòloe", "traerò", "elèđer", "koverdarò", "tràđoe", "usir", "tioler", "cèñar", "galixar", "strapiena", "védoe", "ordo", "fondamentar", "tèñar", "fífoe", "bójer", "céñar", "vèñar", "podar", "kàlŧoe", "tòrxer", "sòrxer", "vedarò", "téñar", "grasio", "eƚèto", "véñar", "kapitolar", "ceño", "baldería", "vésoe", "camo", "camar", "pésoe", "ŧesar", "inèsto", "lèđar", "lèđo", "enso", "tiolto", "fòso", "mòso", "stansa", "spenđarò", "strénđer", "teño", "bekon", "veño", "dòso", "skrivo", "ledarò", "dréŧoe", "vestir", "lèder", "batuda", "sèsoe", "spéŧoe", "markar", "kanbiar", "bufar", "fosar", "sarvo", "marko", "véder", "sarvar", "pòpoƚoe", "strenđarò", "prexéntoe", "bekado", "ténxer", "iterar", "eƚèxer", "subvéñoe", "kovèrđer", "salir", "probo", "bojida", "cèño", "splexo", "pòdo", "krèo", "boɉerò", "korerò", "eƚexarò", "konvinserò", "tioƚer", "strénder", "prométoe", "coler", "kaskada", "tèño", "nàser", "ŧèso", "parto", "stéloe", "toler", "vèño", "podo", "tràxar", "elèxoe", "xbalŧo", "boɉir", "batadura", "fèrto", "trađo", "voler", "prexento", "konŧar", "konŧo", "fríđoe", "skriverò", "koverxerò", "soluto", "fleterò", "verò", "batíđoe", "kovèrder", "fluso", "komàndoe", "bojarò", "domàndoe", "onir", "unir", "frito", "spénđar", "vango", "càmoe", "belir", "vangar", "tenxarò", "métar", "kúxoe", "tràxoe", "dúxoe", "kalŧar", "fúxoe", "gúxoe", "fríder", "probar", "tòrdo", "volxerò", "mòrdo", "getar", "núnsioe", "tòrđar", "trađerò", "xetar", "tíroe", "fonderò", "míroe", "mendo", "levado", "someɉar", "setar", "parar", "vívar", "petar", "tendo", "àndome", "vendo", "fiƚada", "lèdre", "taɉar", "sàloe", "kòxar", "fodir", "fiƚar", "ŧàpoe", "tòrme", "friđarò", "ŧètoe", "gàloe", "soveñir", "sorxarò", "galixo", "konpónar", "kreserò", "serka", "poxar", "konpónoe", "peso", "dreŧar", "vòlvo", "meso", "vutu", "prometerò", "tòr", "sòlvo", "peŧar", "veñir", "pròbo", "teñir", "patrio", "vòlđer", "ensir", "còr", "veso", "spénđer", "sovèñer", "popoƚar", "lèxer", "batidar", "bàter", "speŧar", "bojerò", "varso", "saer", "traxo", "vedre", "kapítoloe", "púxoe", "úxoe", "lúxoe", "mèdio", "tòrxo", "pianto", "volderò", "sòrxo", "trovar", "tòlto", "solderò", "katar", "sòlto", "levar", "kovèrđo", "vòlto", "piègo", "batudo", "stima", "àlŧoe", "vedo", "tokar", "díxar", "torđerò", "kòlto", "vendarò", "mando", "ménoe", "colto", "tendarò", "fridre", "ŧítoe", "ŧòlo", "formo", "ponerò", "spento", "strendre", "sèrvoe", "prénder", "sèso", "kovèrxo", "tàjoe", "sérkoe", "tràdoe", "tòrmene", "fríxer", "tornar", "koñosanŧa", "còlto", "vixionar", "veƚar", "tenxo", "úsoe", "spirar", "bèkoloe", "bèkolo", "torxarò", "piegar", "laso", "àtoe", "somejar", "nonsio", "baso", "kovèrxoe", "ésoe", "lèdo", "subviñir", "kredarò", "tenđerò", "paso", "naso", "bóɉoe", "kóroe", "gabiéndomene", "kredo", "kovèrđoe", "gabiéndome", "tolto", "volto", "sàltoe", "spénder", "tiòlto", "bojido", "vò-tu", "bòta", "dir", "batiđar", "prometo", "fifo", "konvinŧerò", "ànemo", "bútoe", "xbàlŧoe", "pàtrioe", "véloe", "tórnoe", "kavar", "steƚar", "strénxoe", "próboe", "fudarò", "vixiono", "bojo", "kovèrdre", "kovèrđar", "vèloe", "kuñar", "bèkoƚo", "stra-pien", "deventar", "spexo", "legar", "nónsioe", "gaƚar", "konparir", "vàngoe", "còrmene", "mordarò", "tràder", "sovéñoe", "traxarò", "tolo", "baƚotar", "negar", "kapítoƚoe", "kónŧoe", "volo", "puđar", "foƚada", "integrar", "dupio", "devéntoe", "ŧerka", "soveñarò", "soƚudo", "fúđar", "monto", "vòtu", "konvinŧo", "pàrtoe", "tiolo", "fondaméntoe", "prexo", "strénxer", "fado", "fúder", "spénxoe", "solvarò", "krexo", "tardo", "còlo", "vardo", "ŧerko", "pijo", "màrkoe", "teñarò", "stelar", "kalko", "naserò", "tòlo", "sòlo", "nunsio", "dopio", "ceñarò", "ténđoe", "cèñer", "tòrđoe", "splendre", "konvinto", "stelin", "leđarò", "fíloe", "vòlo", "pođar", "vèñer", "sàrvoe", "tèñer", "bojir", "soƚuda", "fikar", "veñarò", "volxarò", "colo", "stimo", "kovèrxer", "bolo", "kòpio", "céñer", "ponsar", "eƚèxo", "elèdar", "vederò", "lèđer", "soméɉoe", "tioƚo", "pikar", "griño", "ŧiñar", "pono", "piàntoe", "véñer", "pagar", "konsar", "konóser", "promeso", "téñer", "eƚexerò", "baƚòto", "konoso", "lederò", "strenđerò", "eleđerò", "koverderò", "íntegro", "frido", "pónoe", "spexa", "galíđoe", "lèxar", "far", "dónoe", "bàtar", "tradarò", "tràxer", "trato", "soméjoe", "ítaro", "salvo", "elèđo", "íntegroe", "aseñar", "aparo", "ato", "abiéndomene", "andar", "ando", "alŧar", "alŧo", "aseño", "aparso", "aséñoe", "aldir", "aparir", "aer", "alsar", "also", "aver", "atar", "abiendo", "anemar", "apariso", "abiéndome", "aŧion", "andar", "aver", "aseñar", "aparo", "abiéndomene", "ato", "ando", "aseño", "alŧo", "alŧar", "aparso", "aséñoe", "aldir", "aparir", "aer", "also", "alsar", "abiendo", "atar", "apariso", "anemar", "abiéndome", "aŧion", "eƚixo", "tràoe", "spénxar", "velar", "tajar", "teñerò", "strenđo", "menado", "veñerò", "skaldo", "kuadro", "mòver", "ceñerò", "màndoe", "leđerò", "posto", "prométer", "ànemoe", "sentir", "subveño", "kàtoe", "trađarò", "móntoe", "lèxoe", "bàtoe", "móver", "soƚuto", "saƚir", "batixo", "dono", "graŧio", "súsitoe", "kúñoe", "dente", "devento", "tenxerò", "ítaroe", "èstre", "lexarò", "fuđir", "elèđoe", "uxo", "koverđarò", "spenderò", "coƚer", "xbalso", "gaƚixo", "toƚer", "inestar", "strapien", "voƚer", "filo", "filar", "elèxo", "eƚèxoe", "kamin", "pòvoloe", "lègoe", "fríđar", "elèxar", "nègoe", "tràđar", "vixiónoe", "víver", "velo", "tajo", "vèƚoe", "tàɉoe", "ŧitar", "sorxerò", "kòltoe", "galar", "krederò", "komando", "vàrsoe", "ŧapar", "sòldo", "méter", "menar", "vòldo", "torxerò", "fođir", "kòxer", "ténxoe", "díxoe", "vòltoƚoe", "tradre", "tókoe", "kalso", "đirar", "balŧa", "spenxo", "pàroe", "púđoe", "konposto", "xente", "fúđoe", "piègoe", "lèvoe", "konponerò", "kórar", "sovèño", "pesko", "tòrxoe", "vòltoe", "fórmoe", "sòrxoe", "torđarò", "konponarò", "nunsiar", "soviñir", "pòsto", "gaƚixar", "stra-piena", "korso", "súsito", "nonŧio", "boɉo", "tenderò", "gatu", "konosenŧa", "bóɉar", "sovèñar", "konoserò", "nónŧioe", "kovèrxar", "tiòrmene", "fondamento", "bekolar", "tòrđer", "vèlo", "prendre", "dúpioe", "mòrso", "véƚoe", "uso", "galiđar", "ténđer", "krédoe", "domando", "menada", "sponsal", "strénxar", "venderò", "buto", "butar", "patriar", "eso", "volđerò", "batido", "elexarò", "salo", "morderò", "tirar", "ŧito", "sétoe", "galo", "vívoe", "sòldar", "vòlxo", "ŧetar", "ŧapo", "mirar", "meno", "torderò", "pétoe", "skaldar", "kàlkoe", "vendedora", "strénđoe", "puxar", "lúxar", "đente", "kúxar", "métoe", "gétoe", "vàrdoe", "tàrdoe", "kalsar", "dúxar", "xirar", "traxerò", "téntoe", "stímoe", "séntoe", "fúxar", "buƚo", "sàlvoe", "vòlđoe", "sàpoe", "prometarò", "xètoe", "sètoe", "peskar", "pòvolo", "folada", "pètoe", "batíxoe", "spéndar", "kasko", "solverò", "konvínŧar", "koro", "pòrtoe", "vòltoƚo", "konsiderar", "spendarò", "balotar", "kaskado", "prométar", "íteroe", "frixarò", "fríxoe", "krear", "metarò", "galiđo", "póxoe", "kreso", "dresar", "péŧoe", "dreso", "nonsiar", "fondar", "mondo", "fondo", "mondar", "speso", "prendo", "spesar", "pòxoe", "fíƚoe", "préndar", "vivarò", "someɉo", "visto", "kòxoe", "konósoe", "bèkoƚoe", "fóndar", "gaver", "sitar", "tiro", "tràer", "elèder", "konpóner", "luxo", "sítoe", "miro", "vòlxar", "konvinso", "puxo", "vèsto", "kòpioe", "kòto", "kredre", "eledarò", "sapar", "spenxerò", "prenderò", "saver", "bòto", "soluda", "skrivarò", "volsudo", "fuderò", "mòvar", "spléndoe", "ào", "kaskar", "vèrso", "traderò", "doto", "nunŧio", "fuđarò", "skontrato", "ŧérkoe", "dópioe", "bonbo", "vàtu", "strendarò", "viñir", "batarò", "dixarò", "còrme", "sidio", "mòrdre", "bóƚoe", "vòƚo", "sòƚoe", "tòƚo", "móvar", "sòƚo", "tòrdre", "novar", "movo", "vu-tu", "tendre", "krésar", "fudir", "fridarò", "vendre", "coƚo", "boƚo", "boƚar", "trado", "móvoe", "àtu", "filada", "gríñoe", "foƚar", "konvinsarò", "soƚar", "sémeno", "grasiar", "spénxer", "fúđer", "ŧèto", "guxo", "guxar", "eleđarò", "fuxo", "gaƚíxoe", "duxo", "nòvoe", "kuxo", "voƚo", "flètar", "dirar", "díxer", "flèto", "toƚo", "strenxerò", "elèto", "prendarò", "baƚòtoe", "mòvoe", "tiòrme", "frídoe", "konvinŧarò", "sito", "pòdoe", "movarò", "trovo", "splenderò", "védar", "dito", "krèoe", "fuđerò", "vàoe", "versar", "sapo", "kàlsoe", "sovéñer", "torno", "nòvo", "mòvo", "fornir", "visuda", "vòlxoe", "konsídero", "póner", "elèxer", "konósar", "spenxarò", "còƚo", "bonbar", "konvínŧer", "ŧolar", "stréndar", "semenar", "kovèrdar", "dreŧo", "poxo", "fòsoe", "partiso", "skríver", "pesar", "skontrar", "baterò", "téñoe", "flètoe", "peŧo", "tràđer", "pasada", "véñoe", "sòlvar", "duxarò", "batídoe", "spésoe", "lèđoe", "flèso", "mèritoe", "kàpito", "skontro", "luxarò", "sesar", "kuxarò", "dixerò", "céñoe", "nunŧiar", "mediar", "xbalŧar", "vesar", "fuxarò", "fàoe", "drésoe", "konosarò", "konvínsoe", "povolar", "varsar", "tèñoe", "bekoƚar", "pódoe", "krésoe", "vèñoe", "speŧo", "ŧèsoe", "cèñoe", "inèstoe", "kalŧo", "gràsioe", "àlsoe", "koxarò", "elèdre", "meto", "mòrdar", "fríđer", "geto", "voltolar", "mendar", "àndoe", "soveño", "téndar", "véndar", "tòrđo", "seto", "konpòsto", "búfoe", "paro", "peto", "partir", "vivo", "bójar", "konsidarar", "uxar", "nonŧiar", "sòldoe", "taɉo", "kòxo", "stréndoe", "pòxo", "vòldoe", "fiƚo", "gabiendo", "konsídaro", "konvínsar", "vendedor", "tenđo", "splendarò", "lasar", "spiro", "volsuda", "soludo", "basar", "lexerò", "mèrito", "lèdar", "pòpolo", "móndoe", "kapítoƚo", "síñoe", "pasar", "fóndoe", "vòltoloe", "vòltolo", "piantar", "lèto", "voltar", "pèto", "poƚir", "sovèñoe", "splendo", "koltar", "péskoe", "kuxir", "kanbio", "fuxir", "sèto", "pòpoloe", "xèto", "fifar", "fato", "sòrxar", "tòrxar", "méndoe", "koñóser", "téndoe", "kato", "òrdoe", "frixerò", "formar", "kuadrar", "farir", "pijar", "toko", "strenxarò", "strenderò", "boɉarò", "púdoe", "bato", "núnŧioe", "tiòlo", "dixo", "batixar", "mandar", "stelo", "konvínŧoe", "nato", "koxerò", "fúdoe", "stanŧa", "korarò", "vèƚo", "tòrdoe", "spénđoe", "mòrdoe", "fónder", "galíxoe", "graŧiar", "stabiƚir", "ténxar", "énsoe", "nàsar", "véndoe", "pòpoƚo", "veƚo", "bolar", "galido", "kórer", "fondre", "folar", "foxir", "krédar", "sòlder", "vòlder", "elexerò", "bóɉer", "solar", "dupiar", "streto", "batiđo", "puđo", "sékoe", "kovèrdoe", "lèvo", "békoe", "vosuda", "montar", "pàgoe", "spéndoe", "kovèrdo", "ferir", "konosanŧa", "visudo", "èser", "vèrsoe", "dúxer", "fletarò", "friderò", "balòtoe", "soveñerò", "gàƚoe", "flèter", "texo", "nègo", "tiòƚo", "lègo", "fúxer", "trào", "bónboe", "kavo", "kànbioe", "steƚo", "lúxer", "pòđoe", "kúxer", "beƚir", "vèstoe", "koñoso", "kàvoe", "kuño", "susitar", "boɉida", "gaƚo", "skrito", "pónar", "préndoe", "saƚo", "sào", "donar", "meterò", "xbalsar", "ponso", "piko", "gào", "ŧiño", "kàskoe", "elederò", "viverò", "konso", "fào", "pago", "eƚèxar", "griñar", "kàpitoe", "koverđerò", "mèdioe", "sémenoe", "píkoe", "vòlxer", "ŧíñoe", "elèdo", "pròboe", "prexentar", "konpariso", "lèxo", "fíkoe", "montada", "tratin", "tiòre", "strendo", "skóntroe", "sòlvoe", "kréser", "tratar", "àndomene", "stabilir", "sàƚoe", "subviño", "friđo", "salvar", "póđoe", "elèđar", "tardar", "tòrto", "vardar", "sòrto", "dopiar", "pòrto", "bul", "vòlđo", "pòđo", "fúdar", "kapítolo", "koñosenŧa", "spenđerò", "fudre", "kalkar", "ŧerkar", "friđerò", "ponarò", "sòlver", "komandar", "kopiar", "píjoe", "kovèrto", "bekada", "tiòr", "stimar", "spenđo", "pođo", "konparso", "fiko", "bekar", "stéƚoe", "salto", "tento", "strenxo", "tòrder", "sento", "polir", "seko", "sekar", "subvíñoe", "frídar", "kónsoe", "fondarò", "fada", "skàldoe", "galidar", "portar", "pàsoe", "konsídaroe", "meritar", "làsoe", "kapitar", "kresarò", "voltoƚar", "nàsoe", "bóloe", "pónsoe", "somejo", "bàsoe", "itarar", "kapitoƚar", "elèdoe", "sòloe", "frixo", "vosudo", "kostruir", "tràtoe", "skrívoe", "subveñir", "koñoserò", "ordar", "sèrvo", "moverò", "gràŧioe", "pòvoƚo", "splénder", "vòlva", "galídoe", "sovéñar", "tentar", "elixo", "beko", "saltar", "konvínser", "tróvoe", "koverxarò", "fuxion", "soldarò", "lèdoe", "siño", "siñar", "konsíderoe", "mòrder", "còre", "ténder", "fuxerò", "popolar", "vénder", "kuàdroe", "duxerò", "kuxerò", "bufada", "luxerò", "xbàlsoe", "domandar", "serkar", "konpono", "pòvoƚoe", "servar", "skrívar", "bójoe", "boɉido", "kreto", "serko", "ítero", "spíroe", "pudar", "strénđar", "pudo", "povoƚar", "fríxar", "tòre", "spléndar", "tràdar", "esir", "balòto", "kréder", "nasarò", "ŧòloe", "traerò", "elèđer", "koverdarò", "tràđoe", "usir", "tioler", "cèñar", "galixar", "strapiena", "védoe", "ordo", "fondamentar", "tèñar", "fífoe", "bójer", "céñar", "vèñar", "podar", "kàlŧoe", "tòrxer", "sòrxer", "vedarò", "téñar", "grasio", "eƚèto", "véñar", "kapitolar", "ceño", "baldería", "vésoe", "camo", "camar", "pésoe", "ŧesar", "inèsto", "lèđar", "lèđo", "enso", "tiolto", "fòso", "mòso", "stansa", "spenđarò", "strénđer", "teño", "bekon", "veño", "dòso", "skrivo", "ledarò", "dréŧoe", "vestir", "lèder", "batuda", "sèsoe", "spéŧoe", "markar", "kanbiar", "bufar", "fosar", "sarvo", "marko", "véder", "sarvar", "pòpoƚoe", "strenđarò", "prexéntoe", "bekado", "ténxer", "iterar", "eƚèxer", "subvéñoe", "kovèrđer", "salir", "probo", "bojida", "cèño", "splexo", "pòdo", "krèo", "boɉerò", "korerò", "eƚexarò", "konvinserò", "tioƚer", "strénder", "prométoe", "coler", "kaskada", "tèño", "nàser", "ŧèso", "parto", "stéloe", "toler", "vèño", "podo", "tràxar", "elèxoe", "xbalŧo", "boɉir", "batadura", "fèrto", "trađo", "voler", "prexento", "konŧar", "konŧo", "fríđoe", "skriverò", "koverxerò", "soluto", "fleterò", "verò", "batíđoe", "kovèrder", "fluso", "komàndoe", "bojarò", "domàndoe", "onir", "unir", "frito", "spénđar", "vango", "càmoe", "belir", "vangar", "tenxarò", "métar", "kúxoe", "tràxoe", "dúxoe", "kalŧar", "fúxoe", "gúxoe", "fríder", "probar", "tòrdo", "volxerò", "mòrdo", "getar", "núnsioe", "tòrđar", "trađerò", "xetar", "tíroe", "fonderò", "míroe", "mendo", "levado", "someɉar", "setar", "parar", "vívar", "petar", "tendo", "àndome", "vendo", "fiƚada", "lèdre", "taɉar", "sàloe", "kòxar", "fodir", "fiƚar", "ŧàpoe", "tòrme", "friđarò", "ŧètoe", "gàloe", "soveñir", "sorxarò", "galixo", "konpónar", "kreserò", "serka", "poxar", "konpónoe", "peso", "dreŧar", "vòlvo", "meso", "vutu", "prometerò", "tòr", "sòlvo", "peŧar", "veñir", "pròbo", "teñir", "patrio", "vòlđer", "ensir", "còr", "veso", "spénđer", "sovèñer", "popoƚar", "lèxer", "batidar", "bàter", "speŧar", "bojerò", "varso", "saer", "traxo", "vedre", "kapítoloe", "púxoe", "úxoe", "lúxoe", "mèdio", "tòrxo", "pianto", "volderò", "sòrxo", "trovar", "tòlto", "solderò", "katar", "sòlto", "levar", "kovèrđo", "vòlto", "piègo", "batudo", "stima", "àlŧoe", "vedo", "tokar", "díxar", "torđerò", "kòlto", "vendarò", "mando", "ménoe", "colto", "tendarò", "fridre", "ŧítoe", "ŧòlo", "formo", "ponerò", "spento", "strendre", "sèrvoe", "prénder", "sèso", "kovèrxo", "tàjoe", "sérkoe", "tràdoe", "tòrmene", "fríxer", "tornar", "koñosanŧa", "còlto", "vixionar", "veƚar", "tenxo", "úsoe", "spirar", "bèkoloe", "bèkolo", "torxarò", "piegar", "laso", "àtoe", "somejar", "nonsio", "baso", "kovèrxoe", "ésoe", "lèdo", "subviñir", "kredarò", "tenđerò", "paso", "naso", "bóɉoe", "kóroe", "gabiéndomene", "kredo", "kovèrđoe", "gabiéndome", "tolto", "volto", "sàltoe", "spénder", "tiòlto", "bojido", "vò-tu", "bòta", "dir", "batiđar", "prometo", "fifo", "konvinŧerò", "ànemo", "bútoe", "xbàlŧoe", "pàtrioe", "véloe", "tórnoe", "kavar", "steƚar", "strénxoe", "próboe", "fudarò", "vixiono", "bojo", "kovèrdre", "kovèrđar", "vèloe", "kuñar", "bèkoƚo", "stra-pien", "deventar", "spexo", "legar", "nónsioe", "gaƚar", "konparir", "vàngoe", "còrmene", "mordarò", "tràder", "sovéñoe", "traxarò", "tolo", "baƚotar", "negar", "kapítoƚoe", "kónŧoe", "volo", "puđar", "foƚada", "integrar", "dupio", "devéntoe", "ŧerka", "soveñarò", "soƚudo", "fúđar", "monto", "vòtu", "konvinŧo", "pàrtoe", "tiolo", "fondaméntoe", "prexo", "strénxer", "fado", "fúder", "spénxoe", "solvarò", "krexo", "tardo", "còlo", "vardo", "ŧerko", "pijo", "màrkoe", "teñarò", "stelar", "kalko", "naserò", "tòlo", "sòlo", "nunsio", "dopio", "ceñarò", "ténđoe", "cèñer", "tòrđoe", "splendre", "konvinto", "stelin", "leđarò", "fíloe", "vòlo", "pođar", "vèñer", "sàrvoe", "tèñer", "bojir", "soƚuda", "fikar", "veñarò", "volxarò", "colo", "stimo", "kovèrxer", "bolo", "kòpio", "céñer", "ponsar", "eƚèxo", "elèdar", "vederò", "lèđer", "soméɉoe", "tioƚo", "pikar", "griño", "ŧiñar", "pono", "piàntoe", "véñer", "pagar", "konsar", "konóser", "promeso", "téñer", "eƚexerò", "baƚòto", "konoso", "lederò", "strenđerò", "eleđerò", "koverderò", "íntegro", "frido", "pónoe", "spexa", "galíđoe", "lèxar", "far", "dónoe", "bàtar", "tradarò", "tràxer", "trato", "soméjoe", "ítaro", "salvo", "elèđo", "íntegroe", "ƚègo", "ƚúxar", "ƚèvoe", "ƚuxo", "ƚegar", "ƚuxarò", "ƚúxer", "ƚuxerò", "ƚevasion", "ƚèxo", "ƚèxar", "ƚèvo", "ƚúxoe", "ƚègoe", "ƚaso", "ƚasar", "ƚevar", "ƚevado", "ƚexarò", "ƚèxoe", "ƚèto", "ƚexerò", "ƚèxer", "ƚàsoe");
-		List<String> originalLines = words.stream()
-			.map(word -> word + "/" + flag)
-			.collect(Collectors.toList());
-		List<LineEntry> originalRules = originalLines.stream()
-			.map(wordGenerator::createFromDictionaryLine)
-			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
-			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "ar", "[^a]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "odro", "eodév", "aneiparts", "raxilag", "reloit", "rañèc", "risu", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("0", "er", StringUtils.EMPTY, Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("0", "ra", "[^ƚ]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "otirf", "rinu", "rino", "eodnàmod", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX .0 Y 3",
-			"PFX .0 0 re .",
-			"PFX .0 0 ra [^a]",
-			"PFX .0 0 ar [^ƚ]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
-	}
-
-	@Test
-	void casePrefix5() throws IOException{
-		String language = "vec-IT";
-		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
-			"SET UTF-8",
-			"LANG " + language,
-			"FLAG long",
-			"PFX +0 Y 2",
-			"PFX +0 0 in [^n]",
-			"PFX +0 0 i n"
-		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
-		WordGenerator wordGenerator = pair.getRight();
-		String flag = "+0";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("eƚixo", "tràoe", "spénxar", "velar", "tajar", "teñerò", "strenđo", "menado", "veñerò", "skaldo", "kuadro", "mòver", "ceñerò", "màndoe", "leđerò", "posto", "prométer", "ànemoe", "sentir", "subveño", "kàtoe", "trađarò", "móntoe", "lèxoe", "bàtoe", "móver", "soƚuto", "saƚir", "batixo", "dono", "graŧio", "súsitoe", "kúñoe", "dente", "devento", "tenxerò", "ítaroe", "èstre", "lexarò", "fuđir", "elèđoe", "uxo", "koverđarò", "spenderò", "coƚer", "xbalso", "gaƚixo", "toƚer", "inestar", "strapien", "voƚer", "filo", "filar", "elèxo", "eƚèxoe", "kamin", "pòvoloe", "lègoe", "fríđar", "elèxar", "nègoe", "tràđar", "vixiónoe", "víver", "velo", "tajo", "vèƚoe", "tàɉoe", "ŧitar", "sorxerò", "kòltoe", "galar", "krederò", "komando", "vàrsoe", "ŧapar", "sòldo", "méter", "menar", "vòldo", "torxerò", "fođir", "kòxer", "ténxoe", "díxoe", "vòltoƚoe", "tradre", "tókoe", "kalso", "đirar", "balŧa", "spenxo", "pàroe", "púđoe", "konposto", "xente", "fúđoe", "piègoe", "lèvoe", "konponerò", "kórar", "sovèño", "pesko", "tòrxoe", "vòltoe", "fórmoe", "sòrxoe", "torđarò", "konponarò", "nunsiar", "soviñir", "pòsto", "gaƚixar", "stra-piena", "korso", "súsito", "nonŧio", "boɉo", "tenderò", "gatu", "konosenŧa", "bóɉar", "sovèñar", "konoserò", "nónŧioe", "kovèrxar", "tiòrmene", "fondamento", "bekolar", "tòrđer", "vèlo", "prendre", "dúpioe", "mòrso", "véƚoe", "uso", "galiđar", "ténđer", "krédoe", "domando", "menada", "sponsal", "strénxar", "venderò", "buto", "butar", "patriar", "eso", "volđerò", "batido", "elexarò", "salo", "morderò", "tirar", "ŧito", "sétoe", "galo", "vívoe", "sòldar", "vòlxo", "ŧetar", "ŧapo", "mirar", "meno", "torderò", "pétoe", "skaldar", "kàlkoe", "vendedora", "strénđoe", "puxar", "lúxar", "đente", "kúxar", "métoe", "gétoe", "vàrdoe", "tàrdoe", "kalsar", "dúxar", "xirar", "traxerò", "téntoe", "stímoe", "séntoe", "fúxar", "buƚo", "sàlvoe", "vòlđoe", "sàpoe", "prometarò", "xètoe", "sètoe", "peskar", "pòvolo", "folada", "pètoe", "batíxoe", "spéndar", "kasko", "solverò", "konvínŧar", "koro", "pòrtoe", "vòltoƚo", "konsiderar", "spendarò", "balotar", "kaskado", "prométar", "íteroe", "frixarò", "fríxoe", "krear", "metarò", "galiđo", "póxoe", "kreso", "dresar", "péŧoe", "dreso", "nonsiar", "fondar", "mondo", "fondo", "mondar", "speso", "prendo", "spesar", "pòxoe", "fíƚoe", "préndar", "vivarò", "someɉo", "visto", "kòxoe", "konósoe", "bèkoƚoe", "fóndar", "gaver", "sitar", "tiro", "tràer", "elèder", "konpóner", "luxo", "sítoe", "miro", "vòlxar", "konvinso", "puxo", "vèsto", "kòpioe", "kòto", "kredre", "eledarò", "sapar", "spenxerò", "prenderò", "saver", "bòto", "soluda", "skrivarò", "volsudo", "fuderò", "mòvar", "spléndoe", "ào", "kaskar", "vèrso", "traderò", "doto", "nunŧio", "fuđarò", "skontrato", "ŧérkoe", "dópioe", "bonbo", "vàtu", "strendarò", "viñir", "batarò", "dixarò", "còrme", "sidio", "mòrdre", "bóƚoe", "vòƚo", "sòƚoe", "tòƚo", "móvar", "sòƚo", "tòrdre", "novar", "movo", "vu-tu", "tendre", "krésar", "fudir", "fridarò", "vendre", "coƚo", "boƚo", "boƚar", "trado", "móvoe", "àtu", "filada", "gríñoe", "foƚar", "konvinsarò", "soƚar", "sémeno", "grasiar", "spénxer", "fúđer", "ŧèto", "guxo", "guxar", "eleđarò", "fuxo", "gaƚíxoe", "duxo", "nòvoe", "kuxo", "voƚo", "flètar", "dirar", "díxer", "flèto", "toƚo", "strenxerò", "elèto", "prendarò", "baƚòtoe", "mòvoe", "tiòrme", "frídoe", "konvinŧarò", "sito", "pòdoe", "movarò", "trovo", "splenderò", "védar", "dito", "krèoe", "fuđerò", "vàoe", "versar", "sapo", "kàlsoe", "sovéñer", "torno", "nòvo", "mòvo", "fornir", "visuda", "vòlxoe", "konsídero", "póner", "elèxer", "konósar", "spenxarò", "còƚo", "bonbar", "konvínŧer", "ŧolar", "stréndar", "semenar", "kovèrdar", "dreŧo", "poxo", "fòsoe", "partiso", "skríver", "pesar", "skontrar", "baterò", "téñoe", "flètoe", "peŧo", "tràđer", "pasada", "véñoe", "sòlvar", "duxarò", "batídoe", "spésoe", "lèđoe", "flèso", "mèritoe", "kàpito", "skontro", "luxarò", "sesar", "kuxarò", "dixerò", "céñoe", "nunŧiar", "mediar", "xbalŧar", "vesar", "fuxarò", "fàoe", "drésoe", "konosarò", "konvínsoe", "povolar", "varsar", "tèñoe", "bekoƚar", "pódoe", "krésoe", "vèñoe", "speŧo", "ŧèsoe", "cèñoe", "inèstoe", "kalŧo", "gràsioe", "àlsoe", "koxarò", "elèdre", "meto", "mòrdar", "fríđer", "geto", "voltolar", "mendar", "àndoe", "soveño", "téndar", "véndar", "tòrđo", "seto", "konpòsto", "búfoe", "paro", "peto", "partir", "vivo", "bójar", "konsidarar", "uxar", "nonŧiar", "sòldoe", "taɉo", "kòxo", "stréndoe", "pòxo", "vòldoe", "fiƚo", "gabiendo", "konsídaro", "konvínsar", "vendedor", "tenđo", "splendarò", "lasar", "spiro", "volsuda", "soludo", "basar", "lexerò", "mèrito", "lèdar", "pòpolo", "móndoe", "kapítoƚo", "síñoe", "pasar", "fóndoe", "vòltoloe", "vòltolo", "piantar", "lèto", "voltar", "pèto", "poƚir", "sovèñoe", "splendo", "koltar", "péskoe", "kuxir", "kanbio", "fuxir", "sèto", "pòpoloe", "xèto", "fifar", "fato", "sòrxar", "tòrxar", "méndoe", "koñóser", "téndoe", "kato", "òrdoe", "frixerò", "formar", "kuadrar", "farir", "pijar", "toko", "strenxarò", "strenderò", "boɉarò", "púdoe", "bato", "núnŧioe", "tiòlo", "dixo", "batixar", "mandar", "stelo", "konvínŧoe", "nato", "koxerò", "fúdoe", "stanŧa", "korarò", "vèƚo", "tòrdoe", "spénđoe", "mòrdoe", "fónder", "galíxoe", "graŧiar", "stabiƚir", "ténxar", "énsoe", "nàsar", "véndoe", "pòpoƚo", "veƚo", "bolar", "galido", "kórer", "fondre", "folar", "foxir", "krédar", "sòlder", "vòlder", "elexerò", "bóɉer", "solar", "dupiar", "streto", "batiđo", "puđo", "sékoe", "kovèrdoe", "lèvo", "békoe", "vosuda", "montar", "pàgoe", "spéndoe", "kovèrdo", "ferir", "konosanŧa", "visudo", "èser", "vèrsoe", "dúxer", "fletarò", "friderò", "balòtoe", "soveñerò", "gàƚoe", "flèter", "texo", "nègo", "tiòƚo", "lègo", "fúxer", "trào", "bónboe", "kavo", "kànbioe", "steƚo", "lúxer", "pòđoe", "kúxer", "beƚir", "vèstoe", "koñoso", "kàvoe", "kuño", "susitar", "boɉida", "gaƚo", "skrito", "pónar", "préndoe", "saƚo", "sào", "donar", "meterò", "xbalsar", "ponso", "piko", "gào", "ŧiño", "kàskoe", "elederò", "viverò", "konso", "fào", "pago", "eƚèxar", "griñar", "kàpitoe", "koverđerò", "mèdioe", "sémenoe", "píkoe", "vòlxer", "ŧíñoe", "elèdo", "pròboe", "prexentar", "konpariso", "lèxo", "fíkoe", "montada", "tratin", "tiòre", "strendo", "skóntroe", "sòlvoe", "kréser", "tratar", "àndomene", "stabilir", "sàƚoe", "subviño", "friđo", "salvar", "póđoe", "elèđar", "tardar", "tòrto", "vardar", "sòrto", "dopiar", "pòrto", "bul", "vòlđo", "pòđo", "fúdar", "kapítolo", "koñosenŧa", "spenđerò", "fudre", "kalkar", "ŧerkar", "friđerò", "ponarò", "sòlver", "komandar", "kopiar", "píjoe", "kovèrto", "bekada", "tiòr", "stimar", "spenđo", "pođo", "konparso", "fiko", "bekar", "stéƚoe", "salto", "tento", "strenxo", "tòrder", "sento", "polir", "seko", "sekar", "subvíñoe", "frídar", "kónsoe", "fondarò", "fada", "skàldoe", "galidar", "portar", "pàsoe", "konsídaroe", "meritar", "làsoe", "kapitar", "kresarò", "voltoƚar", "nàsoe", "bóloe", "pónsoe", "somejo", "bàsoe", "itarar", "kapitoƚar", "elèdoe", "sòloe", "frixo", "vosudo", "kostruir", "tràtoe", "skrívoe", "subveñir", "koñoserò", "ordar", "sèrvo", "moverò", "gràŧioe", "pòvoƚo", "splénder", "vòlva", "galídoe", "sovéñar", "tentar", "elixo", "beko", "saltar", "konvínser", "tróvoe", "koverxarò", "fuxion", "soldarò", "lèdoe", "siño", "siñar", "konsíderoe", "mòrder", "còre", "ténder", "fuxerò", "popolar", "vénder", "kuàdroe", "duxerò", "kuxerò", "bufada", "luxerò", "xbàlsoe", "domandar", "serkar", "konpono", "pòvoƚoe", "servar", "skrívar", "bójoe", "boɉido", "kreto", "serko", "ítero", "spíroe", "pudar", "strénđar", "pudo", "povoƚar", "fríxar", "tòre", "spléndar", "tràdar", "esir", "balòto", "kréder", "nasarò", "ŧòloe", "traerò", "elèđer", "koverdarò", "tràđoe", "usir", "tioler", "cèñar", "galixar", "strapiena", "védoe", "ordo", "fondamentar", "tèñar", "fífoe", "bójer", "céñar", "vèñar", "podar", "kàlŧoe", "tòrxer", "sòrxer", "vedarò", "téñar", "grasio", "eƚèto", "véñar", "kapitolar", "ceño", "baldería", "vésoe", "camo", "camar", "pésoe", "ŧesar", "inèsto", "lèđar", "lèđo", "enso", "tiolto", "fòso", "mòso", "stansa", "spenđarò", "strénđer", "teño", "bekon", "veño", "dòso", "skrivo", "ledarò", "dréŧoe", "vestir", "lèder", "batuda", "sèsoe", "spéŧoe", "markar", "kanbiar", "bufar", "fosar", "sarvo", "marko", "véder", "sarvar", "pòpoƚoe", "strenđarò", "prexéntoe", "bekado", "ténxer", "iterar", "eƚèxer", "subvéñoe", "kovèrđer", "salir", "probo", "bojida", "cèño", "splexo", "pòdo", "krèo", "boɉerò", "korerò", "eƚexarò", "konvinserò", "tioƚer", "strénder", "prométoe", "coler", "kaskada", "tèño", "nàser", "ŧèso", "parto", "stéloe", "toler", "vèño", "podo", "tràxar", "elèxoe", "xbalŧo", "boɉir", "batadura", "fèrto", "trađo", "voler", "prexento", "konŧar", "konŧo", "fríđoe", "skriverò", "koverxerò", "soluto", "fleterò", "verò", "batíđoe", "kovèrder", "fluso", "komàndoe", "bojarò", "domàndoe", "onir", "unir", "frito", "spénđar", "vango", "càmoe", "belir", "vangar", "tenxarò", "métar", "kúxoe", "tràxoe", "dúxoe", "kalŧar", "fúxoe", "gúxoe", "fríder", "probar", "tòrdo", "volxerò", "mòrdo", "getar", "núnsioe", "tòrđar", "trađerò", "xetar", "tíroe", "fonderò", "míroe", "mendo", "levado", "someɉar", "setar", "parar", "vívar", "petar", "tendo", "àndome", "vendo", "fiƚada", "lèdre", "taɉar", "sàloe", "kòxar", "fodir", "fiƚar", "ŧàpoe", "tòrme", "friđarò", "ŧètoe", "gàloe", "soveñir", "sorxarò", "galixo", "konpónar", "kreserò", "serka", "poxar", "konpónoe", "peso", "dreŧar", "vòlvo", "meso", "vutu", "prometerò", "tòr", "sòlvo", "peŧar", "veñir", "pròbo", "teñir", "patrio", "vòlđer", "ensir", "còr", "veso", "spénđer", "sovèñer", "popoƚar", "lèxer", "batidar", "bàter", "speŧar", "bojerò", "varso", "saer", "traxo", "vedre", "kapítoloe", "púxoe", "úxoe", "lúxoe", "mèdio", "tòrxo", "pianto", "volderò", "sòrxo", "trovar", "tòlto", "solderò", "katar", "sòlto", "levar", "kovèrđo", "vòlto", "piègo", "batudo", "stima", "àlŧoe", "vedo", "tokar", "díxar", "torđerò", "kòlto", "vendarò", "mando", "ménoe", "colto", "tendarò", "fridre", "ŧítoe", "ŧòlo", "formo", "ponerò", "spento", "strendre", "sèrvoe", "prénder", "sèso", "kovèrxo", "tàjoe", "sérkoe", "tràdoe", "tòrmene", "fríxer", "tornar", "koñosanŧa", "còlto", "vixionar", "veƚar", "tenxo", "úsoe", "spirar", "bèkoloe", "bèkolo", "torxarò", "piegar", "laso", "àtoe", "somejar", "nonsio", "baso", "kovèrxoe", "ésoe", "lèdo", "subviñir", "kredarò", "tenđerò", "paso", "naso", "bóɉoe", "kóroe", "gabiéndomene", "kredo", "kovèrđoe", "gabiéndome", "tolto", "volto", "sàltoe", "spénder", "tiòlto", "bojido", "vò-tu", "bòta", "dir", "batiđar", "prometo", "fifo", "konvinŧerò", "ànemo", "bútoe", "xbàlŧoe", "pàtrioe", "véloe", "tórnoe", "kavar", "steƚar", "strénxoe", "próboe", "fudarò", "vixiono", "bojo", "kovèrdre", "kovèrđar", "vèloe", "kuñar", "bèkoƚo", "stra-pien", "deventar", "spexo", "legar", "nónsioe", "gaƚar", "konparir", "vàngoe", "còrmene", "mordarò", "tràder", "sovéñoe", "traxarò", "tolo", "baƚotar", "negar", "kapítoƚoe", "kónŧoe", "volo", "puđar", "foƚada", "integrar", "dupio", "devéntoe", "ŧerka", "soveñarò", "soƚudo", "fúđar", "monto", "vòtu", "konvinŧo", "pàrtoe", "tiolo", "fondaméntoe", "prexo", "strénxer", "fado", "fúder", "spénxoe", "solvarò", "krexo", "tardo", "còlo", "vardo", "ŧerko", "pijo", "màrkoe", "teñarò", "stelar", "kalko", "naserò", "tòlo", "sòlo", "nunsio", "dopio", "ceñarò", "ténđoe", "cèñer", "tòrđoe", "splendre", "konvinto", "stelin", "leđarò", "fíloe", "vòlo", "pođar", "vèñer", "sàrvoe", "tèñer", "bojir", "soƚuda", "fikar", "veñarò", "volxarò", "colo", "stimo", "kovèrxer", "bolo", "kòpio", "céñer", "ponsar", "eƚèxo", "elèdar", "vederò", "lèđer", "soméɉoe", "tioƚo", "pikar", "griño", "ŧiñar", "pono", "piàntoe", "véñer", "pagar", "konsar", "konóser", "promeso", "téñer", "eƚexerò", "baƚòto", "konoso", "lederò", "strenđerò", "eleđerò", "koverderò", "íntegro", "frido", "pónoe", "spexa", "galíđoe", "lèxar", "far", "dónoe", "bàtar", "tradarò", "tràxer", "trato", "soméjoe", "ítaro", "salvo", "elèđo", "íntegroe", "aseñar", "aparo", "ato", "abiéndomene", "andar", "ando", "alŧar", "alŧo", "aseño", "aparso", "aséñoe", "aldir", "aparir", "aer", "alsar", "also", "aver", "atar", "abiendo", "anemar", "apariso", "abiéndome", "aŧion", "andar", "aver", "aseñar", "aparo", "abiéndomene", "ato", "ando", "aseño", "alŧo", "alŧar", "aparso", "aséñoe", "aldir", "aparir", "aer", "also", "alsar", "abiendo", "atar", "apariso", "anemar", "abiéndome", "aŧion", "eƚixo", "tràoe", "spénxar", "velar", "tajar", "teñerò", "strenđo", "menado", "veñerò", "skaldo", "kuadro", "mòver", "ceñerò", "màndoe", "leđerò", "posto", "prométer", "ànemoe", "sentir", "subveño", "kàtoe", "trađarò", "móntoe", "lèxoe", "bàtoe", "móver", "soƚuto", "saƚir", "batixo", "dono", "graŧio", "súsitoe", "kúñoe", "dente", "devento", "tenxerò", "ítaroe", "èstre", "lexarò", "fuđir", "elèđoe", "uxo", "koverđarò", "spenderò", "coƚer", "xbalso", "gaƚixo", "toƚer", "inestar", "strapien", "voƚer", "filo", "filar", "elèxo", "eƚèxoe", "kamin", "pòvoloe", "lègoe", "fríđar", "elèxar", "nègoe", "tràđar", "vixiónoe", "víver", "velo", "tajo", "vèƚoe", "tàɉoe", "ŧitar", "sorxerò", "kòltoe", "galar", "krederò", "komando", "vàrsoe", "ŧapar", "sòldo", "méter", "menar", "vòldo", "torxerò", "fođir", "kòxer", "ténxoe", "díxoe", "vòltoƚoe", "tradre", "tókoe", "kalso", "đirar", "balŧa", "spenxo", "pàroe", "púđoe", "konposto", "xente", "fúđoe", "piègoe", "lèvoe", "konponerò", "kórar", "sovèño", "pesko", "tòrxoe", "vòltoe", "fórmoe", "sòrxoe", "torđarò", "konponarò", "nunsiar", "soviñir", "pòsto", "gaƚixar", "stra-piena", "korso", "súsito", "nonŧio", "boɉo", "tenderò", "gatu", "konosenŧa", "bóɉar", "sovèñar", "konoserò", "nónŧioe", "kovèrxar", "tiòrmene", "fondamento", "bekolar", "tòrđer", "vèlo", "prendre", "dúpioe", "mòrso", "véƚoe", "uso", "galiđar", "ténđer", "krédoe", "domando", "menada", "sponsal", "strénxar", "venderò", "buto", "butar", "patriar", "eso", "volđerò", "batido", "elexarò", "salo", "morderò", "tirar", "ŧito", "sétoe", "galo", "vívoe", "sòldar", "vòlxo", "ŧetar", "ŧapo", "mirar", "meno", "torderò", "pétoe", "skaldar", "kàlkoe", "vendedora", "strénđoe", "puxar", "lúxar", "đente", "kúxar", "métoe", "gétoe", "vàrdoe", "tàrdoe", "kalsar", "dúxar", "xirar", "traxerò", "téntoe", "stímoe", "séntoe", "fúxar", "buƚo", "sàlvoe", "vòlđoe", "sàpoe", "prometarò", "xètoe", "sètoe", "peskar", "pòvolo", "folada", "pètoe", "batíxoe", "spéndar", "kasko", "solverò", "konvínŧar", "koro", "pòrtoe", "vòltoƚo", "konsiderar", "spendarò", "balotar", "kaskado", "prométar", "íteroe", "frixarò", "fríxoe", "krear", "metarò", "galiđo", "póxoe", "kreso", "dresar", "péŧoe", "dreso", "nonsiar", "fondar", "mondo", "fondo", "mondar", "speso", "prendo", "spesar", "pòxoe", "fíƚoe", "préndar", "vivarò", "someɉo", "visto", "kòxoe", "konósoe", "bèkoƚoe", "fóndar", "gaver", "sitar", "tiro", "tràer", "elèder", "konpóner", "luxo", "sítoe", "miro", "vòlxar", "konvinso", "puxo", "vèsto", "kòpioe", "kòto", "kredre", "eledarò", "sapar", "spenxerò", "prenderò", "saver", "bòto", "soluda", "skrivarò", "volsudo", "fuderò", "mòvar", "spléndoe", "ào", "kaskar", "vèrso", "traderò", "doto", "nunŧio", "fuđarò", "skontrato", "ŧérkoe", "dópioe", "bonbo", "vàtu", "strendarò", "viñir", "batarò", "dixarò", "còrme", "sidio", "mòrdre", "bóƚoe", "vòƚo", "sòƚoe", "tòƚo", "móvar", "sòƚo", "tòrdre", "novar", "movo", "vu-tu", "tendre", "krésar", "fudir", "fridarò", "vendre", "coƚo", "boƚo", "boƚar", "trado", "móvoe", "àtu", "filada", "gríñoe", "foƚar", "konvinsarò", "soƚar", "sémeno", "grasiar", "spénxer", "fúđer", "ŧèto", "guxo", "guxar", "eleđarò", "fuxo", "gaƚíxoe", "duxo", "nòvoe", "kuxo", "voƚo", "flètar", "dirar", "díxer", "flèto", "toƚo", "strenxerò", "elèto", "prendarò", "baƚòtoe", "mòvoe", "tiòrme", "frídoe", "konvinŧarò", "sito", "pòdoe", "movarò", "trovo", "splenderò", "védar", "dito", "krèoe", "fuđerò", "vàoe", "versar", "sapo", "kàlsoe", "sovéñer", "torno", "nòvo", "mòvo", "fornir", "visuda", "vòlxoe", "konsídero", "póner", "elèxer", "konósar", "spenxarò", "còƚo", "bonbar", "konvínŧer", "ŧolar", "stréndar", "semenar", "kovèrdar", "dreŧo", "poxo", "fòsoe", "partiso", "skríver", "pesar", "skontrar", "baterò", "téñoe", "flètoe", "peŧo", "tràđer", "pasada", "véñoe", "sòlvar", "duxarò", "batídoe", "spésoe", "lèđoe", "flèso", "mèritoe", "kàpito", "skontro", "luxarò", "sesar", "kuxarò", "dixerò", "céñoe", "nunŧiar", "mediar", "xbalŧar", "vesar", "fuxarò", "fàoe", "drésoe", "konosarò", "konvínsoe", "povolar", "varsar", "tèñoe", "bekoƚar", "pódoe", "krésoe", "vèñoe", "speŧo", "ŧèsoe", "cèñoe", "inèstoe", "kalŧo", "gràsioe", "àlsoe", "koxarò", "elèdre", "meto", "mòrdar", "fríđer", "geto", "voltolar", "mendar", "àndoe", "soveño", "téndar", "véndar", "tòrđo", "seto", "konpòsto", "búfoe", "paro", "peto", "partir", "vivo", "bójar", "konsidarar", "uxar", "nonŧiar", "sòldoe", "taɉo", "kòxo", "stréndoe", "pòxo", "vòldoe", "fiƚo", "gabiendo", "konsídaro", "konvínsar", "vendedor", "tenđo", "splendarò", "lasar", "spiro", "volsuda", "soludo", "basar", "lexerò", "mèrito", "lèdar", "pòpolo", "móndoe", "kapítoƚo", "síñoe", "pasar", "fóndoe", "vòltoloe", "vòltolo", "piantar", "lèto", "voltar", "pèto", "poƚir", "sovèñoe", "splendo", "koltar", "péskoe", "kuxir", "kanbio", "fuxir", "sèto", "pòpoloe", "xèto", "fifar", "fato", "sòrxar", "tòrxar", "méndoe", "koñóser", "téndoe", "kato", "òrdoe", "frixerò", "formar", "kuadrar", "farir", "pijar", "toko", "strenxarò", "strenderò", "boɉarò", "púdoe", "bato", "núnŧioe", "tiòlo", "dixo", "batixar", "mandar", "stelo", "konvínŧoe", "nato", "koxerò", "fúdoe", "stanŧa", "korarò", "vèƚo", "tòrdoe", "spénđoe", "mòrdoe", "fónder", "galíxoe", "graŧiar", "stabiƚir", "ténxar", "énsoe", "nàsar", "véndoe", "pòpoƚo", "veƚo", "bolar", "galido", "kórer", "fondre", "folar", "foxir", "krédar", "sòlder", "vòlder", "elexerò", "bóɉer", "solar", "dupiar", "streto", "batiđo", "puđo", "sékoe", "kovèrdoe", "lèvo", "békoe", "vosuda", "montar", "pàgoe", "spéndoe", "kovèrdo", "ferir", "konosanŧa", "visudo", "èser", "vèrsoe", "dúxer", "fletarò", "friderò", "balòtoe", "soveñerò", "gàƚoe", "flèter", "texo", "nègo", "tiòƚo", "lègo", "fúxer", "trào", "bónboe", "kavo", "kànbioe", "steƚo", "lúxer", "pòđoe", "kúxer", "beƚir", "vèstoe", "koñoso", "kàvoe", "kuño", "susitar", "boɉida", "gaƚo", "skrito", "pónar", "préndoe", "saƚo", "sào", "donar", "meterò", "xbalsar", "ponso", "piko", "gào", "ŧiño", "kàskoe", "elederò", "viverò", "konso", "fào", "pago", "eƚèxar", "griñar", "kàpitoe", "koverđerò", "mèdioe", "sémenoe", "píkoe", "vòlxer", "ŧíñoe", "elèdo", "pròboe", "prexentar", "konpariso", "lèxo", "fíkoe", "montada", "tratin", "tiòre", "strendo", "skóntroe", "sòlvoe", "kréser", "tratar", "àndomene", "stabilir", "sàƚoe", "subviño", "friđo", "salvar", "póđoe", "elèđar", "tardar", "tòrto", "vardar", "sòrto", "dopiar", "pòrto", "bul", "vòlđo", "pòđo", "fúdar", "kapítolo", "koñosenŧa", "spenđerò", "fudre", "kalkar", "ŧerkar", "friđerò", "ponarò", "sòlver", "komandar", "kopiar", "píjoe", "kovèrto", "bekada", "tiòr", "stimar", "spenđo", "pođo", "konparso", "fiko", "bekar", "stéƚoe", "salto", "tento", "strenxo", "tòrder", "sento", "polir", "seko", "sekar", "subvíñoe", "frídar", "kónsoe", "fondarò", "fada", "skàldoe", "galidar", "portar", "pàsoe", "konsídaroe", "meritar", "làsoe", "kapitar", "kresarò", "voltoƚar", "nàsoe", "bóloe", "pónsoe", "somejo", "bàsoe", "itarar", "kapitoƚar", "elèdoe", "sòloe", "frixo", "vosudo", "kostruir", "tràtoe", "skrívoe", "subveñir", "koñoserò", "ordar", "sèrvo", "moverò", "gràŧioe", "pòvoƚo", "splénder", "vòlva", "galídoe", "sovéñar", "tentar", "elixo", "beko", "saltar", "konvínser", "tróvoe", "koverxarò", "fuxion", "soldarò", "lèdoe", "siño", "siñar", "konsíderoe", "mòrder", "còre", "ténder", "fuxerò", "popolar", "vénder", "kuàdroe", "duxerò", "kuxerò", "bufada", "luxerò", "xbàlsoe", "domandar", "serkar", "konpono", "pòvoƚoe", "servar", "skrívar", "bójoe", "boɉido", "kreto", "serko", "ítero", "spíroe", "pudar", "strénđar", "pudo", "povoƚar", "fríxar", "tòre", "spléndar", "tràdar", "esir", "balòto", "kréder", "nasarò", "ŧòloe", "traerò", "elèđer", "koverdarò", "tràđoe", "usir", "tioler", "cèñar", "galixar", "strapiena", "védoe", "ordo", "fondamentar", "tèñar", "fífoe", "bójer", "céñar", "vèñar", "podar", "kàlŧoe", "tòrxer", "sòrxer", "vedarò", "téñar", "grasio", "eƚèto", "véñar", "kapitolar", "ceño", "baldería", "vésoe", "camo", "camar", "pésoe", "ŧesar", "inèsto", "lèđar", "lèđo", "enso", "tiolto", "fòso", "mòso", "stansa", "spenđarò", "strénđer", "teño", "bekon", "veño", "dòso", "skrivo", "ledarò", "dréŧoe", "vestir", "lèder", "batuda", "sèsoe", "spéŧoe", "markar", "kanbiar", "bufar", "fosar", "sarvo", "marko", "véder", "sarvar", "pòpoƚoe", "strenđarò", "prexéntoe", "bekado", "ténxer", "iterar", "eƚèxer", "subvéñoe", "kovèrđer", "salir", "probo", "bojida", "cèño", "splexo", "pòdo", "krèo", "boɉerò", "korerò", "eƚexarò", "konvinserò", "tioƚer", "strénder", "prométoe", "coler", "kaskada", "tèño", "nàser", "ŧèso", "parto", "stéloe", "toler", "vèño", "podo", "tràxar", "elèxoe", "xbalŧo", "boɉir", "batadura", "fèrto", "trađo", "voler", "prexento", "konŧar", "konŧo", "fríđoe", "skriverò", "koverxerò", "soluto", "fleterò", "verò", "batíđoe", "kovèrder", "fluso", "komàndoe", "bojarò", "domàndoe", "onir", "unir", "frito", "spénđar", "vango", "càmoe", "belir", "vangar", "tenxarò", "métar", "kúxoe", "tràxoe", "dúxoe", "kalŧar", "fúxoe", "gúxoe", "fríder", "probar", "tòrdo", "volxerò", "mòrdo", "getar", "núnsioe", "tòrđar", "trađerò", "xetar", "tíroe", "fonderò", "míroe", "mendo", "levado", "someɉar", "setar", "parar", "vívar", "petar", "tendo", "àndome", "vendo", "fiƚada", "lèdre", "taɉar", "sàloe", "kòxar", "fodir", "fiƚar", "ŧàpoe", "tòrme", "friđarò", "ŧètoe", "gàloe", "soveñir", "sorxarò", "galixo", "konpónar", "kreserò", "serka", "poxar", "konpónoe", "peso", "dreŧar", "vòlvo", "meso", "vutu", "prometerò", "tòr", "sòlvo", "peŧar", "veñir", "pròbo", "teñir", "patrio", "vòlđer", "ensir", "còr", "veso", "spénđer", "sovèñer", "popoƚar", "lèxer", "batidar", "bàter", "speŧar", "bojerò", "varso", "saer", "traxo", "vedre", "kapítoloe", "púxoe", "úxoe", "lúxoe", "mèdio", "tòrxo", "pianto", "volderò", "sòrxo", "trovar", "tòlto", "solderò", "katar", "sòlto", "levar", "kovèrđo", "vòlto", "piègo", "batudo", "stima", "àlŧoe", "vedo", "tokar", "díxar", "torđerò", "kòlto", "vendarò", "mando", "ménoe", "colto", "tendarò", "fridre", "ŧítoe", "ŧòlo", "formo", "ponerò", "spento", "strendre", "sèrvoe", "prénder", "sèso", "kovèrxo", "tàjoe", "sérkoe", "tràdoe", "tòrmene", "fríxer", "tornar", "koñosanŧa", "còlto", "vixionar", "veƚar", "tenxo", "úsoe", "spirar", "bèkoloe", "bèkolo", "torxarò", "piegar", "laso", "àtoe", "somejar", "nonsio", "baso", "kovèrxoe", "ésoe", "lèdo", "subviñir", "kredarò", "tenđerò", "paso", "naso", "bóɉoe", "kóroe", "gabiéndomene", "kredo", "kovèrđoe", "gabiéndome", "tolto", "volto", "sàltoe", "spénder", "tiòlto", "bojido", "vò-tu", "bòta", "dir", "batiđar", "prometo", "fifo", "konvinŧerò", "ànemo", "bútoe", "xbàlŧoe", "pàtrioe", "véloe", "tórnoe", "kavar", "steƚar", "strénxoe", "próboe", "fudarò", "vixiono", "bojo", "kovèrdre", "kovèrđar", "vèloe", "kuñar", "bèkoƚo", "stra-pien", "deventar", "spexo", "legar", "nónsioe", "gaƚar", "konparir", "vàngoe", "còrmene", "mordarò", "tràder", "sovéñoe", "traxarò", "tolo", "baƚotar", "negar", "kapítoƚoe", "kónŧoe", "volo", "puđar", "foƚada", "integrar", "dupio", "devéntoe", "ŧerka", "soveñarò", "soƚudo", "fúđar", "monto", "vòtu", "konvinŧo", "pàrtoe", "tiolo", "fondaméntoe", "prexo", "strénxer", "fado", "fúder", "spénxoe", "solvarò", "krexo", "tardo", "còlo", "vardo", "ŧerko", "pijo", "màrkoe", "teñarò", "stelar", "kalko", "naserò", "tòlo", "sòlo", "nunsio", "dopio", "ceñarò", "ténđoe", "cèñer", "tòrđoe", "splendre", "konvinto", "stelin", "leđarò", "fíloe", "vòlo", "pođar", "vèñer", "sàrvoe", "tèñer", "bojir", "soƚuda", "fikar", "veñarò", "volxarò", "colo", "stimo", "kovèrxer", "bolo", "kòpio", "céñer", "ponsar", "eƚèxo", "elèdar", "vederò", "lèđer", "soméɉoe", "tioƚo", "pikar", "griño", "ŧiñar", "pono", "piàntoe", "véñer", "pagar", "konsar", "konóser", "promeso", "téñer", "eƚexerò", "baƚòto", "konoso", "lederò", "strenđerò", "eleđerò", "koverderò", "íntegro", "frido", "pónoe", "spexa", "galíđoe", "lèxar", "far", "dónoe", "bàtar", "tradarò", "tràxer", "trato", "soméjoe", "ítaro", "salvo", "elèđo", "íntegroe", "ƚègo", "ƚúxar", "ƚèvoe", "ƚuxo", "ƚegar", "ƚuxarò", "ƚúxer", "ƚuxerò", "ƚevasion", "ƚèxo", "ƚèxar", "ƚèvo", "ƚúxoe", "ƚègoe", "ƚaso", "ƚasar", "ƚevar", "ƚevado", "ƚexarò", "ƚèxoe", "ƚèto", "ƚexerò", "ƚèxer", "ƚàsoe");
-		List<String> originalLines = words.stream()
-			.map(word -> word + "/" + flag)
-			.collect(Collectors.toList());
-		List<LineEntry> originalRules = originalLines.stream()
-			.map(wordGenerator::createFromDictionaryLine)
-			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
-			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "ni", "[^n]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "olòs", "olòt", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("0", "i", "n", Arrays.asList("eogèn", "raisnun", "rasàn", "eoisnón", "eovòn", "oiŧnun", "eosàn", "ovòn", "raiŧnon", "resàn", "raisnon", "raiŧnun", "osan", "otan", "oisnun", "eoiŧnón", "ogèn", "eoiŧnún", "òresan", "ravon", "eoisnún", "oisnon", "ragen", "oiŧnon", "òrasan"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX +0 Y 2",
-			"PFX +0 0 i n",
-			"PFX +0 0 in [^n]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
-	}
-
-	@Test
-	void casePrefix6() throws IOException{
-		String language = "vec-IT";
-		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
-			"SET UTF-8",
-			"LANG " + language,
-			"FLAG long",
-			"KEEPCASE Z0",
-			"PFX $1 Y 2",
-			"PFX $1 0 h/Z0 .",
-			"PFX $1 0 da/Z0 ."
-		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
-		WordGenerator wordGenerator = pair.getRight();
-		String flag = "$1";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("u", "Wb", "lx", "s", "Bq", "Torr", "Gy", "m", "l", "Ω", "g", "Pl", "kat", "lm", "Np", "Sv", "W", "V", "T", "S", "bar", "eV", "Pa", "mmHg", "N", "Hz", "mol", "K", "J", "H", "F", "Å", "Da", "C", "sr", "A");
-		List<String> originalLines = words.stream()
-			.map(word -> word + "/" + flag)
-			.collect(Collectors.toList());
-		List<LineEntry> originalRules = originalLines.stream()
-			.map(wordGenerator::createFromDictionaryLine)
-			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
-			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", SetHelper.setOf("ad/Z0", "h/Z0"), StringUtils.EMPTY, Arrays.asList("rs", "A", "aD", "C", "Å", "F", "H", "J", "lom", "K", "gHmm", "N", "zH", "Ve", "aP", "rab", "S", "T", "V", "W", "vS", "pN", "tak", "ml", "lP", "g", "Ω", "l", "m", "yG", "rroT", "qB", "s", "xl", "u", "bW"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX $1 Y 2",
-			"PFX $1 0 h/Z0 .",
-			"PFX $1 0 da/Z0 ."
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
-	}
-
-	@Test
-	void casePrefix7() throws IOException{
-		String language = "vec-IT";
-		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
-			"SET UTF-8",
-			"LANG " + language,
-			"FLAG long",
-			"PFX +0 Y 3",
-			"PFX +0 0 in [^ƚn]",
-			"PFX +0 0 in– n",
-			"PFX +0 0 i [lƚmnñrs]"
-		);
-		Pair<RulesReducer, WordGenerator> pair = createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
-		WordGenerator wordGenerator = pair.getRight();
-		String flag = "+0";
-		AffixType affixType = AffixType.PREFIX;
-		List<String> words = Arrays.asList("konplèto", "kòmodo", "kuranŧa", "mamada", "mamado", "nosente", "nosentin", "noŧente");
-		List<String> originalLines = words.stream()
-			.map(word -> word + "/" + flag)
-			.collect(Collectors.toList());
-		List<LineEntry> originalRules = originalLines.stream()
-			.map(wordGenerator::createFromDictionaryLine)
-			.map(wordGenerator::applyAffixRules)
-			.flatMap(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType).stream())
-			.collect(Collectors.toList());
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("0", "ni", "[^n]", Arrays.asList("odamam", "adamam")),
-			new LineEntry("0", "–ni", "n", Arrays.asList("etneŧon", "etneson", "nitneson")),
-			new LineEntry("0", "i", "[^k]", Arrays.asList("odamam", "etneŧon", "etneson", "nitneson", "adamam"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX +0 Y 3",
-			"PFX +0 0 in– n",
-			"PFX +0 0 i [^k]",
-			"PFX +0 0 in [^n]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		reducer.checkReductionCorrectness(flag, rules, originalLines);
-	}
-
-
-	private Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
-		AffixParser affParser = new AffixParser();
-		affParser.parse(affFile, language);
-		AffixData affixData = affParser.getAffixData();
-		File dicFile = FileHelper.createDeleteOnExitFile(language, ".dic",
-			"0");
-		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
-		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser, null);
-		RulesReducer reducer = new RulesReducer(affixData, wordGenerator);
-		return Pair.of(reducer, wordGenerator);
+		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
 }

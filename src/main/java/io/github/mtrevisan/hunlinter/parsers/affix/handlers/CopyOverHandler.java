@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -31,7 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 public class CopyOverHandler implements Handler{
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData){
 		affixData.addData(context.getRuleType(), context.getAllButFirstParameter());
 
 		return 0;

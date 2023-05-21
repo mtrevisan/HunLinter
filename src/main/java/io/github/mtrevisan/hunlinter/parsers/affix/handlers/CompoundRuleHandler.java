@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,19 +25,17 @@
 package io.github.mtrevisan.hunlinter.parsers.affix.handlers;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 
-import java.io.IOException;
-import java.text.MessageFormat;
+import java.io.EOFException;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -45,68 +43,67 @@ import java.util.Set;
 
 public class CompoundRuleHandler implements Handler{
 
-	private static final MessageFormat MISMATCHED_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: mismatched compound rule type (expected {1})");
-	private static final MessageFormat DUPLICATED_LINE = new MessageFormat("Error reading line `{0}`: duplicated line");
-	private static final MessageFormat BAD_FIRST_PARAMETER = new MessageFormat("Error reading line `{0}`: the first parameter is not a number");
-	private static final MessageFormat BAD_NUMBER_OF_ENTRIES = new MessageFormat("Error reading line `{0}`: bad number of entries, `{1}` must be a positive integer");
-	private static final MessageFormat EMPTY_COMPOUND_RULE_TYPE = new MessageFormat("Error reading line `{0}`: compound rule type cannot be empty");
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Error reading line `{0}`: compound rule is bad formatted");
+	private static final String COMPOUND_RULE_EXPECTED = "Expected a compound rule entry, found something else{} in parent flag `{}`; counter should be {}";
+	private static final String MISMATCHED_COMPOUND_RULE_TYPE = "Error reading line `{}`: mismatched compound rule type (expected {})";
+	private static final String DUPLICATED_LINE = "Error reading line `{}`: duplicated line";
+	private static final String BAD_FIRST_PARAMETER = "Error reading line `{}`: the first parameter is not a number";
+	private static final String BAD_NUMBER_OF_ENTRIES = "Error reading line `{}`: bad number of entries, `{}` must be a positive integer less or equal than " + Short.MAX_VALUE;
+	private static final String EMPTY_COMPOUND_RULE_TYPE = "Error reading line `{}`: compound rule type cannot be empty";
+	private static final String BAD_FORMAT = "Error reading line `{}`: compound rule is bad formatted";
 
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
-		try{
-			final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
+		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
-			final int numEntries = checkValidity(context);
+		final int numEntries = checkValidity(context);
+		final Scanner scanner = context.getScanner();
+		final Set<String> compoundRules = new HashSet<>(numEntries);
+		for(int i = 0; i < numEntries; i ++){
+			ParserHelper.assertNotEOF(scanner);
 
-			final Scanner scanner = context.getScanner();
+			final String line = scanner.nextLine();
+			if(line == null || !line.startsWith(AffixOption.COMPOUND_RULE.getCode()))
+				throw new LinterException(COMPOUND_RULE_EXPECTED, (line != null && !line.isEmpty()? ": `" + line + "`": StringUtils.EMPTY),
+					AffixOption.COMPOUND_RULE.getCode(), i);
 
-			final Set<String> compoundRules = new HashSet<>(numEntries);
-			for(int i = 0; i < numEntries; i ++){
-				ParserHelper.assertNotEOF(scanner);
+			final String[] lineParts = StringUtils.split(line);
 
-				final String line = scanner.nextLine();
-				final String[] lineParts = StringUtils.split(line);
+			final AffixOption option = AffixOption.createFromCode(lineParts[0]);
+			if(option != AffixOption.COMPOUND_RULE)
+				throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE, line, AffixOption.COMPOUND_RULE);
 
-				final AffixOption option = AffixOption.createFromCode(lineParts[0]);
-				if(option != AffixOption.COMPOUND_RULE)
-					throw new LinterException(MISMATCHED_COMPOUND_RULE_TYPE.format(new Object[]{line, AffixOption.COMPOUND_RULE}));
+			final String rule = lineParts[1];
 
-				final String rule = lineParts[1];
+			checkRuleValidity(rule, line, strategy);
 
-				checkRuleValidity(rule, line, strategy);
-
-				final boolean inserted = compoundRules.add(rule);
-				if(!inserted)
-					EventBusService.publish(new LinterWarning(DUPLICATED_LINE.format(new Object[]{line}), IndexDataPair.of(context.getIndex() + i, null)));
-			}
-
-			affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
-
-			return numEntries;
+			final boolean inserted = compoundRules.add(rule);
+			if(!inserted)
+				EventBusService.publish(new LinterWarning(DUPLICATED_LINE, line)
+					.withIndex(context.getIndex() + i));
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e.getMessage());
-		}
-	}
 
-	private int checkValidity(final ParsingContext context){
-		if(!NumberUtils.isCreatable(context.getFirstParameter()))
-			throw new LinterException(BAD_FIRST_PARAMETER.format(new Object[]{context}));
-		final int numEntries = Integer.parseInt(context.getFirstParameter());
-		if(numEntries <= 0)
-			throw new LinterException(BAD_NUMBER_OF_ENTRIES.format(new Object[]{context, context.getFirstParameter()}));
+		affixData.addData(AffixOption.COMPOUND_RULE.getCode(), compoundRules);
 
 		return numEntries;
 	}
 
-	private void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
+	private static int checkValidity(final ParsingContext context){
+		if(!NumberUtils.isCreatable(context.getFirstParameter()))
+			throw new LinterException(BAD_FIRST_PARAMETER, context);
+		final int numEntries = Integer.parseInt(context.getFirstParameter());
+		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
+
+		return numEntries;
+	}
+
+	private static void checkRuleValidity(final String rule, final String line, final FlagParsingStrategy strategy){
 		if(StringUtils.isBlank(rule))
-			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE.format(new Object[]{line}));
+			throw new LinterException(EMPTY_COMPOUND_RULE_TYPE, line);
 		final String[] compounds = strategy.extractCompoundRule(rule);
 		if(compounds.length == 0)
-			throw new LinterException(BAD_FORMAT.format(new Object[]{line}));
+			throw new LinterException(BAD_FORMAT, line);
 	}
 
 }

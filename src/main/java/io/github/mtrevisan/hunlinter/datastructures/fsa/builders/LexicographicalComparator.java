@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -45,6 +45,7 @@ import java.util.Comparator;
  * java.util.Arrays#equals(byte[], byte[])}.
  *
  * @see <a href="https://dzone.com/articles/understanding-sunmiscunsafe">Understanding sun.misc.Unsafe</a>
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
  */
 public final class LexicographicalComparator{
 
@@ -84,19 +85,20 @@ public final class LexicographicalComparator{
 		 * BYTE_ARRAY_BASE_OFFSET doesn't get constant-folded.
 		 *
 		 * The compiler can treat static final fields as compile-time constants and can constant-fold
-		 * them while (final or not) local variables are run time values.
+		 * them while (final or not) local variables are runtime values.
 		 */
 
+		@SuppressWarnings("UseOfSunClasses")
 		static final Unsafe theUnsafe = getUnsafe();
 
-		/** The offset to the first element in a byte array */
+		/** The offset to the first element in a byte array. */
 		static final int BYTE_ARRAY_BASE_OFFSET = theUnsafe.arrayBaseOffset(byte[].class);
 		static{
 			//fall back to the safer pure java implementation unless we're in
 			//a 64-bit JVM with an 8-byte aligned field offset.
 			if(!("64".equals(System.getProperty("sun.arch.data.model")) && (BYTE_ARRAY_BASE_OFFSET % 8) == 0
-				//sanity check - this should never fail
-				&& theUnsafe.arrayIndexScale(byte[].class) == 1))
+					//sanity check - this should never fail
+					&& theUnsafe.arrayIndexScale(byte[].class) == 1))
 				//force fallback to PureJavaComparator
 				throw new Error();
 		}
@@ -127,7 +129,7 @@ public final class LexicographicalComparator{
 				});
 			}
 			catch(final PrivilegedActionException e){
-				throw new RuntimeException("Could not initialize intrinsics", e.getCause());
+				throw new Error("Could not initialize intrinsics", e);
 			}
 		}
 
@@ -196,7 +198,7 @@ public final class LexicographicalComparator{
 		}
 	}
 
-	/** Returns the Unsafe-using Comparator, or falls back to the pure-Java implementation if unable to do so */
+	/** Returns the Unsafe-using Comparator, or falls back to the pure-Java implementation if unable to do so. */
 	static Comparator<byte[]> getBestComparator(){
 		try{
 			final Class<?> theClass = Class.forName(UNSAFE_COMPARATOR_NAME);
@@ -207,7 +209,7 @@ public final class LexicographicalComparator{
 			return comparator;
 		}
 		//ensure we really catch *everything*
-		catch(final Throwable t){
+		catch(final ClassNotFoundException ignored){
 			return lexicographicalComparatorJavaImpl();
 		}
 	}

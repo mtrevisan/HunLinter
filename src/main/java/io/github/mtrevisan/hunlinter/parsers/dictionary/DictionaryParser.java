@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,9 +25,10 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.apache.commons.lang3.StringUtils;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,7 @@ public class DictionaryParser{
 	private final Charset charset;
 
 	private final Comparator<String> comparator;
+	private boolean boundariesCalculated;
 	private final NavigableMap<Integer, Integer> boundaries = new TreeMap<>();
 
 
@@ -80,31 +82,33 @@ public class DictionaryParser{
 		this.charset = charset;
 
 		comparator = BaseBuilder.getComparator(language);
+
+		BaseBuilder.checkDefaultComparator(language);
 	}
 
-	public File getDicFile(){
+	public final File getDicFile(){
 		return dicFile;
 	}
 
-	public Charset getCharset(){
+	public final Charset getCharset(){
 		return charset;
 	}
 
-	public Comparator<String> getComparator(){
+	public final Comparator<String> getComparator(){
 		return comparator;
 	}
 
-	public synchronized Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
+	public final Map.Entry<Integer, Integer> getBoundary(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.floorEntry(lineIndex);
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-	public synchronized boolean removeBoundary(final int boundaryIndex){
+	public final boolean removeBoundary(final int boundaryIndex){
 		return (boundaries.remove(boundaryIndex) != null);
 	}
 
-	public synchronized int getBoundaryIndex(final int lineIndex){
-		if(boundaries.isEmpty())
+	public final int getBoundaryIndex(final int lineIndex){
+		if(!boundariesCalculated)
 			calculateDictionaryBoundaries();
 
 		final Map.Entry<Integer, Integer> entry = searchBoundary(lineIndex);
@@ -122,16 +126,16 @@ public class DictionaryParser{
 			int lineIndex = 1;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
-				if(!ParserHelper.isComment(line, ParserHelper.COMMENT_MARK_SHARP, ParserHelper.COMMENT_MARK_SLASH)){
+				if(!ParserHelper.isDictionaryComment(line)){
 					if(startSection < 0)
 						startSection = lineIndex;
 
-					if(!needSorting && StringUtils.isNotBlank(prevLine))
+					if(!needSorting && prevLine != null)
 						needSorting = (comparator.compare(line, prevLine) < 0);
 					prevLine = line;
 				}
 				else if(startSection >= 0){
-					//filter out single word that doesn't need to be sorted
+					//filter out possible single lines that doesn't need to be sorted
 					if(lineIndex - startSection > 2 && needSorting)
 						boundaries.put(startSection, lineIndex - 1);
 
@@ -147,22 +151,24 @@ public class DictionaryParser{
 			if(startSection >= 0 && lineIndex - startSection > 2 && needSorting)
 				boundaries.put(startSection, lineIndex - 1);
 		}
-		catch(final IOException e){
-			LOGGER.error(null, e);
+		catch(final IOException ioe){
+			LOGGER.error(null, ioe);
 		}
+
+		boundariesCalculated = true;
 	}
 
-	public synchronized int getNextBoundaryIndex(final int lineIndex){
+	public final int getNextBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.higherEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public synchronized int getPreviousBoundaryIndex(final int lineIndex){
+	public final int getPreviousBoundaryIndex(final int lineIndex){
 		final Map.Entry<Integer, Integer> entry = boundaries.lowerEntry(lineIndex);
 		return (entry != null? entry.getKey(): -1);
 	}
 
-	public synchronized boolean isInBoundary(final int lineIndex){
+	public final boolean isInBoundary(final int lineIndex){
 		return (searchBoundary(lineIndex) != null);
 	}
 
@@ -171,12 +177,12 @@ public class DictionaryParser{
 		return (entry != null && lineIndex <= entry.getValue()? entry: null);
 	}
 
-
-	public void clear(){
+	public final void clear(){
 		clearBoundaries();
 	}
 
-	public synchronized void clearBoundaries(){
+	public final void clearBoundaries(){
+		boundariesCalculated = false;
 		boundaries.clear();
 	}
 

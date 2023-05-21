@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services;
 
 import org.apache.commons.lang3.StringUtils;
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,8 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public final class RegexHelper{
@@ -44,6 +41,7 @@ public final class RegexHelper{
 	private static final String NOT_GROUP_START = "[^";
 	private static final String GROUP_START = "[";
 	public static final String GROUP_END = "]";
+	private static final String DOT = ".";
 
 
 	private RegexHelper(){}
@@ -56,6 +54,23 @@ public final class RegexHelper{
 		return Pattern.compile(pattern, flags);
 	}
 
+	public static int conditionLength(final String pattern){
+		int length = 0;
+		boolean insideGroup = false;
+		for(int i = 0; i < pattern.length(); i ++){
+			final char chr = pattern.charAt(i);
+			if(chr == '[')
+				insideGroup = true;
+			else if(chr == ']'){
+				insideGroup = false;
+				length ++;
+			}
+			else if(!insideGroup)
+				length ++;
+		}
+		return length;
+	}
+
 	/**
 	 * Returns the delimiters along with the split elements
 	 *
@@ -64,6 +79,10 @@ public final class RegexHelper{
 	 */
 	public static Pattern splitterWithDelimiters(final String delimitersRegex){
 		return pattern(String.format(SPLITTER_PATTERN_WITH_DELIMITER, delimitersRegex));
+	}
+
+	public static String quoteReplacement(final String text){
+		return Matcher.quoteReplacement(text);
 	}
 
 	public static String[] split(final CharSequence text, final Pattern pattern){
@@ -75,31 +94,32 @@ public final class RegexHelper{
 	}
 
 	public static String[] extract(final CharSequence text, final Pattern pattern){
-		return extract(text, pattern, -1);
+		final List<String> result = extract(text, pattern, - 1);
+		return result.toArray(new String[result.size()]);
 	}
 
-	public static String[] extract(final CharSequence text, final Pattern pattern, final int limit){
+	public static List<String> extract(final CharSequence text, final Pattern pattern, final int limit){
 		final Matcher matcher = matcher(text, pattern);
 		return (limit >= 0? extractWithLimit(matcher, limit): extractUnlimited(matcher));
 	}
 
-	private static String[] extractWithLimit(final Matcher matcher, final int limit){
+	private static List<String> extractWithLimit(final Matcher matcher, final int limit){
 		int index = 0;
-		final String[] result = new String[limit];
-		while(matcher.find() && index < limit){
+		final List<String> result = new ArrayList<>(limit);
+		while(matcher.find() && index ++ < limit){
 			final String component = getNextGroup(matcher);
-			result[index ++] = (component != null? component: matcher.group());
+			result.add(component != null? component: matcher.group());
 		}
 		return result;
 	}
 
-	private static String[] extractUnlimited(final Matcher matcher){
-		final SimpleDynamicArray<String> result = new SimpleDynamicArray<>(String.class);
+	private static List<String> extractUnlimited(final Matcher matcher){
+		final List<String> result = new ArrayList<>(0);
 		while(matcher.find()){
 			final String component = getNextGroup(matcher);
-			result.add((component != null? component: matcher.group()));
+			result.add(component != null? component: matcher.group());
 		}
-		return result.extractCopy();
+		return result;
 	}
 
 	private static String getNextGroup(final Matcher matcher){
@@ -109,6 +129,12 @@ public final class RegexHelper{
 		while(component == null && i <= size)
 			component = matcher.group(i ++);
 		return component;
+	}
+
+	public static int indexOf(final CharSequence text, final Pattern pattern){
+		final Matcher m = matcher(text, pattern);
+		m.find();
+		return m.start();
 	}
 
 
@@ -135,23 +161,67 @@ public final class RegexHelper{
 		return replaceAll(text, pattern, StringUtils.EMPTY);
 	}
 
+	/**
+	 * NOTE: the empty set produce an empty result.
+	 */
+	public static String makeGroup(final char[] group, final Comparator<String> comparator){
+		final String merge = sortAndMergeSet(group, comparator);
+		return (group.length > 1? GROUP_START + merge + GROUP_END: merge);
+	}
+
+	/**
+	 * NOTE: the empty set produce an empty result.
+	 */
 	public static String makeGroup(final Collection<Character> group, final Comparator<String> comparator){
-		final String merge = mergeSet(group, comparator);
+		final String merge = sortAndMergeSet(group, comparator);
 		return (group.size() > 1? GROUP_START + merge + GROUP_END: merge);
 	}
 
-	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
-		final String merge = mergeSet(group, comparator);
-		return NOT_GROUP_START + merge + GROUP_END;
+	public static String makeNotGroup(final char[] group, final Comparator<String> comparator){
+		final String notGroup;
+		if(group.length == 0)
+			//the negation of an empty set is everything
+			notGroup = DOT;
+		else{
+			final String merge = sortAndMergeSet(group, comparator);
+			notGroup = NOT_GROUP_START + merge + GROUP_END;
+		}
+		return notGroup;
 	}
 
-	public static <V> String mergeSet(final Collection<V> set, final Comparator<String> comparator){
-		final List<String> list = new ArrayList<>(set.size());
-		forEach(set, v -> list.add(String.valueOf(v)));
+	public static String makeNotGroup(final Collection<Character> group, final Comparator<String> comparator){
+		final String notGroup;
+		if(group.isEmpty())
+			//the negation of an empty set is everything
+			notGroup = DOT;
+		else{
+			final String merge = sortAndMergeSet(group, comparator);
+			notGroup = NOT_GROUP_START + merge + GROUP_END;
+		}
+		return notGroup;
+	}
+
+	public static String sortAndMergeSet(final char[] set, final Comparator<String> comparator){
+		final List<String> list = new ArrayList<>(set.length);
+		for(int i = 0; i < set.length; i ++)
+			list.add(String.valueOf(set[i]));
 		list.sort(comparator);
 
 		final StringBuilder sb = new StringBuilder();
-		forEach(list, sb::append);
+		for(final String elem : list)
+			sb.append(elem);
+		return sb.toString();
+	}
+
+	public static <V> String sortAndMergeSet(final Collection<V> set, final Comparator<String> comparator){
+		final List<String> list = new ArrayList<>(set.size());
+		for(final V v : set)
+			list.add(String.valueOf(v));
+		list.sort(comparator);
+
+		final StringBuilder sb = new StringBuilder();
+		for(final String elem : list)
+			sb.append(elem);
 		return sb.toString();
 	}
 

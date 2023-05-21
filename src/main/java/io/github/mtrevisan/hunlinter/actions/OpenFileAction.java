@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,14 +25,17 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.services.Packager;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -54,8 +57,8 @@ public class OpenFileAction extends AbstractAction{
 	public OpenFileAction(final Supplier<File> fileSupplier, final Packager packager){
 		super("system.open");
 
-		Objects.requireNonNull(fileSupplier);
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(fileSupplier, "File supplier cannot be null");
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		this.fileSupplier = fileSupplier;
 		fileKey = null;
@@ -65,8 +68,8 @@ public class OpenFileAction extends AbstractAction{
 	public OpenFileAction(final String fileKey, final Packager packager){
 		super("system.open");
 
-		Objects.requireNonNull(fileKey);
-		Objects.requireNonNull(packager);
+		Objects.requireNonNull(fileKey, "File key cannot be null");
+		Objects.requireNonNull(packager, "Packager cannot be null");
 
 		fileSupplier = null;
 		this.fileKey = fileKey;
@@ -74,7 +77,7 @@ public class OpenFileAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		try{
 			final File file = (fileSupplier != null? fileSupplier.get(): packager.getFile(fileKey));
 			FileHelper.openFileWithChosenEditor(file);
@@ -82,6 +85,25 @@ public class OpenFileAction extends AbstractAction{
 		catch(final IOException | InterruptedException e){
 			LOGGER.warn("Exception while opening file", e);
 		}
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

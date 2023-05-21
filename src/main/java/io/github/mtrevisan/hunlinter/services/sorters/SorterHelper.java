@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,12 +34,6 @@ public final class SorterHelper{
 
 	private SorterHelper(){}
 
-	public static <T> void swap(final T[] data, final int i, final int j){
-		final T temp = data[i];
-		data[i] = data[j];
-		data[j] = temp;
-	}
-
 	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array){
 		return removeDuplicates(array, 0, array.length);
@@ -48,7 +42,7 @@ public final class SorterHelper{
 	/* Assume the array is already sorted! */
 	public static <T extends Comparable<? super T>> T[] removeDuplicates(final T[] array, final int low, final int high){
 		//fetch all the duplicates
-		final Collection<T> set = new HashSet<>();
+		final Collection<T> set = new HashSet<>(high - low);
 		final int[] indexes = new int[high - low];
 		int offset = 0;
 		for(int i = low; i < high; i ++)

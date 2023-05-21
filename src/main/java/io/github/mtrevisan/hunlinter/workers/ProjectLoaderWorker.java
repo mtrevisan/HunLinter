@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.workers;
 
-import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataProject;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerProject;
 

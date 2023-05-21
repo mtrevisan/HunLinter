@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,7 +33,11 @@ import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serial;
@@ -57,30 +61,31 @@ public class HelpDialog extends JDialog{
 
 
 		try{
+			@SuppressWarnings("ConstantConditions")
 			final BufferedImage img = ImageIO.read(HelpDialog.class.getResourceAsStream("/icon.png"));
 			final Icon icon = new ImageIcon(img.getScaledInstance(logo.getHeight(), logo.getHeight(), Image.SCALE_SMOOTH));
 			logo.setIcon(icon);
 		}
 		catch(final IOException ignored){}
 
-		final String artifactID = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID);
-		final String version = (String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION);
-		final LocalDate buildTimestamp = (LocalDate)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_BUILD_TIMESTAMP);
+		productNameValue.setText(DownloaderHelper.ARTIFACT_ID);
+		productVersionValue.setText(DownloaderHelper.APPLICATION_VERSION.toString());
+		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(DownloaderHelper.BUILD_TIMESTAMP));
+		managedOptionsTextArea.setText("""
+			General:
+			\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM
 
-		productNameValue.setText(artifactID);
-		productVersionValue.setText(version);
-		releaseDateValue.setText(DictionaryParser.DATE_FORMATTER.format(buildTimestamp));
-		managedOptionsTextArea.setText(
-			"General:\n"
-				+ "\tSET, FLAG, COMPLEXPREFIXES, LANG, AF, AM\n\n"
-			+ "Suggestions:\n"
-				+ "\tTRY (only read), NOSUGGEST (only read), REP, MAP (only read)\n\n"
-			+ "Compounding:\n"
-				+ "\tBREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE\n\n"
-			+ "Affix creation:\n"
-				+ "\tPFX, SFX\n\n"
-			+ "Others:\n"
-				+ "\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX");
+			Suggestions:
+			\tTRY (only read), NOSUGGEST (only read), REP, MAP (only read)
+
+			Compounding:
+			\tBREAK (only read), COMPOUNDRULE, COMPOUNDMIN, COMPOUNDFLAG, ONLYINCOMPOUND, COMPOUNDPERMITFLAG, COMPOUNDFORBIDFLAG, COMPOUNDMORESUFFIXES, COMPOUNDWORDMAX, CHECKCOMPOUNDDUP, CHECKCOMPOUNDREP, CHECKCOMPOUNDCASE, CHECKCOMPOUNDTRIPLE, SIMPLIFIEDTRIPLE, FORCEUCASE
+
+			Affix creation:
+			\tPFX, SFX
+
+			Others:
+			\tCIRCUMFIX, FORBIDDENWORD, FULLSTRIP, KEEPCASE, ICONV, OCONV, NEEDAFFIX""");
 		managedOptionsTextArea.setCaretPosition(0);
 		copyright.setText("Copyright © 2019-" + DictionaryParser.YEAR_FORMATTER.format(LocalDate.now()) + " Mauro Trevisan");
 	}
@@ -125,18 +130,14 @@ public class HelpDialog extends JDialog{
 
       authorLabelValue.setText("<html><a href=#>Mauro Trevisan</a></html>");
       authorLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-      authorLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mouseClicked(java.awt.event.MouseEvent evt) {
-            authorLabelValueMouseClicked(evt);
-         }
-      });
+      authorLabelValue.addMouseListener(new MyMouseAdapter());
 
       homePageLabel.setText("Home page:");
 
       homePageLabelValue.setText("<html><a href=#>https://github.com/mtrevisan/HunLinter</a></html>");
       homePageLabelValue.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
       homePageLabelValue.addMouseListener(new java.awt.event.MouseAdapter() {
-         public void mouseClicked(java.awt.event.MouseEvent evt) {
+         public void mouseClicked(final java.awt.event.MouseEvent evt) {
             homePageLabelValueMouseClicked(evt);
          }
       });
@@ -149,14 +150,14 @@ public class HelpDialog extends JDialog{
 
       managedOptionsTextArea.setEditable(false);
       managedOptionsTextArea.setColumns(20);
-      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+      managedOptionsTextArea.setFont(new java.awt.Font("Tahoma", Font.PLAIN, 11)); // NOI18N
       managedOptionsTextArea.setLineWrap(true);
       managedOptionsTextArea.setRows(1);
       managedOptionsTextArea.setTabSize(3);
       managedOptionsTextArea.setWrapStyleWord(true);
       managedOptionsScrollPane.setViewportView(managedOptionsTextArea);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,16 +234,24 @@ public class HelpDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void authorLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorLabelValueMouseClicked
+	private static void authorLabelValueMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorLabelValueMouseClicked
 		FileHelper.sendEmail("mailto:851903%2Bmtrevisan@users.noreply.github.com?subject=HunLinter%20request");
 	}//GEN-LAST:event_authorLabelValueMouseClicked
 
-   private void homePageLabelValueMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
+   private void homePageLabelValueMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_homePageLabelValueMouseClicked
 		FileHelper.browseURL(GUIHelper.removeHTMLCode(homePageLabelValue.getText()));
    }//GEN-LAST:event_homePageLabelValueMouseClicked
 
 
-   // Variables declaration - do not modify//GEN-BEGIN:variables
+	private static class MyMouseAdapter extends MouseAdapter{
+		@Override
+		public final void mouseClicked(final MouseEvent evt){
+			authorLabelValueMouseClicked(evt);
+		}
+	}
+
+
+	// Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JLabel authorLabel;
    private javax.swing.JLabel authorLabelValue;
    private javax.swing.JLabel copyright;
@@ -257,5 +266,5 @@ public class HelpDialog extends JDialog{
    private javax.swing.JLabel releaseDate;
    private javax.swing.JLabel releaseDateValue;
    private javax.swing.JLabel supportedOptionsLabel;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 }

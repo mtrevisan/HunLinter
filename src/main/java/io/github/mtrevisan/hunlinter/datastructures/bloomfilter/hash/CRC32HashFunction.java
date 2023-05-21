@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,19 +34,19 @@ import java.util.zip.Checksum;
 public class CRC32HashFunction implements HashFunction{
 
 	@Override
-	public boolean isSingleValued(){
+	public final boolean isSingleValued(){
 		return true;
 	}
 
 	@Override
-	public long hash(final byte[] bytes){
+	public final int hash(final byte[] bytes){
 		final Checksum crc32 = new CRC32();
 		crc32.update(bytes);
-		return crc32.getValue();
+		return (int)crc32.getValue();
 	}
 
 	@Override
-	public long[] hashMultiple(final byte[] bytes){
+	public final long[] hashMultiple(final byte[] bytes){
 		return new long[]{hash(bytes)};
 	}
 

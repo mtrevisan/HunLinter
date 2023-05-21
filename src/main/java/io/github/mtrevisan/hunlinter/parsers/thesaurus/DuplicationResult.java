@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -44,34 +41,31 @@ public class DuplicationResult<T>{
 		this.forceInsertion = forceInsertion;
 	}
 
-	public List<T> getDuplicates(){
+	public final List<T> getDuplicates(){
 		return duplicates;
 	}
 
-	public boolean isForceInsertion(){
+	public final boolean isForceInsertion(){
 		return forceInsertion;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final DuplicationResult<?> other = (DuplicationResult<?>)obj;
-		return new EqualsBuilder()
-			.append(duplicates, other.duplicates)
-			.append(forceInsertion, other.forceInsertion)
-			.isEquals();
+		final DuplicationResult<?> rhs = (DuplicationResult<?>)obj;
+		return (forceInsertion == rhs.forceInsertion
+			&& duplicates.equals(rhs.duplicates));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(duplicates)
-			.append(forceInsertion)
-			.toHashCode();
+	public final int hashCode(){
+		int result = duplicates.hashCode();
+		result = 31 * result + Boolean.hashCode(forceInsertion);
+		return result;
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,6 +29,8 @@ import io.github.mtrevisan.hunlinter.parsers.affix.ConversionTable;
 import io.github.mtrevisan.hunlinter.parsers.affix.ParsingContext;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 
+import java.io.EOFException;
+
 
 public class ConversionTableHandler implements Handler{
 
@@ -40,7 +42,7 @@ public class ConversionTableHandler implements Handler{
 	}
 
 	@Override
-	public int parse(final ParsingContext context, final AffixData affixData){
+	public final int parse(final ParsingContext context, final AffixData affixData) throws EOFException{
 		final ConversionTable table = new ConversionTable(affixOption);
 		table.parse(context);
 

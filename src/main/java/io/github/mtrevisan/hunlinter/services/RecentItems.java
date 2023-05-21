@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.prefs.Preferences;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 /**
  * A simple data structure to store recent items (e.g. recent file in a menu or recent search text in a search dialog).
@@ -50,11 +48,11 @@ public class RecentItems{
 	private final Preferences preferenceNode;
 
 	private final List<String> items;
-	private final Collection<RecentItemsObserver> observers = new ArrayList<>();
+	private final Collection<RecentItemsObserver> observers = new ArrayList<>(0);
 
 
 	public RecentItems(final int maxItems, final Preferences preferenceNode){
-		Objects.requireNonNull(preferenceNode);
+		Objects.requireNonNull(preferenceNode, "Preference node cannot be null");
 
 		this.maxItems = maxItems;
 		this.preferenceNode = preferenceNode;
@@ -63,11 +61,11 @@ public class RecentItems{
 		loadFromPreferences();
 	}
 
-	public List<String> getItems(){
+	public final List<String> getItems(){
 		return items;
 	}
 
-	public void push(final String item){
+	public final void push(final String item){
 		items.remove(item);
 		items.add(0, item);
 
@@ -77,40 +75,41 @@ public class RecentItems{
 		update();
 	}
 
-	public void remove(final String item){
+	public final void remove(final String item){
 		items.remove(item);
 
 		update();
 	}
 
-	public void clear(){
+	public final void clear(){
 		items.clear();
 
 		update();
 	}
 
-	public String get(final int index){
+	public final String get(final int index){
 		return items.get(index);
 	}
 
-	public int indexOf(final String item){
+	public final int indexOf(final String item){
 		return items.indexOf(item);
 	}
 
-	public int size(){
+	public final int size(){
 		return items.size();
 	}
 
-	public void addObserver(final RecentItemsObserver observer){
+	public final void addObserver(final RecentItemsObserver observer){
 		observers.add(observer);
 	}
 
-	public void removeObserver(final RecentItemsObserver observer){
+	public final void removeObserver(final RecentItemsObserver observer){
 		observers.remove(observer);
 	}
 
 	private void update(){
-		forEach(observers, observer -> observer.onRecentItemChange(this));
+		for(final RecentItemsObserver observer : observers)
+			observer.onRecentItemChange(this);
 
 		storeToPreferences();
 	}

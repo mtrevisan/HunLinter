@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,10 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.enums;
 
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
-
 
 public enum AffixType{
 
@@ -42,7 +38,10 @@ public enum AffixType{
 	}
 
 	public static AffixType createFromCode(final String code){
-		return LoopHelper.match(values(), tag -> tag.option.is(code));
+		for(final AffixType tag : values())
+			if(tag.option.is(code))
+				return tag;
+		return null;
 	}
 
 	public AffixOption getOption(){

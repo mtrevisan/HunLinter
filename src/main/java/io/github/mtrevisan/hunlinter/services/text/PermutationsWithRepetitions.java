@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
 
 
 /**
- * Generates permutations of {@code n} items taken <code>k</code> at a time, in lexicographic order, with repetitions
+ * Generates permutations of {@code n} items taken {@code k} at a time, in lexicographic order, with repetitions
  *
  * @see <a href="https://github.com/dasanjos/java-examples/blob/master/src/main/java/com/dasanjos/java/util/math/PermutationWithRepetitionIterator.java">dasanjos/java-examples</a>
  * @see <a href="https://stackoverflow.com/questions/51946590/sequence-of-numbers-without-repeating-subsequent-digits">Sequence of numbers without repeating adjacent digits</a>
@@ -78,13 +78,13 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 
 	/**
 	 * @param limit	Count limit for the results
-	 * @return	Total permutations with repetitions of {@code n} elements taken <code>2…maxCompounds</code> at a time
+	 * @return	Total permutations with repetitions of {@code n} elements taken {@code 2…maxCompounds} at a time
 	 */
-	public List<int[]> permutations(final int limit){
+	public final List<int[]> permutations(final int limit){
 		if(limit < 1)
 			throw new IllegalArgumentException(ONE_OUTPUT_MINIMUM);
 
-		final List<int[]> all = new ArrayList<>();
+		final List<int[]> all = new ArrayList<>(0);
 		for(int kk = 2; (k == MAX_COMPOUNDS_INFINITY || kk <= k) && all.size() < limit; kk ++)
 			all.addAll(extractAllKPermutations(kk, all.size(), limit));
 		return all;
@@ -93,20 +93,19 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 	private List<int[]> extractAllKPermutations(final int kk, final int currentCount, final int limit){
 		final PermutationsWithRepetitions pr = new PermutationsWithRepetitions(n, kk, forbidDuplicates);
 
-		final ArrayList<int[]> all = new ArrayList<>(limit);
+		final List<int[]> all = new ArrayList<>(limit);
 		while(pr.hasNext() && all.size() + currentCount < limit)
 			all.add(pr.next());
-		all.trimToSize();
 		return all;
 	}
 
 	@Override
-	public boolean hasNext(){
+	public final boolean hasNext(){
 		return (k == MAX_COMPOUNDS_INFINITY || currentIndex < maximumIndex);
 	}
 
 	@Override
-	public int[] next(){
+	public final int[] next(){
 		if(!hasNext())
 			throw new NoSuchElementException("No permutations left");
 
@@ -115,7 +114,7 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		if(forbidDuplicates){
 			boolean consecutiveDuplicates = true;
 			while(consecutiveDuplicates && currentIndex < maximumIndex)
-				//if next doesn't contains consecutive duplicates, break
+				//if next doesn't contain consecutive duplicates, break
 				consecutiveDuplicates = hasConsecutiveDuplicates(++ currentIndex, n);
 		}
 		else
@@ -140,8 +139,8 @@ public class PermutationsWithRepetitions implements Iterator<int[]>{
 		return result;
 	}
 
-	/** In num = sum(i=0..k, a[i] * b^i), check if a[i] is equals to a[i - 1] for i = 1..k */
-	private boolean hasConsecutiveDuplicates(long decimalNumber, final int radix){
+	/** In {@code num = sum(i=0..k, a[i] * b^i)}, check if {@code a[i]} is equals to {@code a[i - 1] for i = 1..k}. */
+	private static boolean hasConsecutiveDuplicates(long decimalNumber, final int radix){
 		int digit = -1;
 		while(decimalNumber != 0l){
 			final int newDigit = (int)(decimalNumber % radix);

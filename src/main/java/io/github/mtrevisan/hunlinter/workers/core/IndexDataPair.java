@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -23,9 +23,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.github.mtrevisan.hunlinter.workers.core;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 public final class IndexDataPair<T>{
@@ -61,24 +58,21 @@ public final class IndexDataPair<T>{
 
 	@Override
 	public boolean equals(final Object obj){
-		if(obj == this)
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final IndexDataPair<?> rhs = (IndexDataPair<?>)obj;
-		return new EqualsBuilder()
-			.append(index, rhs.index)
-			.append(data, rhs.data)
-			.isEquals();
+		return (index == rhs.index
+			&& data.equals(rhs.data));
 	}
 
 	@Override
 	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(index)
-			.append(data)
-			.toHashCode();
+		int result = Integer.hashCode(index);
+		result = 31 * result + data.hashCode();
+		return result;
 	}
 
 }

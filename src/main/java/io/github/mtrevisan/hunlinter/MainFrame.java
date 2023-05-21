@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,25 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter;
 
-import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
-import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
-import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
-import io.github.mtrevisan.hunlinter.gui.panes.AutoCorrectLayeredPane;
-import io.github.mtrevisan.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
-import io.github.mtrevisan.hunlinter.gui.panes.WordExceptionsLayeredPane;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
-import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
-import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
-import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.actions.AboutAction;
 import io.github.mtrevisan.hunlinter.actions.AffixRulesReducerAction;
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterFSAAction;
 import io.github.mtrevisan.hunlinter.actions.CheckUpdateOnStartupAction;
 import io.github.mtrevisan.hunlinter.actions.CreatePackageAction;
 import io.github.mtrevisan.hunlinter.actions.DictionaryExtractDuplicatesAction;
@@ -62,42 +47,71 @@ import io.github.mtrevisan.hunlinter.actions.ProjectLoaderAction;
 import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
 import io.github.mtrevisan.hunlinter.actions.SelectFontAction;
 import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterAction;
+import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
 import io.github.mtrevisan.hunlinter.actions.UpdateAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
 import io.github.mtrevisan.hunlinter.gui.ProjectFolderFilter;
 import io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu;
+import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
+import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.gui.events.LoadProjectEvent;
 import io.github.mtrevisan.hunlinter.gui.events.PreLoadProjectEvent;
 import io.github.mtrevisan.hunlinter.gui.events.TabbedPaneEnableEvent;
+import io.github.mtrevisan.hunlinter.gui.panes.AutoCorrectLayeredPane;
 import io.github.mtrevisan.hunlinter.gui.panes.CompoundsLayeredPane;
 import io.github.mtrevisan.hunlinter.gui.panes.DictionaryLayeredPane;
 import io.github.mtrevisan.hunlinter.gui.panes.HyphenationLayeredPane;
 import io.github.mtrevisan.hunlinter.gui.panes.PoSFSALayeredPane;
+import io.github.mtrevisan.hunlinter.gui.panes.SentenceExceptionsLayeredPane;
 import io.github.mtrevisan.hunlinter.gui.panes.ThesaurusLayeredPane;
+import io.github.mtrevisan.hunlinter.gui.panes.WordExceptionsLayeredPane;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.aid.AidParser;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.RecentItems;
+import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.eventbus.events.BusExceptionEvent;
+import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
+import org.apache.commons.lang3.StringUtils;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.KeyStroke;
+import javax.swing.MenuSelectionManager;
+import javax.swing.SwingWorker;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.filechooser.FileView;
-import javax.swing.text.DefaultCaret;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -113,6 +127,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.file.Path;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
@@ -130,6 +145,8 @@ import java.util.prefs.Preferences;
  * @see <a href="https://compresspng.com/">PNG compresser</a>
  * @see <a href="https://www.icoconverter.com/index.php">ICO converter</a>
  * @see <a href="https://icon-icons.com/">Free icons</a>
+ *
+ * TODO? progress bar on taskbar: https://github.com/Dansoftowner/FXTaskbarProgressBar/tree/11/src/main/java/com/nativejavafx/taskbar
  */
 public class MainFrame extends JFrame implements ActionListener, PropertyChangeListener{
 
@@ -161,11 +178,15 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public static final Integer ACTION_COMMAND_PARSER_CLEAR_AUTO_TEXT = 29;
 	public static final Integer ACTION_COMMAND_PARSER_RELOAD_DICTIONARY = 30;
 
-	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
+	public static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
 
+	public static final String PROPERTY_NAME_PROGRESS = "progress";
+	public static final String PROPERTY_NAME_STATE = "state";
+	public static final String PROPERTY_NAME_PAUSED = "paused";
 
-	private final JFileChooser openProjectPathFileChooser;
+
+	private final Future<JFileChooser> futureOpenProjectPathFileChooser;
 
 	private final Preferences preferences = Preferences.userNodeForPackage(MainFrame.class);
 	private final ParserManager parserManager;
@@ -177,9 +198,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	public MainFrame(){
+		Runtime.getRuntime().addShutdownHook(new Thread(JavaHelper::shutdownExecutor));
+
 		packager = new Packager();
 		parserManager = new ParserManager(packager);
-		workerManager = new WorkerManager(packager, parserManager, this);
+		workerManager = new WorkerManager(packager, parserManager);
 
 
 		initComponents();
@@ -188,31 +211,27 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 		filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.isEnabled());
 
-		//add "fontable" property
-		FontHelper.addFontableProperty(parsingResultTextArea);
+		FontHelper.addFontableProperty(parsingResultTextPane);
+		FontHelper.addLoggableProperty(parsingResultTextPane);
 
-		ApplicationLogAppender.addTextArea(parsingResultTextArea, ParserManager.MARKER_APPLICATION);
+		ApplicationLogAppender.addTextPane(parsingResultTextPane, ParserManager.MARKER_APPLICATION);
 
 
-		openProjectPathFileChooser = new JFileChooser();
-		openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
-		openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		//disable the "All files" option
-		openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
-		try{
-			final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
-			final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
-			openProjectPathFileChooser.setFileView(new FileView(){
-				//choose the right icon for the folder
-				@Override
-				public Icon getIcon(final File file){
-					return (Packager.isProjectFolder(file)
-						? projectFolderIcon
-						: FileSystemView.getFileSystemView().getSystemIcon(file));
-				}
-			});
-		}
-		catch(final IOException ignored){}
+		futureOpenProjectPathFileChooser = JavaHelper.executeFuture(() -> {
+			final JFileChooser openProjectPathFileChooser = new JFileChooser();
+			openProjectPathFileChooser.setFileFilter(new ProjectFolderFilter("Project folders"));
+			openProjectPathFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			//disable the "All files" option
+			openProjectPathFileChooser.setAcceptAllFileFilterUsed(false);
+			try{
+				@SuppressWarnings("ConstantConditions")
+				final BufferedImage projectFolderImg = ImageIO.read(GUIHelper.class.getResourceAsStream("/project_folder.png"));
+				final Icon projectFolderIcon = new ImageIcon(projectFolderImg);
+				openProjectPathFileChooser.setFileView(new MyFileView(projectFolderIcon));
+			}
+			catch(final IOException ignored){}
+			return openProjectPathFileChooser;
+		});
 
 
 		//check for updates
@@ -224,33 +243,41 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
-				catch(final Exception ignored){}
+				catch(final IOException | ParseException | VersionException ignored){}
 			});
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-   private void initComponents() {
+   @SuppressWarnings("ConstantConditions")
+	private void initComponents() {
 
       parsingResultScrollPane = new javax.swing.JScrollPane();
-      parsingResultTextArea = new javax.swing.JTextArea();
+      parsingResultTextPane = new javax.swing.JTextPane();
       mainProgressBar = new javax.swing.JProgressBar();
+		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+		mainProgressBar.setUI(new MultiProgressBarUI());
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
-      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this);
+		EventBusService.subscribe(dicLayeredPane);
+      cmpLayeredPane = new CompoundsLayeredPane(packager, parserManager, workerManager, this, this);
+		EventBusService.subscribe(cmpLayeredPane);
       theLayeredPane = new ThesaurusLayeredPane(parserManager);
+		EventBusService.subscribe(theLayeredPane);
       hypLayeredPane = new HyphenationLayeredPane(packager, parserManager, this);
+		EventBusService.subscribe(hypLayeredPane);
       acoLayeredPane = new AutoCorrectLayeredPane(packager, parserManager, this);
+		EventBusService.subscribe(acoLayeredPane);
       sexLayeredPane = new SentenceExceptionsLayeredPane(packager, parserManager);
+		EventBusService.subscribe(sexLayeredPane);
       wexLayeredPane = new WordExceptionsLayeredPane(packager, parserManager);
+		EventBusService.subscribe(wexLayeredPane);
       pdcLayeredPane = new PoSFSALayeredPane(parserManager);
+		EventBusService.subscribe(pdcLayeredPane);
       mainMenuBar = new javax.swing.JMenuBar();
       filMenu = new javax.swing.JMenu();
       filOpenProjectMenuItem = new javax.swing.JMenuItem();
       filCreatePackageMenuItem = new javax.swing.JMenuItem();
-      filFontSeparator = new javax.swing.JPopupMenu.Separator();
-      filFontMenuItem = new javax.swing.JMenuItem();
+      setFontMenuItem = new javax.swing.JMenuItem();
       filRecentProjectsSeparator = new javax.swing.JPopupMenu.Separator();
       filEmptyRecentProjectsMenuItem = new javax.swing.JMenuItem();
       filSeparator = new javax.swing.JPopupMenu.Separator();
@@ -266,18 +293,21 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractDuplicatesMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractWordlistPlainTextMenuItem = new javax.swing.JMenuItem();
+      dicExtractFullstripWordlistMenuItem = new javax.swing.JMenuItem();
       dicExtractMinimalPairsMenuItem = new javax.swing.JMenuItem();
       dicFSASeparator = new javax.swing.JPopupMenu.Separator();
       dicExtractDictionaryFSAMenuItem = new javax.swing.JMenuItem();
       dicExtractPoSFSAMenuItem = new javax.swing.JMenuItem();
       theMenu = new javax.swing.JMenu();
       theLinterMenuItem = new javax.swing.JMenuItem();
+      theLinterFSAMenuItem = new javax.swing.JMenuItem();
       hypMenu = new javax.swing.JMenu();
       hypLinterMenuItem = new javax.swing.JMenuItem();
       hypDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       hypStatisticsMenuItem = new javax.swing.JMenuItem();
       acoMenu = new javax.swing.JMenu();
       acoLinterMenuItem = new javax.swing.JMenuItem();
+      acoLinterFSAMenuItem = new javax.swing.JMenuItem();
       setMenu = new javax.swing.JMenu();
       setCheckUpdateOnStartupCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
       setReportWarningsCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -290,19 +320,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hlpAboutMenuItem = new javax.swing.JMenuItem();
 
       setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-      setTitle((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID));
+      setTitle(DownloaderHelper.ARTIFACT_ID);
       setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icon.png")));
       setMinimumSize(new java.awt.Dimension(964, 534));
 
-      parsingResultTextArea.setEditable(false);
-      parsingResultTextArea.setColumns(20);
-      parsingResultTextArea.setRows(1);
-      parsingResultTextArea.setTabSize(3);
-      final DefaultCaret caret = (DefaultCaret)parsingResultTextArea.getCaret();
-      caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-      parsingResultScrollPane.setViewportView(parsingResultTextArea);
+      parsingResultTextPane.setEditable(false);
+      parsingResultScrollPane.setViewportView(parsingResultTextPane);
 
-      mainTabbedPane.addTab("Dictionary", dicLayeredPane);
+      mainTabbedPane.addTab("Inflections", dicLayeredPane);
       mainTabbedPane.addTab("Compounds", cmpLayeredPane);
       mainTabbedPane.addTab("Thesaurus", theLayeredPane);
       mainTabbedPane.addTab("Hyphenation", hypLayeredPane);
@@ -321,14 +346,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filMenu.setMnemonic('F');
       filMenu.setText("File");
 
-      filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
+		filOpenProjectMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/file_open.png"))); // NOI18N
       filOpenProjectMenuItem.setMnemonic('O');
       filOpenProjectMenuItem.setText("Open project…");
-      filOpenProjectMenuItem.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            filOpenProjectMenuItemActionPerformed(evt);
-         }
-      });
+      filOpenProjectMenuItem.addActionListener(this::filOpenProjectMenuItemActionPerformed);
       filMenu.add(filOpenProjectMenuItem);
 
       filCreatePackageMenuItem.setAction(new CreatePackageAction(parserManager));
@@ -336,18 +357,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       filCreatePackageMenuItem.setText("Create package");
       filCreatePackageMenuItem.setEnabled(false);
       filMenu.add(filCreatePackageMenuItem);
-      filMenu.add(filFontSeparator);
-
-      filFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
-      filFontMenuItem.setMnemonic('f');
-      filFontMenuItem.setText("Select font…");
-      filMenu.add(filFontMenuItem);
       filMenu.add(filRecentProjectsSeparator);
 
       filEmptyRecentProjectsMenuItem.setMnemonic('e');
       filEmptyRecentProjectsMenuItem.setText("Empty recent projects list");
       filEmptyRecentProjectsMenuItem.setEnabled(false);
-      filEmptyRecentProjectsMenuItem.addActionListener(evt -> filEmptyRecentProjectsMenuItemActionPerformed(evt));
+      filEmptyRecentProjectsMenuItem.addActionListener(this::filEmptyRecentProjectsMenuItemActionPerformed);
       filMenu.add(filEmptyRecentProjectsMenuItem);
       filMenu.add(filSeparator);
 
@@ -358,7 +373,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       mainMenuBar.add(filMenu);
       final RecentItems recentItems = new RecentItems(5, preferences);
-      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, this::loadFile);
+      recentProjectsMenu = new io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu(recentItems, MainFrame::loadFile);
       recentProjectsMenu.setText("Recent projects");
       recentProjectsMenu.setMnemonic('R');
       filMenu.add(recentProjectsMenu, 3);
@@ -369,12 +384,12 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this));
       dicLinterMenuItem.setMnemonic('c');
-      dicLinterMenuItem.setText("Check correctness");
+      dicLinterMenuItem.setText("Correctness check");
       dicLinterMenuItem.setToolTipText("");
       dicMenu.add(dicLinterMenuItem);
 
       dicSortDictionaryMenuItem.setAction(new DictionarySorterAction(parserManager, workerManager, this));
-      dicSortDictionaryMenuItem.setMnemonic('s');
+      dicSortDictionaryMenuItem.setMnemonic('o');
       dicSortDictionaryMenuItem.setText("Sort dictionary…");
       dicMenu.add(dicSortDictionaryMenuItem);
 
@@ -390,8 +405,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicWordCountMenuItem.setText("Word count");
       dicMenu.add(dicWordCountMenuItem);
 
-      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this));
-      dicStatisticsMenuItem.setMnemonic('t');
+      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this, this));
+      dicStatisticsMenuItem.setMnemonic('S');
       dicStatisticsMenuItem.setText("Statistics");
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
@@ -409,8 +424,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
+		dicExtractFullstripWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.FULLSTRIP_WORDS, workerManager, this));
+		dicExtractFullstripWordlistMenuItem.setText("Extract fullstrip wordlist…");
+		dicMenu.add(dicExtractFullstripWordlistMenuItem);
+
       dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
-      dicExtractMinimalPairsMenuItem.setMnemonic('m');
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
       dicMenu.add(dicExtractMinimalPairsMenuItem);
       dicMenu.add(dicFSASeparator);
@@ -431,8 +449,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this));
       theLinterMenuItem.setMnemonic('c');
-      theLinterMenuItem.setText("Check correctness");
+      theLinterMenuItem.setText("Correctness check");
       theMenu.add(theLinterMenuItem);
+
+		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
+		theLinterFSAMenuItem.setMnemonic('d');
+      theLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
+		theMenu.add(theLinterFSAMenuItem);
 
       mainMenuBar.add(theMenu);
 
@@ -441,13 +464,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.setEnabled(false);
 
       hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
-      hypLinterMenuItem.setMnemonic('d');
-      hypLinterMenuItem.setText("Check correctness");
+      hypLinterMenuItem.setMnemonic('c');
+      hypLinterMenuItem.setText("Correctness check");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
-      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this));
-      hypStatisticsMenuItem.setMnemonic('t');
+      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this, this));
+      hypStatisticsMenuItem.setMnemonic('S');
       hypStatisticsMenuItem.setText("Statistics");
       hypMenu.add(hypStatisticsMenuItem);
 
@@ -458,9 +481,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoMenu.setEnabled(false);
 
       acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
-      acoLinterMenuItem.setMnemonic('C');
-      acoLinterMenuItem.setText("Check correctness");
+      acoLinterMenuItem.setMnemonic('c');
+      acoLinterMenuItem.setText("Correctness check");
       acoMenu.add(acoLinterMenuItem);
+
+		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
+		acoLinterFSAMenuItem.setMnemonic('d');
+		acoLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
+		acoMenu.add(acoLinterFSAMenuItem);
 
       mainMenuBar.add(acoMenu);
 
@@ -471,6 +499,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setCheckUpdateOnStartupCheckBoxMenuItem.setSelected(preferences.getBoolean(CheckUpdateOnStartupAction.UPDATE_STARTUP_CHECK, true));
       setCheckUpdateOnStartupCheckBoxMenuItem.setText("Check for updates on startup");
       setMenu.add(setCheckUpdateOnStartupCheckBoxMenuItem);
+
+		setFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
+		setFontMenuItem.setMnemonic('f');
+		setFontMenuItem.setText("Select font…");
+		setMenu.add(setFontMenuItem);
 
       setReportWarningsCheckBoxMenuItem.setAction(new ReportWarningsAction(preferences));
       setReportWarningsCheckBoxMenuItem.setSelected(preferences.getBoolean(ReportWarningsAction.REPORT_WARNINGS, true));
@@ -506,7 +539,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
       setJMenuBar(mainMenuBar);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -539,9 +572,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       setLocationRelativeTo(null);
    }// </editor-fold>//GEN-END:initComponents
 
-	private void filOpenProjectMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
+	private void filOpenProjectMenuItemActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filOpenProjectMenuItemActionPerformed
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
+		final JFileChooser openProjectPathFileChooser = JavaHelper.waitForFuture(futureOpenProjectPathFileChooser);
 		final int projectSelected = openProjectPathFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
 			final File baseFile = openProjectPathFileChooser.getSelectedFile();
@@ -554,7 +588,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 	}//GEN-LAST:event_filOpenProjectMenuItemActionPerformed
 
-	private void filEmptyRecentProjectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
+	private void filEmptyRecentProjectsMenuItemActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filEmptyRecentProjectsMenuItemActionPerformed
 		recentProjectsMenu.clear();
 
 		recentProjectsMenu.setEnabled(false);
@@ -563,19 +597,22 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
-		workerManager.checkForAbortion();
+	public final void actionPerformed(final ActionEvent event){
+		WorkerManager.checkForAbortion(this);
 	}
 
-	private void loadFile(final Path basePath){
+	private static void loadFile(final Path basePath){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		EventBusService.publish(new PreLoadProjectEvent(basePath));
 	}
 
 	@EventHandler
-	public void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
-		parsingResultTextArea.setText(null);
+	@SuppressWarnings("unused")
+	public final void loadFileInternal(final PreLoadProjectEvent preLoadProjectEvent){
+		parsingResultTextPane.setText(null);
+		filOpenProjectMenuItem.setEnabled(false);
+		recentProjectsMenu.setEnabled(false);
 
 		if(parserManager != null)
 			parserManager.stopFileListener();
@@ -586,17 +623,19 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		mainTabbedPane.setSelectedIndex(0);
 
 		//NOTE: in order to avoid concurrency problems it is necessary to transform the loader into an event for the bus
-		//so as to happen after all the clear events
+		//so to happen after all the clear events
 		EventBusService.publish(preLoadProjectEvent.convertToLoadEvent());
 	}
 
 	@EventHandler
-	public void loadFileInternal(final LoadProjectEvent loadProjectEvent){
+	@SuppressWarnings("unused")
+	public final void loadFileInternal(final LoadProjectEvent loadProjectEvent){
 		final Path projectPath = loadProjectEvent.getProject();
 		final Consumer<Font> initialize = temporaryFont -> {
 			FontHelper.setCurrentFont(temporaryFont, this);
 
 			filOpenProjectMenuItem.setEnabled(false);
+			recentProjectsMenu.setEnabled(false);
 		};
 		final ActionListener projectLoaderAction = new ProjectLoaderAction(projectPath, packager, workerManager,
 			initialize, this::loadFileCompleted, this::loadFileCancelled, this);
@@ -605,18 +644,19 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void loadFileInternal(final BusExceptionEvent exceptionEvent){
+	@SuppressWarnings("unused")
+	public final void loadFileInternal(final BusExceptionEvent exceptionEvent){
 		final Throwable cause = exceptionEvent.getCause();
 
 		//FIXME sometimes happens...
 		if(cause.getMessage() == null)
 			cause.printStackTrace();
 
-		LOGGER.info(ParserManager.MARKER_APPLICATION, cause.getMessage());
+		LOGGER.error(ParserManager.MARKER_APPLICATION, cause.getMessage());
 
-		if(cause instanceof ProjectNotFoundException){
+		if(cause instanceof ProjectNotFoundException pnfe){
 			//remove the file from the recent projects menu
-			recentProjectsMenu.removeEntry(((ProjectNotFoundException)cause).getProjectPath().toString());
+			recentProjectsMenu.removeEntry(pnfe.getProjectPath().toString());
 
 			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filEmptyRecentProjectsMenuItem.setEnabled(recentProjectsMenu.hasEntries());
@@ -624,30 +664,26 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void parsingWarnings(final LinterWarning warningEvent){
+	@SuppressWarnings("unused")
+	public static void parsingWarnings(final LinterWarning warningEvent){
 		final String errorMessage = ExceptionHelper.getMessage(warningEvent);
-		final IndexDataPair<?> eventData = warningEvent.getData();
+		final Object eventData = warningEvent.getData();
 		if(eventData != null){
-			final int index = eventData.getIndex();
-			final String lineText = (index >= 0? ", line " + index: StringUtils.EMPTY);
-			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData.getData());
-			if(eventData.getData() != null)
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData.getData());
-			else
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}{}", warningEvent.getMessage(), lineText);
+			final int eventIndex = warningEvent.getIndex();
+			final String lineText = (eventIndex >= 0? ", line " + (eventIndex + 1): StringUtils.EMPTY);
+			LOGGER.trace("WARN: {}{}: {}", errorMessage, lineText, eventData);
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: {}{}: {}", warningEvent.getMessage(), lineText, eventData);
 		}
 		else{
 			LOGGER.trace("WARN: {}", errorMessage);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "WARN: {}", warningEvent.getMessage());
+			LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: {}", warningEvent.getMessage());
 		}
 	}
 
 	private void loadFileCompleted(){
-		parserManager.registerFileListener();
-		parserManager.startFileListener();
-
 		try{
 			filOpenProjectMenuItem.setEnabled(true);
+			recentProjectsMenu.setEnabled(recentProjectsMenu.hasEntries());
 			filCreatePackageMenuItem.setEnabled(true);
 //			filFontMenuItem.setEnabled(true);
 			dicLinterMenuItem.setEnabled(true);
@@ -662,31 +698,36 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 			//dictionary file (compound):
 			final AffixData affixData = parserManager.getAffixData();
-			EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
+			if(affixData != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(cmpLayeredPane, !affixData.getCompoundRules().isEmpty()));
 
 			//thesaurus file:
-			theMenu.setEnabled(parserManager.getTheParser().getSynonymsCount() > 0);
-			EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
-
-			//autocorrection file:
-			acoMenu.setEnabled(parserManager.getAcoParser().getCorrectionsCounter() > 0);
-			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, theMenu.isEnabled()));
+			final ThesaurusParser theParser = parserManager.getTheParser();
+			if(theParser != null){
+				theMenu.setEnabled(theParser.getSynonymsCount() > 0);
+				EventBusService.publish(new TabbedPaneEnableEvent(theLayeredPane, theMenu.isEnabled()));
+			}
 
 			//hyphenation file:
 			hypMenu.setEnabled(parserManager.getHyphenator() != null);
 			EventBusService.publish(new TabbedPaneEnableEvent(hypLayeredPane, hypMenu.isEnabled()));
 
-			//auto-correct file:
-			EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane,
-				(parserManager.getAcoParser().getCorrectionsCounter() > 0)));
+			//autocorrection file:
+			final AutoCorrectParser acoParser = parserManager.getAcoParser();
+			if(acoParser != null){
+				acoMenu.setEnabled(acoParser.getCorrectionsCounter() > 0);
+				EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, acoMenu.isEnabled()));
+			}
 
 			//sentence exceptions file:
-			EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane,
-				(parserManager.getSexParser().getExceptionsCounter() > 0)));
+			final ExceptionsParser sexParser = parserManager.getSexParser();
+			if(sexParser != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(sexLayeredPane, (sexParser.getExceptionsCounter() > 0)));
 
 			//word exceptions file:
-			EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane,
-				(parserManager.getWexParser().getExceptionsCounter() > 0)));
+			final ExceptionsParser wexParser = parserManager.getWexParser();
+			if(wexParser != null)
+				EventBusService.publish(new TabbedPaneEnableEvent(wexLayeredPane, (wexParser.getExceptionsCounter() > 0)));
 
 			//Part-of-Speech dictionary file:
 			EventBusService.publish(new TabbedPaneEnableEvent(pdcLayeredPane, true));
@@ -700,11 +741,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			//load font for this language
 			loadLanguageDependentFont();
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
+		catch(final RuntimeException e){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "A bad error occurred: {}", e.getMessage());
 
 			LOGGER.error("A bad error occurred", e);
 		}
+
+		parserManager.startFileListener();
 	}
 
 	private void loadLanguageDependentFont(){
@@ -718,7 +761,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
+	@SuppressWarnings("unused")
+	public final void tabbedPaneEnableEvent(final TabbedPaneEnableEvent evt){
 		final JLayeredPane pane = evt.getPane();
 		final boolean enable = evt.isEnable();
 		if(pane != null){
@@ -756,7 +800,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@EventHandler
-	public void clearAffixParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearAffixParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AFFIX)
 			return;
 
@@ -777,7 +822,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearDictionaryParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearDictionaryParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_DICTIONARY)
 			return;
 
@@ -787,7 +833,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearAidParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearAidParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AID)
 			return;
 
@@ -799,7 +846,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearThesaurusParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearThesaurusParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_THESAURUS)
 			return;
 
@@ -814,7 +862,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearHyphenationParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearHyphenationParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_HYPHENATION)
 			return;
 
@@ -829,12 +878,14 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearAutoCorrectParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearAutoCorrectParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_AUTO_CORRECT)
 			return;
 
 		EventBusService.publish(ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT);
 
+		acoMenu.setEnabled(false);
 		EventBusService.publish(new TabbedPaneEnableEvent(acoLayeredPane, false));
 
 		final AutoCorrectParser acoParser = parserManager.getAcoParser();
@@ -843,7 +894,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearSentenceExceptionsParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearSentenceExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_SENTENCE_EXCEPTION)
 			return;
 
@@ -857,7 +909,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	}
 
 	@EventHandler
-	public void clearWordExceptionsParser(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clearWordExceptionsParser(final Integer actionCommand){
 		if(actionCommand != ACTION_COMMAND_PARSER_CLEAR_ALL && actionCommand != ACTION_COMMAND_PARSER_CLEAR_WORD_EXCEPTION)
 			return;
 
@@ -872,35 +925,51 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
+	public final void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
-			case "progress":
-				final int progress = (int)evt.getNewValue();
+			case PROPERTY_NAME_PROGRESS -> {
+				final int progress = (Integer)evt.getNewValue();
 				mainProgressBar.setValue(progress);
-				break;
-
-			case "state":
+			}
+			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerData().getWorkerName();
-					workerManager.callOnEnd(workerName);
+				if(stateValue == SwingWorker.StateValue.STARTED)
+					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+				else if(stateValue == SwingWorker.StateValue.DONE){
+					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
+					WorkerManager.callOnEnd(workerName);
 				}
-				break;
+			}
+			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
+		}
+	}
 
-			default:
+	private static final class MyFileView extends FileView{
+		private final Icon projectFolderIcon;
+
+		private MyFileView(final Icon projectFolderIcon){
+			this.projectFolderIcon = projectFolderIcon;
+		}
+
+		//choose the right icon for the folder
+		@Override
+		public Icon getIcon(final File file){
+			return (Packager.isProjectFolder(file)
+				? projectFolderIcon
+				: FileSystemView.getFileSystemView().getSystemIcon(file));
 		}
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
@@ -915,7 +984,13 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		}
 
 		//create and display the form
-		JavaHelper.executeOnEventDispatchThread(() -> (new MainFrame()).setVisible(true));
+		JavaHelper.executeOnEventDispatchThread(() -> {
+			final MainFrame mainFrame = new MainFrame();
+			EventBusService.subscribe(mainFrame);
+			mainFrame.setVisible(true);
+
+			FontHelper.loadAllFonts();
+		});
 	}
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -930,6 +1005,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem dicExtractPoSFSAMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistMenuItem;
    private javax.swing.JMenuItem dicExtractWordlistPlainTextMenuItem;
+   private javax.swing.JMenuItem dicExtractFullstripWordlistMenuItem;
    private javax.swing.JPopupMenu.Separator dicFSASeparator;
    private javax.swing.JLayeredPane dicLayeredPane;
    private javax.swing.JMenuItem dicLinterMenuItem;
@@ -942,8 +1018,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem filCreatePackageMenuItem;
    private javax.swing.JMenuItem filEmptyRecentProjectsMenuItem;
    private javax.swing.JMenuItem filExitMenuItem;
-   private javax.swing.JMenuItem filFontMenuItem;
-   private javax.swing.JPopupMenu.Separator filFontSeparator;
+   private javax.swing.JMenuItem setFontMenuItem;
    private javax.swing.JMenu filMenu;
    private javax.swing.JMenuItem filOpenProjectMenuItem;
    private javax.swing.JPopupMenu.Separator filRecentProjectsSeparator;
@@ -964,7 +1039,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JProgressBar mainProgressBar;
    private javax.swing.JTabbedPane mainTabbedPane;
    private javax.swing.JScrollPane parsingResultScrollPane;
-   private javax.swing.JTextArea parsingResultTextArea;
+   private javax.swing.JTextPane parsingResultTextPane;
    private javax.swing.JLayeredPane pdcLayeredPane;
    private javax.swing.JCheckBoxMenuItem setCheckUpdateOnStartupCheckBoxMenuItem;
    private javax.swing.JMenu setMenu;
@@ -972,8 +1047,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JLayeredPane sexLayeredPane;
    private javax.swing.JLayeredPane theLayeredPane;
    private javax.swing.JMenuItem theLinterMenuItem;
+   private javax.swing.JMenuItem theLinterFSAMenuItem;
+   private javax.swing.JMenuItem acoLinterFSAMenuItem;
    private javax.swing.JMenu theMenu;
    private javax.swing.JLayeredPane wexLayeredPane;
-   // End of variables declaration//GEN-END:variables
+	// End of variables declaration//GEN-END:variables
 
 }

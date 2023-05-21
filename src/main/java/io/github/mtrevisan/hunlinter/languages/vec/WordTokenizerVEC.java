@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
+import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import org.apache.commons.lang3.RegExUtils;
-import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -48,7 +48,7 @@ public class WordTokenizerVEC extends WordTokenizer{
 
 
 	@Override
-	public List<String> tokenize(String text){
+	public final List<String> tokenize(String text){
 		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");
 		return super.tokenize(text);
 	}

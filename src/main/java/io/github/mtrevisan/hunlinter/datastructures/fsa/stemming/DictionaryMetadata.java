@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,9 @@
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.DictionaryAttribute;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -51,21 +54,22 @@ import java.util.Map;
  */
 public class DictionaryMetadata{
 
-	/** Default attribute values */
-	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = new DictionaryMetadataBuilder()
-		.frequencyIncluded(false)
-		.ignorePunctuation()
-		.ignoreNumbers()
-		.ignoreCamelCase()
-		.ignoreAllUppercase()
-		.ignoreDiacritics()
-		.convertCase()
-		.supportRunOnWords()
-		.toMap();
+	/** Default attribute values. */
+	private static final Map<DictionaryAttribute, String> DEFAULT_ATTRIBUTES = Collections.unmodifiableMap(
+		new DictionaryMetadataBuilder()
+			.frequencyIncluded(false)
+			.ignorePunctuation()
+			.ignoreNumbers()
+			.ignoreCamelCase()
+			.ignoreAllUppercase()
+			.ignoreDiacritics()
+			.convertCase()
+			.supportRunOnWords()
+			.toMap());
 
-	/** Required attributes */
-	private static final EnumSet<DictionaryAttribute> REQUIRED_ATTRIBUTES =
-		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING);
+	/** Required attributes. */
+	private static final Set<DictionaryAttribute> REQUIRED_ATTRIBUTES = Collections.unmodifiableSet(
+		EnumSet.of(DictionaryAttribute.SEPARATOR, DictionaryAttribute.ENCODER, DictionaryAttribute.ENCODING));
 
 
 	/**
@@ -78,30 +82,30 @@ public class DictionaryMetadata{
 
 	private Charset charset;
 
-	/** All attributes */
+	/** All attributes. */
 	private final Map<DictionaryAttribute, String> attributes;
 
-	/** Replacement pairs for non-obvious candidate search in a speller dictionary */
-	private Map<String, List<String>> replacementPairs = new HashMap<>();
-	/** Conversion pairs for input conversion, for example to replace ligatures */
-	private Map<String, String> inputConversion = new HashMap<>();
-	/** Conversion pairs for output conversion, for example to replace ligatures */
-	private Map<String, String> outputConversion = new HashMap<>();
+	/** Replacement pairs for non-obvious candidate search in a speller dictionary. */
+	private Map<String, List<String>> replacement = new HashMap<>(0);
+	/** Conversion pairs for input conversion, for example to replace ligatures. */
+	private Map<String, String> inputConversion = new HashMap<>(0);
+	/** Conversion pairs for output conversion, for example to replace ligatures. */
+	private Map<String, String> outputConversion = new HashMap<>(0);
 	/**
 	 * Equivalent characters (treated similarly as equivalent chars with and without
 	 * diacritics). For example, Polish <tt>ł</tt> can be specified as equivalent to <tt>l</tt>.
 	 * <p>
 	 * This implements a feature similar to hunspell MAP in the affix file.
 	 */
-	private Map<Character, List<Character>> equivalentChars = new HashMap<>();
+	private Map<Character, List<Character>> equivalentChars = new HashMap<>(0);
 
-	/** All "enabled" boolean attributes */
+	/** All "enabled" boolean attributes. */
 	private final EnumMap<DictionaryAttribute, Boolean> boolAttributes = new EnumMap<>(DictionaryAttribute.class);
 
-	/** Sequence encoder */
+	/** Sequence encoder. */
 	private EncoderType encoderType;
 
-	/** Expected metadata file extension */
+	/** Expected metadata file extension. */
 	private static final String METADATA_FILE_EXTENSION = "info";
 
 
@@ -109,7 +113,7 @@ public class DictionaryMetadata{
 	 * Read dictionary metadata from a property file (stream).
 	 *
 	 * @param metadataStream The stream with metadata.
-	 * @return Returns {@link DictionaryMetadata} read from a the stream (property file).
+	 * @return Returns the metadata read from a stream (property file).
 	 * @throws IOException Thrown if an I/O exception occurs.
 	 */
 	public static DictionaryMetadata read(final InputStream metadataStream) throws IOException{
@@ -157,7 +161,7 @@ public class DictionaryMetadata{
 	public DictionaryMetadata(final Map<DictionaryAttribute, String> attributes){
 		this.attributes = attributes;
 
-		final EnumMap<DictionaryAttribute, String> allAttributes = new EnumMap<>(DEFAULT_ATTRIBUTES);
+		final Map<DictionaryAttribute, String> allAttributes = new EnumMap<>(DEFAULT_ATTRIBUTES);
 		allAttributes.putAll(attributes);
 
 		for(final DictionaryAttribute attr : REQUIRED_ATTRIBUTES)
@@ -176,11 +180,11 @@ public class DictionaryMetadata{
 				case ENCODER -> encoderType = (EncoderType)value;
 				case INPUT_CONVERSION -> inputConversion = (Map<String, String>)value;
 				case OUTPUT_CONVERSION -> outputConversion = (Map<String, String>)value;
-				case REPLACEMENT_PAIRS -> replacementPairs = (Map<String, List<String>>)value;
+				case REPLACEMENT_PAIRS -> replacement = (Map<String, List<String>>)value;
 				case EQUIVALENT_CHARS -> equivalentChars = (Map<Character, List<Character>>)value;
 				case IGNORE_PUNCTUATION, IGNORE_NUMBERS, IGNORE_CAMEL_CASE, IGNORE_ALL_UPPERCASE, IGNORE_DIACRITICS, CONVERT_CASE, RUN_ON_WORDS, FREQUENCY_INCLUDED -> boolAttributes.put(e.getKey(), (Boolean)value);
 				case AUTHOR, LICENSE, CREATION_DATE -> e.getKey().fromString(e.getValue());
-				default -> throw new RuntimeException("Unexpected code path (attribute should be handled but is not): " + e.getKey());
+				default -> throw new ParserException("Unexpected code path (attribute should be handled but is not): {}", e.getKey());
 			}
 		}
 	}
@@ -188,45 +192,45 @@ public class DictionaryMetadata{
 	/**
 	 * @return Return all metadata attributes.
 	 */
-	public Map<DictionaryAttribute, String> getAttributes(){
+	public final Map<DictionaryAttribute, String> getAttributes(){
 		return Collections.unmodifiableMap(attributes);
 	}
 
-	public String getEncoding(){ return charset.name(); }
+	public final String getEncoding(){ return charset.name(); }
 
-	public byte getSeparator(){ return separator; }
+	public final byte getSeparator(){ return separator; }
 
-	public Locale getLocale(){ return locale; }
+	public final Locale getLocale(){ return locale; }
 
-	public Map<String, String> getInputConversionPairs(){ return inputConversion; }
+	public final Map<String, String> getInputConversionPairs(){ return inputConversion; }
 
-	public Map<String, String> getOutputConversionPairs(){ return outputConversion; }
+	public final Map<String, String> getOutputConversionPairs(){ return outputConversion; }
 
-	public Map<String, List<String>> getReplacementPairs(){ return replacementPairs; }
+	public final Map<String, List<String>> getReplacementPairs(){ return replacement; }
 
-	public Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
+	public final Map<Character, List<Character>> getEquivalentChars(){ return equivalentChars; }
 
-	public boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
+	public final boolean isFrequencyIncluded(){ return boolAttributes.get(DictionaryAttribute.FREQUENCY_INCLUDED); }
 
-	public boolean isIgnoringPunctuation(){ return boolAttributes.get(DictionaryAttribute.IGNORE_PUNCTUATION); }
+	public final boolean isIgnoringPunctuation(){ return boolAttributes.get(DictionaryAttribute.IGNORE_PUNCTUATION); }
 
-	public boolean isIgnoringNumbers(){ return boolAttributes.get(DictionaryAttribute.IGNORE_NUMBERS); }
+	public final boolean isIgnoringNumbers(){ return boolAttributes.get(DictionaryAttribute.IGNORE_NUMBERS); }
 
-	public boolean isIgnoringCamelCase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_CAMEL_CASE); }
+	public final boolean isIgnoringCamelCase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_CAMEL_CASE); }
 
-	public boolean isIgnoringAllUppercase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_ALL_UPPERCASE); }
+	public final boolean isIgnoringAllUppercase(){ return boolAttributes.get(DictionaryAttribute.IGNORE_ALL_UPPERCASE); }
 
-	public boolean isIgnoringDiacritics(){ return boolAttributes.get(DictionaryAttribute.IGNORE_DIACRITICS); }
+	public final boolean isIgnoringDiacritics(){ return boolAttributes.get(DictionaryAttribute.IGNORE_DIACRITICS); }
 
-	public boolean isConvertingCase(){ return boolAttributes.get(DictionaryAttribute.CONVERT_CASE); }
+	public final boolean isConvertingCase(){ return boolAttributes.get(DictionaryAttribute.CONVERT_CASE); }
 
-	public boolean isSupportingRunOnWords(){ return boolAttributes.get(DictionaryAttribute.RUN_ON_WORDS); }
+	public final boolean isSupportingRunOnWords(){ return boolAttributes.get(DictionaryAttribute.RUN_ON_WORDS); }
 
-	public Charset getCharset(){
+	public final Charset getCharset(){
 		return charset;
 	}
 
-	public EncoderType getSequenceEncoderType(){
+	public final EncoderType getSequenceEncoderType(){
 		return encoderType;
 	}
 
@@ -234,14 +238,14 @@ public class DictionaryMetadata{
 	/**
 	 * Returns the expected name of the metadata file, based on the name of the
 	 * dictionary file. The expected name is resolved by truncating any
-	 * file extension of <code>name</code> and appending
+	 * file extension of {@code name} and appending
 	 * {@link DictionaryMetadata#METADATA_FILE_EXTENSION}.
 	 *
-	 * @param dictionaryFile	The name of the dictionary (<code>*.dict</code>) file.
+	 * @param dictionaryFile	The name of the dictionary ({@code *.dict}) file.
 	 * @return	The expected name of the metadata file.
 	 */
 	public static String getExpectedMetadataFileName(final String dictionaryFile){
-		final int dotIndex = dictionaryFile.lastIndexOf('.');
+		final int dotIndex = StringUtils.lastIndexOf(dictionaryFile, '.');
 		return (dotIndex >= 0? dictionaryFile.substring(0, dotIndex): dictionaryFile) + "." + METADATA_FILE_EXTENSION;
 	}
 
@@ -259,7 +263,7 @@ public class DictionaryMetadata{
 	 * @param writer	The writer to write to.
 	 * @throws IOException	Thrown when an I/O error occurs.
 	 */
-	public void write(final Writer writer) throws IOException{
+	public final void write(final Writer writer) throws IOException{
 		final PropertiesUTF8 properties = new PropertiesUTF8();
 		for(final Map.Entry<DictionaryAttribute, String> e : getAttributes().entrySet())
 			properties.setProperty(e.getKey().propertyName, e.getValue());

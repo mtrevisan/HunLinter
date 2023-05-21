@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,9 @@
  */
 package io.github.mtrevisan.hunlinter.languages;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class WordTokenizer{
 	private static final String DATE_ISO8601 = "(?<!\\d)(?:[+-]?\\d{4}(?!\\d{2}\\b))(?:(-?)(?:(?:00[1-9]|0[1-9]\\d|[12]\\d{2}|3[0-5]\\d|36[0-6])|(?:3[0-6]\\d)|(?:[0-2]\\d{2})|(?:0[1-9]|1[0-2])(?:\\2(?:0[1-9]|[12]\\d|3[01]))?|(?:\\d{1,2})|W(?:[0-4]\\d|5[0-2])(?:-?[1-7])?)(?!\\d)(?:[T\\s](?:(?:(?:[01]\\d|2[0-3])(?:(:?)[0-5]\\d)?|24\\:?00)(?:[.,]\\d+(?!:))?)?(?:\\3[0-5]\\d(?:[.,]\\d+)?)?(?:[zZ]|(?:[+-])(?:[01]\\d|2[0-3]):?(?:[0-5]\\d)?)?)?)?";
 	private static final String TIME = "(?<!\\d)(?:(?:0?[1-9]|1[0-2])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)? ?[aApP][mM])|(?:(?:0?\\d|1\\d|2[0-3])(?::|\\.)[0-5]\\d(?:(?::|\\.)[0-5]\\d)?)";
 	//@see <a href="https://www.ietf.org/rfc/rfc0822.txt">RFC-0822</a>
-	private static final String EMAIL = "([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
+	private static final String EMAIL = "(?:[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22(?:[^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(?:\\x2e(?:[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22(?:[^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40(?:[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b(?:[^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(?:\\x2e(?:[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b(?:[^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*";
 	//@see <a href="https://www.ietf.org/rfc/rfc3986.txt">RFC-3986</a>
 	private static final String URL = "(?:(?:[a-zA-Z][a-zA-Z\\d+-.]*):)(?:\\/\\/(?:(?:[^:]*)(?::(?:[^@]*))?@)?(?:(?:[a-zA-Z0-9-.%]+)|(?:\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(?:\\[(?:[a-fA-F\\d.:]+)\\]))?(?::(?:\\d*))?(?:(?:\\/[^\\/]*)*)|(?:\\/[^\\#\\?]+(?:\\/[^\\#\\?]*)*)?|(?:[^\\/]+(?:\\/[^\\#\\?]*)*))?(?:\\?(?:[^#]*))?(?:\\#(?:[^#]*))?";
 	private static final Pattern PATTERN_UNBREAKABLE;
@@ -65,13 +65,12 @@ public class WordTokenizer{
 			.add(DATE_ISO8601)
 			.add(TIME)
 			.add(EMAIL)
-			//FIXME consider only urls like www., or similar
-//			.add(URL)
+			.add(URL)
 		;
 		PATTERN_UNBREAKABLE = RegexHelper.pattern("(" + sj + ")");
 	}
 
-	public static final String DEFAULT_TOKENIZING_CHARACTERS = " \u00A0ᅟ" +
+	protected static final String DEFAULT_TOKENIZING_CHARACTERS = " \u00A0ᅟ" +
 		"ᅠ\u1680"
 		+ "\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007"
 		+ "\u2008\u2009\u200A\u200B\u200c\u200d\u200e\u200f"
@@ -98,6 +97,7 @@ public class WordTokenizer{
 		this.tokenizingCharacters = tokenizingCharacters;
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public List<String> tokenize(String text){
 		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
@@ -105,7 +105,7 @@ public class WordTokenizer{
 			StringHelper.maxRepeating(text, '\0') + 1);
 
 		//find all urls and emails, substitute with placeholder
-		final List<String> unbreakableText = new ArrayList<>();
+		final List<String> unbreakableText = new ArrayList<>(0);
 		text = RegexHelper.matcher(text, PATTERN_UNBREAKABLE)
 			.replaceAll(m -> {
 				unbreakableText.add(m.group(1));
@@ -116,7 +116,7 @@ public class WordTokenizer{
 	}
 
 	private List<String> extractTokens(final String text, final String placeholder, final List<String> unbreakableText){
-		final List<String> result = new ArrayList<>();
+		final List<String> result = new ArrayList<>(0);
 		int index = 0;
 		final StringTokenizer st = new StringTokenizer(text, tokenizingCharacters, true);
 		while(st.hasMoreElements()){

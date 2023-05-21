@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultListModel;
+import java.awt.Frame;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -71,14 +71,10 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
       setResizable(false);
 
       languageList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-      languageList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-         public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-            languageListValueChanged(evt);
-         }
-      });
+      languageList.addListSelectionListener(this::languageListValueChanged);
       languageScrollPane.setViewportView(languageList);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -98,14 +94,14 @@ public class LanguageChooserDialog extends javax.swing.JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void languageListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_languageListValueChanged
+   private void languageListValueChanged(final javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_languageListValueChanged
 		languageChosen = true;
 		onSelection.accept(languageList.getSelectedValue());
 
 		dispose();
    }//GEN-LAST:event_languageListValueChanged
 
-	public boolean languageChosen(){
+	public final boolean isLanguageChosen(){
    	return languageChosen;
 	}
 

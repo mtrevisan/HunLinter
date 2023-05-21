@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,15 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JDialog;
-import java.awt.*;
-import java.io.IOException;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -102,20 +103,12 @@ public class CorrectionDialog extends JDialog{
       btnOk.setMaximumSize(new java.awt.Dimension(65, 23));
       btnOk.setMinimumSize(new java.awt.Dimension(65, 23));
       btnOk.setPreferredSize(new java.awt.Dimension(65, 23));
-      btnOk.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnOkActionPerformed(evt);
-         }
-      });
+      btnOk.addActionListener(this::btnOkActionPerformed);
 
       btnCancel.setText("Cancel");
-      btnCancel.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            btnCancelActionPerformed(evt);
-         }
-      });
+      btnCancel.addActionListener(this::btnCancelActionPerformed);
 
-      javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
+      final javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
       buttonPanel.setLayout(buttonPanelLayout);
       buttonPanelLayout.setHorizontalGroup(
          buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -138,7 +131,7 @@ public class CorrectionDialog extends JDialog{
 
       buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -172,18 +165,19 @@ public class CorrectionDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+   private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
       dispose();
    }//GEN-LAST:event_btnCancelActionPerformed
 
-   private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+   private void btnOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
       try{
 			final String incorrect = incorrectTextField.getText();
 			final String correct = correctTextField.getText();
          okButtonAction.accept(incorrect, correct);
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction, e.getMessage());
+      catch(final RuntimeException re){
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Error while changing the auto correction for word {}: {}", correction,
+				re.getMessage());
       }
 
       dispose();
@@ -192,13 +186,13 @@ public class CorrectionDialog extends JDialog{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,13 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.affix.strategies;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.util.regex.Pattern;
 
 
@@ -40,10 +39,10 @@ import java.util.regex.Pattern;
  */
 final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 
-	private static final MessageFormat BAD_FORMAT = new MessageFormat("Each flag should be in {0} encoding: `{1}`");
-	private static final MessageFormat FLAG_MUST_BE_EVEN_IN_LENGTH = new MessageFormat("Flag must be of length multiple of two: `{0}`");
-	private static final MessageFormat FLAG_MUST_BE_OF_LENGTH_TWO = new MessageFormat("Flag must be of length two: `{0}`");
-	private static final MessageFormat BAD_FORMAT_COMPOUND_RULE = new MessageFormat("Compound rule must be composed by double-characters flags in {0} encoding, or the optional operators '*' or '?: was `{1}`");
+	private static final String BAD_FORMAT = "Each flag should be in {} encoding: `{}`";
+	private static final String FLAG_MUST_BE_EVEN_IN_LENGTH = "Flag must be even number of characters: `{}`";
+	private static final String FLAG_MUST_BE_OF_LENGTH_TWO = "Flag must be of length two: `{}`";
+	private static final String BAD_FORMAT_COMPOUND_RULE = "Compound rule must be composed by double-characters flags in {} encoding, or the optional operators '*' or '?': `{}`";
 
 	private static final Pattern PATTERN = RegexHelper.pattern("(?<=\\G.{2})");
 
@@ -61,33 +60,33 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 	private DoubleASCIIParsingStrategy(){}
 
 	@Override
-	public String[] parseFlags(final String flags){
-		if(StringUtils.isBlank(flags))
+	public String[] parseFlags(final String rawFlags){
+		if(StringUtils.isBlank(rawFlags))
 			return null;
 
-		if(flags.length() % 2 != 0)
-			throw new LinterException(FLAG_MUST_BE_EVEN_IN_LENGTH.format(new Object[]{flags}));
+		if(rawFlags.length() % 2 != 0)
+			throw new LinterException(FLAG_MUST_BE_EVEN_IN_LENGTH, rawFlags);
 
-		if(!canEncode(flags))
-			throw new LinterException(BAD_FORMAT.format(new Object[]{StandardCharsets.US_ASCII.displayName(), flags}));
+		if(!canEncode(rawFlags))
+			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), rawFlags);
 
-		final String[] singleFlags = extractFlags(flags);
+		final String[] flags = extractFlags(rawFlags);
 
-		checkForDuplicates(singleFlags);
+		checkForDuplicates(flags);
 
-		return singleFlags;
+		return flags;
 	}
 
-	private String[] extractFlags(final CharSequence flags){
-		return RegexHelper.split(flags, PATTERN);
+	private static String[] extractFlags(final CharSequence rawFlags){
+		return RegexHelper.split(rawFlags, PATTERN);
 	}
 
 	@Override
 	public void validate(final String flag){
 		if(flag == null || flag.length() != 2)
-			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_TWO.format(new Object[]{flag}));
+			throw new LinterException(FLAG_MUST_BE_OF_LENGTH_TWO, flag);
 		if(!canEncode(flag))
-			throw new LinterException(BAD_FORMAT.format(new Object[]{StandardCharsets.US_ASCII.displayName(), flag}));
+			throw new LinterException(BAD_FORMAT, StandardCharsets.US_ASCII.displayName(), flag);
 	}
 
 	@Override
@@ -99,16 +98,17 @@ final class DoubleASCIIParsingStrategy extends FlagParsingStrategy{
 		return parts;
 	}
 
-	private void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
+	private static void checkCompoundValidity(final String[] parts, final CharSequence compoundRule){
 		for(final String part : parts){
 			final int size = part.length();
-			final boolean isFlag = (size != 1 || part.charAt(0) != '*' && part.charAt(0) != '?');
+			final boolean isFlag = (size != 1
+				|| !FlagParsingStrategy.FLAG_OPTIONAL.equals(part) && !FlagParsingStrategy.FLAG_ANY.equals(part));
 			if(size != 2 && isFlag || !canEncode(compoundRule))
-				throw new LinterException(BAD_FORMAT_COMPOUND_RULE.format(new Object[]{StandardCharsets.US_ASCII.displayName(), compoundRule}));
+				throw new LinterException(BAD_FORMAT_COMPOUND_RULE, StandardCharsets.US_ASCII.displayName(), compoundRule);
 		}
 	}
 
-	private boolean canEncode(final CharSequence cs){
+	private static boolean canEncode(final CharSequence cs){
 		final CharsetEncoder encoder = StandardCharsets.US_ASCII.newEncoder();
 		//NOTE: encoder.canEncode is not thread-safe!
 		return encoder.canEncode(cs);

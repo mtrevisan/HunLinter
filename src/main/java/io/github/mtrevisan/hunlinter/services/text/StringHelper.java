@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -43,15 +43,15 @@ public final class StringHelper{
 	private static final Pattern PATTERN_COMBINING_DIACRITICAL_MARKS = RegexHelper.pattern("\\p{InCombiningDiacriticalMarks}+");
 
 	public enum Casing{
-		/** All lower case or neutral case, e.g. "hello java" */
+		/** All lower case or neutral case, e.g. "hello java". */
 		LOWER_CASE,
-		/** Start upper case, rest lower case, e.g. "Hello java" */
+		/** Start upper case, rest lower case, e.g. "Hello java". */
 		TITLE_CASE,
-		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA" */
+		/** All upper case, e.g. "UPPERCASE" or "HELLO JAVA". */
 		ALL_CAPS,
-		/** Camel case, start lower case, e.g. "helloJava" */
+		/** Camel case, start lower case, e.g. "helloJava". */
 		CAMEL_CASE,
-		/** Pascal case, start upper case, e.g. "HelloJava" */
+		/** Pascal case, start upper case, e.g. "HelloJava". */
 		PASCAL_CASE
 	}
 
@@ -104,11 +104,11 @@ public final class StringHelper{
 		return longestCommonAffix(StringHelper::commonPrefix, texts);
 	}
 
-	public static String longestCommonSuffix(final String... texts){
+	public static String longestCommonSuffix(final String[] texts){
 		return longestCommonAffix(StringHelper::commonSuffix, texts);
 	}
 
-	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String... texts){
+	private static String longestCommonAffix(final BiFunction<String, String, String> commonAffix, final String[] texts){
 		String lcs = null;
 		if(texts.length > 0){
 			int offset = 0;
@@ -131,7 +131,7 @@ public final class StringHelper{
 		final int maxSuffixLength = Math.min(aLength, bLength);
 		while(s < maxSuffixLength && a.charAt(aLength - s - 1) == b.charAt(bLength - s - 1))
 			s ++;
-		if(validSurrogatePairAt(a, aLength - s - 1) || validSurrogatePairAt(b, bLength - s - 1))
+		if(isValidSurrogatePairAt(a, aLength - s - 1) || isValidSurrogatePairAt(b, bLength - s - 1))
 			s --;
 		return a.subSequence(aLength - s, aLength).toString();
 	}
@@ -146,7 +146,7 @@ public final class StringHelper{
 		final int maxPrefixLength = Math.min(a.length(), b.length());
 		while(p < maxPrefixLength && a.charAt(p) == b.charAt(p))
 			p ++;
-		if(validSurrogatePairAt(a, p - 1) || validSurrogatePairAt(b, p - 1))
+		if(isValidSurrogatePairAt(a, p - 1) || isValidSurrogatePairAt(b, p - 1))
 			p --;
 		return a.subSequence(0, p).toString();
 	}
@@ -155,10 +155,10 @@ public final class StringHelper{
 	 * True when a valid surrogate pair starts at the given {@code index} in the given {@code string}.
 	 * Out-of-range indexes return false.
 	 */
-	private static boolean validSurrogatePairAt(final CharSequence string, final int index){
-		return (index >= 0 && index <= (string.length() - 2)
-			&& Character.isHighSurrogate(string.charAt(index))
-			&& Character.isLowSurrogate(string.charAt(index + 1)));
+	private static boolean isValidSurrogatePairAt(final CharSequence text, final int index){
+		return (index >= 0 && index <= (text.length() - 2)
+			&& Character.isHighSurrogate(text.charAt(index))
+			&& Character.isLowSurrogate(text.charAt(index + 1)));
 	}
 
 	public static int getLastCommonLetterIndex(final CharSequence word1, final CharSequence word2){
@@ -254,7 +254,7 @@ public final class StringHelper{
 			//if current character matches with next
 			if(i < n - 1 && text.charAt(i) == chr && text.charAt(i + 1) == chr)
 				currentCount ++;
-			//if doesn't match, update result (if required) and reset count
+			//if it doesn't match, update result (if required) and reset count
 			else{
 				if(currentCount > count)
 					count = currentCount;
@@ -271,6 +271,15 @@ public final class StringHelper{
 		while((index = sb.indexOf(strToRemove, index)) >= 0)
 			sb.deleteCharAt(index --);
 		return sb.toString();
+	}
+
+
+	public static char lastChar(final CharSequence text){
+		return lastChar(text, 0);
+	}
+
+	public static char lastChar(final CharSequence text, final int charsFromEnd){
+		return text.charAt(text.length() - charsFromEnd - 1);
 	}
 
 }

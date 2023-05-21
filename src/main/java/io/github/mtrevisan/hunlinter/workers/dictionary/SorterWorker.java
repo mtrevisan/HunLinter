@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,14 +26,17 @@ package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +58,7 @@ public class SorterWorker extends WorkerDictionary{
 	public SorterWorker(final File dicFile, final ParserManager parserManager, final int lineIndex){
 		super(new WorkerDataParser<>(WORKER_NAME, parserManager.getDicParser()));
 
-		Objects.requireNonNull(dicFile);
+		Objects.requireNonNull(dicFile, "Dictionary file cannot be null");
 
 		getWorkerData()
 			.withParallelProcessing()
@@ -66,6 +69,9 @@ public class SorterWorker extends WorkerDictionary{
 		comparator = BaseBuilder.getComparator(parserManager.getLanguage());
 		final Map.Entry<Integer, Integer> boundary = dicParser.getBoundary(lineIndex);
 		//here `boundary` cannot be null
+		@SuppressWarnings("ConstantConditions")
+		final int sectionStart = boundary.getKey();
+		final int sectionEnd = boundary.getValue() + 1;
 
 		final Function<Void, List<String>> step1 = ignored -> {
 			prepareProcessing("Load dictionary file (step 1/3)");
@@ -74,11 +80,11 @@ public class SorterWorker extends WorkerDictionary{
 			try{
 				lines = FileHelper.readAllLines(dicParser.getDicFile().toPath(), dicParser.getCharset());
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new WorkerException(ioe, ioe.getMessage());
 			}
 
-			setProgress(33);
+			setWorkerProgress(33);
 
 			return lines;
 		};
@@ -86,10 +92,10 @@ public class SorterWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Sort selected section (step 2/3)");
 
 			//sort the chosen section
-			lines.subList(boundary.getKey(), boundary.getValue() + 1)
+			lines.subList(sectionStart, sectionEnd)
 				.sort(comparator);
 
-			setProgress(67);
+			setWorkerProgress(67);
 
 			return lines;
 		};
@@ -99,12 +105,12 @@ public class SorterWorker extends WorkerDictionary{
 			try{
 				FileHelper.saveFile(dicParser.getDicFile().toPath(), System.lineSeparator(), dicParser.getCharset(), lines);
 
-				dicParser.removeBoundary(boundary.getKey());
+				dicParser.removeBoundary(sectionStart);
 
 				finalizeProcessing("Successfully processed " + workerData.getWorkerName());
 			}
-			catch(final Exception e){
-				throw new RuntimeException(e.getMessage());
+			catch(final IOException ioe){
+				throw new WriterException(ioe, ioe.getMessage());
 			}
 
 			return null;

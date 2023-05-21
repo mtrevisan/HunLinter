@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -39,14 +39,6 @@ class VersionCompareTest{
 	}
 
 	@Test
-	void shouldIgnoreBuildMetadataWhenCheckingForEquality(){
-		Version v1 = new Version("2.3.7-beta+build");
-		Version v2 = new Version("2.3.7-beta");
-
-		Assertions.assertEquals(v1, v2);
-	}
-
-	@Test
 	void preReleaseShouldHaveLowerPrecedenceThanAssociatedNormal(){
 		Version v1 = new Version("1.3.7");
 		Version v2 = new Version("1.3.7-alpha");
@@ -60,7 +52,7 @@ class VersionCompareTest{
 		Version v1 = new Version("2.3.7-alpha");
 		Version v2 = new Version("2.3.7-beta");
 
-		Assertions.assertTrue(v1.lessThan(v2));
+		Assertions.assertTrue(v1.isLessThan(v2));
 	}
 
 	@Test
@@ -68,7 +60,7 @@ class VersionCompareTest{
 		Version v1 = new Version("2.3.7-beta.1");
 		Version v2 = new Version("2.3.7-beta.2");
 
-		Assertions.assertTrue(v1.lessThan(v2));
+		Assertions.assertTrue(v1.isLessThan(v2));
 	}
 
 }

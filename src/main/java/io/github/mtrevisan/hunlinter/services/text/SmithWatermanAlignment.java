@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,18 +25,14 @@
 package io.github.mtrevisan.hunlinter.services.text;
 
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.tuple.Pair;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.regex.Pattern;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 /**
@@ -61,10 +57,15 @@ public class SmithWatermanAlignment{
 	private static final double COST_MISMATCH = -1.;
 	private static final double COST_DELETION = 0.;
 	private static final double COST_INSERTION = 0.;
-	/** must be GAP_OPENING_PENALTY < 0 */
+	/** must be GAP_OPENING_PENALTY < 0. */
 	private static final double GAP_OPENING_PENALTY = -1.;
-	/** must be GAP_OPENING_PENALTY < GAP_EXTENSION_PENALTY < 0*/
+	/** must be GAP_OPENING_PENALTY < GAP_EXTENSION_PENALTY < 0. */
 	private static final double GAP_EXTENSION_PENALTY = -1. / 3.;
+
+	private static final Character MINUS = '-';
+	private static final Character PLUS = '+';
+	private static final Character SPACE = ' ';
+	private static final Character START = '*';
 
 
 	//TODO introduce getters
@@ -75,31 +76,27 @@ public class SmithWatermanAlignment{
 		private int lastIndexB;
 		private Deque<Character> operations;
 
-
 		@Override
-		public boolean equals(final Object obj){
-			if(obj == this)
+		public final boolean equals(final Object obj){
+			if(this == obj)
 				return true;
-			if(obj == null || obj.getClass() != getClass())
+			if(obj == null || getClass() != obj.getClass())
 				return false;
 
 			final Trace rhs = (Trace)obj;
-			return new EqualsBuilder()
-				.append(firstIndexA, rhs.firstIndexA)
-				.append(firstIndexB, rhs.firstIndexB)
-				.append(lastIndexA, rhs.lastIndexA)
-				.append(lastIndexB, rhs.lastIndexB)
-				.isEquals();
+			return (firstIndexA == rhs.firstIndexA
+				&& firstIndexB == rhs.firstIndexB
+				&& lastIndexA == rhs.lastIndexA
+				&& lastIndexB == rhs.lastIndexB);
 		}
 
 		@Override
-		public int hashCode(){
-			return new HashCodeBuilder()
-				.append(firstIndexA)
-				.append(firstIndexB)
-				.append(lastIndexA)
-				.append(lastIndexB)
-				.toHashCode();
+		public final int hashCode(){
+			int result = Integer.hashCode(firstIndexA);
+			result = 31 * result + Integer.hashCode(firstIndexB);
+			result = 31 * result + Integer.hashCode(lastIndexA);
+			result = 31 * result + Integer.hashCode(lastIndexB);
+			return result;
 		}
 	}
 
@@ -126,7 +123,7 @@ public class SmithWatermanAlignment{
 			scores[0][j] = j * COST_INSERTION;
 	}
 
-	public Set<Trace> align(){
+	public final Set<Trace> align(){
 		//calculate scores:
 		double maxScore = 0.;
 		for(int j = 1; j <= m; j ++)
@@ -138,10 +135,11 @@ public class SmithWatermanAlignment{
 				maxScore = Math.max(maxScore, scores[i][j]);
 			}
 
-		final Set<Trace> traces = new HashSet<>();
-		final Deque<Pair<Integer, Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Deque<IndexDataPair<Integer>> maxScoreIndices = extractMaxScoreIndices(maxScore);
+		final Set<Trace> traces = new HashSet<>(maxScoreIndices.size());
 		//extract edit operations
-		LoopHelper.forEach(maxScoreIndices, score -> traces.add(traceback(score.getLeft(), score.getRight())));
+		for(final IndexDataPair<Integer> score : maxScoreIndices)
+			traces.add(traceback(score.getIndex(), score.getData()));
 		return traces;
 	}
 
@@ -171,21 +169,21 @@ public class SmithWatermanAlignment{
 		return (x[i - 1].equals(y[j - 1])? COST_MATCH: COST_MISMATCH);
 	}
 
-	private double insertionCost(final double k){
+	private static double insertionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private double deletionCost(final double k){
+	private static double deletionCost(final double k){
 		return GAP_OPENING_PENALTY + GAP_EXTENSION_PENALTY * (k - 1);
 	}
 
-	private Deque<Pair<Integer, Integer>> extractMaxScoreIndices(final double maxScore){
+	private Deque<IndexDataPair<Integer>> extractMaxScoreIndices(final double maxScore){
 		//collect max scores:
-		final Deque<Pair<Integer, Integer>> maxScores = new ArrayDeque<>();
+		final Deque<IndexDataPair<Integer>> maxScores = new ArrayDeque<>();
 		for(int j = 1; j <= m; j ++)
 			for(int i = 1; i <= n; i ++)
 				if(scores[i][j] == maxScore)
-					maxScores.push(Pair.of(i, j));
+					maxScores.push(IndexDataPair.of(i, j));
 		return maxScores;
 	}
 
@@ -193,7 +191,7 @@ public class SmithWatermanAlignment{
 		final Trace trace = new Trace();
 		trace.lastIndexA = lastIndexA - 1;
 		trace.lastIndexB = lastIndexB - 1;
-		trace.operations = new ArrayDeque<>();
+		trace.operations = new LinkedList<>();
 
 		//backward reconstruct path
 		while(lastIndexA != 0 || lastIndexB != 0){
@@ -205,16 +203,16 @@ public class SmithWatermanAlignment{
 			trace.firstIndexB = lastIndexB - 1;
 
 			if(lastIndexA != 0 && lastIndexB != 0 && tmp == matching(lastIndexA, lastIndexB)){
-				trace.operations.push(x[lastIndexA - 1].equals(y[lastIndexB - 1])? ' ': '*');
+				trace.operations.push(x[lastIndexA - 1].equals(y[lastIndexB - 1])? SPACE: START);
 				lastIndexA --;
 				lastIndexB --;
 			}
 			else if(lastIndexA != 0 && tmp == deletion(lastIndexA, lastIndexB)){
-				trace.operations.push('-');
+				trace.operations.push(MINUS);
 				lastIndexA --;
 			}
 			else if(lastIndexB != 0 && tmp == insertion(lastIndexA, lastIndexB)){
-				trace.operations.push('+');
+				trace.operations.push(PLUS);
 				lastIndexB --;
 			}
 		}

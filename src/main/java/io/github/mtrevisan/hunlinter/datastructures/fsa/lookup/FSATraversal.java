@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,15 +24,19 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.builders.FSAFlags;
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
 
 
-/** This class implements some common matching and scanning operations on a generic FSA */
+/**
+ * This class implements some common matching and scanning operations on a generic FSA.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
+ */
 public final class FSATraversal{
 
-	/** target automaton */
-	private final FSA fsa;
+	/** target automaton. */
+	private final FSAAbstract fsa;
 
 
 	/**
@@ -40,7 +44,7 @@ public final class FSATraversal{
 	 *
 	 * @param fsa	The target automaton for traversals.
 	 */
-	public FSATraversal(final FSA fsa){
+	public FSATraversal(final FSAAbstract fsa){
 		this.fsa = fsa;
 	}
 
@@ -58,13 +62,13 @@ public final class FSATraversal{
 
 	/**
 	 * Calculate perfect hash for a given input sequence of bytes. The perfect hash requires
-	 * that {@link FSA} is built with {@link FSAFlags#NUMBERS} and corresponds to the sequential
+	 * that {@link FSAAbstract} is built with {@link FSAFlags#NUMBERS} and corresponds to the sequential
 	 * order of input sequences used at automaton construction time.
 	 *
 	 * @param sequence The byte sequence to calculate perfect hash for.
 	 * @param start    Start index in the sequence array.
 	 * @param length   Length of the byte sequence, must be at least 1.
-	 * @param node     The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node     The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return Returns a unique integer assigned to the input sequence in the automaton (reflecting
 	 * the number of that sequence in the input used to build the automaton). Returns a negative
 	 * integer if the input sequence was not part of the input from which the automaton was created.
@@ -130,7 +134,7 @@ public final class FSATraversal{
 
 	/**
 	 * @param sequence	Input sequence to look for in the automaton.
-	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return	{@link FSAMatchResult} with updated match {@link FSAMatchResult#kind}.
 	 */
 	public FSAMatchResult match(final byte[] sequence, final int node){
@@ -139,17 +143,17 @@ public final class FSATraversal{
 
 	/**
 	 * Finds a matching path in the dictionary for a given sequence of labels from
-	 * <code>sequence</code> and starting at node <code>node</code>.
+	 * {@code sequence} and starting at node {@code node}.
 	 *
 	 * @param sequence	Input sequence to look for in the automaton.
 	 * @param start	Start index in the sequence array.
 	 * @param length	Length of the byte sequence, must be at least 1.
-	 * @param node	The node to start traversal from, typically the {@linkplain FSA#getRootNode() root node}.
+	 * @param node	The node to start traversal from, typically the {@linkplain FSAAbstract#getRootNode() root node}.
 	 * @return	{@link FSAMatchResult} with updated match {@link FSAMatchResult#kind}.
 	 */
 	public FSAMatchResult match(final byte[] sequence, final int start, final int length, int node){
 		if(node == 0)
-			return new FSAMatchResult(FSAMatchResult.NO_MATCH, start, node);
+			return new FSAMatchResult(FSAMatchResult.NO_MATCH, start, 0);
 
 		final int end = start + length;
 		for(int i = start; i < end; i ++){

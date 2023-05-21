@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -66,7 +66,7 @@ class VersionTest{
 	void shouldParseBuild(){
 		Version version = new Version("1.2.3+build");
 
-		Assertions.assertEquals(new Version(1, 2, 3, null, new String[]{"build"}), version);
+		Assertions.assertEquals(new Version(1, 2, 3, new String[0], new String[]{"build"}), version);
 		Assertions.assertEquals("1.2.3+build", version.toString());
 	}
 

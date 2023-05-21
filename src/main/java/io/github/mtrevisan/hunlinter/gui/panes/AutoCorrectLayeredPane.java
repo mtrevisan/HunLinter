@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,11 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.gui.panes;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
@@ -44,22 +39,32 @@ import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.DefaultRowSorter;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
+import javax.xml.transform.TransformerException;
+import java.awt.Font;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -67,9 +72,9 @@ import java.io.Serial;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.function.BooleanSupplier;
 
 
 public class AutoCorrectLayeredPane extends JLayeredPane{
@@ -109,8 +114,6 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		FontHelper.addFontableProperty(table, incorrectTextField, correctTextField);
 
 		GUIHelper.addUndoManager(incorrectTextField, correctTextField);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -123,15 +126,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       correctTextField = new javax.swing.JTextField();
       addButton = new javax.swing.JButton();
       scrollPane = new javax.swing.JScrollPane();
-      table = new JCopyableTable(){
-         @Override
-         public String getValueAtRow(final int row){
-            final TableModel model = getModel();
-            final String incorrect = (String)model.getValueAt(row, 0);
-            final String correct = (String)model.getValueAt(row, 1);
-            return incorrect + " > " + correct;
-         }
-      };
+      table = new MyJCopyableTable();
       correctionsRecordedLabel = new javax.swing.JLabel();
       correctionsRecordedValueLabel = new javax.swing.JLabel();
       openAcoButton = new javax.swing.JButton();
@@ -142,7 +137,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
 		incorrectTextField.setFont(currentFont);
       incorrectTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             incorrectTextFieldKeyReleased(evt);
          }
       });
@@ -153,7 +148,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 
       correctTextField.setFont(currentFont);
       correctTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             correctTextFieldKeyReleased(evt);
          }
       });
@@ -161,11 +156,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       addButton.setMnemonic('A');
       addButton.setText("Add");
       addButton.setEnabled(false);
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       table.setFont(currentFont);
       table.setModel(new AutoCorrectTableModel());
@@ -196,8 +187,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                      //… and save the files
                      parserManager.storeAutoCorrectFile();
                   }
-                  catch(Exception ex){
-                     LOGGER.info(ParserManager.MARKER_APPLICATION, ex.getMessage());
+                  catch(final TransformerException ex){
+                     LOGGER.error(ParserManager.MARKER_APPLICATION, ex.getMessage());
                   }
                };
                final CorrectionEntry definition = parserManager.getAcoParser().getCorrectionsDictionary().get(row);
@@ -205,7 +196,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
                GUIHelper.addCancelByEscapeKey(dialog);
                dialog.addWindowListener(new WindowAdapter(){
                   @Override
-                  public void windowClosed(final WindowEvent e){
+                  public void windowClosed(final WindowEvent we){
                      table.clearSelection();
                   }
                });
@@ -238,8 +229,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openAcoButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -288,27 +279,27 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void incorrectTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_incorrectTextFieldKeyReleased
+   private void incorrectTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_incorrectTextFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_incorrectTextFieldKeyReleased
 
-   private void correctTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correctTextFieldKeyReleased
+   private void correctTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_correctTextFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_correctTextFieldKeyReleased
 
-   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          //try adding the correction
          final String incorrect = incorrectTextField.getText();
          final String correct = correctTextField.getText();
-         final Supplier<Boolean> duplicatesDiscriminator = () -> {
+         final BooleanSupplier duplicatesDiscriminator = () -> {
             final int responseOption = JOptionPane.showConfirmDialog(this,
                "There is a duplicate with same incorrect and correct forms.\nForce insertion?", "Duplicate detected",
                JOptionPane.YES_NO_OPTION);
             return (responseOption == JOptionPane.YES_OPTION);
          };
          final DuplicationResult<CorrectionEntry> duplicationResult = parserManager.getAcoParser()
-         .insertCorrection(incorrect, correct, duplicatesDiscriminator);
+         	.insertCorrection(incorrect, correct, duplicatesDiscriminator);
          if(duplicationResult.isForceInsertion()){
             //if everything's ok update the table and the sorter…
             final AutoCorrectTableModel dm = (AutoCorrectTableModel)table.getModel();
@@ -321,7 +312,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
             addButton.setEnabled(false);
             incorrectTextField.requestFocusInWindow();
             @SuppressWarnings("unchecked")
-            TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
+            final TableRowSorter<AutoCorrectTableModel> sorter = (TableRowSorter<AutoCorrectTableModel>)table.getRowSorter();
             sorter.setRowFilter(null);
 
             updateAutoCorrectionsCounter();
@@ -332,19 +323,20 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
          else{
             incorrectTextField.requestFocusInWindow();
 
-            final String duplicatedWords = duplicationResult.getDuplicates().stream()
-            .map(CorrectionEntry::toString)
-            .collect(Collectors.joining(", "));
-            LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
+				final StringJoiner duplicatedWords = new StringJoiner(", ");
+				for(final CorrectionEntry correctionEntry : duplicationResult.getDuplicates())
+					duplicatedWords.add(correctionEntry.toString());
+            LOGGER.warn(ParserManager.MARKER_APPLICATION, "WARN: Duplicate detected: {}", duplicatedWords);
          }
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      catch(final TransformerException e){
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -362,8 +354,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	@SuppressWarnings("unchecked")
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality", "unchecked"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_AUTO_CORRECT)
 			return;
 
@@ -391,8 +383,8 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 			//… and save the files
 			parserManager.storeAutoCorrectFile();
 		}
-		catch(final Exception e){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
+		catch(final TransformerException e){
+			LOGGER.error(ParserManager.MARKER_APPLICATION, "Deletion error: {}", e.getMessage());
 		}
 	}
 
@@ -400,7 +392,7 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 		final String unmodifiedIncorrectText = incorrectTextField.getText().trim();
 		final String unmodifiedCorrectText = correctTextField.getText().trim();
 		if(formerFilterIncorrectText != null && formerFilterIncorrectText.equals(unmodifiedIncorrectText)
-			&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
+				&& formerFilterCorrectText != null && formerFilterCorrectText.equals(unmodifiedCorrectText))
 			return;
 
 		formerFilterIncorrectText = unmodifiedIncorrectText;
@@ -429,19 +421,30 @@ public class AutoCorrectLayeredPane extends JLayeredPane{
 	}
 
 	private void updateAutoCorrectionsCounter(){
-		correctionsRecordedValueLabel.setText(DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter()));
+		final String text = DictionaryParser.COUNTER_FORMATTER.format(parserManager.getAcoParser().getCorrectionsCounter());
+		correctionsRecordedValueLabel.setText(text);
+	}
+
+	private static final class MyJCopyableTable extends JCopyableTable{
+		@Override
+		public String getValueAtRow(final int row){
+			final TableModel model = getModel();
+			final String incorrect = (String)model.getValueAt(row, 0);
+			final String correct = (String)model.getValueAt(row, 1);
+			return incorrect + " > " + correct;
+		}
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

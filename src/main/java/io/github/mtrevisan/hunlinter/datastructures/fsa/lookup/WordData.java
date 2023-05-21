@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,16 +24,18 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.lookup;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 
-/** Stem and tag data associated with a given word */
+/**
+ * Stem and tag data associated with a given word.
+ *
+ * @see "org.carrot2.morfologik-parent, 2.1.7-SNAPSHOT, 2020-01-02"
+ */
 public class WordData{
 
-	/** inflected word form data */
+	/** inflected word form data. */
 	private byte[] word;
 	private byte[] stem;
 	private byte[] tag;
@@ -49,65 +51,63 @@ public class WordData{
 	/**
 	 * @return	Inflected word form data. Usually the parameter passed to {@link DictionaryLookup#lookup(String)}.
 	 */
-	public byte[] getWord(){
+	public final byte[] getWord(){
 		return word;
 	}
 
 	/**
-	 * @return	Stem data decoded to a character sequence or <code>null</code> if no associated stem data exists.
+	 * @return	Stem data decoded to a character sequence or {@code null} if no associated stem data exists.
 	 */
-	public byte[] getStem(){
+	public final byte[] getStem(){
 		return stem;
 	}
 
 	/**
-	 * @return	Tag data decoded to a character sequence or <code>null</code> if no associated tag data exists.
+	 * @return	Tag data decoded to a character sequence or {@code null} if no associated tag data exists.
 	 */
-	public byte[] getTag(){
+	public final byte[] getTag(){
 		return tag;
 	}
 
-	void setWord(final byte[] word){
+	final void setWord(final byte[] word){
 		this.word = word;
 	}
 
-	void setStem(final byte[] stem){
+	final void setStem(final byte[] stem){
 		this.stem = stem;
 	}
 
-	void setTag(final byte[] tag){
+	final void setTag(final byte[] tag){
 		this.tag = tag;
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final WordData rhs = (WordData)obj;
-		return new EqualsBuilder()
-			.append(word, rhs.word)
-			.append(stem, rhs.stem)
-			.append(tag, rhs.tag)
-			.isEquals();
+		return (Arrays.equals(word, rhs.word)
+			&& Arrays.equals(stem, rhs.stem)
+			&& Arrays.equals(tag, rhs.tag));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(word)
-			.append(stem)
-			.append(tag)
-			.toHashCode();
+	public final int hashCode(){
+		int result = Arrays.hashCode(word);
+		result = 31 * result + Arrays.hashCode(stem);
+		result = 31 * result + Arrays.hashCode(tag);
+		return result;
 	}
 
 	@Override
-	public String toString(){
-		return "WordData[" + new String(word, StandardCharsets.UTF_8)
-			+ "," + new String(stem, StandardCharsets.UTF_8)
-			+ "," + new String(tag, StandardCharsets.UTF_8) + "]";
+	public final String toString(){
+		return "WordData[word:" + new String(word, StandardCharsets.UTF_8)
+			+ ", stem:" + (stem != null? new String(stem, StandardCharsets.UTF_8): "null")
+			+ ", tag:" + (tag != null? new String(tag, StandardCharsets.UTF_8): "null")
+			+ "]";
 	}
 
 }

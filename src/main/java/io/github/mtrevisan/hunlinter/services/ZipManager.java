@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -47,25 +44,22 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 
-public class ZipManager{
+public final class ZipManager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ZipManager.class);
 
 
-	public void zipDirectory(final Path dir, final int compressionLevel, final File zipFile) throws IOException{
-		zipDirectory(dir, compressionLevel, zipFile, new Path[0]);
-	}
+	private ZipManager(){}
 
-	public void zipDirectory(final Path dir, final int compressionLevel, final File zipFile, Path... excludeFolderBut)
+	@SuppressWarnings("OverlyBroadThrowsClause")
+	public static void zipDirectory(final File dir, final int compressionLevel, final File zipFile, final File... excludeFolderBut)
 			throws IOException{
 		Files.deleteIfExists(zipFile.toPath());
 
-		final List<String> folders = extractFilesList(dir);
-		excludeFolderBut = ArrayUtils.removeAllOccurrences(excludeFolderBut, null);
-		final List<String> filesListInDir = filterFolders(folders, excludeFolderBut);
+		final List<String> filesListInDir = extractFileList(dir, excludeFolderBut);
 
 		//zip files one by one
-		final int startIndex = dir.toFile().getAbsolutePath().length() + 1;
+		final int startIndex = dir.getAbsolutePath().length() + 1;
 		try(final ZipOutputStream zos = createZIPWriter(zipFile, compressionLevel)){
 			for(final String filePath : filesListInDir){
 				//for ZipEntry we need to keep only relative file path, so we used substring on absolute path
@@ -82,49 +76,30 @@ public class ZipManager{
 		}
 	}
 
-	private List<String> extractFilesList(final Path dir){
-		final File[] files = Optional.ofNullable(dir.toFile().listFiles())
+	private static List<String> extractFileList(final File projectFolder, final File[] excludeFolderBut){
+		final List<File> exclusions = new ArrayList<>(excludeFolderBut.length);
+		for(final File file : excludeFolderBut)
+			if(file != null)
+				exclusions.add(file.getParentFile());
+		final List<String> filesListInDir = extractFilesList(projectFolder, exclusions);
+		for(final File file : excludeFolderBut)
+			if(file != null)
+				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
+		return filesListInDir;
+	}
+
+	private static List<String> extractFilesList(final File dir, final List<File> excludeFolderBut){
+		final File[] files = Optional.ofNullable(dir.listFiles())
 			.orElse(new File[0]);
 		final List<String> filesListInDir = new ArrayList<>(files.length);
 		for(final File file : files){
 			if(file.isFile())
 				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
-			else
-				filesListInDir.addAll(extractFilesList(file.toPath()));
+			else if(!excludeFolderBut.contains(file))
+				filesListInDir.addAll(extractFilesList(file, excludeFolderBut));
 		}
 
 		return filesListInDir;
-	}
-
-	private List<String> filterFolders(final Collection<String> folders, final Path[] excludeFolderBut){
-		final ArrayList<String> filteredFolders = new ArrayList<>(folders.size());
-		for(String folder : folders){
-			folder = StringUtils.replaceChars(Path.of(folder)
-				.toString(), '\\', '/');
-
-			boolean process = true;
-			if(!ArrayUtils.contains(excludeFolderBut, Path.of(folder))){
-				final String[] includeFolders = Arrays.stream(excludeFolderBut)
-					.map(Path::getParent)
-					.map(Path::toString)
-					.toArray(String[]::new);
-				process = (match(includeFolders, folder) == null);
-			}
-			if(process)
-				filteredFolders.add(folder);
-		}
-		filteredFolders.trimToSize();
-		return filteredFolders;
-	}
-
-	private static String match(final String[] array, final String folder){
-		final int size = (array != null? array.length: 0);
-		for(int i = 0; i < size; i ++){
-			final String elem = array[i];
-			if(folder.startsWith(elem))
-				return elem;
-		}
-		return null;
 	}
 
 	private static ZipOutputStream createZIPWriter(final File file, final int compressionLevel) throws IOException{
@@ -136,7 +111,7 @@ public class ZipManager{
 	}
 
 
-	public void unzipFile(final File zipFile, final Path destination){
+	public static void unzipFile(final File zipFile, final Path destination){
 		final byte[] buffer = new byte[1024];
 		try(final ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))){
 			final File dest = destination.toFile();
@@ -164,14 +139,14 @@ public class ZipManager{
 			}
 			zis.closeEntry();
 		}
-		catch(final IOException ioe){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ioe){
 			LOGGER.warn("Cannot extract file", ioe);
 		}
 	}
 
-	//This method guards against writing files to the file system outside of the target folder.
+	//This method guards against writing files to the file system outside the target folder.
 	//This vulnerability is called Zip Slip.
-	private File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
+	private static File createNewFile(final File destinationDir, final ZipEntry zipEntry) throws IOException{
 		final File destFile = new File(destinationDir, zipEntry.getName());
 		final String destDirPath = destinationDir.getCanonicalPath();
 		final String destFilePath = destFile.getCanonicalPath();

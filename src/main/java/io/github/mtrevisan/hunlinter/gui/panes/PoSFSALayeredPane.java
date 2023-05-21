@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,23 +28,25 @@ import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.DictionaryLookup;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.lookup.WordData;
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.Dictionary;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.WordTokenizer;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import org.apache.commons.lang3.StringUtils;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.log.ExceptionHelper;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.lang3.StringUtils;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.io.NotSerializableException;
@@ -52,6 +54,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +62,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.Future;
 
 
 public class PoSFSALayeredPane extends JLayeredPane{
@@ -76,7 +80,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	private final ParserManager parserManager;
 
-	private JFileChooser openPoSDictionaryFileChooser;
+	private final Future<JFileChooser> futureOpenPoSFSAFileChooser;
 	private String formerFilterInputText;
 	private DictionaryLookup dictionaryLookup;
 
@@ -93,12 +97,18 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		initComponents();
 
 
+		futureOpenPoSFSAFileChooser = JavaHelper.executeFuture(() -> {
+			final JFileChooser openPoSDictionaryFileChooser = new JFileChooser();
+			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
+			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return openPoSDictionaryFileChooser;
+		});
+
+
 		//add "fontable" property
 		FontHelper.addFontableProperty(textField, resultTextArea);
 
 		GUIHelper.addUndoManager(textField);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -117,7 +127,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             textFieldKeyReleased(evt);
          }
       });
@@ -129,19 +139,15 @@ public class PoSFSALayeredPane extends JLayeredPane{
       resultScrollPane.setViewportView(resultTextArea);
 
       openPoSFSAButton.setText("Load PoS FSA");
-      openPoSFSAButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            openPoSFSAButtonActionPerformed(evt);
-         }
-      });
+      openPoSFSAButton.addActionListener(this::openPoSFSAButtonActionPerformed);
 
       setLayer(inputLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(textField, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(resultScrollPane, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openPoSFSAButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -170,22 +176,17 @@ public class PoSFSALayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void textFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
+   private void textFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
 		debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
-   private void openPoSFSAButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
+   private void openPoSFSAButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPoSFSAButtonActionPerformed
 		openPoSFSAButton.setEnabled(false);
 
-		if(openPoSDictionaryFileChooser == null){
-			openPoSDictionaryFileChooser = new JFileChooser();
-			openPoSDictionaryFileChooser.setFileFilter(new FileNameExtensionFilter("FSA files", "dict"));
-			openPoSDictionaryFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		}
-
-		final int projectSelected = openPoSDictionaryFileChooser.showOpenDialog(this);
+		final JFileChooser openPoSFSAFileChooser = JavaHelper.waitForFuture(futureOpenPoSFSAFileChooser);
+		final int projectSelected = openPoSFSAFileChooser.showOpenDialog(this);
 		if(projectSelected == JFileChooser.APPROVE_OPTION){
-			final File baseFile = openPoSDictionaryFileChooser.getSelectedFile();
+			final File baseFile = openPoSFSAFileChooser.getSelectedFile();
 			loadFSAFile(baseFile.toPath());
 		}
    }//GEN-LAST:event_openPoSFSAButtonActionPerformed
@@ -194,14 +195,13 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		try{
 			dictionaryLookup = new DictionaryLookup(Dictionary.read(basePath));
 
-
 			textField.requestFocusInWindow();
 
 			formerFilterInputText = null;
 			if(StringUtils.isNotBlank(textField.getText()))
 				processSentence();
 		}
-		catch(final Exception e){
+		catch(final IllegalArgumentException | IOException e){
 			JOptionPane.showMessageDialog(this, "Error while loading Part-of-Speech FSA\n\n"
 				+ ExceptionHelper.getMessageNoLineNumber(e), "Error", JOptionPane.ERROR_MESSAGE);
 		}
@@ -210,7 +210,8 @@ public class PoSFSALayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_POS_DICTIONARY)
 			return;
 
@@ -226,7 +227,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		}
 
 		final String inputText = textField.getText().trim();
-		if(formerFilterInputText != null && formerFilterInputText.equals(inputText))
+		if(inputText.equals(formerFilterInputText))
 			return;
 
 		formerFilterInputText = inputText;
@@ -240,9 +241,10 @@ public class PoSFSALayeredPane extends JLayeredPane{
 			for(final String token : tokens){
 				final StringJoiner readings = new StringJoiner(READINGS_DELIMITER);
 				final String lowercaseToken = token.toLowerCase(Locale.ROOT);
-				final WordData[] datas = dictionaryLookup.lookup(lowercaseToken);
-				for(final WordData data : datas){
-					final byte[] wholeArray = ArrayHelper.concatenate(data.getStem(), LEMMA_START.getBytes(), data.getWord(), LEMMA_END.getBytes(), data.getTag());
+				final List<WordData> data = dictionaryLookup.lookup(lowercaseToken);
+				for(final WordData dt : data){
+					final byte[] wholeArray = ArrayHelper.concatenate(dt.getStem(), LEMMA_START.getBytes(StandardCharsets.UTF_8), dt.getWord(),
+						LEMMA_END.getBytes(StandardCharsets.UTF_8), dt.getTag());
 					readings.add(new String(wholeArray, charset));
 				}
 				sj.add(readings.toString());
@@ -253,7 +255,7 @@ public class PoSFSALayeredPane extends JLayeredPane{
 		resultTextArea.setText(sj.toString());
 	}
 
-	private List<String> extractTrueWords(final Collection<String> tokens){
+	private static List<String> extractTrueWords(final Collection<String> tokens){
 		final List<String> noWhitespaceTokens = new ArrayList<>(tokens.size());
 		for(final String token : tokens)
 			if(StringHelper.isWord(token))
@@ -264,13 +266,13 @@ public class PoSFSALayeredPane extends JLayeredPane{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

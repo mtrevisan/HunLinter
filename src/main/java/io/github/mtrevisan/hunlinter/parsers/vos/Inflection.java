@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -29,33 +29,38 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Function;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class Inflection extends DictionaryEntry{
 
 	private static final String TAB = "\t";
 	private static final String FROM = "from";
-	private static final String LEADS_TO = " > ";
+	public static final String LEADS_TO = " > ";
 	private static final String POS_FIELD_PREFIX = ":";
 
 	public static final String POS_FSA_SEPARATOR = ",";
 	private static final String COMMA = ",";
 
+	private static final AffixEntry[] EMPTY_APPLIED_RULES = new AffixEntry[0];
+
 
 	private AffixEntry[] appliedRules;
 
-	private final DictionaryEntry[] compoundEntries;
+	private final List<DictionaryEntry> compoundEntries;
+	private boolean fullstrip;
 
 
-	public static Inflection createFromCompound(final String word, final String[] continuationFlags,
-			final DictionaryEntry[] compoundEntries){
-		final String[] morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
+	public static Inflection createFromCompound(final String word, final List<String> continuationFlags,
+			final List<DictionaryEntry> compoundEntries){
+		final List<String> morphologicalFields = AffixEntry.extractMorphologicalFields(compoundEntries);
 		return new Inflection(word, continuationFlags, morphologicalFields, true, null, compoundEntries);
 	}
 
@@ -65,11 +70,11 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	public static Inflection createFromInflection(final String word, final AffixEntry appliedEntry,
-			final DictionaryEntry dicEntry, final String[] remainingContinuationFlags, final boolean combinable){
-		final String[] continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
-		final String[] morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
+			final DictionaryEntry dicEntry, final Collection<String> remainingContinuationFlags, final boolean combinable){
+		final List<String> continuationFlags = appliedEntry.combineContinuationFlags(remainingContinuationFlags);
+		final List<String> morphologicalFields = appliedEntry.combineMorphologicalFields(dicEntry);
 		final AffixEntry[] appliedRules = {appliedEntry};
-		final DictionaryEntry[] compoundEntries = extractCompoundEntries(dicEntry);
+		final List<DictionaryEntry> compoundEntries = extractCompoundEntries(dicEntry);
 		return new Inflection(word, continuationFlags, morphologicalFields, combinable, appliedRules, compoundEntries);
 	}
 
@@ -83,37 +88,49 @@ public class Inflection extends DictionaryEntry{
 		compoundEntries = extractCompoundEntries(dicEntry);
 	}
 
-	private Inflection(final String word, final String[] continuationFlags, final String[] morphologicalFields,
-			final boolean combinable, final AffixEntry[] appliedRules, final DictionaryEntry[] compoundEntries){
+	private Inflection(final String word, final List<String> continuationFlags, final List<String> morphologicalFields,
+			final boolean combinable, final AffixEntry[] appliedRules, final List<DictionaryEntry> compoundEntries){
 		super(word, continuationFlags, morphologicalFields, combinable);
 
 		this.appliedRules = appliedRules;
 		this.compoundEntries = compoundEntries;
 	}
 
-	/* NOTE: used for testing purposes */
+	/* NOTE: used for testing purposes. */
 	public Inflection(final String word, final String continuationFlags, final String morphologicalFields,
-			final DictionaryEntry[] compoundEntries, final FlagParsingStrategy strategy){
-		super(word, (strategy != null? strategy.parseFlags(continuationFlags): null),
-			(morphologicalFields != null? StringUtils.split(morphologicalFields): null), true);
+			final List<DictionaryEntry> compoundEntries, final FlagParsingStrategy strategy){
+		super(word, (strategy != null && StringUtils.isNotBlank(continuationFlags)
+				? Arrays.asList(strategy.parseFlags(continuationFlags))
+				: null),
+			(morphologicalFields != null? new ArrayList<>(Arrays.asList(StringUtils.split(morphologicalFields))): null), true);
 
 		this.compoundEntries = compoundEntries;
 	}
 
-	private static DictionaryEntry[] extractCompoundEntries(final DictionaryEntry dicEntry){
-		return (dicEntry instanceof Inflection? ((Inflection)dicEntry).compoundEntries: null);
+	public Inflection withFullstrip(final boolean fullstrip){
+		this.fullstrip = fullstrip;
+
+		return this;
+	}
+
+	public boolean isFullstrip(){
+		return fullstrip;
+	}
+
+	private static List<DictionaryEntry> extractCompoundEntries(final DictionaryEntry dicEntry){
+		return (dicEntry instanceof Inflection inflection? inflection.compoundEntries: null);
 	}
 
 	@Override
-	public AffixEntry[] getAppliedRules(){
-		return appliedRules;
+	public final AffixEntry[] getAppliedRules(){
+		return (appliedRules != null? appliedRules: EMPTY_APPLIED_RULES);
 	}
 
-	public AffixEntry getAppliedRule(final int index){
+	public final AffixEntry getAppliedRule(final int index){
 		return (appliedRules != null && index < appliedRules.length? appliedRules[index]: null);
 	}
 
-	public boolean hasAppliedRule(final String flag){
+	public final boolean hasAppliedRule(final String flag){
 		if(appliedRules != null)
 			for(final AffixEntry appliedRule : appliedRules)
 				if(appliedRule.getFlag().equals(flag))
@@ -122,36 +139,50 @@ public class Inflection extends DictionaryEntry{
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(final AffixType type){
+	public final AffixEntry getLastAppliedRule(final AffixType type){
 		AffixEntry result = null;
 		if(appliedRules != null)
-			for(final AffixEntry rule : appliedRules)
-				result = rule;
+			for(int i = appliedRules.length - 1; i >= 0; i --){
+				final AffixEntry rule = appliedRules[i];
+				if(rule.getType() == type){
+					result = rule;
+					break;
+				}
+			}
 		return result;
 	}
 
 	@Override
-	public AffixEntry getLastAppliedRule(){
+	public final AffixEntry getLastAppliedRule(){
 		return (appliedRules != null? appliedRules[appliedRules.length - 1]: null);
 	}
 
-	public void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
-		if(compoundEntries != null && compoundEntries.length > 0
-				&& compoundEntries[compoundEntries.length - 1].hasContinuationFlag(forceCompoundUppercaseFlag))
+	@Override
+	public final boolean hasRuleApplied(final Set<String> flags){
+		if(appliedRules != null)
+			for(final AffixEntry appliedRule : appliedRules)
+				if(flags.contains(appliedRule.getFlag()))
+					return true;
+		return false;
+	}
+
+	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
+		if(compoundEntries != null && !compoundEntries.isEmpty()
+				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
 	}
 
-	public boolean hasMorphologicalFields(){
-		return (morphologicalFields != null && morphologicalFields.length > 0);
+	public final boolean hasMorphologicalFields(){
+		return (morphologicalFields != null && !morphologicalFields.isEmpty());
 	}
 
-	public void prependAppliedRules(final AffixEntry[] appliedRules){
+	public final void prependAppliedRules(final AffixEntry[] appliedRules){
 		if(appliedRules != null)
 			this.appliedRules = ArrayUtils.insert(0, (this.appliedRules != null? this.appliedRules: new AffixEntry[1]),
 				appliedRules);
 	}
 
-	public boolean hasInflectionRules(){
+	public final boolean hasInflectionRules(){
 		return (appliedRules != null && appliedRules.length > 0);
 	}
 
@@ -163,63 +194,58 @@ public class Inflection extends DictionaryEntry{
 //		return (appliedRules != null && appliedRules.stream().map(AffixEntry::getType).anyMatch(t -> t == type));
 //	}
 
-	public boolean isTwofolded(final String circumfixFlag){
-		if(appliedRules != null){
-			//find last applied rule with circumfix flag
-			int startIndex = appliedRules.length - 1;
-			while(startIndex >= 0)
-				if(appliedRules[startIndex --].hasContinuationFlag(circumfixFlag))
-					break;
-
-			final int[] suffixesAffixesCount = new int[2];
-			for(int idx = startIndex + 1; idx < appliedRules.length; idx ++)
-				suffixesAffixesCount[appliedRules[idx].getType() == AffixType.SUFFIX? 1: 0] ++;
-			return (suffixesAffixesCount[0] > 0 && suffixesAffixesCount[1] > 0);
-		}
-		return false;
+	public final boolean isCircumfixTwofolded(final String circumfixFlag){
+		final boolean continuationFlag1 = (appliedRules != null && appliedRules.length > 0
+			&& appliedRules[0].hasContinuationFlag(circumfixFlag));
+		final AffixType ruleType1 = (continuationFlag1? appliedRules[0].getType(): null);
+		final boolean continuationFlag2 = (appliedRules != null && appliedRules.length > 1
+			&& appliedRules[1].hasContinuationFlag(circumfixFlag));
+		final AffixType ruleType2 = (continuationFlag2? appliedRules[1].getType(): null);
+		return (!continuationFlag1 && !continuationFlag2 || continuationFlag1 && continuationFlag2 && ruleType1 != ruleType2);
 	}
 
-	public String getRulesSequence(){
+	public final String getRulesSequence(){
 		final StringJoiner sj = new StringJoiner(LEADS_TO);
-		forEach(appliedRules, rule -> sj.add(rule.getFlag()));
+		if(appliedRules != null)
+			for(final AffixEntry rule : appliedRules)
+				sj.add(rule.getFlag());
 		return sj.toString();
 	}
 
-	public String getMorphologicalFields(){
+	public final String getMorphologicalFields(){
 		return (morphologicalFields != null? StringUtils.join(morphologicalFields, StringUtils.SPACE): StringUtils.EMPTY);
 	}
 
-	public String[] getMorphologicalFieldsAsArray(){
+	public final List<String> getMorphologicalFieldsAsList(){
 		return morphologicalFields;
 	}
 
 	@Override
-	public boolean isCompound(){
-		return (compoundEntries != null && compoundEntries.length > 0);
+	public final boolean isCompound(){
+		return (compoundEntries != null && !compoundEntries.isEmpty());
 	}
 
-	public String toStringWithPartOfSpeechAndStem(){
-		final String[] pos = getMorphologicalFieldPartOfSpeech();
-		final String stem = getMorphologicalFieldStem();
-		if(pos.length > 0){
-			Arrays.sort(pos, Comparator.naturalOrder());
-			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA)
-				+ StringUtils.SPACE + stem;
+	public final String toStringWithPartOfSpeech(){
+		final List<String> pos = getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
+		if(!pos.isEmpty()){
+			pos.sort(Comparator.naturalOrder());
+			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA);
 		}
 		return word;
 	}
 
-	public void applyOutputConversionTable(final Function<String, String> outputConversionTable){
+	public final void applyOutputConversionTable(final Function<String, String> outputConversionTable){
 		word = outputConversionTable.apply(word);
 	}
 
+
 	@Override
-	public String toString(){
+	public final String toString(){
 		return toString(null);
 	}
 
 	@Override
-	public String toString(final FlagParsingStrategy strategy){
+	public final String toString(final FlagParsingStrategy strategy){
 		final StringJoiner sj = new StringJoiner(TAB);
 		sj.add(super.toString(strategy));
 		if(hasInflectionRules()){

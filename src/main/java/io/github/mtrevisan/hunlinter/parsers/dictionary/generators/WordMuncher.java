@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,24 +26,21 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntryFactory;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.workers.dictionary.DictionaryInclusionTestWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 //https://github.com/nuspell/nuspell/blob/45d383c0e2f25e4ea48ee8efeca53c2bb51a3510/src/tools/munch.cxx
@@ -56,6 +53,7 @@ public class WordMuncher{
 
 
 	private final AffixData affixData;
+	protected final DictionaryEntryFactory dictionaryEntryFactory;
 //	private final DictionaryParser dicParser;
 	private final WordGenerator wordGenerator;
 
@@ -66,6 +64,7 @@ public class WordMuncher{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 //		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 
+		dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 		this.affixData = affixData;
 //		this.dicParser = dicParser;
 		this.wordGenerator = wordGenerator;
@@ -75,13 +74,13 @@ public class WordMuncher{
 
 	private void loadDictionaryForInclusionTest(final DictionaryParser dicParser){
 		if(dicInclusionTestWorker == null){
-			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData.getLanguage(), dicParser, wordGenerator);
+			dicInclusionTestWorker = new DictionaryInclusionTestWorker(affixData, dicParser);
 
 			dicInclusionTestWorker.executeSynchronously();
 		}
 	}
 
-	public List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
+	public final List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
 		originators.add(0, dicEntry);
 
@@ -90,58 +89,63 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			forEach(originators, inflection -> LOGGER.trace("Inferred inflection: {}", inflection));
+			for(int i = 0; i < originators.size(); i ++)
+				LOGGER.trace("Inferred inflection: {}", originators.get(i));
 		return originators;
 	}
 
 	private List<DictionaryEntry> extractAllAffixes(final DictionaryEntry dicEntry){
 		final String word = dicEntry.getWord();
-		final String[] partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
+		final List<String> partOfSpeech = dicEntry.getMorphologicalFieldPartOfSpeech();
 
-		final List<DictionaryEntry> originators = new ArrayList<>();
+		final List<DictionaryEntry> originators = new ArrayList<>(0);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
-		for(final RuleEntry ruleEntry : ruleEntries)
+		for(int i = 0; i < ruleEntries.size(); i ++){
+			final RuleEntry ruleEntry = ruleEntries.get(i);
 			//for each affix entry in rule
-			for(final AffixEntry affixEntry : ruleEntry.getEntries())
+			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
+			for(int j = 0; j < affixEntries.size(); j ++){
+				final AffixEntry affixEntry = affixEntries.get(j);
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
-					if(originatingWord != null){
-						final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
+					final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-						Inflection[] inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
-						//remove base inflection
-						inflections = ArrayUtils.remove(inflections, WordGenerator.BASE_INFLECTION_INDEX);
+					final List<Inflection> inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+					//remove base inflection
+					inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
 
-						//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
-						if(inflections.length != 1)
-							continue;
+					//FIXME consider also the cases where a word can be attached to multiple derivations from an originating word
+					if(inflections.size() != 1)
+						continue;
 
-						final String[] baseInflectionPartOfSpeech = inflections[0].getMorphologicalFieldPartOfSpeech();
-						if(baseInflectionPartOfSpeech != null && (baseInflectionPartOfSpeech.length == 0 && partOfSpeech.length == 0
-								|| Arrays.equals(baseInflectionPartOfSpeech, partOfSpeech)))
-							originators.add(originatorEntry);
-					}
+					final List<String> baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
+					if(baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty() || baseInflectionPartOfSpeech.equals(partOfSpeech))
+						originators.add(originatorEntry);
 				}
-
+			}
+		}
 		return originators;
 	}
 
 	private List<Inflection> extractAllAffixes(final String word, final String partOfSpeech){
-		final List<Inflection> originatingRules = new ArrayList<>();
-		final DictionaryEntry nullDicEntry = DictionaryEntry.createFromDictionaryLine(word, affixData);
+		final List<Inflection> originatingRules = new ArrayList<>(0);
+		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
-		for(final RuleEntry ruleEntry : ruleEntries){
-			final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>();
-			for(final AffixEntry affixEntry : ruleEntry.getEntries())
+		final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
+		for(int i = 0; i < ruleEntries.size(); i ++){
+			final RuleEntry ruleEntry = ruleEntries.get(i);
+			originatingRulesFromEntry.clear();
+			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
+			for(int j = 0; j < affixEntries.size(); j ++){
+				final AffixEntry affixEntry = affixEntries.get(j);
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
-					if(originatingWord != null){
-						final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
-						if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
-							originatingRulesFromEntry.add(originatingRule);
-					}
+					final Inflection originatingRule = Inflection.createFromInflection(originatingWord, affixEntry, ruleEntry.isCombinable());
+					if(partOfSpeech.isEmpty() || !originatingRule.hasPartOfSpeech() || originatingRule.hasPartOfSpeech(partOfSpeech))
+						originatingRulesFromEntry.add(originatingRule);
 				}
+			}
 			if(!originatingRulesFromEntry.isEmpty()){
 				//originatingRulesFromEntry should not have inflections from identical word
 				final Map<String, List<Inflection>> wordBucket = SetHelper.bucket(originatingRulesFromEntry, DictionaryEntry::getWord);

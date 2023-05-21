@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -22,38 +22,37 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-package io.github.mtrevisan.hunlinter.datastructures;
+package io.github.mtrevisan.hunlinter.workers.exceptions;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import io.github.mtrevisan.hunlinter.datastructures.dynamicarray.DynamicArray;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 
 
-class SimpleDynamicArrayTest{
+public class LinterIllegalArgumentException extends RuntimeException{
 
-	@Test
-	void add(){
-		DynamicArray<Integer> array = new DynamicArray<>();
+	@Serial
+	private static final long serialVersionUID = -3541599634727937775L;
 
-		for(int i = 0; i < 1_000_000; i ++)
-			array.add(i);
 
-		for(int i = 0; i < 1_000_000; i ++)
-			Assertions.assertEquals(i, array.get(i));
+	public LinterIllegalArgumentException(final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	@Test
-	void remove(){
-		DynamicArray<Integer> array = new DynamicArray<>();
 
-		for(int i = 0; i < 1_000_000; i ++)
-			array.add(i);
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
 
-		for(int i = 0; i < 900_000; i ++)
-			array.remove();
-
-		for(int i = 0; i < 100_000; i ++)
-			Assertions.assertEquals(i, array.get(i));
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

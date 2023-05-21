@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,17 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary.generators;
 
-import io.github.mtrevisan.hunlinter.datastructures.SimpleDynamicArray;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.services.text.PermutationsWithRepetitions;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.text.PermutationsWithRepetitions;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,83 +43,83 @@ import java.util.function.Function;
 
 class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 
-	private static final MessageFormat NON_POSITIVE_LIMIT = new MessageFormat("Limit cannot be non-positive: was {0}");
-	private static final MessageFormat NON_POSITIVE_MAX_COMPOUNDS = new MessageFormat("Max compounds cannot be non-positive: was {0}");
+	private static final String NON_POSITIVE_LIMIT = "Limit cannot be non-positive: {}";
+	private static final String NON_POSITIVE_MAX_COMPOUNDS = "Max compounds cannot be non-positive: {}";
 
 
-	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryCorrectnessChecker checker){
-		super(affixData, dicParser, wordGenerator, checker);
+	WordGeneratorCompoundFlag(final AffixData affixData, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker){
+		super(affixData, dicParser, checker);
 	}
 
 	/**
-	 * Generates a list of stems for the provided flag from words in the dictionary marked with AffixOption.COMPOUND_FLAG
+	 * Generates a list of stems for the provided flag from words in the dictionary marked with {@code AffixOption.COMPOUND_FLAG}.
 	 *
-	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule
-	 * @param limit	Limit result count
-	 * @param maxCompounds	Maximum compound count
-	 * @return	The list of inflections
-	 * @throws NoApplicableRuleException	If there are no rules that apply to the word
+	 * @param inputCompounds	List of compounds used to generate the inflection through the compound rule.
+	 * @param limit	Limit result count.
+	 * @param maxCompounds	Maximum compound count.
+	 * @return	The list of inflections.
+	 * @throws NoApplicableRuleException	If there are no rules that apply to the word.
 	 */
-	Inflection[] applyCompoundFlag(final String[] inputCompounds, final int limit, final int maxCompounds){
+	final List<Inflection> applyCompoundFlag(final String[] inputCompounds, final int limit, final Integer maxCompounds){
 		Objects.requireNonNull(inputCompounds, "Input compounds cannot be null");
 		if(limit <= 0)
-			throw new LinterException(NON_POSITIVE_LIMIT.format(new Object[]{limit}));
-		if(maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
-			throw new LinterException(NON_POSITIVE_MAX_COMPOUNDS.format(new Object[]{maxCompounds}));
+			throw new LinterException(NON_POSITIVE_LIMIT, limit);
+		if(maxCompounds == null || maxCompounds <= 0 && maxCompounds != PermutationsWithRepetitions.MAX_COMPOUNDS_INFINITY)
+			throw new LinterException(NON_POSITIVE_MAX_COMPOUNDS, maxCompounds);
 
 		final boolean forbidDuplicates = affixData.isForbidDuplicatesInCompound();
 
 		loadDictionaryForInclusionTest();
 
 		//extract list of dictionary entries
-		final DictionaryEntry[] inputs = extractCompoundFlags(inputCompounds);
+		final List<DictionaryEntry> inputs = extractCompoundFlags(inputCompounds);
 
 		//check if it's possible to compound some words
-		if(inputs.length == 0)
-			return new Inflection[0];
+		if(inputs.isEmpty())
+			return Collections.emptyList();
 
-		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.length, maxCompounds, forbidDuplicates);
+		final PermutationsWithRepetitions perm = new PermutationsWithRepetitions(inputs.size(), maxCompounds, forbidDuplicates);
 		final List<int[]> permutations = perm.permutations(limit);
 
-		final List<List<Inflection[]>> entries = generateCompounds(permutations, inputs);
+		final List<List<List<Inflection>>> entries = generateCompounds(permutations, inputs);
 
 		return applyCompound(entries, limit);
 	}
 
-	private DictionaryEntry[] extractCompoundFlags(final String[] inputCompounds){
-		final int compoundMinimumLength = affixData.getCompoundMinimumLength();
+	private List<DictionaryEntry> extractCompoundFlags(final String[] inputCompounds){
+		final Integer compoundMinimumLength = affixData.getCompoundMinimumLength();
 		final String forbiddenWordFlag = affixData.getForbiddenWordFlag();
 
-		final SimpleDynamicArray<DictionaryEntry> result = new SimpleDynamicArray<>(DictionaryEntry.class, inputCompounds.length);
+		final List<DictionaryEntry> result = new ArrayList<>(inputCompounds.length);
 		for(final String inputCompound : inputCompounds){
-			final DictionaryEntry dicEntry = DictionaryEntry.createFromDictionaryLine(inputCompound, affixData);
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
 
 			//filter input set by minimum length and forbidden flag
-			if(dicEntry.getWord().length() >= compoundMinimumLength && !dicEntry.hasContinuationFlag(forbiddenWordFlag))
+			if(compoundMinimumLength != null && dicEntry.getWord().length() >= compoundMinimumLength
+					&& !dicEntry.hasContinuationFlag(forbiddenWordFlag))
 				result.add(dicEntry);
 		}
-		return result.extractCopy();
+		return result;
 	}
 
-	private List<List<Inflection[]>> generateCompounds(final Iterable<int[]> permutations, final DictionaryEntry[] inputs){
-		final Map<Integer, Inflection[]> dicEntries = new HashMap<>();
-		final List<List<Inflection[]>> list = new ArrayList<>();
-		for(final int[] permutation : permutations){
-			final List<Inflection[]> inflections = generateCompound(permutation, dicEntries, inputs);
+	private List<List<List<Inflection>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
+		final Map<Integer, List<Inflection>> dicEntries = new HashMap<>(0);
+		final List<List<List<Inflection>>> list = new ArrayList<>(permutations.size());
+		for(int i = 0; i < permutations.size(); i ++){
+			final List<List<Inflection>> inflections = generateCompound(permutations.get(i), dicEntries, inputs);
 			if(inflections != null)
 				list.add(inflections);
 		}
 		return list;
 	}
 
-	private List<Inflection[]> generateCompound(final int[] permutation, final Map<Integer, Inflection[]> dicEntries,
-			final DictionaryEntry[] inputs){
-		final List<Inflection[]> expandedPermutationEntries = new ArrayList<>();
-		final Function<Integer, Inflection[]> integerFunction = idx -> applyAffixRules(inputs[idx], true, null);
+	private List<List<Inflection>> generateCompound(final int[] permutation, final Map<Integer, List<Inflection>> dicEntries,
+			final List<DictionaryEntry> inputs){
+		final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.length);
+		final Function<Integer, List<Inflection>> integerFunction = idx -> applyAffixRules(inputs.get(idx), true, null);
 		for(final int index : permutation){
-			final Inflection[] list = dicEntries.computeIfAbsent(index, integerFunction);
-			if(list.length > 0)
+			final List<Inflection> list = dicEntries.computeIfAbsent(index, integerFunction);
+			if(!list.isEmpty())
 				expandedPermutationEntries.add(list);
 		}
 		return (!expandedPermutationEntries.isEmpty()? expandedPermutationEntries: null);

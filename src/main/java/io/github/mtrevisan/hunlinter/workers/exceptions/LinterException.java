@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -37,60 +41,70 @@ public class LinterException extends RuntimeException{
 	public enum FixActionType{ADD, REPLACE, REMOVE}
 
 
-	private final IndexDataPair<?> data;
+	private IndexDataPair<?> data;
 	//FIXME useful?
-	private final Runnable fix;
-	private final FixActionType fixActionType;
+	private Runnable fixAction;
+	private FixActionType fixActionType;
 
 
-	public LinterException(final Throwable cause, final Object data){
-		this(null, cause, IndexDataPair.of(-1, data), null, null);
+	public LinterException(final Throwable cause){
+		super(cause);
 	}
 
-	public LinterException(final Throwable cause, final IndexDataPair<?> data){
-		this(null, cause, data, null, null);
+	public LinterException(final String message, final Object... parameters){
+		this(null, message, parameters);
 	}
 
-	public LinterException(final String message){
-		this(message, null, null, null);
+	public LinterException(final Throwable cause, final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters), cause);
 	}
 
-	public LinterException(final String message, final IndexDataPair<?> data){
-		this(message, null, data, null, null);
-	}
-
-	public LinterException(final String message, final Throwable cause, final IndexDataPair<?> data){
-		this(message, cause, data, null, null);
-	}
-
-	public LinterException(final String message, final IndexDataPair<?> data, final Runnable fix,
-			final FixActionType fixActionType){
-		this(message, null, data, fix, fixActionType);
-	}
-
-	public LinterException(final String message,  final Throwable cause, final IndexDataPair<?> data, final Runnable fix,
-			final FixActionType fixActionType){
-		super(message, cause);
-
+	public final LinterException withIndexDataPair(final IndexDataPair<?> data){
 		this.data = data;
-		this.fix = fix;
-		this.fixActionType = fixActionType;
+
+		return this;
 	}
 
-	public IndexDataPair<?> getData(){
+	public final LinterException withData(final Object data){
+		this.data = (IndexDataPair.class.isInstance(data)? (IndexDataPair<?>)data: IndexDataPair.of(-1, data));
+
+		return this;
+	}
+
+	public final LinterException withFixAction(final Runnable fixAction, final FixActionType fixActionType){
+		this.fixAction = fixAction;
+		this.fixActionType = fixActionType;
+
+		return this;
+	}
+
+	public final IndexDataPair<?> getData(){
 		return data;
 	}
 
-	public boolean canFix(){
-		return (fix != null);
+	public final boolean canFix(){
+		return (fixAction != null);
 	}
 
-	public Runnable getFixAction(){
-		return fix;
+	public final Runnable getFixAction(){
+		return fixAction;
 	}
 
-	public FixActionType getFixActionType(){
+	public final FixActionType getFixActionType(){
 		return fixActionType;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

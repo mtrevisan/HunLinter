@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,14 +28,21 @@ import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
-/** Abstraction of the process of parsing flags taken from the affix and dic files */
+/** Abstraction of the process of parsing flags taken from the affix and dic files. */
 public abstract class FlagParsingStrategy{
 
-	private static final MessageFormat DUPLICATED_FLAG = new MessageFormat("Flags must not be duplicated: {0}");
+	/** Represents a '?' character in a compound rule. */
+	public static final String FLAG_OPTIONAL = "?";
+	/** Represents a '*' character in a compound rule. */
+	public static final String FLAG_ANY = "*";
+
+	private static final String DUPLICATED_FLAG = "Flags must not be duplicated: {}";
 
 
 	public abstract void validate(final String flag);
@@ -43,19 +50,34 @@ public abstract class FlagParsingStrategy{
 	/**
 	 * Parses the given String into multiple flags
 	 *
-	 * @param flags	String to parse into flags
+	 * @param rawFlags	String to parse into flags
 	 * @return Parsed flags
 	 */
-	public abstract String[] parseFlags(final String flags);
+	public abstract String[] parseFlags(final String rawFlags);
 
-	protected void checkForDuplicates(final String[] flags){
-		final Set<String> notDuplicatedFlags = SetHelper.setOf(flags);
+	protected static void checkForDuplicates(final String[] flags){
+		final Set<String> notDuplicatedFlags = new HashSet<>(Arrays.asList(flags));
 		if(notDuplicatedFlags.size() < flags.length){
 			final Set<String> duplicates = SetHelper.getDuplicates(flags);
-			throw new LinterException(DUPLICATED_FLAG.format(new Object[]{String.join(", ", duplicates)}));
+			if(!duplicates.isEmpty())
+				throw new LinterException(DUPLICATED_FLAG, String.join(", ", duplicates));
 		}
 	}
 
+
+	public final String joinFlags(final List<String> flags){
+		if(flags == null || flags.isEmpty())
+			return StringUtils.EMPTY;
+
+		final int size = flags.size();
+		for(int i = 0; i < size; i ++)
+			validate(flags.get(i));
+
+		final StringBuilder sb = new StringBuilder(flags.get(0).length() * size);
+		for(int i = 0; i < size; i ++)
+			sb.append(flags.get(i));
+		return sb.toString();
+	}
 
 	/**
 	 * Compose the given array of String into one flag stream
@@ -63,15 +85,16 @@ public abstract class FlagParsingStrategy{
 	 * @param flags	Array of String to compose into flags
 	 * @return Composed flags
 	 */
-	public String joinFlags(final String[] flags){
+	public final String joinFlags(final String[] flags){
 		return joinFlags(flags, (flags != null? flags.length: 0));
 	}
 
+	@SuppressWarnings("DesignForExtension")
 	public String joinFlags(final String[] flags, final int size){
 		return joinFlags(flags, size, StringUtils.EMPTY);
 	}
 
-	protected String joinFlags(final String[] flags, final int size, final String flagSeparator){
+	protected final String joinFlags(final String[] flags, final int size, final String flagSeparator){
 		if(flags == null || size == 0)
 			return StringUtils.EMPTY;
 
@@ -82,7 +105,7 @@ public abstract class FlagParsingStrategy{
 	}
 
 	/**
-	 * Extract each rule from a compound rule ("a*bc?" into ["a*", "b", "c?"])
+	 * Extract each rule from a compound rule ("a*bc?" into ["a", "*", "b", "c", "?"])
 	 *
 	 * @param compoundRule	String to parse into flags
 	 * @return Parsed flags

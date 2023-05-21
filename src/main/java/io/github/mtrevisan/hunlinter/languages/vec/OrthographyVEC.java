@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,14 +24,13 @@
  */
 package io.github.mtrevisan.hunlinter.languages.vec;
 
-import org.apache.commons.lang3.StringUtils;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 
@@ -46,51 +45,21 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] MB_MP = {"mb", "mp"};
 	private static final String[] NB_NP = {"nb", "np"};
 
-	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüïo` to be valid
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiïouàéèíóòúü])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiïouàéèíóòúü])");
+	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
+	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_V_IUMLAUT = RegexHelper.pattern("([aeiouàèéíïòóúü])ï");
+	private static final Pattern PATTERN_V_UUMLAUT = RegexHelper.pattern("([aeiouàèéíïòóúü])ü");
 
-	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeeioouàéèíóòú)");
+	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)");
 
-	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^" + GraphemeVEC.PHONEME_JJH + "(?=[^aeiouàèéíïòóúüh])");
+	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
-	private static final Pattern PATTERN_I_INSIDE_INTO_J = RegexHelper.pattern("([aeiouàèéíïòóúü])i(?=[aeiouàèéíïòóúü])");
-	private static final List<Pattern> PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES = Arrays.asList(
-		RegexHelper.pattern("[nv][ou]ialtri"),
-		RegexHelper.pattern("b[ae]ro[iï][aeèi]r"),
-		RegexHelper.pattern("re[sŧ]e[iï][ouü]r[aeio]?")
-	);
-	private static final Pattern PATTERN_I_INSIDE_INTO_J_EXCLUSIONS = RegexHelper.pattern("[aeiouàèéíïòóúü]i(?:o|(?:[oó]n|on-)(?:[gmnstv].{1,3}|[ei])?(?:[lƚ][oiae])?|é(?:-?[ou])?|e[dg]e(?:-[ou])?|omi|ent[eoi]?-?(?:[gmnstv].{1,3})?(?:[lƚ][oiae])?|inti)$");
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpt])");
-	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdg" + GraphemeVEC.PHONEME_JJH
-		+ "ɉsvrlŧ]))");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])");
+	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))");
 	private static final String FALSE_S_INTO_X = "èsre";
-
-	private static final Pattern PATTERN_MORPHOLOGICAL = RegexHelper.pattern("([c" + GraphemeVEC.PHONEME_JJH + "ñ])i([aeiou])");
-
-	//a double consonant, not ^inn, not [eo]nne$
-	private static final Pattern PATTERN_CONSONANT_GEMINATES = RegexHelper.pattern("([^aeiou])\\1+");
-	private static final Function<String, String> GEMINATES_REDUCER = word -> {
-		String strippedWord = word;
-		String starting = "";
-		if(strippedWord.startsWith("inn")){
-			strippedWord = strippedWord.substring(3);
-			starting = "inn";
-		}
-		String ending = "";
-		if(strippedWord.endsWith("onne")){
-			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
-			ending = "onne";
-		}
-		else if(strippedWord.endsWith("enne")){
-			strippedWord = strippedWord.substring(0, strippedWord.length() - 4);
-			ending = "enne";
-		}
-		strippedWord = RegexHelper.replaceAll(strippedWord, PATTERN_CONSONANT_GEMINATES, "$1");
-		return starting + strippedWord + ending;
-	};
 
 	private static class SingletonHelper{
 		private static final Orthography INSTANCE = new OrthographyVEC();
@@ -99,22 +68,23 @@ public final class OrthographyVEC extends Orthography{
 
 	private OrthographyVEC(){}
 
+	@SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
 	public static Orthography getInstance(){
 		return SingletonHelper.INSTANCE;
 	}
 
 	@Override
-	public String correctOrthography(String word){
-		word = WordVEC.unmarkDefaultStress(word);
-
+	public String correctOrthography(final String word){
 		//correct stress
 		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+
+		correctedWord = WordVEC.markDefaultStress(correctedWord);
 
 		//correct h occurrences after d, j, l, n, t
 		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
 
 		//remove other occurrences of h not into fhV
-		if(!GraphemeVEC.GRAPHEME_H.equals(correctedWord))
+		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
@@ -123,63 +93,72 @@ public final class OrthographyVEC extends Orthography{
 		//correct ïC/üC occurrences into iC/uC
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_IUMLAUT_C, "i$1");
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_UUMLAUT_C, "u$1");
-
-		correctedWord = GraphemeVEC.handleJHJWIUmlautPhonemes(correctedWord);
+		//correct Vï/Vü occurrences into Vi/Vu
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_IUMLAUT, "$1i");
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_UUMLAUT, "$1u");
 
 		correctedWord = correctIJOccurrences(correctedWord);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INSIDE_INTO_L, "$1l");
-		//correct x occurrences into s prior to c, f, k, p, t
-		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, s, v, r, l
+		//correct x occurrences into s prior to c, f, k, p, s, t, ŧ
+		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, v, r, l
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
 		if(!correctedWord.endsWith(FALSE_S_INTO_X))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
-		//correct morphological errors
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_MORPHOLOGICAL, "$1$2");
-
-		correctedWord = GraphemeVEC.rollbackJHJWIUmlautPhonemes(correctedWord);
-
 		//eliminate consonant geminates
-		correctedWord = GEMINATES_REDUCER.apply(correctedWord);
+		correctedWord = reduceGeminates(correctedWord);
 
 		return correctedWord;
 	}
 
-	private String correctIJOccurrences(String word){
+	private static String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
 		//correcting also the converse
 		word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
-		word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.PHONEME_JJH);
-		boolean iInsideIntoJFalsePositive = false;
-		for(final Pattern p : PATTERN_I_INSIDE_INTO_J_FALSE_POSITIVES)
-			if(RegexHelper.find(word, p)){
-				iInsideIntoJFalsePositive = true;
-				break;
-			}
-		if(!iInsideIntoJFalsePositive && !RegexHelper.find(word, PATTERN_I_INSIDE_INTO_J_EXCLUSIONS))
-			word = RegexHelper.replaceAll(word, PATTERN_I_INSIDE_INTO_J, "$1" + GraphemeVEC.PHONEME_JJH);
+		word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.GRAPHEME_J);
 		return word;
 	}
 
+	//Reduce geminates, except `^[ie]nn`, `^d[ei]ss`, or `[eo]nne$`.
+	//FIXME speed up
+	private static String reduceGeminates(final CharSequence word){
+		final StringBuilder sb = new StringBuilder(word);
+		for(int i = 1; i < sb.length(); i ++){
+			char chr = sb.charAt(i);
+			if(chr == sb.charAt(i - 1) && Arrays.binarySearch(WordVEC.VOWELS_ARRAY, chr) < 0){
+				final boolean starting1With = (i == 2 && ((chr = word.charAt(0)) == 'i' || chr == 'e'));
+				final boolean starting2With = (i == 3 && word.charAt(0) == 'd' && ((chr = word.charAt(1)) == 'e' || chr == 'i'));
+				final boolean endingWith = (i == sb.length() - 2 && ((chr = word.charAt(word.length() - 4)) == 'o' || chr == 'e')
+					&& word.charAt(word.length() - 1) == 'e');
+				if(!starting1With && !starting2With && !endingWith){
+					sb.replace(i - 1, i + 1, String.valueOf(sb.charAt(i)));
+					i --;
+				}
+			}
+		}
+		return sb.toString();
+	}
+
 	@Override
-	public boolean[] getSyllabationErrors(final String[] syllabes){
-		final boolean[] errors = new boolean[syllabes.length];
-		for(int i = 0; i < syllabes.length; i ++){
-			final String syllabe = syllabes[i];
+	public boolean[] getSyllabationErrors(final List<String> syllabes){
+		final boolean[] errors = new boolean[syllabes.size()];
+		for(int i = 0; i < syllabes.size(); i ++){
+			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
 				&& !StringUtils.contains(syllabe, HyphenationParser.MODIFIER_LETTER_APOSTROPHE)
-				&& !syllabe.equals(HyphenationParser.MINUS_SIGN) && !StringUtils.containsAny(syllabe, WordVEC.VOWELS));
+				&& !(syllabe.equals(HyphenationParser.MINUS_SIGN) || syllabe.equals(HyphenationParser.EN_DASH) || syllabe.equals(HyphenationParser.SOFT_HYPHEN))
+				&& !StringUtils.containsAny(syllabe, WordVEC.VOWELS_ARRAY));
 		}
 		return errors;
 	}
 
 	@Override
-	public int getStressedSyllabeIndexFromLast(final String[] syllabes){
-		for(int i = syllabes.length - 1; i >= 0; i --)
-			if(hasStressedGrapheme(syllabes[i]))
+	public int getStressedSyllabeIndexFromLast(final List<String> syllabes){
+		for(int i = syllabes.size() - 1; i >= 0; i --)
+			if(hasStressedGrapheme(syllabes.get(i)))
 				return i;
 		return -1;
 	}

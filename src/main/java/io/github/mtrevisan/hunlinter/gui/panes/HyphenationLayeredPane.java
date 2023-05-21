@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,31 +26,33 @@ package io.github.mtrevisan.hunlinter.gui.panes;
 
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.HyphenationOptionsDialog;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationOptionsParser;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
-import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JFrame;
+import javax.swing.JLayeredPane;
+import javax.swing.JPopupMenu;
+import java.awt.Font;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -70,6 +72,9 @@ public class HyphenationLayeredPane extends JLayeredPane{
 	private static final Pattern PATTERN_POINTS_AND_NUMBERS_AND_EQUALS_AND_MINUS = RegexHelper.pattern("[.\\d=-]");
 
 	private static final int DEBOUNCER_INTERVAL = 600;
+
+	private static final String SYLLABATION_PREFIX = "<html>";
+	private static final String SYLLABATION_SUFFIX = "</html>";
 
 
 	private final Debouncer<HyphenationLayeredPane> debouncer = new Debouncer<>(this::hyphenate, DEBOUNCER_INTERVAL);
@@ -101,17 +106,11 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		GUIHelper.addUndoManager(wordTextField, addRuleTextField);
 
 		try{
-			//FIXME
-//			final int iconSize = hypRulesValueLabel.getHeight();
-//			final int iconSize = dicTotalInflectionsValueLabel.getHeight();
-final int iconSize = 17;
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(iconSize, copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, syllabationValueLabel, rulesValueLabel, addRuleSyllabationValueLabel);
 		}
 		catch(final IOException ignored){}
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -142,7 +141,7 @@ final int iconSize = 17;
 
 		wordTextField.setFont(currentFont);
       wordTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             wordTextFieldKeyReleased(evt);
          }
       });
@@ -171,27 +170,19 @@ final int iconSize = 17;
       addRuleTextField.setFont(currentFont);
       addRuleTextField.setEnabled(false);
       addRuleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             addRuleTextFieldKeyReleased(evt);
          }
       });
 
       addRuleLevelComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Non compound", "Compound" }));
       addRuleLevelComboBox.setEnabled(false);
-      addRuleLevelComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addRuleLevelComboBoxActionPerformed(evt);
-         }
-      });
+      addRuleLevelComboBox.addActionListener(this::addRuleLevelComboBoxActionPerformed);
 
       addRuleButton.setMnemonic('A');
       addRuleButton.setText("Add rule");
       addRuleButton.setEnabled(false);
-      addRuleButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addRuleButtonActionPerformed(evt);
-         }
-      });
+      addRuleButton.addActionListener(this::addRuleButtonActionPerformed);
 
       addRuleSyllabationLabel.setText("New syllabation:");
       addRuleSyllabationLabel.setPreferredSize(new java.awt.Dimension(81, 17));
@@ -205,11 +196,7 @@ final int iconSize = 17;
       addRuleSyllabesCountValueLabel.setText("…");
 
       optionsButton.setText("Options");
-      optionsButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optionsButtonActionPerformed(evt);
-         }
-      });
+      optionsButton.addActionListener(this::optionsButtonActionPerformed);
 
       openHypButton.setAction(new OpenFileAction(Packager.KEY_FILE_HYPHENATION, packager));
       openHypButton.setText("Open Hyphenation");
@@ -234,8 +221,8 @@ final int iconSize = 17;
       setLayer(optionsButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openHypButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -321,19 +308,19 @@ final int iconSize = 17;
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void wordTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wordTextFieldKeyReleased
+   private void wordTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_wordTextFieldKeyReleased
       debouncer.call(this);
    }//GEN-LAST:event_wordTextFieldKeyReleased
 
-   private void addRuleTextFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_addRuleTextFieldKeyReleased
+   private void addRuleTextFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_addRuleTextFieldKeyReleased
       addRuleDebouncer.call(this);
    }//GEN-LAST:event_addRuleTextFieldKeyReleased
 
-   private void addRuleLevelComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleLevelComboBoxActionPerformed
+   private void addRuleLevelComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleLevelComboBoxActionPerformed
       addRuleDebouncer.call(this);
    }//GEN-LAST:event_addRuleLevelComboBoxActionPerformed
 
-   private void addRuleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleButtonActionPerformed
+   private void addRuleButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRuleButtonActionPerformed
       final  String newRule = addRuleTextField.getText();
       final HyphenationParser.Level level = HyphenationParser.Level.values()[addRuleLevelComboBox.getSelectedIndex()];
       final String foundRule = parserManager.addHyphenationRule(newRule.toLowerCase(Locale.ROOT), level);
@@ -353,26 +340,26 @@ final int iconSize = 17;
             addRuleSyllabationValueLabel.setText(null);
             addRuleSyllabesCountValueLabel.setText(null);
          }
-         catch(final IOException e){
-            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", e);
+         catch(final IOException ioe){
+            LOGGER.error("Something very bad happened while adding a rule to the hyphenation file", ioe);
          }
       }
       else{
          addRuleTextField.requestFocusInWindow();
 
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Duplicated rule found ({}), cannot insert {}", foundRule, newRule);
       }
    }//GEN-LAST:event_addRuleButtonActionPerformed
 
-   private void optionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
+   private void optionsButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optionsButtonActionPerformed
       final Consumer<HyphenationOptionsParser> acceptButtonAction = (options) -> {
          try{
             parserManager.getHypParser().setOptions(options);
 
             parserManager.storeHyphenationFile();
          }
-         catch(final Exception e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
+         catch(final IOException ioe){
+            LOGGER.error(ParserManager.MARKER_APPLICATION, ioe.getMessage());
          }
       };
       final HyphenationOptionsDialog dialog = new HyphenationOptionsDialog(parserManager.getHypParser().getOptions(),
@@ -383,7 +370,8 @@ final int iconSize = 17;
    }//GEN-LAST:event_optionsButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -391,7 +379,8 @@ final int iconSize = 17;
 	}
 
 	@EventHandler
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_HYPHENATION)
 			return;
 
@@ -419,12 +408,11 @@ final int iconSize = 17;
 		formerHyphenationText = text;
 
 		String count = null;
-		String[] rules = new String[0];
+		java.util.List<String> rules = new ArrayList<>(0);
 		if(StringUtils.isNotBlank(text)){
 			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 
-			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
-				"</html>");
+			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, SYLLABATION_PREFIX, SYLLABATION_SUFFIX);
 			final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 				.toString();
@@ -505,13 +493,13 @@ final int iconSize = 17;
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

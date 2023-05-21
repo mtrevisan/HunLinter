@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,19 +26,21 @@ package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
 import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 
+import java.nio.ByteBuffer;
+
 
 /**
- * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
- * non-equal suffix and infix <code>source</code> and <code>target</code> have. The
+ * Encodes {@code target} relative to {@code source} by trimming whatever
+ * non-equal suffix and infix {@code source} and {@code target} have. The
  * output code is (bytes):
  *
  * <pre>
  * {X}{L}{K}{suffix}
  * </pre>
  *
- * where <code>source</code>'s infix at position (<code>X</code> - 'A') and of
- * length (<code>L</code> - 'A') should be removed, then (<code>K</code> -
- * 'A') bytes should be trimmed from the end and then the <code>suffix</code>
+ * where {@code source}'s infix at position ({@code X} - 'A') and of
+ * length ({@code L} - 'A') should be removed, then ({@code K} -
+ * 'A') bytes should be trimmed from the end and then the {@code suffix}
  * should be appended to the resulting byte sequence.
  *
  * <p>
@@ -60,7 +62,7 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		//FIXME
 		//Search for the infix that can be encoded and remove from `source` to get a maximum-length prefix of `target`.
 		//This could be done more efficiently by running a smarter longest-common-subsequence algorithm and some pruning (?).
@@ -72,14 +74,15 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		int maxInfixIndex = 0;
 		int maxSubsequenceLength = ArrayHelper.longestCommonPrefix(source, target);
 		int maxInfixLength = 0;
-		for(final int i : new int[]{0, maxSubsequenceLength}){
+		ByteBuffer scratch = ByteBuffer.allocate(0);
+		for(final int i : new int[]{0, maxSubsequenceLength})
 			for(int j = 1; j <= source.length - i; j ++){
 				//compute temporary `source` with the infix removed
 				//concatenate in scratch space for simplicity
 				final int len2 = source.length - (i + j);
-				final byte[] scratch = new byte[i + len2];
-				System.arraycopy(source, 0, scratch, 0, i);
-				System.arraycopy(source, i + j, scratch, i, len2);
+				scratch = clearAndEnsureCapacity(scratch, i + len2);
+				scratch.put(source, 0, i);
+				scratch.put(source, i + j, len2);
 
 				final int sharedPrefix = ArrayHelper.longestCommonPrefix(scratch, target);
 
@@ -90,19 +93,21 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 					maxInfixLength = j;
 				}
 			}
-		}
 
 		int truncateSuffixBytes = source.length - (maxInfixLength + maxSubsequenceLength);
 
 		//special case: if we're removing the suffix in the infix code, move it to the suffix code instead
 		if(truncateSuffixBytes == 0 && maxInfixIndex + maxInfixLength == source.length){
 			truncateSuffixBytes = maxInfixLength;
-			maxInfixIndex = maxInfixLength = 0;
+			maxInfixLength = 0;
+			maxInfixIndex = 0;
 		}
 
 		if(truncateSuffixBytes >= REMOVE_EVERYTHING){
-			maxInfixIndex = maxSubsequenceLength = 0;
-			maxInfixLength = truncateSuffixBytes = REMOVE_EVERYTHING;
+			maxSubsequenceLength = 0;
+			maxInfixIndex = 0;
+			truncateSuffixBytes = REMOVE_EVERYTHING;
+			maxInfixLength = REMOVE_EVERYTHING;
 		}
 
 		final int len1 = target.length - maxSubsequenceLength;
@@ -114,8 +119,25 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 		return encoded;
 	}
 
+	/**
+	 * Ensure the buffer's capacity is large enough to hold a given number
+	 * of elements. If the input buffer is not large enough, a new buffer is allocated
+	 * and returned.
+	 *
+	 * @param elements The required number of elements to be appended to the buffer.
+	 * @param buffer   The buffer to check or {@code null} if a new buffer should be allocated.
+	 * @return Returns the same buffer or a new buffer with the given capacity.
+	 */
+	private static ByteBuffer clearAndEnsureCapacity(ByteBuffer buffer, final int elements){
+		if(buffer == null || buffer.capacity() < elements)
+			buffer = ByteBuffer.allocate(elements);
+		else
+			buffer.clear();
+		return buffer;
+	}
+
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		int infixIndex = decodeValue(encoded[0]);
 		int infixLength = decodeValue(encoded[1]);
 		int truncateSuffixBytes = decodeValue(encoded[2]);
@@ -136,7 +158,7 @@ public class TrimInfixAndSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

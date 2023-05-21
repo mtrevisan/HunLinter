@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.services.downloader;
 
-import javax.swing.*;
+import javax.swing.SwingWorker;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,7 +34,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 
-/** Execute file download in a background thread and update the progress */
+/** Execute file download in a background thread and update the progress. */
 public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperDelegate{
 
 	private final String localPath;
@@ -49,8 +49,10 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 	}
 
 	@Override
-	protected Void doInBackground(){
-		try{
+	protected final Void doInBackground(){
+		try(
+				final FileOutputStream fos = new FileOutputStream(localPath);
+				final FileChannel fileChannel = fos.getChannel()){
 			listener.startCheckUpdates();
 
 			if(!DownloaderHelper.hasInternetConnectivity())
@@ -60,14 +62,9 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 			final URL url = new URL(remoteObject.downloadUrl);
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
-			try(
-					final FileOutputStream fos = new FileOutputStream(localPath);
-					final FileChannel fileChannel = fos.getChannel();
-					){
-				fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
-			}
+			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
 		}
-		catch(final Exception e){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException e){
 			listener.failed(e);
 
 			cancel(true);
@@ -75,7 +72,7 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 		return null;
 	}
 
-	private int contentLength(final URL url){
+	private static int contentLength(final URL url){
 		int contentLength = -1;
 		try{
 			HttpURLConnection.setFollowRedirects(false);
@@ -85,30 +82,30 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 			contentLength = connection.getContentLength();
 		}
-		catch(final Exception ignored){}
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
 		return contentLength;
 	}
 
-	public void cancelTask(){
+	public final void cancelTask(){
 		listener.stopped();
 
 		cancel(true);
 	}
 
 	@Override
-	public void rbcProgressCallback(final RBCWrapper rbc, final double progress){
-		setProgress(Math.min((int)Math.round(progress), 100));
+	public final void rbcProgressCallback(final RBCWrapper rbc, final double progress){
+		setProgress(Math.min((int)Math.floor(progress), 100));
 	}
 
 	@Override
-	protected void done(){
+	protected final void done(){
 		if(!isCancelled()){
 			try{
 				listener.validatingFile(remoteObject, localPath);
 
 				listener.succeeded();
 			}
-			catch(final Exception e){
+			catch(final RuntimeException e){
 				listener.failed(e);
 			}
 		}

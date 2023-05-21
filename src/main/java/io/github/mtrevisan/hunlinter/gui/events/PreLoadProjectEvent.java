@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -36,7 +36,7 @@ public class PreLoadProjectEvent{
 		this.project = project;
 	}
 
-	public LoadProjectEvent convertToLoadEvent(){
+	public final LoadProjectEvent convertToLoadEvent(){
 		return new LoadProjectEvent(project);
 	}
 

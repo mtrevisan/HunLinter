@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,17 +24,17 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie;
 
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.HitProcessor;
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 
 /**
@@ -73,12 +73,12 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	/**
 	 * Perform a search and return all the entries that are contained into the given text.
 	 *
-	 * @param text	The text
-	 * @return	A list of outputs
+	 * @param text	The text.
+	 * @return	A list of outputs.
 	 */
-	public List<SearchResult<V>> searchInText(final String text){
+	public final List<SearchResult<V>> searchInText(final String text){
 		final ArrayList<SearchResult<V>> collectedHits = new ArrayList<>();
-		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final HitConsumer consumer = (hits, index) -> {
 			collectedHits.ensureCapacity(collectedHits.size() + hits.length);
 			final int position = index + 1;
 			for(final int hit : hits)
@@ -92,13 +92,13 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	/**
 	 * Perform a search and call the processor for each entry that are contained into the given text.
 	 *
-	 * @param text	The text
-	 * @param processor	A processor which handles the output
+	 * @param text	The text.
+	 * @param processor	A processor which handles the output.
 	 */
-	public void searchInText(final String text, final HitProcessor<V> processor){
-		Objects.requireNonNull(processor);
+	public final void searchInText(final String text, final HitProcessor<V> processor){
+		Objects.requireNonNull(processor, "Processor cannot be null");
 
-		final BiFunction<int[], Integer, Boolean> consumer = (hits, index) -> {
+		final HitConsumer consumer = (hits, index) -> {
 			final int position = index + 1;
 			for(final int hit : hits){
 				final boolean proceed = processor.hit(position - keyLength[hit], position, outerValue.get(hit));
@@ -111,23 +111,23 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Checks if the text contains at least one substring
+	 * Checks if the text contains at least one substring.
 	 *
-	 * @param text	Source text to check
-	 * @return	<code>true</code> if string contains at least one substring
+	 * @param text	Source text to check.
+	 * @return	{@code true} if string contains at least one substring.
 	 */
-	public boolean containsKey(final String text){
+	public final boolean containsKey(final String text){
 		return searchInText(text, (hits, index) -> false);
 	}
 
 	/**
-	 * Search text
+	 * Search text.
 	 *
-	 * @param text	The text
-	 * @param hitConsumer	The consumer called in case of a hit
+	 * @param text	The text.
+	 * @param hitConsumer	The consumer called in case of a hit.
 	 */
-	private boolean searchInText(final String text, final BiFunction<int[], Integer, Boolean> hitConsumer){
-		Objects.requireNonNull(text);
+	private boolean searchInText(final String text, final HitConsumer hitConsumer){
+		Objects.requireNonNull(text, "Text cannot be null");
 
 		boolean found = false;
 		if(isInitialized()){
@@ -156,24 +156,24 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return nextNodeId;
 	}
 
-	public boolean hasKey(final String key){
+	public final boolean hasKey(final String key){
 		final int id = exactMatchSearch(key);
 		return (id >= 0);
 	}
 
-	public V get(final String key){
+	public final V get(final String key){
 		final int id = exactMatchSearch(key);
 		return (outerValue != null && id >= 0? outerValue.get(id): null);
 	}
 
 	/**
-	 * Update a value corresponding to a key
+	 * Update a value corresponding to a key.
 	 *
-	 * @param key	The key
-	 * @param value	The value
-	 * @return	successful or not（failure if there is no key）
+	 * @param key	The key.
+	 * @param value	The value.
+	 * @return	successful or not（failure if there is no key）.
 	 */
-	public boolean set(final String key, final V value){
+	public final boolean set(final String key, final V value){
 		final int id = exactMatchSearch(key);
 		if(id >= 0){
 			outerValue.set(id, value);
@@ -182,7 +182,7 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return false;
 	}
 
-	/** Transition of a node, if the node is root and it failed, then returns the root */
+	/** Transition of a node, if the node is root, and it failed, then returns the root. */
 	private int transitionWithRoot(final int nodeId, final char character){
 		final int b = base[nodeId];
 		final int idx = b + character + 1;
@@ -192,26 +192,26 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 	}
 
 	/**
-	 * Match exactly by a key
+	 * Match exactly by a key.
 	 *
-	 * @param key	The key
-	 * @return	The id of the key (you can use it as a perfect hash function)
+	 * @param key	The key.
+	 * @return	The id of the key (you can use it as a perfect hash function).
 	 */
 	private int exactMatchSearch(final String key){
 		return exactMatchSearch(key, 0, 0, ROOT_NODE_ID);
 	}
 
 	/**
-	 * Match exactly by a key
+	 * Match exactly by a key.
 	 *
-	 * @param key	The key
-	 * @param position	The begin index of char array
-	 * @param length	The length of the key
-	 * @param nodeId	The starting position of the node for searching
-	 * @return	The id of the key (you can use it as a perfect hash function)
+	 * @param key	The key.
+	 * @param position	The starting index of char array.
+	 * @param length	The length of the key.
+	 * @param nodeId	The starting position of the node for searching.
+	 * @return	The id of the key (you can use it as a perfect hash function).
 	 */
 	private int exactMatchSearch(final String key, final int position, int length, int nodeId){
-		Objects.requireNonNull(key);
+		Objects.requireNonNull(key, "Key cannot be null");
 
 		int result = -1;
 		if(isInitialized()){
@@ -238,47 +238,56 @@ public class AhoCorasickTrie<V extends Serializable> implements Serializable{
 		return result;
 	}
 
-	public int size(){
+	public final int size(){
 		return (outerValue != null? outerValue.size(): 0);
 	}
 
-	public boolean isEmpty(){
+	public final boolean isEmpty(){
 		return (size() == 0);
 	}
 
-	public boolean isInitialized(){
+	public final boolean isInitialized(){
 		return (output != null);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		@SuppressWarnings("unchecked")
-		final AhoCorasickTrie<? super V> rhs = (AhoCorasickTrie<? super V>)obj;
-		return new EqualsBuilder()
-			.append(base, rhs.base)
-			.append(next, rhs.next)
-			.append(check, rhs.check)
-			.append(output, rhs.output)
-			.append(outerValue, rhs.outerValue)
-			.append(keyLength, rhs.keyLength)
-			.isEquals();
+		final AhoCorasickTrie<?> rhs = (AhoCorasickTrie<?>)obj;
+		return (Arrays.equals(base, rhs.base)
+			&& Arrays.equals(next, rhs.next)
+			&& Arrays.equals(check, rhs.check)
+			&& Arrays.deepEquals(output, rhs.output)
+			&& outerValue.equals(rhs.outerValue)
+			&& Arrays.equals(keyLength, rhs.keyLength));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(base)
-			.append(next)
-			.append(check)
-			.append(output)
-			.append(outerValue)
-			.append(keyLength)
-			.toHashCode();
+	public final int hashCode(){
+		int result = outerValue.hashCode();
+		result = 31 * result + Arrays.hashCode(base);
+		result = 31 * result + Arrays.hashCode(next);
+		result = 31 * result + Arrays.hashCode(check);
+		result = 31 * result + Arrays.deepHashCode(output);
+		result = 31 * result + Arrays.hashCode(keyLength);
+		return result;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

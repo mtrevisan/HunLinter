@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,17 +24,25 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
+import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.services.Packager;
 import org.apache.commons.lang3.StringUtils;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -47,7 +55,6 @@ public class SelectFontAction extends AbstractAction{
 	@Serial
 	private static final long serialVersionUID = -4735745104118440213L;
 
-	private static final String FONT_FAMILY_NAME_PREFIX = "font.familyName.";
 	private static final String FONT_SIZE_PREFIX = "font.size.";
 
 
@@ -56,6 +63,7 @@ public class SelectFontAction extends AbstractAction{
 	private final Preferences preferences;
 
 
+	@SuppressWarnings("ConstantConditions")
 	public SelectFontAction(final Packager packager, final ParserManager parserManager, final Preferences preferences){
 		super("system.font", new ImageIcon(SelectFontAction.class.getResource("/file_font.png")));
 
@@ -69,7 +77,7 @@ public class SelectFontAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Supplier<String> sampleExtractor = () -> {
@@ -84,13 +92,32 @@ public class SelectFontAction extends AbstractAction{
 			FontHelper.setCurrentFont(font, parentFrame);
 
 			final String language = parserManager.getLanguage();
-			preferences.put(FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
+			preferences.put(MainFrame.FONT_FAMILY_NAME_PREFIX + language, font.getFamily());
 			preferences.put(FONT_SIZE_PREFIX + language, Integer.toString(font.getSize()));
 		};
 		final FontChooserDialog dialog = new FontChooserDialog(sampleExtractor, onSelection, parentFrame);
 		GUIHelper.addCancelByEscapeKey(dialog);
 		dialog.setLocationRelativeTo(parentFrame);
 		dialog.setVisible(true);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

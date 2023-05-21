@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -31,14 +31,17 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 class AffixEntryTest{
 
 	@Test
 	void notValidSuffix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		String line = "SFX M0 b i a";
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		String line = "SFX M b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
 		Assertions.assertEquals("Condition part doesn't ends with removal part: `" + line + "`", exception.getMessage());
@@ -48,8 +51,8 @@ class AffixEntryTest{
 //	@Test
 //	void notValidSuffix2(){
 //		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-//		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-//		String line = "SFX M0 a ai a";
+//		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+//		String line = "SFX M a ai a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
 //		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
@@ -58,8 +61,8 @@ class AffixEntryTest{
 	@Test
 	void notValidPrefix1(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M0", 'N');
-		String line = "PFX M0 b i a";
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M", 'N');
+		String line = "PFX M b i a";
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> createAffixEntry(line, parent, strategy));
 		Assertions.assertEquals("Condition part doesn't starts with removal part: `" + line + "`", exception.getMessage());
@@ -69,8 +72,8 @@ class AffixEntryTest{
 //	@Test
 //	void notValidPrefix2(){
 //		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-//		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M0", 'N');
-//		String line = "PFX M0 a ia a";
+//		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M", 'N');
+//		String line = "PFX M a ia a";
 //		Throwable exception = Assertions.assertThrows(LinterException.class,
 //			() -> createAffixEntry(line, parent, strategy));
 //		Assertions.assertEquals("Characters in common between removed and added part: `" + line + "`", exception.getMessage());
@@ -79,8 +82,8 @@ class AffixEntryTest{
 	@Test
 	void hasContinuationFlag(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
 
 		boolean matches = entry.hasContinuationFlag("A");
 
@@ -90,8 +93,8 @@ class AffixEntryTest{
 	@Test
 	void notHasContinuationFlag(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
 
 		boolean matches = entry.hasContinuationFlag("B");
 
@@ -101,20 +104,20 @@ class AffixEntryTest{
 	@Test
 	void combineContinuationFlags(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
 
-		String[] combinedFlags = entry.combineContinuationFlags(new String[]{"B", "A"});
+		final List<String> combinedFlags = entry.combineContinuationFlags(Arrays.asList("B", "A"));
 
-		Assertions.assertArrayEquals(new String[]{"B", "A"}, combinedFlags);
+		Assertions.assertEquals(Arrays.asList("A", "B"), combinedFlags);
 	}
 
 	@Test
 	void isSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		AffixType type = entry.getType();
 
@@ -124,9 +127,9 @@ class AffixEntryTest{
 	@Test
 	void isPrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("PFX M0 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("PFX M 0 i/A [^oaie]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		AffixType type = entry.getType();
 
@@ -136,9 +139,9 @@ class AffixEntryTest{
 	@Test
 	void matchOk(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		boolean matches = entry.canApplyTo("man");
 
@@ -148,9 +151,9 @@ class AffixEntryTest{
 	@Test
 	void matchNotOk(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		boolean matches = entry.canApplyTo("mano");
 
@@ -160,9 +163,9 @@ class AffixEntryTest{
 	@Test
 	void applyRuleSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i/A [^oaie]", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i/A [^oaie]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.applyRule("man\\/man", true);
 
@@ -172,8 +175,8 @@ class AffixEntryTest{
 	@Test
 	void cannotApplyRuleSuffixFullstrip(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 man i/A man", parent, strategy);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M man i/A man", parent, strategy);
 
 		Throwable exception = Assertions.assertThrows(LinterException.class,
 			() -> entry.applyRule("man", false));
@@ -183,9 +186,9 @@ class AffixEntryTest{
 	@Test
 	void applyRulePrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "TB", 'N');
-		AffixEntry entry = createAffixEntry("PFX TB ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
+		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.applyRule("ŧinkue", true);
 
@@ -195,9 +198,9 @@ class AffixEntryTest{
 	@Test
 	void undoRuleSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M0", 'N');
-		AffixEntry entry = createAffixEntry("SFX M0 0 i [^oaie]	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
+		AffixEntry entry = createAffixEntry("SFX M 0 i [^oaie]	po:noun", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.undoRule("mani");
 
@@ -207,9 +210,9 @@ class AffixEntryTest{
 	@Test
 	void undoRulePrefix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "TB", 'N');
-		AffixEntry entry = createAffixEntry("PFX TB ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
+		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		String inflection = entry.undoRule("sinkue");
 
@@ -219,13 +222,13 @@ class AffixEntryTest{
 	@Test
 	void testToString(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
-		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "TB", 'N');
-		AffixEntry entry = createAffixEntry("PFX TB ŧ s ŧ	po:noun", parent, strategy);
-		parent.setEntries(entry);
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "T", 'N');
+		AffixEntry entry = createAffixEntry("PFX T ŧ s ŧ	po:noun", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
 
 		String representation = entry.toString();
 
-		Assertions.assertEquals("PFX TB ŧ s ŧ po:noun", representation);
+		Assertions.assertEquals("PFX T ŧ s ŧ po:noun", representation);
 	}
 
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,8 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.workers.exceptions;
 
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 
 
@@ -35,33 +39,51 @@ public class LinterWarning extends Exception{
 	private static final long serialVersionUID = 3853411643385148097L;
 
 
-	private final IndexDataPair<?> data;
+	private int index;
+	private IndexDataPair<?> data;
 
 
-	public LinterWarning(final Throwable cause, final Object data){
-		this(null, cause, IndexDataPair.of(-1, data));
+	public LinterWarning(final String message, final Object... parameters){
+		super(JavaHelper.textFormat(message, parameters));
 	}
 
-	public LinterWarning(final Throwable cause, final IndexDataPair<?> data){
-		this(null, cause, data);
+	public final LinterWarning withIndex(final int index){
+		this.index = index;
+
+		return this;
 	}
 
-	public LinterWarning(final String message){
-		this(message, null, null);
+	public final int getIndex(){
+		return index;
 	}
 
-	public LinterWarning(final String message, final IndexDataPair<?> data){
-		this(message, null, data);
-	}
-
-	public LinterWarning(final String message, final Throwable cause, final IndexDataPair<?> data){
-		super(message, cause);
-
+	public final LinterWarning withIndexDataPair(final IndexDataPair<?> data){
 		this.data = data;
+
+		return this;
 	}
 
-	public IndexDataPair<?> getData(){
+	public final LinterWarning withData(final Object data){
+		this.data = (IndexDataPair.class.isInstance(data)? (IndexDataPair<?>)data: IndexDataPair.of(-1, data));
+
+		return this;
+	}
+
+	public final IndexDataPair<?> getData(){
 		return data;
+	}
+
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,12 +24,14 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
+import java.util.RandomAccess;
+
 
 /**
- * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays</a>
+ * @see <a href="https://cs.uwaterloo.ca/~imunro/cs840/ResizableArrays.pdf">Resizable arrays in optimal time and space</a>
  * @see <a href="https://github.com/LHongy/DynamicArray">DynamicArray</a>
  */
-public class DynamicIntArray{
+public class DynamicIntArray implements RandomAccess{
 
 	private static final int CAPACITY_DEFAULT = 4;
 
@@ -37,7 +39,7 @@ public class DynamicIntArray{
 	//number of Blocks in `blocks`
 	private int sizeOfBlocks;
 	//number of elements in DynamicArray
-	private volatile int size;
+	private int size;
 	private int numberOfEmptyDataBlocks;
 	private int indexOfLastNonEmptyDataBlock;
 	private int indexOfLastDataBlock;
@@ -56,7 +58,7 @@ public class DynamicIntArray{
 		blocks[0] = new IntBlock(1);
 
 		//SB0 has only one Block, and that Block can only have one element
-		lastSuperBlock = new SuperBlock(true, 1, 1, 0);
+		lastSuperBlock = SuperBlock.createEven(1, 1, 0);
 		//SB0 contains a Block, incrementCurrentNumberOfDataBlocks
 		lastSuperBlock.incrementCurrentNumberOfDataBlocks();
 
@@ -71,7 +73,7 @@ public class DynamicIntArray{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized int get(final int i){
+	public final synchronized int get(final int i){
 		// We need to find which Block contains the requested element, also in what position of that Block.
 		// locate() gives us a Location object.
 		// The object will contain the index of Block that we want,
@@ -87,7 +89,7 @@ public class DynamicIntArray{
 	// Throws IllegalArgumentException if index < 0 or
 	// index > size -1;
 	// Target complexity: O(1)
-	public synchronized void set(final int index, final int x){
+	public final synchronized void set(final int index, final int x){
 		final Location location = new Location(index);
 		final IntBlock block = blocks[location.block];
 		//use the elementIndex in the Location object to set the element within the Block to x
@@ -104,10 +106,10 @@ public class DynamicIntArray{
 	private void grow(){
 		IntBlock lastDataBlock = blocks[indexOfLastDataBlock];
 
-		// If the last Block is full, we need to make a new Block.
+		//if the last Block is full, we need to make a new Block
 		if(lastDataBlock.isFull()){
 			if(sizeOfBlocks == blocks.length)
-				//`blocks` is full, need to expand.
+				//`blocks` is full, need to expand
 				expandArray();
 
 			//if the lastSuperBlock is full of Blocks, we need to create a new SuperBlock and increment numberOfSuperBlocks
@@ -117,13 +119,14 @@ public class DynamicIntArray{
 					// The new SuperBlock will have the same MaxNumberOfDataBlocks as the old one,
 					// but twice the MaxNumberOfElementsPerBlock.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock * 2, 0);
+					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock << 1, 0);
 				else
 					// If the number of the current full lastSuperBlock is not even,
 					// The new SuperBlock will have the same MaxNumberOfElementsPerBlock as the old one,
 					// but twice the MaxNumberOfDataBlocks.
 					// This new superBlock currently has no Block in it.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks * 2, lastSuperBlock.maxNumberOfElementsPerBlock, 0);
+					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks << 1,
+						lastSuperBlock.maxNumberOfElementsPerBlock, 0);
 			}
 
 			// Create a new Block, use lastSuperBlock to figure out how many elements the Block can store.
@@ -146,37 +149,37 @@ public class DynamicIntArray{
 
 	}
 
-	public synchronized void push(final int x){
+	public final void push(final int x){
 		add(x);
 	}
 
 	// Grows the DynamicArray by one space, increases the size of the
 	// DynamicArray, and sets the last element to x.
 	// Target complexity: O(1)
-	public synchronized void add(final int x){
+	public final synchronized void add(final int x){
 		grow();
 
 		size ++;
 		set(size - 1, x);
 	}
 
-	public synchronized void addAll(final DynamicIntArray array){
+	public final void addAll(final DynamicIntArray array){
 		for(int i = 0; i < array.size; i ++)
 			add(array.get(i));
 	}
 
-	public synchronized void addAll(final int[] array){
+	public final void addAll(final int[] array){
 		for(final int value : array)
 			add(value);
 	}
 
-	public synchronized int pop(){
+	public final synchronized int pop(){
 		final int elem = get(size - 1);
 		remove();
 		return elem;
 	}
 
-	public synchronized void shrink(final int newSize){
+	public final synchronized void shrink(final int newSize){
 		while(size > newSize)
 			remove();
 	}
@@ -189,7 +192,7 @@ public class DynamicIntArray{
 	 *
 	 * @throws IllegalStateException	If the DynamicArray is empty when remove is called
 	 */
-	public synchronized void remove(){
+	public final synchronized void remove(){
 		final IntBlock lastNonEmptyDataBlock = blocks[indexOfLastNonEmptyDataBlock];
 		lastNonEmptyDataBlock.shrink();
 		size --;
@@ -225,13 +228,15 @@ public class DynamicIntArray{
 					// but the same MaxNumberOfElementsPerBlock.
 					// This previous superBlock currently is full of Blocks.
 					// --numberOfSuperBlocks - 1 gives us the number of this previous superBlock.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks / 2, lastSuperBlock.maxNumberOfElementsPerBlock, lastSuperBlock.maxNumberOfDataBlocks / 2);
+					lastSuperBlock = SuperBlock.createOdd(lastSuperBlock.maxNumberOfDataBlocks / 2,
+						lastSuperBlock.maxNumberOfElementsPerBlock, lastSuperBlock.maxNumberOfDataBlocks / 2);
 				else
 					// If the number of the current empty lastSuperBlock is not even,
 					// The previous SuperBlock will have one half of MaxNumberOfElementsPerBlock as the old one,
 					// but the same MaxNumberOfDataBlocks.
 					// This previous superBlock currently is full of Blocks.
-					lastSuperBlock = new SuperBlock(!lastSuperBlock.isEven(), lastSuperBlock.maxNumberOfDataBlocks, lastSuperBlock.maxNumberOfElementsPerBlock / 2, lastSuperBlock.maxNumberOfDataBlocks);
+					lastSuperBlock = SuperBlock.createEven(lastSuperBlock.maxNumberOfDataBlocks,
+						lastSuperBlock.maxNumberOfElementsPerBlock / 2, lastSuperBlock.maxNumberOfDataBlocks);
 			}
 		}
 	}
@@ -252,7 +257,7 @@ public class DynamicIntArray{
 	 * Create a new `blocks` and copy the Blocks from the old one to this new array.
 	 */
 	private void expandArray(){
-		final IntBlock[] newBlocks = new IntBlock[blocks.length * 2];
+		final IntBlock[] newBlocks = new IntBlock[(blocks.length << 1)];
 		if(sizeOfBlocks >= 0)
 			System.arraycopy(blocks, 0, newBlocks, 0, sizeOfBlocks);
 		blocks = newBlocks;
@@ -260,11 +265,11 @@ public class DynamicIntArray{
 
 	// Returns the size of the DynamicArray which is the number of elements that
 	// have been added to it with the add(x) method but not removed.
-	public synchronized int size(){
+	public final synchronized int size(){
 		return size;
 	}
 
-	public synchronized boolean isEmpty(){
+	public final synchronized boolean isEmpty(){
 		return (size == 0);
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,9 +25,10 @@
 package io.github.mtrevisan.hunlinter.parsers.autocorrect;
 
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
+import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.XMLManager;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
-import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.tuple.Pair;
@@ -35,31 +36,25 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.parsers.thesaurus.DuplicationResult;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Supplier;
-import java.util.regex.Matcher;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
+import java.util.function.BooleanSupplier;
 
 
-/** Manages pairs of mistyped words and their correct spelling */
+/** Manages pairs of mistyped words and their correct spelling. */
 public class AutoCorrectParser{
 
 	private static final String QUOTATION_MARK = "\"";
 
-	private static final MessageFormat BAD_QUOTE = new MessageFormat("{0} form cannot contain apostrophes or double quotes: `{1}`");
-	private static final MessageFormat DUPLICATED_ENTRY = new MessageFormat("Duplicated entry in auto-correct file: `{0}` -> `{1}`");
-	private static final MessageFormat INVALID_ROOT = new MessageFormat("Invalid root element, expected `{0}`, was `{1}`");
+	private static final String BAD_QUOTE = "{} form cannot contain apostrophes or double quotes: `{}`";
+	private static final String DUPLICATED_ENTRY = "Duplicated entry in auto-correct file: `{}` -> `{}`";
+	private static final String INVALID_ROOT = "Invalid root element, expected `{}`, was `{}`";
 
 	private static final String AUTO_CORRECT_NAMESPACE = "block-list:";
 	private static final String AUTO_CORRECT_ROOT_ELEMENT = AUTO_CORRECT_NAMESPACE + "block-list";
@@ -68,27 +63,30 @@ public class AutoCorrectParser{
 	private static final String AUTO_CORRECT_CORRECT_FORM = AUTO_CORRECT_NAMESPACE + "name";
 
 
-	private final List<CorrectionEntry> dictionary = new ArrayList<>();
+	private final List<CorrectionEntry> dictionary = new ArrayList<>(0);
+
+	private final XMLManager xmlManager = new XMLManager();
 
 
 	/**
 	 * Parse the rows out from a `DocumentList.xml` file.
 	 *
-	 * @param acoFile	The reference to the auto-correct file
-	 * @throws IOException	If an I/O error occurs
-	 * @throws SAXException	If an parsing error occurs on the `xml` file
+	 * @param acoFile	The reference to the auto-correct file.
+	 * @throws IOException	If an I/O error occurs.
+	 * @throws SAXException	If a parsing error occurs on the `xml` file.
 	 */
-	public void parse(final File acoFile) throws IOException, SAXException{
+	public final void parse(final File acoFile) throws IOException, SAXException{
 		clear();
 
-		final Document doc = XMLManager.parseXMLDocument(acoFile);
+		final Document doc = xmlManager.parseXMLDocument(acoFile);
 
 		final Element rootElement = doc.getDocumentElement();
 		if(!AUTO_CORRECT_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-			throw new LinterException(INVALID_ROOT.format(new Object[]{AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName()}));
+			throw new LinterException(INVALID_ROOT, AUTO_CORRECT_ROOT_ELEMENT, rootElement.getNodeName());
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
-		for(final Node child : children){
+		for(int i = 0; i < children.size(); i ++){
+			final Node child = children.get(i);
 			final Node mediaType = XMLManager.extractAttribute(child, AUTO_CORRECT_INCORRECT_FORM);
 			if(mediaType != null){
 				final CorrectionEntry correctionEntry = new CorrectionEntry(mediaType.getNodeValue(),
@@ -103,25 +101,26 @@ public class AutoCorrectParser{
 	private void validate(){
 		//check for duplications
 		int index = 0;
-		final Collection<String> map = new HashSet<>();
-		for(final CorrectionEntry s : dictionary){
-			if(!map.add(s.getIncorrectForm()))
-				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY.format(new Object[]{s.getIncorrectForm(), s.getCorrectForm()}),
-					IndexDataPair.of(index, null)));
+		final Collection<String> map = new HashSet<>(dictionary.size());
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry entry = dictionary.get(i);
+			if(!map.add(entry.getIncorrectForm()))
+				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, entry.getIncorrectForm(), entry.getCorrectForm())
+					.withIndex(index));
 
 			index ++;
 		}
 	}
 
-	public List<CorrectionEntry> getCorrectionsDictionary(){
+	public final List<CorrectionEntry> getCorrectionsDictionary(){
 		return dictionary;
 	}
 
-	public int getCorrectionsCounter(){
+	public final int getCorrectionsCounter(){
 		return dictionary.size();
 	}
 
-	public void setCorrection(final int index, final String incorrect, final String correct){
+	public final void setCorrection(final int index, final String incorrect, final String correct){
 		dictionary.set(index, new CorrectionEntry(incorrect, correct));
 	}
 
@@ -132,40 +131,45 @@ public class AutoCorrectParser{
 	 * 	(return {@code true} to force insertion)
 	 * @return The duplication result
 	 */
-	public DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
-			final Supplier<Boolean> duplicatesDiscriminator){
+	public final DuplicationResult<CorrectionEntry> insertCorrection(final String incorrect, final String correct,
+			final BooleanSupplier duplicatesDiscriminator){
 		if(incorrect.contains(HyphenationParser.APOSTROPHE) || incorrect.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.format(new Object[]{"Incorrect", incorrect}));
+			throw new LinterException(BAD_QUOTE, "Incorrect", incorrect);
 		if(correct.contains(HyphenationParser.APOSTROPHE) || correct.contains(QUOTATION_MARK))
-			throw new LinterException(BAD_QUOTE.format(new Object[]{"Correct", correct}));
+			throw new LinterException(BAD_QUOTE, "Correct", correct);
 
 		final List<CorrectionEntry> duplicates = extractDuplicates(incorrect, correct);
-		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.get());
+		final boolean forceInsertion = (duplicates.isEmpty() || duplicatesDiscriminator.getAsBoolean());
 		if(forceInsertion)
 			dictionary.add(new CorrectionEntry(incorrect, correct));
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
-	public void deleteCorrection(final int selectedRowID){
+	public final void deleteCorrection(final int selectedRowID){
 		dictionary.remove(selectedRowID);
 	}
 
-	/* Find if there is a duplicate with the same incorrect and correct forms */
+	/** Find if there is a duplicate with the same incorrect and correct forms. */
 	private List<CorrectionEntry> extractDuplicates(final String incorrect, final String correct){
-		final ArrayList<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
-		applyIf(dictionary,
-			correction -> correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct),
-			duplicates::add);
-		duplicates.trimToSize();
+		final List<CorrectionEntry> duplicates = new ArrayList<>(dictionary.size());
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry correction = dictionary.get(i);
+			if(correction.getIncorrectForm().equals(incorrect) && correction.getCorrectForm().equals(correct))
+				duplicates.add(correction);
+		}
 		return duplicates;
 	}
 
-	/* Find if there is a duplicate with the same incorrect and correct forms */
-	public boolean contains(final CharSequence incorrect, final CharSequence correct){
-		return (match(dictionary,
-			elem -> !incorrect.isEmpty() && !correct.isEmpty()
-				&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct)) != null);
+	/** Find if there is a duplicate with the same incorrect and correct forms. */
+	public final boolean contains(final String incorrect, final String correct){
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry elem = dictionary.get(i);
+			if(!incorrect.isEmpty() && !correct.isEmpty()
+					&& elem.getIncorrectForm().equals(incorrect) && elem.getCorrectForm().equals(correct))
+				return true;
+		}
+		return false;
 	}
 
 	public static Pair<String, String> extractComponentsForFilter(final String incorrect, final String correct){
@@ -174,7 +178,7 @@ public class AutoCorrectParser{
 
 	private static String clearFilter(final String text){
 		//escape special characters
-		return Matcher.quoteReplacement(text.trim());
+		return RegexHelper.quoteReplacement(text.trim());
 	}
 
 	public static Pair<String, String> prepareTextForFilter(final String incorrect, final String correct){
@@ -186,15 +190,16 @@ public class AutoCorrectParser{
 		return Pair.of(incorrectFilter, correctFilter);
 	}
 
-	public void save(final File acoFile) throws TransformerException{
-		final Document doc = XMLManager.newXMLDocumentStandalone();
+	public final void save(final File acoFile) throws TransformerException{
+		final Document doc = xmlManager.newXMLDocumentStandalone();
 
 		//root element
 		final Element root = doc.createElement(AUTO_CORRECT_ROOT_ELEMENT);
 		root.setAttribute(XMLManager.ROOT_ATTRIBUTE_NAME, XMLManager.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
-		for(final CorrectionEntry correction : dictionary){
+		for(int i = 0; i < dictionary.size(); i ++){
+			final CorrectionEntry correction = dictionary.get(i);
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
 			elem.setAttribute(AUTO_CORRECT_INCORRECT_FORM, correction.getIncorrectForm());
@@ -205,7 +210,7 @@ public class AutoCorrectParser{
 		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 

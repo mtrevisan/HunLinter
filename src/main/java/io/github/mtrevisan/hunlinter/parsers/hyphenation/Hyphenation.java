@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,25 +24,23 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
+import java.util.List;
 import java.util.Objects;
 
 
 public class Hyphenation{
 
-	private final String[] syllabes;
-	private final String[] compounds;
-	private final String[] rules;
+	private final List<String> syllabes;
+	private final List<String> compounds;
+	private final List<String> rules;
 	private final String breakCharacter;
 
 
-	public Hyphenation(final String[] syllabes, final String[] compounds, final String[] rules, final String breakCharacter){
-		Objects.requireNonNull(syllabes);
-		Objects.requireNonNull(compounds);
-		Objects.requireNonNull(rules);
-		Objects.requireNonNull(breakCharacter);
+	public Hyphenation(final List<String> syllabes, final List<String> compounds, final List<String> rules, final String breakCharacter){
+		Objects.requireNonNull(syllabes, "Syllabes cannot be null");
+		Objects.requireNonNull(compounds, "Compounds cannot be null");
+		Objects.requireNonNull(rules, "Rules cannot be null");
+		Objects.requireNonNull(breakCharacter, "Break character cannot be null");
 
 		this.syllabes = syllabes;
 		this.compounds = compounds;
@@ -50,19 +48,19 @@ public class Hyphenation{
 		this.breakCharacter = breakCharacter;
 	}
 
-	public String[] getSyllabes(){
+	public final List<String> getSyllabes(){
 		return syllabes;
 	}
 
-	public String[] getCompounds(){
+	public final List<String> getCompounds(){
 		return compounds;
 	}
 
-	public String[] getRules(){
+	public final List<String> getRules(){
 		return rules;
 	}
 
-	public String getBreakCharacter(){
+	public final String getBreakCharacter(){
 		return breakCharacter;
 	}
 
@@ -70,11 +68,11 @@ public class Hyphenation{
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the (relative) index of the syllabe at the given (global) index
 	 */
-	public int getSyllabeIndex(int idx){
+	public final int getSyllabeIndex(int idx){
 		int k = -1;
 		final int size = countSyllabes();
 		for(int i = 0; i < size; i ++){
-			final String syllabe = syllabes[i];
+			final String syllabe = syllabes.get(i);
 			idx -= syllabe.length();
 			if(idx < 0){
 				k = i;
@@ -88,54 +86,51 @@ public class Hyphenation{
 	 * @param idx	Index with respect to the word from which to extract the index of the corresponding syllabe
 	 * @return the syllabe at the given (global) index
 	 */
-	public String getSyllabe(final int idx){
-		return syllabes[getSyllabeIndex(idx)];
+	public final String getSyllabe(final int idx){
+		return syllabes.get(getSyllabeIndex(idx));
 	}
 
-	public int countSyllabes(){
-		return syllabes.length;
+	public final int countSyllabes(){
+		return syllabes.size();
 	}
 
 	/**
 	 * @param idx	Index of syllabe to extract, if negative then it's relative to the last syllabe
 	 * @return the syllabe at the given (relative) index
 	 */
-	public String getAt(final int idx){
-		return syllabes[restoreRelativeIndex(idx)];
+	public final String getAt(final int idx){
+		return syllabes.get(restoreRelativeIndex(idx));
 	}
 
 	private int restoreRelativeIndex(final int idx){
 		return (idx + countSyllabes()) % countSyllabes();
 	}
 
-	public boolean isHyphenated(){
-		return (rules.length > 0);
+	public final boolean isHyphenated(){
+		return !rules.isEmpty();
 	}
 
-	public boolean isCompound(){
-		return (compounds.length > 1);
+	public final boolean isCompound(){
+		return (compounds.size() > 1);
 	}
 
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final Hyphenation rhs = (Hyphenation)obj;
-		return new EqualsBuilder()
-			.append(syllabes, rhs.syllabes)
-			.append(breakCharacter, rhs.breakCharacter)
-			.isEquals();
+		return (syllabes.equals(rhs.syllabes)
+			&& breakCharacter.equals(rhs.breakCharacter));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(syllabes)
-			.append(breakCharacter)
-			.toHashCode();
+	public final int hashCode(){
+		int result = syllabes.hashCode();
+		result = 31 * result + breakCharacter.hashCode();
+		return result;
 	}
 
 }

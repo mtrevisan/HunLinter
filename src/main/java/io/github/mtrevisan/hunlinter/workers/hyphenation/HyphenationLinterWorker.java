@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -35,6 +35,7 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenatorInterface;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
@@ -42,7 +43,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -60,7 +60,7 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	private static final String POS_NUMERAL_LATIN = MorphologicalTag.PART_OF_SPEECH.attachValue("numeral_latin");
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
-	private static final MessageFormat WORD_IS_NOT_SYLLABABLE = new MessageFormat("Word {0} ({1}) is not syllabable");
+	private static final String WORD_IS_NOT_SYLLABABLE = "{} ({}) is not syllabable";
 
 
 	public HyphenationLinterWorker(final ParserManager parserManager){
@@ -74,8 +74,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		getWorkerData()
 			.withParallelProcessing();
 
-		Objects.requireNonNull(wordGenerator);
-		Objects.requireNonNull(hyphenator);
+		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
+		Objects.requireNonNull(hyphenator, "Hyphenator cannot be null");
 
 
 		final Orthography orthography = BaseBuilder.getOrthography(language);
@@ -83,17 +83,19 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(final Inflection inflection : inflections){
+			for(int i = 0; i < inflections.size(); i ++){
+				final Inflection inflection = inflections.get(i);
 				final String word = inflection.getWord();
 				if(word.length() > 1 && !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE)
 						&& !rulesLoader.containsUnsyllabableWords(word)){
 					final Hyphenation hyphenation = hyphenator.hyphenate(word);
-					final String[] syllabes = hyphenation.getSyllabes();
+					final List<String> syllabes = hyphenation.getSyllabes();
 					if(orthography.hasSyllabationErrors(syllabes)){
-						final String message = WORD_IS_NOT_SYLLABABLE.format(new Object[]{word,
-							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK), indexData.getData()});
+						final String message = JavaHelper.textFormat(WORD_IS_NOT_SYLLABABLE, word,
+							orthography.formatHyphenation(syllabes, new StringJoiner(SLASH), syllabe -> ASTERISK + syllabe + ASTERISK),
+							indexData.getData());
 						final StringBuilder sb = new StringBuilder(message);
 						if(inflection.hasInflectionRules())
 							sb.append(" (via ").append(inflection.getRulesSequence()).append(")");
@@ -106,7 +108,8 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
-			final Path dicPath = dicParser.getDicFile().toPath();
+			final Path dicPath = dicParser.getDicFile()
+				.toPath();
 			final Charset charset = dicParser.getCharset();
 			processLines(dicPath, charset, lineProcessor);
 

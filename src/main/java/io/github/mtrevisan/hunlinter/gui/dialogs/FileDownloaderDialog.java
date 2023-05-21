@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,21 +24,29 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import io.github.mtrevisan.hunlinter.MainFrame;
+import io.github.mtrevisan.hunlinter.services.downloader.DownloadException;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadListenerInterface;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloadTask;
 import io.github.mtrevisan.hunlinter.services.downloader.DownloaderHelper;
 import io.github.mtrevisan.hunlinter.services.downloader.GITFileData;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.parser.ParseException;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -47,7 +55,9 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,7 +74,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private DownloadTask task;
 
 
-	public FileDownloaderDialog(final Frame parent) throws Exception{
+	public FileDownloaderDialog(final Frame parent) throws IOException, ParseException, VersionException{
 		super(parent, "File downloader", true);
 
 		initComponents();
@@ -79,9 +89,9 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		//copy to default download folder
 		localPath = System.getProperty("user.home") + "/Downloads/" + remoteObject.name;
 
-		currentVersionLabel.setText((String)DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_VERSION));
+		currentVersionLabel.setText(DownloaderHelper.APPLICATION_VERSION.toString());
 		newVersionLabel.setText(remoteObject.version.toString());
-		downloadSizeLabel.setText(StringHelper.byteCountToHumanReadable(remoteObject.size));
+		downloadSizeLabel.setText(remoteObject.size != null? StringHelper.byteCountToHumanReadable(remoteObject.size): "--");
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -101,7 +111,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
       setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-      versionAvailableLabel.setText("A new version of " + DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + " is available.");
+      versionAvailableLabel.setText("A new version of " + DownloaderHelper.ARTIFACT_ID + " is available.");
 
       currentVersionPreLabel.setText("Current version:");
 
@@ -118,20 +128,12 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       statusLabel.setText(" ");
 
       whatsNewButton.setText("What's new");
-      whatsNewButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            whatsNewButtonActionPerformed(evt);
-         }
-      });
+      whatsNewButton.addActionListener(this::whatsNewButtonActionPerformed);
 
       downloadButton.setText("Download");
-      downloadButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            downloadButtonActionPerformed(evt);
-         }
-      });
+      downloadButton.addActionListener(this::downloadButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,7 +197,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void whatsNewButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
+	private void whatsNewButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
 		try{
 			final List<Pair<Version, String>> whatsNew = DownloaderHelper.extractNewerVersions();
 			final String message = whatsNew.stream()
@@ -216,10 +218,10 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(final Exception ignored){}
+		catch(final VersionException | IOException | ParseException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
-   private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+   private void downloadButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
 		downloadButton.setEnabled(false);
 
 		task = new DownloadTask(localPath, remoteObject, this);
@@ -227,7 +229,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		task.execute();
    }//GEN-LAST:event_downloadButtonActionPerformed
 
-	public void interrupt(){
+	public final void interrupt(){
 		if(task != null && !task.isCancelled())
 			task.cancelTask();
 
@@ -235,37 +237,37 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	}
 
 	@Override
-	public void startCheckUpdates(){
+	public final void startCheckUpdates(){
 		statusLabel.setText("Check for updates…");
 	}
 
 	@Override
-	public void startDownloads(final GITFileData fileData){
+	public final void startDownloads(final GITFileData fileData){
 		statusLabel.setText("Begin downloading version " + fileData.version + "…");
 	}
 
 	@Override
-	public void validatingFile(final GITFileData fileData, final String localPath){
+	public final void validatingFile(final GITFileData fileData, final String localPath){
 		statusLabel.setText("Validating download…");
 
 		try{
 			final byte[] content = DownloaderHelper.readFileContent(localPath);
 			DownloaderHelper.validate(content, remoteObject);
 		}
-		catch(final Exception e){
+		catch(final IOException | DownloadException | NoSuchAlgorithmException e){
 			statusLabel.setText(e.getMessage());
 		}
 	}
 
 	@Override
-	public void stopped(){
+	public final void stopped(){
 		statusLabel.setText("Update stopped");
 
 		downloadButton.setEnabled(true);
 	}
 
 	@Override
-	public void succeeded(){
+	public final void succeeded(){
 		statusLabel.setText("File has been downloaded and verified successfully!");
 
 		try{
@@ -274,7 +276,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 				final String destinationFolder = FilenameUtils.getFullPath(
 					MainFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
 				final Path destinationPath = Path.of(
-					(destinationFolder.startsWith("/")? destinationFolder.substring(1): destinationFolder),
+					(!destinationFolder.isEmpty() && destinationFolder.charAt(0) == '/'? destinationFolder.substring(1): destinationFolder),
 					FilenameUtils.getBaseName(localPath) + "." + FilenameUtils.getExtension(localPath));
 				FileHelper.moveFile(fileToMove, destinationPath);
 
@@ -286,37 +288,39 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 				FileHelper.browse(new File(localPath));
 
 				//exit
-				System.exit(0);
+				JavaHelper.exit(0);
 			}
 		}
-		catch(final Exception e){
+		catch(final URISyntaxException | IllegalArgumentException | IOException | InterruptedException e){
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void failed(final Exception e){
+	public final void failed(final Exception e){
 		statusLabel.setText("Error downloading file: " + e.getMessage());
 
 		downloadButton.setEnabled(true);
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
-		if("progress".equals(evt.getPropertyName()))
-			fileProgressBar.setValue((Integer)evt.getNewValue());
+	public final void propertyChange(final PropertyChangeEvent evt){
+		if(MainFrame.PROPERTY_NAME_PROGRESS.equals(evt.getPropertyName())){
+			final int progress = (Integer)evt.getNewValue();
+			fileProgressBar.setValue(progress);
+		}
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

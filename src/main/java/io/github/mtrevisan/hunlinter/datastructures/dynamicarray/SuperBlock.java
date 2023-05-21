@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,7 @@
 package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
 
-class SuperBlock{
+final class SuperBlock{
 
 	//as in S0, S1, etc
 	private final boolean even;
@@ -34,7 +34,17 @@ class SuperBlock{
 	private int numberOfDataBlocks;
 
 
-	SuperBlock(final boolean even, final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+	public static SuperBlock createEven(final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+			final int numberOfDataBlocks){
+		return new SuperBlock(true, maxNumberOfDataBlocks, maxNumberOfElementsPerBlock, numberOfDataBlocks);
+	}
+
+	public static SuperBlock createOdd(final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
+			final int numberOfDataBlocks){
+		return new SuperBlock(false, maxNumberOfDataBlocks, maxNumberOfElementsPerBlock, numberOfDataBlocks);
+	}
+
+	private SuperBlock(final boolean even, final int maxNumberOfDataBlocks, final int maxNumberOfElementsPerBlock,
 			final int numberOfDataBlocks){
 		this.even = even;
 		this.maxNumberOfDataBlocks = maxNumberOfDataBlocks;

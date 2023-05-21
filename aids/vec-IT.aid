@@ -1,13 +1,18 @@
-t0/l0/70: theme 2, 4, 5, 6, 7 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
-n0: theme 2, 4, 7, 11, 12 (-àr, -ér, '-er, -ír, -ír/is: northern variant)
-t1/l1/71/c1/c0/c7/n1: theme 1 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant/central variant (with and without vanishild el)/northern variant)
-p4/l4/74: theme 4 (base central variant/no vanishing el variant central variant/vanishing el variant central variant)
-t8/n8: theme 8 (base/northern variant)
+UTF-8
+
+t0/l0/70: theme 2, 5, 6, 7 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
+t4/1F/7F: theme 4 (-àr, -ér, '-er, -ír, -ír/is: base/northern variant/northern variant for unstressed word)
+n0/n4: theme 2, 4, 7, 11, 12 (-àr, -ér, '-er, -ír, -ír/is: northern variant)
+t1/n1/N9: theme 1 (-àr, -ér, '-er, -ír, -ír/is: base/northern variant/northern variant for unstressed word)
+t2: theme 1 (-ér, '-er: buranèl and coxòto variant)
+p4/l4/74: theme 1, 2, 4 (base central variant/no vanishing el variant central variant/vanishing el variant central variant)
+t8/u8/n8/l8/78: theme 8 (base/base with ü/northern variant/no vanishing el variant/vanishing el variant)
 T8/N8: theme 8 for stressed word (base/northern variant)
 tA/lA/7A: theme 9, 10 (-àr: base/no vanishing el variant/vanishing el variant)
 tE/lE/7E: theme 9, 10 (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
 tB/lB/7B: theme 9, 10 for stressed words (-àr: base/no vanishing el variant/vanishing el variant)
 tC/lC/7C: theme 9, 10 for stressed words (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
+tG/lG/7G: gerund simple (-àr, '-er: base/no vanishing el variant/vanishing el variant)
 
 xA: irregular verb (re-?)andar
 xB/xC: irregular verb (re-?)av?er, (re-?)g(av)er, ʼ(v)er
@@ -16,15 +21,15 @@ xE : irregular verb (des|re)(c|ti?)oler, (ben|mal|re)(vu?|ʼ)oler
 xF : irregular verb (dex)dar, ((dex)asue|des|kon(tra)|[lƚ]iku[ei]|putre|(ra)?re|sastu|sat[iu]s|sodis|sora|stra|stupe|tore|tume)far, (kon(tra)|mal|move|o|re|so(ra|to))star
 xG : irregular verb liku[ei]far senŧa èle vanesente
 xH : irregular verb ƚiku[ei]far ko èle vanesente
-xI : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|pre|re)díxer
-xJ : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|male|pre|re)díxer senŧa èle vanesente
-xK : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|maƚe|pre|re)díxer ko èle vanesente
-xL : irregular verb déver
-xM/xN : irregular verb (re)èser/rïèser
-xO : irregular verb poder
-xP : irregular verb (pre|re|stra)sav?er
-xQ : irregular verb (a|as|de|des|es|kon|pro|re|so)tràer
-xR : irregular verb vardar
+xI : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|ma[lƚ][ae]|pre|re)díxer
+xJ : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|mal[ae]|pre|re)díxer senŧa èle vanesente
+xK : irregular verb déver
+xL/xM : irregular verb (re)èser/rïèser
+xN : irregular verb poder
+xO : irregular verb (pre|re|stra)sav?er
+xP : irregular verb (a|as|de|des|es|kon|pro|re|so)tràer
+xQ : irregular verb vardar
+xR : verb fir/[ie]n-dir/re-?dir
 
 P0/Pl/P7: pronomenal verbs, detached (-[gmnstv]e(ne) / -([gmstv]e)l[oaie] / -([gmstv]e)ƚ[oaie])
 Q0/Ql/Q7: pronomenal verbs, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
@@ -34,7 +39,7 @@ D0/Dl/D7: pronomenal verbs for the imperative, attached ([gmnstv]e(ne) / ([gmstv
 FS: sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>n|ñ[oei], ñ.>ñ|ñ[oei], b.>p|b[oei], p.>p|p[oei], ...)
 J1/I1: interrogatives for first singular, detached (-(m)i, -n(t)[ei], -[ei]) / attached ((m)i, n(t)[ei], [ei])
 J2/I2: interrogatives for first plural, detached (-i, -n(t)[ei], -[ei]) / attached (i, n(t)[ei], [ei])
-J3/I3: interrogatives for second singular, detached (-(s)tu, -to) / attached ((s)tu, to)
+J3/I3/j3: interrogatives for second singular, detached (-(s)tu, -to) / attached ((s)tu, to)
 J4/I4: interrogatives for second plural, detached (-[uo]) / attached ([uo])
 J5/j5: interrogatives for third, detached (-l[oaie] / -ƚ[oaie])
 I5/i5: interrogatives for third, attached (l[oaie] / ƚ[oaie])
@@ -56,6 +61,7 @@ A5/A6: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, 
 V3/V4/V7: venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
 Vf/Vm/Vx: venetian transformation for femenine/masculine/neuter words (-l>-ƚe)
 Vp: prefix for venetian transformation (lV->ƚV-, jV->ɉV-, ŧV->sV-, đV->xV-)
+Bu: buran language transformation (a[lnr] > à, on > ó)
 Pd: paduan transformation: metaphonesis (-oxo>-uxi)
 Vs: prefix for vicentine transformation (re->ra-/ar-, se->sa-, per- > par-)
 Vr/VR: veronexe transformation (-ente > -ènte/M0FS, -en[pstŧ]o > -èn[pstŧ]o/M0FSPd, -en[dstŧ]a > -èn[dstŧ]a/F0, -osto > -òsto/M0FS, -ongo > -òngo/M0FS, -evo > -èvo/M0)
@@ -93,6 +99,7 @@ p2/p3: prefix for bi-/tr[ie]-
 *0: prefix for contrary or privative-pejorative action, removal, exit, separation ([sx]-)
 .0: prefix for repeated action (re-)
 @0: prefix for direction, approach, addition, intensive value (a-)
+@1: prefix for reinforcing (gives a superlative value) (ar[sŧ][iï]-)
 :0: prefix for union, participation, connection (kon-)
 gv: prefix for initial lenition gu[ae]>v[ae]
 N1..N6/|1..|6: composite numerals

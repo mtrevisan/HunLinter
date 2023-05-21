@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,23 +24,33 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
-import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
+import io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.affix.RulesReducerWorker;
+import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -51,13 +61,11 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
+import java.util.function.Consumer;
 
 
 public class RulesReducerDialog extends JDialog implements ActionListener, PropertyChangeListener{
@@ -68,17 +76,22 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducerDialog.class);
 
 
+//	private final WorkerManager workerManager;
 	private final ParserManager parserManager;
 
 	private RulesReducerWorker rulesReducerWorker;
+	private final ActionListener actionListener;
 
 
-	public RulesReducerDialog(final ParserManager parserManager, final Frame parent){
+	public RulesReducerDialog(/*final WorkerManager workerManager,*/ final ParserManager parserManager, final Frame parent){
 		super(parent, "Rules Reducer", true);
 
+//		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
+//		this.workerManager = workerManager;
 		this.parserManager = parserManager;
+		actionListener = this::ruleComboBoxActionPerformed;
 
 		initComponents();
 
@@ -88,7 +101,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 
 		try{
 			final JPopupMenu copyPopupMenu = new JPopupMenu();
-			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(reducedSetLabel.getHeight(), copyPopupMenu, GUIHelper::copyCallback));
+			copyPopupMenu.add(GUIHelper.createPopupCopyMenu(copyPopupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(copyPopupMenu, reducedSetTextArea);
 		}
 		catch(final IOException ignored){}
@@ -110,6 +123,8 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       currentSetScrollPane = new javax.swing.JScrollPane();
       currentSetTextArea = new javax.swing.JTextArea();
       mainProgressBar = new javax.swing.JProgressBar();
+		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+		mainProgressBar.setUI(new MultiProgressBarUI());
       statusLabel = new javax.swing.JLabel();
       reducedSetLabel = new javax.swing.JLabel();
       reducedSetScrollPane = new javax.swing.JScrollPane();
@@ -124,25 +139,15 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		ruleComboBox.setFont(currentFont);
-      ruleComboBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            ruleComboBoxActionPerformed(evt);
-         }
-      });
+      ruleComboBox.addActionListener(actionListener);
 
       optimizeClosedGroupCheckBox.setText("Optimize for closed group");
-      optimizeClosedGroupCheckBox.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            optimizeClosedGroupCheckBoxActionPerformed(evt);
-         }
-      });
+      optimizeClosedGroupCheckBox.addActionListener(this::optimizeClosedGroupCheckBoxActionPerformed);
+		optimizeClosedGroupCheckBox.setEnabled(false);
 
       reduceButton.setText("Reduce");
-      reduceButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            reduceButtonActionPerformed(evt);
-         }
-      });
+      reduceButton.addActionListener(this::reduceButtonActionPerformed);
+		reduceButton.setEnabled(false);
 
       currentSetLabel.setText("Current set:");
 
@@ -167,7 +172,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
       reducedSetTextArea.setTabSize(3);
       reducedSetScrollPane.setViewportView(reducedSetTextArea);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -225,30 +230,58 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		getRootPane().registerKeyboardAction(this, escapeKeyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
 	}
 
+
+	@EventHandler
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
+		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
+			return;
+
+		reload();
+	}
+
 	public final void reload(){
 		mainProgressBar.setValue(0);
 		currentSetTextArea.setText(null);
+		ruleComboBoxActionPerformed(null);
 
 		final AffixData affixData = parserManager.getAffixData();
 		final List<RuleEntry> affixes = affixData.getRuleEntries();
-		final List<String> affixEntries = affixes.stream()
-			.map(affix -> (affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX)
-				+ StringUtils.SPACE + affix.getEntries()[0].getFlag())
-			.sorted()
-			.collect(Collectors.toList());
+		final List<String> affixEntries = new ArrayList<>(affixes.size());
+		final StringBuilder sb = new StringBuilder(6);
+		for(final RuleEntry affix : affixes){
+			sb.setLength(0);
+			sb.append((affix.getType() == AffixType.SUFFIX? AffixOption.SUFFIX: AffixOption.PREFIX).getCode())
+				.append(StringUtils.SPACE)
+				.append(affix.getFlag());
+			affixEntries.add(sb.toString());
+		}
+		affixEntries.sort(null);
 
 		JavaHelper.executeOnEventDispatchThread(() -> {
+			final Object selectedItem = ruleComboBox.getSelectedItem();
+			ruleComboBox.removeActionListener(actionListener);
+
 			ruleComboBox.removeAllItems();
-			forEach(affixEntries, ruleComboBox::addItem);
+			for(final String elem : affixEntries)
+				ruleComboBox.addItem(elem);
+
+			//restore previous selection
+			ruleComboBox.addActionListener(actionListener);
+			ruleComboBox.setSelectedItem(selectedItem);
 		});
 
 		if(rulesReducerWorker != null && !rulesReducerWorker.isDone())
 			rulesReducerWorker.cancel();
 	}
 
-   public void ruleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
+   private void ruleComboBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ruleComboBoxActionPerformed
 		final String flag = getSelectedFlag();
-		if(flag != null){
+
+		final boolean selected = (flag != null);
+		optimizeClosedGroupCheckBox.setEnabled(selected);
+		reduceButton.setEnabled(selected);
+		if(selected){
 			mainProgressBar.setValue(0);
 
 			final RuleEntry rule = parserManager.getAffixData().getData(flag);
@@ -256,18 +289,18 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 			final String header = sj.add(rule.getType().getOption().getCode())
 				.add(flag)
 				.add(Character.toString(rule.combinableChar()))
-				.add(Integer.toString(rule.getEntries().length))
+				.add(Integer.toString(rule.getEntries().size()))
 				.toString();
-			final String rules = Arrays.stream(rule.getEntries())
-				.map(AffixEntry::toString)
-				.collect(Collectors.joining(StringUtils.LF));
+			final StringJoiner rules = new StringJoiner(StringUtils.LF);
+			for(final AffixEntry affixEntry : rule.getEntries())
+				rules.add(affixEntry.toString());
 			currentSetTextArea.setText(header + StringUtils.LF + rules);
 			currentSetTextArea.setCaretPosition(0);
 			reducedSetTextArea.setText(null);
 		}
    }//GEN-LAST:event_ruleComboBoxActionPerformed
 
-   private void reduceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
+   private void reduceButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reduceButtonActionPerformed
 		mainProgressBar.setValue(0);
 		reducedSetTextArea.setText(null);
 		ruleComboBox.setEnabled(false);
@@ -277,12 +310,12 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		reduceRules();
    }//GEN-LAST:event_reduceButtonActionPerformed
 
-   private void optimizeClosedGroupCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optimizeClosedGroupCheckBoxActionPerformed
+   private void optimizeClosedGroupCheckBoxActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optimizeClosedGroupCheckBoxActionPerformed
 		reducedSetTextArea.setText(null);
    }//GEN-LAST:event_optimizeClosedGroupCheckBoxActionPerformed
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		if(rulesReducerWorker != null && rulesReducerWorker.getState() == SwingWorker.StateValue.STARTED){
 			final Runnable cancelTask = () -> {
 				ruleComboBox.setEnabled(true);
@@ -297,18 +330,18 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt){
-		final String propertyName = evt.getPropertyName();
-		if("progress".equals(propertyName)){
-			final int progress = (int)evt.getNewValue();
-			mainProgressBar.setValue(progress);
-		}
-		else if("state".equals(propertyName) && evt.getNewValue() == SwingWorker.StateValue.DONE){
-			reducedSetTextArea.setCaretPosition(0);
-
-			ruleComboBox.setEnabled(true);
-			optimizeClosedGroupCheckBox.setEnabled(true);
-			reduceButton.setEnabled(true);
+	public final void propertyChange(final PropertyChangeEvent evt){
+		switch(evt.getPropertyName()){
+			case MainFrame.PROPERTY_NAME_PROGRESS -> {
+				final int progress = (Integer)evt.getNewValue();
+				mainProgressBar.setValue(progress);
+			}
+			case MainFrame.PROPERTY_NAME_STATE -> {
+				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
+				if(stateValue == SwingWorker.StateValue.STARTED)
+					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+			}
+			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
 		}
 	}
 
@@ -316,21 +349,23 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		if(rulesReducerWorker == null || rulesReducerWorker.isDone()){
 			mainProgressBar.setValue(0);
 
-			try{
-				final String flag = getSelectedFlag();
-				final boolean keepLongestCommonAffix = getKeepLongestCommonAffix();
-				rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(), parserManager.getDicParser(),
-					parserManager.getWordGenerator());
-				rulesReducerWorker.addPropertyChangeListener(this);
-				rulesReducerWorker.execute();
-			}
-			catch(final Exception e){
+			final String flag = getSelectedFlag();
+			final boolean keepLongestCommonAffix = isKeepLongestCommonAffix();
+			final Runnable onCompleted = () -> {
+				reducedSetTextArea.setCaretPosition(0);
+
 				ruleComboBox.setEnabled(true);
 				optimizeClosedGroupCheckBox.setEnabled(true);
 				reduceButton.setEnabled(true);
-
-				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, e.getMessage());
-			}
+			};
+			final Consumer<Exception> onCancelled = exc -> {
+				//change color of progress bar to reflect an error
+				propertyChange(rulesReducerWorker.propertyChangeEventWorkerCancelled);
+			};
+			rulesReducerWorker = new RulesReducerWorker(flag, keepLongestCommonAffix, parserManager.getAffixData(),
+				parserManager.getDicParser(), parserManager.getWordGenerator(), onCompleted, onCancelled);
+			rulesReducerWorker.addPropertyChangeListener(this);
+			rulesReducerWorker.execute();
 		}
 	}
 
@@ -339,20 +374,20 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		return (item != null? StringUtils.split(item.toString())[1]: null);
 	}
 
-	private boolean getKeepLongestCommonAffix(){
+	private boolean isKeepLongestCommonAffix(){
 		return optimizeClosedGroupCheckBox.isSelected();
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

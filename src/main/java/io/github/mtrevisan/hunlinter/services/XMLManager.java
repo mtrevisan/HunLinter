@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,7 +33,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,8 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-
 
 public final class XMLManager{
 
@@ -65,45 +62,48 @@ public final class XMLManager{
 	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);
 	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = getXMLProperties(StandardCharsets.US_ASCII);
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
+	@SuppressWarnings("HttpUrlsUsage")
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";
 
 
-	private static DocumentBuilder DOCUMENT_BUILDER;
-	static{
+	private DocumentBuilder documentBuilder;
+
+
+	public XMLManager(){
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setExpandEntityReferences(false);
 		try{
-			DOCUMENT_BUILDER = factory.newDocumentBuilder();
-			DOCUMENT_BUILDER.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
+			documentBuilder = factory.newDocumentBuilder();
+			documentBuilder.setEntityResolver((publicId, systemId) -> new InputSource(new StringReader(StringUtils.EMPTY)));
 		}
 		catch(final ParserConfigurationException e){
 			LOGGER.error("Bad error while creating the XML parser", e);
 		}
 	}
 
-
-	private XMLManager(){}
-
-	public static Document parseXMLDocument(final File file) throws SAXException, IOException{
-		final Document doc = DOCUMENT_BUILDER.parse(file);
+	public Document parseXMLDocument(final File file) throws SAXException, IOException{
+		final Document doc = documentBuilder.parse(file);
 		doc.getDocumentElement().normalize();
 		return doc;
 	}
 
-	public static Document newXMLDocumentStandalone(){
-		final Document doc = DOCUMENT_BUILDER.newDocument();
+	public Document newXMLDocumentStandalone(){
+		final Document doc = documentBuilder.newDocument();
 		//remove `standalone="no"` from XML declaration
 		doc.setXmlStandalone(true);
 		return doc;
 	}
 
-	/* Transform the DOM Object to an XML File */
+	/** Transform the DOM Object to an XML File. */
 	@SafeVarargs
+	@SuppressWarnings("OverlyBroadThrowsClause")
 	public static void createXML(final File xmlFile, final Document doc, final Pair<String, String>... properties)
 			throws TransformerException{
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		final Transformer transformer = transformerFactory.newTransformer();
-		forEach(properties, property -> transformer.setOutputProperty(property.getKey(), property.getValue()));
+		if(properties != null)
+			for(final Pair<String, String> property : properties)
+				transformer.setOutputProperty(property.getKey(), property.getValue());
 		final Source domSource = new DOMSource(doc);
 		final Result streamResult = new StreamResult(xmlFile);
 		transformer.transform(domSource, streamResult);
@@ -114,11 +114,16 @@ public final class XMLManager{
 	}
 
 	public static List<Node> extractChildren(final Node parentNode, final Predicate<Node> extractionCondition){
-		final ArrayList<Node> children = new ArrayList<>();
+		final ArrayList<Node> children = new ArrayList<>(0);
 		if(parentNode != null){
 			final NodeList nodes = parentNode.getChildNodes();
-			children.ensureCapacity(nodes.getLength());
-			LoopHelper.applyIf(nodes, extractionCondition, children::add);
+			final int length = nodes.getLength();
+			children.ensureCapacity(length);
+			for(int i = 0; i < length; i ++){
+				final Node node = nodes.item(i);
+				if(extractionCondition.test(node))
+					children.add(node);
+			}
 		}
 		return children;
 	}
@@ -131,7 +136,7 @@ public final class XMLManager{
 		return entry.getAttributes().getNamedItem(name).getNodeValue();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "HttpUrlsUsage"})
 	private static Pair<String, String>[] getXMLProperties(final Charset charset){
 		return new Pair[]{
 			Pair.of(OutputKeys.VERSION, "1.0"),

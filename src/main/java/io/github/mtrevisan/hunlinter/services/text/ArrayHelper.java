@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.text;
 
+import java.nio.ByteBuffer;
+
 
 public final class ArrayHelper{
 
@@ -32,26 +34,45 @@ public final class ArrayHelper{
 	public static byte[] concatenate(final byte[]... arrays){
 		int size = 0;
 		for(int i = 0; i < arrays.length; i ++)
-			size += arrays[i].length;
+			size += (arrays[i] != null? arrays[i].length: 0);
 
-		size = 0;
 		final byte[] joinedArray = new byte[size];
-		for(int i = 0; i < arrays.length; i ++, size += arrays[i].length)
-			System.arraycopy(arrays[i], 0, joinedArray, size, arrays[i].length);
+		size = 0;
+		for(int i = 0; i < arrays.length; i ++)
+			if(arrays[i] != null){
+				final int length = arrays[i].length;
+				System.arraycopy(arrays[i], 0, joinedArray, size, length);
+				size += length;
+			}
 		return joinedArray;
 	}
 
 	/**
-	 * Compute the length of the shared prefix between two byte sequences
+	 * Compute the length of the shared prefix between two byte sequences.
 	 *
-	 * @param a	First array
-	 * @param b	Second array
-	 * @return	The longest common prefix
+	 * @param a	First array.
+	 * @param b	Second array.
+	 * @return	The longest common prefix.
 	 */
 	public static int longestCommonPrefix(final byte[] a, final byte[] b){
 		int i = 0;
 		final int max = Math.min(a.length, b.length);
 		while(i < max && a[i] == b[i])
+			i ++;
+		return i;
+	}
+
+	/**
+	 * Compute the length of the shared prefix between two byte sequences.
+	 *
+	 * @param a	First {@link ByteBuffer}.
+	 * @param b	Second array.
+	 * @return	The longest common prefix.
+	 */
+	public static int longestCommonPrefix(final ByteBuffer a, final byte[] b){
+		int i = 0;
+		final int max = Math.min(a.limit(), b.length);
+		while(i < max && a.get(i) == b[i])
 			i ++;
 		return i;
 	}

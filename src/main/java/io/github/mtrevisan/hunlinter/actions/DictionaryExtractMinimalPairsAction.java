@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,15 +25,23 @@
 package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.MenuSelectionManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.concurrent.Future;
 
 
 public class DictionaryExtractMinimalPairsAction extends AbstractAction{
@@ -45,33 +53,36 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
 
-	private static final JFileChooser SAVE_RESULT_FILE_CHOOSER;
-	static{
-		SAVE_RESULT_FILE_CHOOSER = new JFileChooser();
-		SAVE_RESULT_FILE_CHOOSER.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		SAVE_RESULT_FILE_CHOOSER.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	}
+	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
 		super("dictionary.extractMinimalPairs");
 
-		Objects.requireNonNull(workerManager);
-		Objects.requireNonNull(propertyChangeListener);
+		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
+		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+
+		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
+			final JFileChooser saveResultFileChooser = new JFileChooser();
+			saveResultFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+			saveResultFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			return saveResultFileChooser;
+		});
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		workerManager.createMinimalPairsWorker(
 			() -> {
-				final int fileChosen = SAVE_RESULT_FILE_CHOOSER.showSaveDialog(parentFrame);
-				return (fileChosen == JFileChooser.APPROVE_OPTION? SAVE_RESULT_FILE_CHOOSER.getSelectedFile(): null);
+				final JFileChooser saveResultFileChooser = JavaHelper.waitForFuture(futureSaveResultFileChooser);
+				final int fileChosen = saveResultFileChooser.showSaveDialog(parentFrame);
+				return (fileChosen == JFileChooser.APPROVE_OPTION? saveResultFileChooser.getSelectedFile(): null);
 			},
 			worker -> {
 				setEnabled(false);
@@ -79,8 +90,33 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 				worker.addPropertyChangeListener(propertyChangeListener);
 				worker.execute();
 			},
-			worker -> setEnabled(true)
+			worker -> {
+				//change color of progress bar to reflect an error
+				if(worker.isCancelled())
+					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
+
+				setEnabled(true);
+			}
 		);
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

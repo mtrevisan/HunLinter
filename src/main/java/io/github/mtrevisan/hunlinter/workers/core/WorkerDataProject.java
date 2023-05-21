@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -39,18 +39,18 @@ public class WorkerDataProject extends WorkerData{
 	public WorkerDataProject(final String workerName, final Packager packager, final ParserManager parserManager){
 		super(workerName);
 
-		Objects.requireNonNull(packager);
-		Objects.requireNonNull(parserManager);
+		Objects.requireNonNull(packager, "Packager cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
 		this.packager = packager;
 		this.parserManager = parserManager;
 	}
 
-	Packager getPackager(){
+	final Packager getPackager(){
 		return packager;
 	}
 
-	ParserManager getParserManager(){
+	final ParserManager getParserManager(){
 		return parserManager;
 	}
 

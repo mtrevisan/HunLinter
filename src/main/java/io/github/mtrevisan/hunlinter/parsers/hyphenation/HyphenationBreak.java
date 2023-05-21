@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,12 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.tuple.Pair;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,169 +38,160 @@ public class HyphenationBreak{
 
 	@FunctionalInterface
 	public interface NoHyphenationManageFunction{
-		String[] manage(final Map<Integer, Pair<Integer, String>> indexesAndRules, final String[] syllabes, final String nohyp,
+		void manage(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes, final String nohyp,
 			final int wordLength);
 	}
 
-	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = new HashMap<>(4);
-	static{
-		NO_HYPHENATION_MANAGE_METHODS.put("  ", HyphenationBreak::manageInside);
-		NO_HYPHENATION_MANAGE_METHODS.put("^ ", HyphenationBreak::manageStartsWith);
-		NO_HYPHENATION_MANAGE_METHODS.put(" $", HyphenationBreak::manageEndsWith);
-		NO_HYPHENATION_MANAGE_METHODS.put("^$", HyphenationBreak::manageWhole);
-	}
+	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = Map.of(
+		"  ", HyphenationBreak::manageInside,
+		"^ ", HyphenationBreak::manageStartsWith,
+		" $", HyphenationBreak::manageEndsWith,
+		"^$", HyphenationBreak::manageWhole
+	);
 
-	public static final Pair<Integer, String> EMPTY_PAIR = Pair.of(0, null);
-
-
-	private final Map<Integer, Pair<Integer, String>> indexesAndRules;
+	static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
 
 
-	public HyphenationBreak(final Map<Integer, Pair<Integer, String>> indexesAndRules){
-		Objects.requireNonNull(indexesAndRules);
+	private final Map<Integer, IndexDataPair<String>> indexesAndRules;
+
+
+	HyphenationBreak(final Map<Integer, IndexDataPair<String>> indexesAndRules){
+		Objects.requireNonNull(indexesAndRules, "Indexes and rules cannot be null");
 
 		this.indexesAndRules = indexesAndRules;
 	}
 
 
-	public boolean isBreakpoint(final int index){
-		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getKey() % 2 != 0);
+	public final boolean isBreakpoint(final int index){
+		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getIndex() % 2 != 0);
 	}
 
-	public String getRule(final int index){
-		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getValue();
+	public final String getRule(final int index){
+		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getData();
 	}
 
-	public String[] getRules(){
-		int offset = 0;
-		final String[] list = new String[indexesAndRules.size()];
-		for(final Pair<Integer, String> pair : indexesAndRules.values())
-			list[offset ++] = pair.getValue();
+	public final List<String> getRules(){
+		final Collection<IndexDataPair<String>> pairs = indexesAndRules.values();
+		final List<String> list = new ArrayList<>(pairs.size());
+		for(final IndexDataPair<String> pair : pairs)
+			list.add(pair.getData());
 		return list;
 	}
 
-	public String[] enforceNoHyphens(String[] syllabes, final Iterable<String> noHyphen){
-		if(syllabes.length > 1){
+	public final void enforceNoHyphens(final List<String> syllabes, final Iterable<String> noHyphen){
+		if(syllabes.size() > 1){
 			int wordLength = 0;
-			for(final String syllabe : syllabes)
-				wordLength += syllabe.length();
+			for(int i = 0; i < syllabes.size(); i ++)
+				wordLength += syllabes.get(i).length();
 			for(final String nohyp : noHyphen){
 				final String reducedKey = reduceKey(nohyp);
 				final NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
-				syllabes = fun.manage(indexesAndRules, syllabes, nohyp, wordLength);
-				if(syllabes.length <= 1)
+				fun.manage(indexesAndRules, syllabes, nohyp, wordLength);
+				if(syllabes.size() <= 1)
 					break;
 			}
 		}
-		return syllabes;
 	}
 
-	private static String[] manageInside(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static void manageInside(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			final CharSequence nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
 
 		int index = 0;
-		for(int i = 0; syllabes.length > 1 && i < syllabes.length; i ++){
-			final String syllabe = syllabes[i];
+		for(int i = 0; syllabes.size() > 1 && i < syllabes.size(); i ++){
+			final String syllabe = syllabes.get(i);
 
 			if(syllabe.contentEquals(nohyp)){
 				indexesAndRules.remove(index);
 				indexesAndRules.remove(index + nohypLength);
 
 				if(i == 0)
-					syllabes = mergeIndexWithFollowing(syllabes, 0);
-				else if(i == syllabes.length - 1)
-					syllabes = mergeIndexWithPrevious(syllabes, i);
-				else if(syllabes.length == 2)
-					syllabes = mergeIndexWithPrevious(syllabes, syllabes.length - 1);
+					mergeIndexWithFollowing(syllabes, 0);
+				else if(i == syllabes.size() - 1)
+					mergeIndexWithPrevious(syllabes, i);
+				else if(syllabes.size() == 2)
+					mergeIndexWithPrevious(syllabes, syllabes.size() - 1);
 				else
-					syllabes = mergeIndexAndNextWithPrevious(syllabes, i);
+					mergeIndexAndNextWithPrevious(syllabes, i);
 
 				i --;
 			}
 
 			index += syllabe.length();
 		}
-		return syllabes;
 	}
 
-	private static String[] manageStartsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static void manageStartsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			final String nohyp, final int wordLength){
-		if(syllabes[0].equals(nohyp.substring(1))){
+		if(syllabes.get(0).equals(nohyp.substring(1))){
 			indexesAndRules.remove(1);
 			indexesAndRules.remove(nohyp.length());
 
-			if(syllabes.length > 1)
-				syllabes = mergeIndexWithFollowing(syllabes, 0);
+			if(syllabes.size() > 1)
+				mergeIndexWithFollowing(syllabes, 0);
 		}
-		return syllabes;
 	}
 
-	private static String[] manageEndsWith(final Map<Integer, Pair<Integer, String>> indexesAndRules, String[] syllabes,
+	private static void manageEndsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			final String nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
-		if(syllabes[syllabes.length - 1].equals(nohyp.substring(0, nohypLength - 1))){
+		if(syllabes.get(syllabes.size() - 1).equals(nohyp.substring(0, nohypLength - 1))){
 			indexesAndRules.remove(wordLength - nohypLength - 1);
 			indexesAndRules.remove(wordLength - 1);
 
-			if(syllabes.length > 1)
-				syllabes = mergeIndexWithPrevious(syllabes, syllabes.length - 1);
+			if(syllabes.size() > 1)
+				mergeIndexWithPrevious(syllabes, syllabes.size() - 1);
 		}
-		return syllabes;
 	}
 
-	private static String[] manageWhole(final Map<Integer, Pair<Integer, String>> indexesAndRules, final String[] syllabes,
+	private static void manageWhole(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			String nohyp, final int wordLength){
 		nohyp = nohyp.substring(1, nohyp.length() - 1);
 		manageInside(indexesAndRules, syllabes, nohyp, wordLength);
-		return syllabes;
 	}
 
-	private static String[] mergeIndexWithFollowing(final String[] array, final int index){
-		array[index + 1] = array[index] + array[index + 1];
-		return ArrayUtils.remove(array, index);
+	private static void mergeIndexWithFollowing(final List<String> array, final int index){
+		array.set(index + 1, array.get(index) + array.get(index + 1));
+		array.remove(index);
 	}
 
-	private static String[] mergeIndexWithPrevious(final String[] array, final int index){
-		array[index - 1] += array[index];
-		return ArrayUtils.remove(array, index);
+	private static void mergeIndexWithPrevious(final List<String> array, final int index){
+		array.set(index - 1, array.get(index - 1) + array.get(index));
+		array.remove(index);
 	}
 
-	private static String[] mergeIndexAndNextWithPrevious(final String[] array, final int index){
-		array[index - 1] = array[index - 1] + array[index] + array[index + 1];
-		return ArrayUtils.removeAll(array, index, index + 1);
+	private static void mergeIndexAndNextWithPrevious(final List<String> array, final int index){
+		array.set(index - 1, array.get(index - 1) + array.get(index) + array.get(index + 1));
+		array.remove(index);
+		array.remove(index);
 	}
 
-	private String reduceKey(final CharSequence key){
+	private static String reduceKey(final CharSequence key){
 		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
 	}
 
-	private boolean isStarting(final CharSequence key){
+	private static boolean isStarting(final CharSequence key){
 		return (key.charAt(0) == '^');
 	}
 
-	private boolean isEnding(final CharSequence key){
-		return (key.charAt(key.length() - 1) == '$');
+	private static boolean isEnding(final CharSequence key){
+		return (StringHelper.lastChar(key) == '$');
 	}
 
 	@Override
-	public boolean equals(final Object obj){
+	public final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
 			return false;
 
-		final HyphenationBreak other = (HyphenationBreak)obj;
-		return new EqualsBuilder()
-			.append(indexesAndRules, other.indexesAndRules)
-			.isEquals();
+		final HyphenationBreak rhs = (HyphenationBreak)obj;
+		return indexesAndRules.equals(rhs.indexesAndRules);
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(indexesAndRules)
-			.toHashCode();
+	public final int hashCode(){
+		return indexesAndRules.hashCode();
 	}
 
 }

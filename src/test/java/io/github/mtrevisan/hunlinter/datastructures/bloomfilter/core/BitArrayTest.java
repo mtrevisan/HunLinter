@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -52,7 +52,7 @@ class BitArrayTest{
 
 	@Test
 	void memoryMappedFile() throws IOException{
-		File file = File.createTempFile(DownloaderHelper.APPLICATION_PROPERTIES.get(DownloaderHelper.PROPERTY_KEY_ARTIFACT_ID) + "-duplications-bitarray", ".bits");
+		File file = File.createTempFile(DownloaderHelper.ARTIFACT_ID + "-duplications-bitarray", ".bits");
 		file.deleteOnExit();
 		try(MemoryMappedFileBitArray bits = new MemoryMappedFileBitArray(file, MAX)){
 			for(int i = 0; i < MAX; i ++){

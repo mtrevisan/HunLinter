@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,23 +24,21 @@
  */
 package io.github.mtrevisan.hunlinter.languages;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
+import java.util.Arrays;
 
 
 public class LetterMatcherEntry{
 
-	private final MessageFormat messagePattern;
-	private final String masterLetter;
+	private final String messagePattern;
+	private final Character masterLetter;
 	private final String[] wrongFlags;
 	private final String correctRule;
 
 
-	public LetterMatcherEntry(final MessageFormat messagePattern, final String masterLetter, final String[] wrongFlags,
+	public LetterMatcherEntry(final String messagePattern, final Character masterLetter, final String[] wrongFlags,
 			final String correctRule){
 		this.messagePattern = messagePattern;
 		this.masterLetter = masterLetter;
@@ -48,37 +46,34 @@ public class LetterMatcherEntry{
 		this.correctRule = correctRule;
 	}
 
-	public void match(final Inflection inflection){
-		for(final String flag : wrongFlags)
-			if(inflection.hasContinuationFlag(flag))
-				throw new LinterException(messagePattern.format(new Object[]{masterLetter, flag, correctRule}));
+	public final void match(final Inflection inflection){
+		if(!inflection.getContinuationFlags().isEmpty())
+			for(int i = 0; i < wrongFlags.length; i ++)
+				if(inflection.hasContinuationFlag(wrongFlags[i]))
+					throw new LinterException(messagePattern, masterLetter, wrongFlags[i], correctRule);
 	}
 
-
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final LetterMatcherEntry rhs = (LetterMatcherEntry)obj;
-		return new EqualsBuilder()
-			.append(messagePattern, rhs.messagePattern)
-			.append(masterLetter, rhs.masterLetter)
-			.append(wrongFlags, rhs.wrongFlags)
-			.append(correctRule, rhs.correctRule)
-			.isEquals();
+		return (messagePattern.equals(rhs.messagePattern)
+			&& masterLetter.equals(rhs.masterLetter)
+			&& Arrays.equals(wrongFlags, rhs.wrongFlags)
+			&& correctRule.equals(rhs.correctRule));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(messagePattern)
-			.append(masterLetter)
-			.append(wrongFlags)
-			.append(correctRule)
-			.toHashCode();
+	public final int hashCode(){
+		int result = (messagePattern == null? 0: messagePattern.hashCode());
+		result = 31 * result + Character.hashCode(masterLetter);
+		result = 31 * result + Arrays.hashCode(wrongFlags);
+		result = 31 * result + correctRule.hashCode();
+		return result;
 	}
 
 }

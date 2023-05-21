@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -35,34 +35,34 @@ import java.util.Comparator;
  */
 public final class ExternalSorterOptions{
 
-	/** Default maximal number of temporary files allowed */
+	/** Default maximal number of temporary files allowed. */
 	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
-	/** Default maximal size of temporary file allowed [B] */
+	/** Default maximal size of temporary file allowed [B]. */
 	public static final int MAX_TEMPORARY_FILE_SIZE_UNLIMITED = -1;
-	/** Default ZIP buffer size [B] */
+	/** Default ZIP buffer size [B]. */
 	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
 
 	private static final String LINE_SEPARATOR_DEFAULT = System.lineSeparator();
 
 
 	private final Charset charset;
-	/** String comparator */
+	/** String comparator. */
 	private final Comparator<String> comparator;
-	/** Whether the duplicate lines should be discarded */
+	/** Whether the duplicate lines should be discarded. */
 	private final boolean removeDuplicates;
-	/** Whether to make a parallel sort */
+	/** Whether to make a parallel sort. */
 	private final boolean sortInParallel;
-	/** Maximum number of temporary files allowed */
+	/** Maximum number of temporary files allowed. */
 	private final int maxTemporaryFiles;
-	/** Maximum size of temporary file allowed [B] */
+	/** Maximum size of temporary file allowed [B]. */
 	private final long maxTemporaryFileSize;
-	/** Whether to use ZIP for temporary files */
+	/** Whether to use ZIP for temporary files. */
 	private final boolean useTemporaryAsZip;
-	/** Whether to use ZIP for output file */
+	/** Whether to use ZIP for output file. */
 	private final boolean writeOutputAsZip;
-	/** ZIP buffer size [B] */
+	/** ZIP buffer size [B]. */
 	private final int zipBufferSize;
-	/** Line separator for output file */
+	/** Line separator for output file. */
 	private final String lineSeparator;
 
 
@@ -104,61 +104,61 @@ public final class ExternalSorterOptions{
 
 		ExternalSorterOptionsBuilder(){}
 
-		public ExternalSorterOptionsBuilder charset(final Charset charset){
+		public final ExternalSorterOptionsBuilder charset(final Charset charset){
 			this.charset = charset;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder comparator(final Comparator<String> comparator){
+		public final ExternalSorterOptionsBuilder comparator(final Comparator<String> comparator){
 			this.comparator = comparator;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder removeDuplicates(){
+		public final ExternalSorterOptionsBuilder removeDuplicates(){
 			removeDuplicates = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder sortInParallel(){
+		public final ExternalSorterOptionsBuilder sortInParallel(){
 			sortInParallel = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder maxTemporaryFiles(final int maxTemporaryFiles){
+		public final ExternalSorterOptionsBuilder maxTemporaryFiles(final int maxTemporaryFiles){
 			this.maxTemporaryFiles = maxTemporaryFiles;
 			maxTemporaryFiles$set = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder maxTemporaryFileSize(final long maxTemporaryFileSize){
+		public final ExternalSorterOptionsBuilder maxTemporaryFileSize(final long maxTemporaryFileSize){
 			this.maxTemporaryFileSize = maxTemporaryFileSize;
 			maxTemporaryFileSize$set = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder useTemporaryAsZip(){
+		public final ExternalSorterOptionsBuilder useTemporaryAsZip(){
 			useTemporaryAsZip = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder writeOutputAsZip(){
+		public final ExternalSorterOptionsBuilder writeOutputAsZip(){
 			writeOutputAsZip = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder zipBufferSize(final int zipBufferSize){
+		public final ExternalSorterOptionsBuilder zipBufferSize(final int zipBufferSize){
 			this.zipBufferSize = zipBufferSize;
 			zipBufferSize$set = true;
 			return this;
 		}
 
-		public ExternalSorterOptionsBuilder lineSeparator(final String lineSeparator){
+		public final ExternalSorterOptionsBuilder lineSeparator(final String lineSeparator){
 			this.lineSeparator = lineSeparator;
 			return this;
 		}
 
 		@Override
-		public ExternalSorterOptions build(){
+		public final ExternalSorterOptions build(){
 			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
 				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
 				(maxTemporaryFileSize$set? maxTemporaryFileSize: MAX_TEMPORARY_FILE_SIZE_UNLIMITED),

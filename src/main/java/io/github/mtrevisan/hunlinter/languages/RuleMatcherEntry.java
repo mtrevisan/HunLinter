@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,56 +24,51 @@
  */
 package io.github.mtrevisan.hunlinter.languages;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
-import java.text.MessageFormat;
+import java.util.Arrays;
 
 
 public class RuleMatcherEntry{
 
-	private final MessageFormat messagePattern;
+	private final String messagePattern;
 	private final String masterFlag;
 	private final String[] wrongFlags;
 
 
-	public RuleMatcherEntry(final MessageFormat messagePattern, final String masterFlag, final String[] wrongFlags){
+	public RuleMatcherEntry(final String messagePattern, final String masterFlag, final String[] wrongFlags){
 		this.messagePattern = messagePattern;
 		this.masterFlag = masterFlag;
 		this.wrongFlags = wrongFlags;
 	}
 
-	public void match(final Inflection inflection){
-		for(final String flag : wrongFlags)
-			if(inflection.hasContinuationFlag(flag))
-				throw new LinterException(messagePattern.format(new Object[]{masterFlag, flag}));
+	public final void match(final Inflection inflection){
+		if(!inflection.getContinuationFlags().isEmpty())
+			for(int i = 0; i < wrongFlags.length; i ++)
+				if(inflection.hasContinuationFlag(wrongFlags[i]))
+					throw new LinterException(messagePattern, masterFlag, wrongFlags[i]);
 	}
 
-
 	@Override
-	public boolean equals(final Object obj){
-		if(obj == this)
+	public final boolean equals(final Object obj){
+		if(this == obj)
 			return true;
-		if(obj == null || obj.getClass() != getClass())
+		if(obj == null || getClass() != obj.getClass())
 			return false;
 
 		final RuleMatcherEntry rhs = (RuleMatcherEntry)obj;
-		return new EqualsBuilder()
-			.append(messagePattern, rhs.messagePattern)
-			.append(masterFlag, rhs.masterFlag)
-			.append(wrongFlags, rhs.wrongFlags)
-			.isEquals();
+		return (messagePattern.equals(rhs.messagePattern)
+			&& masterFlag.equals(rhs.masterFlag)
+			&& Arrays.equals(wrongFlags, rhs.wrongFlags));
 	}
 
 	@Override
-	public int hashCode(){
-		return new HashCodeBuilder()
-			.append(messagePattern)
-			.append(masterFlag)
-			.append(wrongFlags)
-			.toHashCode();
+	public final int hashCode(){
+		int result = messagePattern.hashCode();
+		result = 31 * result + masterFlag.hashCode();
+		result = 31 * result + Arrays.hashCode(wrongFlags);
+		return result;
 	}
 
 }

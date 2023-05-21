@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,7 +27,6 @@ package io.github.mtrevisan.hunlinter.gui.models;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
 
 import javax.swing.table.AbstractTableModel;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -46,24 +45,24 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 	private List<CorrectionEntry> corrections;
 
 
-	public void setCorrections(final List<CorrectionEntry> corrections){
+	public final void setCorrections(final List<CorrectionEntry> corrections){
 		this.corrections = corrections;
 
 		fireTableDataChanged();
 	}
 
 	@Override
-	public int getRowCount(){
+	public final int getRowCount(){
 		return (corrections != null? corrections.size(): 0);
 	}
 
 	@Override
-	public int getColumnCount(){
+	public final int getColumnCount(){
 		return COLUMN_NAMES.length;
 	}
 
 	@Override
-	public Object getValueAt(final int rowIndex, final int columnIndex){
+	public final Object getValueAt(final int rowIndex, final int columnIndex){
 		if(corrections == null || corrections.size() <= rowIndex)
 			return null;
 
@@ -76,20 +75,20 @@ public class AutoCorrectTableModel extends AbstractTableModel{
 	}
 
 	@Override
-	public String getColumnName(final int column){
+	public final String getColumnName(final int column){
 		return COLUMN_NAMES[column];
 	}
 
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

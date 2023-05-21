@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,25 +26,16 @@ package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
-import io.github.mtrevisan.hunlinter.services.system.LoopHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
-import java.util.TreeMap;
 import java.util.regex.Pattern;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.applyIf;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.match;
 
 
 public class ThesaurusDictionary{
@@ -58,41 +49,48 @@ public class ThesaurusDictionary{
 
 	private final Map<String, ThesaurusEntry> dictionary;
 
+	private final Comparator<String> comparator;
+
 
 	public ThesaurusDictionary(final String language){
-		final Comparator<String> comparator = BaseBuilder.getComparator(language);
+		comparator = BaseBuilder.getComparator(language);
+
 		//sort the definitions in language-specific order
-		dictionary = new TreeMap<>(comparator);
+		dictionary = new HashMap<>();
 	}
 
-	public boolean add(final ThesaurusEntry entry){
+	public final boolean add(final ThesaurusEntry entry){
 		return (dictionary.put(entry.getDefinition(), entry) == null);
 	}
 
-	public boolean add(final String[] partOfSpeeches, final String[] synonyms){
+	public final void addAll(final Map<String, ThesaurusEntry> entries){
+		dictionary.putAll(entries);
+	}
+
+	/**
+	 * @param partOfSpeeches	Part-of-speech.
+	 * @param synonyms	Unique list of synonyms.
+	 * @return	Whether the row was added.
+	 */
+	public final boolean add(final String[] partOfSpeeches, final List<String> synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
-		LoopHelper.forEach(partOfSpeeches, sj::add);
+		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
+		for(int i = 0; i < size; i ++)
+			sj.add(partOfSpeeches[i]);
 		final String wholePartOfSpeeches = sj.toString();
-		final Collection<String> uniqueSynonyms = new ArrayList<>(synonyms.length);
-		final Collection<String> uniqueValues = new HashSet<>();
-		LoopHelper.forEach(synonyms, synonym -> {
-			final String s = synonym.toLowerCase(Locale.ROOT);
-			if(uniqueValues.add(s))
-				uniqueSynonyms.add(s);
-		});
 
 		boolean result = false;
-		for(String currentDefinition : uniqueSynonyms){
-			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, uniqueSynonyms,
-				currentDefinition);
+		for(int i = 0; i < synonyms.size(); i ++){
+			String currentDefinition = synonyms.get(i);
+			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
 
 			currentDefinition = removeSynonymUse(currentDefinition);
 			final ThesaurusEntry foundDefinition = dictionary.get(currentDefinition);
 			if(foundDefinition != null)
-				//add definition and synonyms if definition does exists
+				//add definition and synonyms if definition does exist
 				foundDefinition.addSynonym(synonymsEntry);
 			else{
-				//add to list if definition doesn't exists
+				//add to list if definition doesn't exist
 				final ThesaurusEntry entry = ThesaurusEntry.createFromDefinitionAndSynonyms(currentDefinition, synonymsEntry);
 				dictionary.put(currentDefinition, entry);
 
@@ -103,35 +101,46 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final Iterable<String> synonyms,
+	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		LoopHelper.applyIf(synonyms,
-			synonym -> !synonym.equals(definition),
-			sj::add);
+		for(int i = 0; i < synonyms.size(); i ++){
+			final String synonym = synonyms.get(i);
+			if(!synonym.equals(definition))
+				sj.add(synonym);
+		}
 		return new SynonymsEntry(sj.toString());
 	}
 
-	/* Find if there is a duplicate with the same definition and same Part-of-Speech */
-	public boolean contains(final String definition, final String[] partOfSpeeches, final String synonym){
+	/** Find if there is a duplicate with the same definition and same Part-of-Speech. */
+	public final boolean contains(final String definition, final List<String> partOfSpeeches, final String synonym){
 		final ThesaurusEntry def = dictionary.get(definition);
 		return (def != null && def.containsPartOfSpeechesAndSynonym(partOfSpeeches, synonym));
 	}
 
-	/* Find if there is a duplicate with the same Part-of-Speech and same synonyms */
-	public boolean contains(final String[] partOfSpeeches, final String[] synonyms){
+	/** Find if there is a duplicate with the same Part-of-Speech and same synonyms. */
+	public final boolean contains(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
 		final List<String> syns = Arrays.asList(synonyms);
-		return (LoopHelper.match(dictionary.values(), entry -> entry.contains(pos, syns)) != null);
+		for(final ThesaurusEntry entry : dictionary.values())
+			if(entry.contains(pos, syns))
+				return true;
+		return false;
 	}
 
 	//FIXME? remove only one entry?
-	public void deleteDefinition(final String definition, final String synonyms){
+	public final void deleteDefinition(final String definition, final String synonyms){
 		//recover all words (definition and synonyms) from given definition
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final Set<String> definitions = entryToBeDeleted.getSynonymsSet();
+		final List<String> definitions = new ArrayList<>(entryToBeDeleted.getSynonymsSet());
 		definitions.add(definition);
+		for(int i = 0; i < definitions.size(); i ++){
+			final int subTypeIndex = StringUtils.indexOfAny(definitions.get(i), '(');
+			if(subTypeIndex >= 0)
+				//NOTE: remove also de space before the open parenthesis (this assumes the subtype be the last thing of the synonym)
+				definitions.set(i, definitions.get(i).substring(0, subTypeIndex - 1));
+		}
 
 		//remove all
 		dictionary.entrySet()
@@ -155,33 +164,37 @@ public class ThesaurusDictionary{
 //			});
 	}
 
-	public List<ThesaurusEntry> getSynonymsDictionary(){
-		return new ArrayList<>(dictionary.values());
+	public final List<ThesaurusEntry> getSynonymsDictionary(){
+		//sort for GUI
+		return getSortedEntries(comparator);
 	}
 
-	public List<ThesaurusEntry> getSortedSynonyms(){
+	public final List<ThesaurusEntry> getSortedSynonyms(){
+		//sort for package
+		return getSortedEntries(Comparator.naturalOrder());
+	}
+
+	private List<ThesaurusEntry> getSortedEntries(final Comparator<String> comparator){
 		final List<ThesaurusEntry> synonyms = new ArrayList<>(dictionary.values());
-		//need to sort the definitions in natural order
-		synonyms.sort((entry1, entry2) -> Comparator.<String>naturalOrder().compare(entry1.getDefinition(), entry2.getDefinition()));
+		synonyms.sort((ThesaurusEntry entry1, ThesaurusEntry entry2) -> comparator.compare(entry1.getDefinition(), entry2.getDefinition()));
 		return synonyms;
 	}
 
-	public void clear(){
+	public final void clear(){
 		dictionary.clear();
 	}
 
-	public int size(){
+	public final int size(){
 		return dictionary.size();
 	}
 
-	/* Find all the entries that have Part-of-Speech and synonyms contained into the given ones */
-	public List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
+	/** Find all the entries that have Part-of-Speech and synonyms contained into the given ones. */
+	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
-		final List<String> syns = Arrays.asList(synonyms);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
-		LoopHelper.applyIf(dictionary.values(),
-			entry -> entry.intersects(pos, syns),
-			list::add);
+		for(final ThesaurusEntry entry : dictionary.values())
+			if(entry.intersects(pos, synonyms))
+				list.add(entry);
 		return list;
 	}
 

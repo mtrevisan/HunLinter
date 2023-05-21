@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,15 @@
  */
 package io.github.mtrevisan.hunlinter.gui.dialogs;
 
+import io.github.mtrevisan.hunlinter.gui.FontHelper;
+import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryStatistics;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.Frequency;
+import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -40,17 +48,18 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.gui.FontHelper;
-import io.github.mtrevisan.hunlinter.gui.GUIHelper;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryStatistics;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.Frequency;
-import io.github.mtrevisan.hunlinter.parsers.hyphenation.Hyphenation;
-import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 
-import javax.swing.*;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -63,18 +72,20 @@ import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.StringJoiner;
+import java.util.concurrent.Future;
 
 
 public class DictionaryStatisticsDialog extends JDialog{
 
 	@Serial
-	private static final long serialVersionUID = 5762751368059394067l;
+	private static final long serialVersionUID = 5762751368059394067L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DictionaryStatisticsDialog.class);
 
@@ -83,13 +94,13 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 	private final DictionaryStatistics statistics;
 
-	private final JFileChooser saveTextFileFileChooser;
+	private final Future<JFileChooser> futureSaveTextFileFileChooser;
 
 
 	public DictionaryStatisticsDialog(final DictionaryStatistics statistics, final Frame parent){
 		super(parent, "Dictionary statistics", false);
 
-		Objects.requireNonNull(statistics);
+		Objects.requireNonNull(statistics, "Statistics cannot be null");
 
 		this.statistics = statistics;
 
@@ -97,7 +108,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		try{
 			final JPopupMenu popupMenu = new JPopupMenu();
-			popupMenu.add(GUIHelper.createPopupCopyMenu(compoundWordsValueLabel.getHeight(), popupMenu, GUIHelper::copyCallback));
+			popupMenu.add(GUIHelper.createPopupCopyMenu(popupMenu, GUIHelper::copyCallback));
 			GUIHelper.addPopupMenu(popupMenu, compoundWordsValueLabel, contractedWordsValueLabel, lengthsModeValueLabel,
 				longestWordCharactersValueLabel, longestWordSyllabesValueLabel, mostCommonSyllabesValueLabel,
 				syllabeLengthsModeValueLabel, totalWordsValueLabel, uniqueWordsValueLabel);
@@ -106,10 +117,14 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 		addListenerOnClose();
 
-		saveTextFileFileChooser = new JFileChooser();
-		saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
-		final File currentDir = new File(".");
-		saveTextFileFileChooser.setCurrentDirectory(currentDir);
+
+		futureSaveTextFileFileChooser = JavaHelper.executeFuture(() -> {
+			final JFileChooser saveTextFileFileChooser = new JFileChooser();
+			saveTextFileFileChooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt"));
+			final File currentDir = new File(".");
+			saveTextFileFileChooser.setCurrentDirectory(currentDir);
+			return saveTextFileFileChooser;
+		});
 
 
 		fillStatisticData();
@@ -205,7 +220,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       longestWordSyllabesValueLabel.setText("…");
       longestWordSyllabesValueLabel.setPreferredSize(new java.awt.Dimension(9, 17));
 
-      javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
+      final javax.swing.GroupLayout lengthsPanelLayout = new javax.swing.GroupLayout(lengthsPanel);
       lengthsPanel.setLayout(lengthsPanelLayout);
       lengthsPanelLayout.setHorizontalGroup(
          lengthsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,7 +233,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mainTabbedPane.addTab("Word lengths", lengthsPanel);
 
-      javax.swing.GroupLayout syllabesPanelLayout = new javax.swing.GroupLayout(syllabesPanel);
+      final javax.swing.GroupLayout syllabesPanelLayout = new javax.swing.GroupLayout(syllabesPanel);
       syllabesPanel.setLayout(syllabesPanelLayout);
       syllabesPanelLayout.setHorizontalGroup(
          syllabesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -231,7 +246,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
       mainTabbedPane.addTab("Word syllabes", syllabesPanel);
 
-      javax.swing.GroupLayout stressesPanelLayout = new javax.swing.GroupLayout(stressesPanel);
+      final javax.swing.GroupLayout stressesPanelLayout = new javax.swing.GroupLayout(stressesPanel);
       stressesPanel.setLayout(stressesPanelLayout);
       stressesPanelLayout.setHorizontalGroup(
          stressesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,13 +260,9 @@ public class DictionaryStatisticsDialog extends JDialog{
       mainTabbedPane.addTab("Word stresses", stressesPanel);
 
       exportButton.setText("Export");
-      exportButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            exportButtonActionPerformed(evt);
-         }
-      });
+      exportButton.addActionListener(this::exportButtonActionPerformed);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
       getContentPane().setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -350,7 +361,8 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+   private void exportButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+		final JFileChooser saveTextFileFileChooser = JavaHelper.waitForFuture(futureSaveTextFileFileChooser);
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){
 			exportButton.setEnabled(false);
@@ -361,7 +373,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 
 				FileHelper.browse(outputFile);
 			}
-			catch(final Exception e){
+			catch(final IOException | InterruptedException e){
 				LOGGER.error("Cannot export statistics", e);
 			}
 
@@ -411,16 +423,16 @@ public class DictionaryStatisticsDialog extends JDialog{
 		x = (double)contractedWords / totalWords;
 		final String formattedContractedWords = DictionaryParser.COUNTER_FORMATTER.format(contractedWords)
 			+ formatFrequencyVariableDecimals(x);
-		final String formattedLengthsMode = lengthsFrequencies.getMode().stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(LIST_SEPARATOR));
+		final StringJoiner formattedLengthsMode = new StringJoiner(LIST_SEPARATOR);
+		for(final Integer integer : lengthsFrequencies.getMode())
+			formattedLengthsMode.add(String.valueOf(integer));
 		final String formattedLongestWords = StringUtils.join(longestWords, LIST_SEPARATOR)
 			+ " (" + longestWordCharsCount + ")";
 
 		totalWordsValueLabel.setText(formattedTotalWords);
 		uniqueWordsValueLabel.setText(formattedUniqueWords);
 		contractedWordsValueLabel.setText(formattedContractedWords);
-		lengthsModeValueLabel.setText(formattedLengthsMode);
+		lengthsModeValueLabel.setText(formattedLengthsMode.toString());
 		longestWordCharactersValueLabel.setText(formattedLongestWords);
 	}
 
@@ -429,25 +441,24 @@ public class DictionaryStatisticsDialog extends JDialog{
 		final int uniqueWords = statistics.getUniqueWords();
 		final Frequency<Integer> syllabeLengthsFrequencies = statistics.getSyllabeLengthsFrequencies();
 		final List<String> mostCommonSyllabes = statistics.getMostCommonSyllabes(7);
-		List<String> longestWordSyllabes = statistics.getLongestWordsBySyllabes().stream()
-			.map(Hyphenation::getSyllabes)
-			.map(syllabes -> StringUtils.join(syllabes, HyphenationParser.SOFT_HYPHEN))
-			.collect(Collectors.toList());
+		List<String> longestWordSyllabes = new ArrayList<>(0);
+		for(final Hyphenation hyphenation : statistics.getLongestWordsBySyllabes())
+			longestWordSyllabes.add(StringUtils.join(hyphenation.getSyllabes(), HyphenationParser.SOFT_HYPHEN));
 		longestWordSyllabes = DictionaryStatistics.extractRepresentatives(longestWordSyllabes, 4);
 		final int longestWordSyllabesCount = statistics.getLongestWordCountBySyllabes();
 
 		final double x = (double)compoundWords / uniqueWords;
 		final String formattedCompoundWords = DictionaryParser.COUNTER_FORMATTER.format(compoundWords)
 			+ formatFrequencyVariableDecimals(x);
-		final String formattedSyllabeLengthsMode = syllabeLengthsFrequencies.getMode().stream()
-			.map(String::valueOf)
-			.collect(Collectors.joining(LIST_SEPARATOR));
+		final StringJoiner formattedSyllabeLengthsMode = new StringJoiner(LIST_SEPARATOR);
+		for(final Integer integer : syllabeLengthsFrequencies.getMode())
+			formattedSyllabeLengthsMode.add(String.valueOf(integer));
 		final String formattedMostCommonSyllabes = StringUtils.join(mostCommonSyllabes, LIST_SEPARATOR);
 		final String formattedLongestWordSyllabes = StringUtils.join(longestWordSyllabes, LIST_SEPARATOR)
 			+ " (" + longestWordSyllabesCount + ")";
 
 		compoundWordsValueLabel.setText(formattedCompoundWords);
-		syllabeLengthsModeValueLabel.setText(formattedSyllabeLengthsMode);
+		syllabeLengthsModeValueLabel.setText(formattedSyllabeLengthsMode.toString());
 		mostCommonSyllabesValueLabel.setText(formattedMostCommonSyllabes);
 		longestWordSyllabesValueLabel.setText(formattedLongestWordSyllabes);
 
@@ -461,7 +472,8 @@ public class DictionaryStatisticsDialog extends JDialog{
 		longestWordSyllabesValueLabel.setEnabled(true);
 	}
 
-	private String formatFrequencyVariableDecimals(final double x){
+	@SuppressWarnings("StringConcatenationInFormatCall")
+	private static String formatFrequencyVariableDecimals(final double x){
 		return String.format(Locale.ROOT, " (%." + Frequency.getDecimals(x) + "f%%)", x * 100.);
 	}
 
@@ -500,43 +512,17 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
-	private JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
+	private static JPanel createChartPanel(final String title, final String xAxisTitle, final String yAxisTitle){
 		final JFreeChart chart = createChart(title, xAxisTitle, yAxisTitle);
-		return new ChartPanel(chart){
-			@Override
-			protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save,
-					final boolean print, final boolean zoom){
-				final JPopupMenu result = new JPopupMenu("Chart:");
-				final JMenuItem propertiesItem = new JMenuItem("Properties…");
-				propertiesItem.setActionCommand("PROPERTIES");
-				propertiesItem.addActionListener(this);
-				result.add(propertiesItem);
-
-				result.addSeparator();
-
-				final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG…");
-				saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
-				saveAsPNGItem.addActionListener(this);
-				result.add(saveAsPNGItem);
-
-				result.addSeparator();
-
-				final JMenuItem printItem = new JMenuItem("Print…");
-				printItem.setActionCommand("PRINT");
-				printItem.addActionListener(this);
-				result.add(printItem);
-
-				return result;
-			}
-		};
+		return new MyChartPanel(chart);
 	}
 
-	private JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
+	private static JFreeChart createChart(final String title, final String xAxisTitle, final String yAxisTitle){
 		final XYPlot plot = createChartPlot(xAxisTitle, yAxisTitle);
 		return new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, false);
 	}
 
-	private XYPlot createChartPlot(final String xAxisTitle, final String yAxisTitle){
+	private static XYPlot createChartPlot(final String xAxisTitle, final String yAxisTitle){
 		final XYBarRenderer renderer = createChartRenderer();
 		final NumberAxis xAxis = createChartXAxis(xAxisTitle);
 		final NumberAxis yAxis = createChartYAxis(yAxisTitle);
@@ -552,7 +538,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return plot;
 	}
 
-	private XYBarRenderer createChartRenderer(){
+	private static XYBarRenderer createChartRenderer(){
 		final XYBarRenderer renderer = new XYBarRenderer();
 		renderer.setSeriesStroke(0, new BasicStroke(1.f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
 			1.f, new float[]{10.f, 6.f}, 0.f));
@@ -568,7 +554,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return renderer;
 	}
 
-	private XYToolTipGenerator createChartTooltip(){
+	private static XYToolTipGenerator createChartTooltip(){
 		return (dataset, series, item) -> {
 			final Number x = dataset.getX(series, item);
 			final Number y = dataset.getY(series, item);
@@ -576,7 +562,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		};
 	}
 
-	private NumberAxis createChartXAxis(final String xAxisTitle){
+	private static NumberAxis createChartXAxis(final String xAxisTitle){
 		//x-axis as integer starting from zero
 		final NumberAxis xAxis = new NumberAxis(xAxisTitle);
 		xAxis.setAutoRangeIncludesZero(false);
@@ -586,7 +572,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		return xAxis;
 	}
 
-	private NumberAxis createChartYAxis(final String yAxisTitle){
+	private static NumberAxis createChartYAxis(final String yAxisTitle){
 		//y-axis as percent starting from zero
 		final NumberAxis yAxis = new NumberAxis(yAxisTitle);
 		yAxis.setAutoRangeIncludesZero(true);
@@ -638,6 +624,7 @@ public class DictionaryStatisticsDialog extends JDialog{
 		}
 	}
 
+	@SuppressWarnings("StringConcatenationInFormatCall")
 	private void exportGraph(final BufferedWriter writer, final Component comp) throws IOException{
 		final int index = mainTabbedPane.indexOfComponent(comp);
 		final boolean hasData = mainTabbedPane.isEnabledAt(index);
@@ -652,24 +639,55 @@ public class DictionaryStatisticsDialog extends JDialog{
 				final XYDataItem xy = (XYDataItem)xItr.next();
 				final double y = xy.getY().doubleValue();
 				final int decimals = Frequency.getDecimals(y);
-				final String line = String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%",
-					xy.getX().intValue(), y * 100.);
+				final String line = String.format(Locale.ROOT, "%d:\t%." + decimals + "f%%", xy.getX().intValue(), y * 100.);
 				writer.write(line);
 				writer.newLine();
 			}
 		}
 	}
 
+	private static final class MyChartPanel extends ChartPanel{
+		private MyChartPanel(final JFreeChart chart){
+			super(chart);
+		}
+
+		@Override
+		protected JPopupMenu createPopupMenu(final boolean properties, final boolean copy, final boolean save, final boolean print,
+				final boolean zoom){
+			final JPopupMenu result = new JPopupMenu("Chart:");
+			final JMenuItem propertiesItem = new JMenuItem("Properties…");
+			propertiesItem.setActionCommand("PROPERTIES");
+			propertiesItem.addActionListener(this);
+			result.add(propertiesItem);
+
+			result.addSeparator();
+
+			final JMenuItem saveAsPNGItem = new JMenuItem("Save as PNG…");
+			saveAsPNGItem.setActionCommand("SAVE_AS_PNG");
+			saveAsPNGItem.addActionListener(this);
+			result.add(saveAsPNGItem);
+
+			result.addSeparator();
+
+			final JMenuItem printItem = new JMenuItem("Print…");
+			printItem.setActionCommand("PRINT");
+			printItem.addActionListener(this);
+			result.add(printItem);
+
+			return result;
+		}
+	}
+
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
@@ -699,5 +717,4 @@ public class DictionaryStatisticsDialog extends JDialog{
    private javax.swing.JLabel uniqueWordsLabel;
    private javax.swing.JLabel uniqueWordsValueLabel;
    // End of variables declaration//GEN-END:variables
-
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,15 +28,15 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 
 
 /**
- * Encodes <code>target</code> relative to <code>source</code> by trimming whatever
- * non-equal suffix <code>source</code> has. The output code is (bytes):
+ * Encodes {@code target} relative to {@code source} by trimming whatever
+ * non-equal suffix {@code source} has. The output code is (bytes):
  *
  * <pre>
  * {K}{suffix}
  * </pre>
  *
- * where (<code>K</code> - 'A') bytes should be trimmed from the end of
- * <code>source</code> and then the <code>suffix</code> should be appended to the
+ * where ({@code K} - 'A') bytes should be trimmed from the end of
+ * {@code source} and then the {@code suffix} should be appended to the
  * resulting byte sequence.
  *
  * <p>
@@ -58,7 +58,7 @@ import io.github.mtrevisan.hunlinter.services.text.ArrayHelper;
 public class TrimSuffixEncoder implements SequenceEncoderInterface{
 
 	@Override
-	public byte[] encode(final byte[] source, final byte[] target){
+	public final byte[] encode(final byte[] source, final byte[] target){
 		int sharedPrefix = ArrayHelper.longestCommonPrefix(source, target);
 		int truncateBytes = source.length - sharedPrefix;
 		if(truncateBytes >= REMOVE_EVERYTHING){
@@ -73,7 +73,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public byte[] decode(final byte[] source, final byte[] encoded){
+	public final byte[] decode(final byte[] source, final byte[] encoded){
 		final byte suffixTrimCode = encoded[0];
 		int truncateBytes = decodeValue(suffixTrimCode);
 		if(truncateBytes == REMOVE_EVERYTHING)
@@ -89,7 +89,7 @@ public class TrimSuffixEncoder implements SequenceEncoderInterface{
 	}
 
 	@Override
-	public String toString(){
+	public final String toString(){
 		return getClass().getSimpleName();
 	}
 

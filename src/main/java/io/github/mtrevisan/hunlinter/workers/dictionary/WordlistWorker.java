@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,29 +25,31 @@
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
+import io.github.mtrevisan.hunlinter.parsers.exceptions.SorterException;
+import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
+import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorter;
 import io.github.mtrevisan.hunlinter.services.sorters.externalsorter.ExternalSorterOptions;
 import io.github.mtrevisan.hunlinter.workers.WorkerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
-import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
-import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
-import static io.github.mtrevisan.hunlinter.services.system.LoopHelper.forEach;
 
 
 public class WordlistWorker extends WorkerDictionary{
@@ -57,8 +59,12 @@ public class WordlistWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Wordlist";
 
 	private static final char[] NEW_LINE = {'\n'};
+	private static final String SLASH = "/";
 
-	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES}
+	public enum WorkerType{COMPLETE, PLAIN_WORDS, PLAIN_WORDS_NO_DUPLICATES, FULLSTRIP_WORDS}
+
+
+	private volatile boolean writerClosed;
 
 
 	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final File outputFile){
@@ -79,63 +85,76 @@ public class WordlistWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 
-
-		final BufferedWriter writer;
 		try{
-			writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+			final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
+			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE || type == WorkerType.FULLSTRIP_WORDS
+				? Inflection::toString
+				: Inflection::getWord);
+			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+
+				final int size = inflections.size();
+				if(type != WorkerType.FULLSTRIP_WORDS)
+					for(int i = 0; !writerClosed && i < size; i ++)
+						writeLine(writer, toString.apply(inflections.get(i)), NEW_LINE);
+				else
+					for(int i = 0; !writerClosed && i < size; i ++){
+						final Inflection inflection = inflections.get(i);
+						if(inflection.isFullstrip()){
+							final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
+							final String originatingWord = lastAppliedRule.undoRule(inflection.getWord());
+							writeLine(writer, originatingWord + SLASH + lastAppliedRule.getFlag(), NEW_LINE);
+						}
+					}
+			};
+
+			getWorkerData()
+				.withDataCancelledCallback(e -> {
+					closeWriter(writer);
+					writerClosed = true;
+				});
+
+			final Function<Void, File> step1 = ignored -> {
+				prepareProcessing("Execute " + workerData.getWorkerName());
+
+				final File dicFile = dicParser.getDicFile();
+				processLines(dicFile.toPath(), charset, lineProcessor);
+
+				return outputFile;
+			};
+			final Function<File, File> step2 = file -> {
+				closeWriter(writer);
+
+				resetProcessing("Sorting");
+
+				//sort file & remove duplicates
+				final ExternalSorterOptions options = ExternalSorterOptions.builder()
+					.charset(charset)
+					.sortInParallel()
+					.comparator(dicParser.getComparator())
+					.useTemporaryAsZip()
+					.removeDuplicates()
+					.build();
+				try{
+					ExternalSorter.sort(outputFile, options, outputFile);
+				}
+				catch(final IOException ioe){
+					throw new SorterException(ioe);
+				}
+
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
+
+				finalizeProcessing("Wordlist extracted successfully");
+
+				return file;
+			};
+			final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
+			setProcessor(step1.andThen(step2).andThen(step3));
 		}
-		catch(final IOException e){
-			throw new RuntimeException(e);
+		catch(final IOException ioe){
+			throw new ParserException(ioe);
 		}
-
-
-		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE? Inflection::toString: Inflection::getWord);
-		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-			final Inflection[] inflections = wordGenerator.applyAffixRules(dicEntry);
-
-			forEach(inflections, inflection -> writeLine(writer, toString.apply(inflection), NEW_LINE));
-		};
-
-		getWorkerData()
-			.withDataCancelledCallback(e -> closeWriter(writer));
-
-		final Function<Void, File> step1 = ignored -> {
-			prepareProcessing("Execute " + workerData.getWorkerName());
-
-			final File dicFile = dicParser.getDicFile();
-			processLines(dicFile.toPath(), charset, lineProcessor);
-			closeWriter(writer);
-
-			return outputFile;
-		};
-		final Function<File, File> step2 = file -> {
-			resetProcessing("Sorting");
-
-			//sort file & remove duplicates
-			final ExternalSorter sorter = new ExternalSorter();
-			final ExternalSorterOptions options = ExternalSorterOptions.builder()
-				.charset(charset)
-				.sortInParallel()
-				.comparator(dicParser.getComparator())
-				.useTemporaryAsZip()
-				.removeDuplicates()
-				.build();
-			try{
-				sorter.sort(outputFile, options, outputFile);
-			}
-			catch(final Exception e){
-				throw new RuntimeException(e);
-			}
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
-
-			finalizeProcessing("Wordlist extracted successfully");
-
-			return file;
-		};
-		final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
-		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
 }

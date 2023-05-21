@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -26,12 +26,21 @@ package io.github.mtrevisan.hunlinter.actions;
 
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
+import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.MenuSelectionManager;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
@@ -50,23 +59,13 @@ public class UpdateAction extends AbstractAction{
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent event){
+	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
 		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
 		try{
 			final FileDownloaderDialog dialog = new FileDownloaderDialog(parentFrame);
-			GUIHelper.addCancelByEscapeKey(dialog, new AbstractAction(){
-				@Serial
-				private static final long serialVersionUID = -5644390861803492172L;
-
-				@Override
-				public void actionPerformed(final ActionEvent e){
-					dialog.interrupt();
-
-					dialog.dispose();
-				}
-			});
+			GUIHelper.addCancelByEscapeKey(dialog, new CancelAction(dialog));
 			dialog.setLocationRelativeTo(parentFrame);
 			dialog.setVisible(true);
 		}
@@ -77,13 +76,66 @@ public class UpdateAction extends AbstractAction{
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.WARNING_MESSAGE);
 		}
-		catch(final Exception e){
+		catch(final IOException | ParseException | VersionException e){
 			final String message = e.getMessage();
 			LOGGER.info(message);
 
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.INFORMATION_MESSAGE);
 		}
+	}
+
+	private static final class CancelAction extends AbstractAction{
+		@Serial
+		private static final long serialVersionUID = -5644390861803492172L;
+		private final FileDownloaderDialog dialog;
+
+		private CancelAction(final FileDownloaderDialog dialog){this.dialog = dialog;}
+
+		@Override
+		public void actionPerformed(final ActionEvent e){
+			dialog.interrupt();
+
+			dialog.dispose();
+		}
+
+
+		@Override
+		@SuppressWarnings("NewExceptionWithoutArguments")
+		protected Object clone() throws CloneNotSupportedException{
+			throw new CloneNotSupportedException();
+		}
+
+		@SuppressWarnings("unused")
+		@Serial
+		private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+			throw new NotSerializableException(getClass().getName());
+		}
+
+		@SuppressWarnings("unused")
+		@Serial
+		private void readObject(final ObjectInputStream is) throws NotSerializableException{
+			throw new NotSerializableException(getClass().getName());
+		}
+	}
+
+
+	@Override
+	@SuppressWarnings("NewExceptionWithoutArguments")
+	protected final Object clone() throws CloneNotSupportedException{
+		throw new CloneNotSupportedException();
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
+	}
+
+	@SuppressWarnings("unused")
+	@Serial
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
+		throw new NotSerializableException(getClass().getName());
 	}
 
 }

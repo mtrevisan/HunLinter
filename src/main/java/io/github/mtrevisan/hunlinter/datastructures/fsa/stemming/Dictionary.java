@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.fsa.stemming;
 
-import io.github.mtrevisan.hunlinter.datastructures.fsa.FSA;
+import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ import java.nio.file.Path;
 
 
 /**
- * A dictionary combines {@link FSA} automaton and {@link DictionaryMetadata}
+ * A dictionary combines {@link FSAAbstract} automaton and {@link DictionaryMetadata}
  * describing the way terms are encoded in the automaton.
  *
  * <p>
@@ -50,9 +50,9 @@ import java.nio.file.Path;
 public class Dictionary{
 
 	/**
-	 * {@link FSA} automaton with the compiled dictionary data.
+	 * {@link FSAAbstract} automaton with the compiled dictionary data.
 	 */
-	public final FSA fsa;
+	public final FSAAbstract fsa;
 
 	/**
 	 * Metadata associated with the dictionary.
@@ -63,11 +63,11 @@ public class Dictionary{
 	 * It is strongly recommended to use static methods in this class for
 	 * reading dictionaries.
 	 *
-	 * @param fsa	An instantiated {@link FSA} instance.
+	 * @param fsa	An instantiated {@link FSAAbstract} instance.
 	 * @param metadata	A map of attributes describing the compression format and other settings not contained in the FSA automaton. For an
 	 *		explanation of available attributes and their possible values, see {@link DictionaryMetadata}.
 	 */
-	public Dictionary(final FSA fsa, final DictionaryMetadata metadata){
+	public Dictionary(final FSAAbstract fsa, final DictionaryMetadata metadata){
 		this.fsa = fsa;
 		this.metadata = metadata;
 	}
@@ -76,7 +76,7 @@ public class Dictionary{
 	 * Attempts to load a dictionary using the path to the FSA file and the
 	 * expected metadata extension.
 	 *
-	 * @param location The location of the dictionary file (<code>*.dict</code>).
+	 * @param location The location of the dictionary file ({@code *.dict}).
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */
@@ -92,7 +92,7 @@ public class Dictionary{
 	 * Attempts to load a dictionary using the URL to the FSA file and the
 	 * expected metadata extension.
 	 *
-	 * @param dictURL The URL pointing to the dictionary file (<code>*.dict</code>).
+	 * @param dictURL The URL pointing to the dictionary file ({@code *.dict}).
 	 * @return An instantiated dictionary.
 	 * @throws IOException if an I/O error occurs.
 	 */
@@ -115,13 +115,13 @@ public class Dictionary{
 	 * Attempts to load a dictionary from opened streams of FSA dictionary data
 	 * and associated metadata. Input streams are not closed automatically.
 	 *
-	 * @param fsaStream	The stream with FSA data
-	 * @param metadataStream	The stream with metadata
-	 * @return	An instantiated {@link Dictionary}.
+	 * @param fsaStream	The stream with FSA data.
+	 * @param metadataStream	The stream with metadata.
+	 * @return	An instance.
 	 * @throws IOException	If an I/O error occurs.
 	 */
 	public static Dictionary read(final InputStream fsaStream, final InputStream metadataStream) throws IOException{
-		return new Dictionary(FSA.read(fsaStream), DictionaryMetadata.read(metadataStream));
+		return new Dictionary(FSAAbstract.read(fsaStream), DictionaryMetadata.read(metadataStream));
 	}
 
 }

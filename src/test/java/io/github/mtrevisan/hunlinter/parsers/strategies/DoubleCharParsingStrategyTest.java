@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -48,7 +48,7 @@ class DoubleCharParsingStrategyTest{
 	@Test
 	void notOk(){
 		Throwable exception = Assertions.assertThrows(LinterException.class, () -> strategy.parseFlags("abc"));
-		Assertions.assertEquals("Flag must be of length multiple of two: `abc`", exception.getMessage());
+		Assertions.assertEquals("Flag must be even number of characters: `abc`", exception.getMessage());
 	}
 
 	@Test

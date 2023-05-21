@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -34,6 +34,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +50,7 @@ import java.util.regex.Pattern;
 public enum DictionaryAttribute{
 
 	/**
-	 * Logical fields separator inside the FSA.
+	 * Logical fields' separator inside the FSA.
 	 */
 	SEPARATOR("fsa.dict.separator"){
 		@Override
@@ -180,8 +181,10 @@ public enum DictionaryAttribute{
 		public EncoderType fromString(final String value){
 			try{
 				return EncoderType.valueOf(value.trim().toUpperCase(Locale.ROOT));
-			}catch(final IllegalArgumentException e){
-				throw new IllegalArgumentException("Invalid encoder name '" + value.trim() + "', only these coders are valid: " + Arrays.toString(EncoderType.values()));
+			}
+			catch(final IllegalArgumentException e){
+				throw new IllegalArgumentException("Invalid encoder name '" + value.trim() + "', only these coders are valid: "
+					+ Arrays.toString(EncoderType.values()), e);
 			}
 		}
 	},
@@ -193,8 +196,8 @@ public enum DictionaryAttribute{
 	INPUT_CONVERSION("fsa.dict.input-conversion"){
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, String> conversionPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -203,7 +206,8 @@ public enum DictionaryAttribute{
 				if(!conversionPairs.containsKey(twoStrings[0]))
 					conversionPairs.put(twoStrings[0], twoStrings[1]);
 				else
-					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: " + twoStrings[0]);
+					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: "
+						+ twoStrings[0]);
 			}
 			return conversionPairs;
 		}
@@ -218,8 +222,8 @@ public enum DictionaryAttribute{
 	OUTPUT_CONVERSION("fsa.dict.output-conversion"){
 		@Override
 		public Map<String, String> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, String> conversionPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, String> conversionPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = stringPair.trim().split(StringUtils.SPACE);
 				if(twoStrings.length != 2)
@@ -228,7 +232,8 @@ public enum DictionaryAttribute{
 				if(!conversionPairs.containsKey(twoStrings[0]))
 					conversionPairs.put(twoStrings[0], twoStrings[1]);
 				else
-					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: " + twoStrings[0]);
+					throw new IllegalArgumentException("Input conversion cannot specify different values for the same input string: "
+						+ twoStrings[0]);
 			}
 			return conversionPairs;
 		}
@@ -243,18 +248,13 @@ public enum DictionaryAttribute{
 	REPLACEMENT_PAIRS("fsa.dict.speller.replacement-pairs"){
 		@Override
 		public Map<String, List<String>> fromString(final String value) throws IllegalArgumentException{
-			final Map<String, List<String>> replacementPairs = new HashMap<>();
 			final String[] replacements = RegexHelper.split(value, SPLITTER);
+			final Map<String, List<String>> replacementPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = StringUtils.split(stringPair.trim(), StringUtils.SPACE, 2);
 				final String replacement = StringUtils.replace(twoStrings[1], " ", "_");
-				if(!replacementPairs.containsKey(twoStrings[0])){
-					final List<String> strList = new ArrayList<>(1);
-					strList.add(replacement);
-					replacementPairs.put(twoStrings[0], strList);
-				}
-				else
-					replacementPairs.get(twoStrings[0]).add(replacement);
+				replacementPairs.computeIfAbsent(twoStrings[0], k -> new ArrayList<>(1))
+					.add(replacement);
 			}
 			return replacementPairs;
 		}
@@ -269,8 +269,8 @@ public enum DictionaryAttribute{
 	EQUIVALENT_CHARS("fsa.dict.speller.equivalent-chars"){
 		@Override
 		public Map<Character, List<Character>> fromString(final String value) throws IllegalArgumentException{
-			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>();
 			final String[] eqChars = RegexHelper.split(value, SPLITTER);
+			final Map<Character, List<Character>> equivalentCharacters = new HashMap<>(eqChars.length);
 			for(final String characterPair : eqChars){
 				final String[] twoChars = characterPair.trim().split(StringUtils.SPACE);
 				if(twoChars.length != 2 || twoChars[0].length() != 1 || twoChars[1].length() != 1)
@@ -285,18 +285,18 @@ public enum DictionaryAttribute{
 		}
 	},
 
-	/** Dictionary license attribute */
+	/** Dictionary license attribute. */
 	LICENSE("fsa.dict.license"),
-	/** Dictionary author */
+	/** Dictionary author. */
 	AUTHOR("fsa.dict.author"),
-	/** Dictionary creation date */
+	/** Dictionary creation date. */
 	CREATION_DATE("fsa.dict.created");
 
 
 	private static final Pattern SPLITTER = RegexHelper.pattern(",\\s*");
 
 
-	/** Property name for this attribute */
+	/** Property name for this attribute. */
 	public final String propertyName;
 
 	/**
@@ -311,28 +311,27 @@ public enum DictionaryAttribute{
 	}
 
 	/**
-	 * @param propertyName The property of a {@link DictionaryAttribute}.
-	 * @return Return a {@link DictionaryAttribute} associated with
-	 * a given {@link #propertyName}.
+	 * @param propertyName The property name.
+	 * @return Return am associated with a given {@link #propertyName}.
 	 */
 	public static DictionaryAttribute fromPropertyName(final String propertyName){
-		final DictionaryAttribute value = attrsByPropertyName.get(propertyName);
+		final DictionaryAttribute value = ATTRS_BY_PROPERTY_NAME.get(propertyName);
 		if(value == null)
 			throw new IllegalArgumentException("No attribute for property: " + propertyName);
 
 		return value;
 	}
 
-	private static final Map<String, DictionaryAttribute> attrsByPropertyName;
-
+	private static final Map<String, DictionaryAttribute> ATTRS_BY_PROPERTY_NAME;
 	static{
-		attrsByPropertyName = new HashMap<>();
-		for(final DictionaryAttribute attr : values())
-			if(attrsByPropertyName.put(attr.propertyName, attr) != null)
-				throw new RuntimeException("Duplicate property key for: " + attr);
+		final DictionaryAttribute[] values = values();
+		final Map<String, DictionaryAttribute> map = new HashMap<>(values.length);
+		for(final DictionaryAttribute attr : values)
+			map.put(attr.propertyName, attr);
+		ATTRS_BY_PROPERTY_NAME = Collections.unmodifiableMap(map);
 	}
 
-	/** Private enum instance constructor */
+	/** Private enum instance constructor. */
 	DictionaryAttribute(final String propertyName){
 		this.propertyName = propertyName;
 	}

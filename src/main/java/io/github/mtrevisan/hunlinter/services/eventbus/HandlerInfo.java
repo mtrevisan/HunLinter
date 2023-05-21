@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -28,7 +28,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 
 
-/** Used to hold the subscriber details */
+/** Used to hold the subscriber details. */
 class HandlerInfo{
 
 	private final Class<?> eventClass;
@@ -44,19 +44,19 @@ class HandlerInfo{
 		this.vetoHandler = vetoHandler;
 	}
 
-	public boolean matchesEvent(final Object event){
+	public final boolean matchesEvent(final Object event){
 		return event.getClass().equals(eventClass);
 	}
 
-	public Method getMethod(){
+	public final Method getMethod(){
 		return method;
 	}
 
-	public Object getSubscriber(){
+	public final Object getSubscriber(){
 		return subscriber.get();
 	}
 
-	public boolean isVetoHandler(){
+	public final boolean isVetoHandler(){
 		return vetoHandler;
 	}
 

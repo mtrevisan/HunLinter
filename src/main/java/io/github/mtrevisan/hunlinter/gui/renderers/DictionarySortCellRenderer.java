@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,14 +24,11 @@
  */
 package io.github.mtrevisan.hunlinter.gui.renderers;
 
-import io.github.mtrevisan.hunlinter.gui.Watercolors;
-
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import java.awt.Component;
 import java.awt.Font;
-import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -62,7 +59,7 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 	}
 
 	@Override
-	public Component getListCellRendererComponent(final JList<? extends String> list, final String value, final int lineIndex,
+	public final Component getListCellRendererComponent(final JList<? extends String> list, final String value, final int lineIndex,
 			final boolean isSelected, final boolean cellHasFocus){
 		final int index = boundaryIndex.apply(lineIndex);
 		if(index >= 0){
@@ -83,13 +80,13 @@ public class DictionarySortCellRenderer extends JLabel implements ListCellRender
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -27,7 +27,7 @@ package io.github.mtrevisan.hunlinter.datastructures.dynamicarray;
 
 class Location{
 
-	private static final double LN2 = Math.log(2);
+	private static final double LN2 = Math.log(2.);
 
 	final int block;
 	final int element;
@@ -40,11 +40,11 @@ class Location{
 		element = computeElement(r, k);
 	}
 
-	/** Helper method computing `p`, the number of data block in superblock prior to superblock `k` */
+	/** Helper method computing `p`, the number of data block in superblock prior to superblock `k`. */
 	private static int computeP(final int k){
 		final int p;
 		//for even k
-		if(k % 2 == 0)
+		if((k & 1) == 0)
 			//p = 2 * (2^floor(k/2) - 1)
 			//k / 2 will give us floor(k / 2), 1 << k / 2 raise 2 to power floor(k / 2).
 			p = 2 * ((1 << k / 2) - 1);
@@ -55,7 +55,7 @@ class Location{
 		return p;
 	}
 
-	/** Helper method computing `b`, the floor(k/2) bits of `r` immediately after the leading 1-bit */
+	/** Helper method computing `b`, the floor(k/2) bits of `r` immediately after the leading 1-bit. */
 	private static int computeDataBlock(int r, final int k){
 		//the value of `b` is given by the base 10 value of the floor(k/2) bits of `r` immediately after the leading 1 bit in `r`
 		//k / 2 will give us floor(k / 2), this is the number of bits we want to capture
@@ -69,7 +69,7 @@ class Location{
 		return r & mask;
 	}
 
-	/** Helper method computing `e`, the last ceil(k/2) bits of `r` */
+	/** Helper method computing `e`, the last ceil(k/2) bits of `r`. */
 	private static int computeElement(final int r, final int k){
 		//the value of `e` is given by the base 10 value of the last ceiling(k/2) bits of `r`.
 		//we want to capture the last ceil(k / 2) bits of `r`
@@ -80,12 +80,12 @@ class Location{
 		return r & mask;
 	}
 
-	/** Returns the log base 2 of n */
+	/** Returns the log base 2 of n. */
 	private static double log2(final int n){
 		return (Math.log(n) / LN2);
 	}
 
-	/** Returns a mask of `N` 1 bits */
+	/** Returns a mask of `N` 1 bits. */
 	private static int mask(final int n){
 		return (1 << n) - 1;
 	}

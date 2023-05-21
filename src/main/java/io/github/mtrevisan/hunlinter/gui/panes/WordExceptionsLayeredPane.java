@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Mauro Trevisan
+ * Copyright (c) 2019-2022 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,9 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.gui.panes;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.github.mtrevisan.hunlinter.MainFrame;
 import io.github.mtrevisan.hunlinter.actions.OpenFileAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
@@ -36,15 +33,18 @@ import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.ExceptionsParser;
 import io.github.mtrevisan.hunlinter.services.Packager;
-import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.eventbus.EventHandler;
 import io.github.mtrevisan.hunlinter.services.system.Debouncer;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
+import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.xml.transform.TransformerException;
-import java.awt.*;
-import java.io.IOException;
+import java.awt.Font;
+import java.awt.HeadlessException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -87,8 +87,6 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 		FontHelper.addFontableProperty(textField, tagPanel);
 
 		GUIHelper.addUndoManager(textField);
-
-		EventBusService.subscribe(this);
 	}
 
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -106,7 +104,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
             wexParser.save(packager.getWordExceptionsFile());
          }
          catch(final TransformerException e){
-            LOGGER.info(ParserManager.MARKER_APPLICATION, e.getMessage());
+            LOGGER.error(ParserManager.MARKER_APPLICATION, e.getMessage());
          }
       });
       correctionsRecordedLabel = new javax.swing.JLabel();
@@ -122,7 +120,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
       textField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(java.awt.event.KeyEvent evt) {
+         public void keyReleased(final java.awt.event.KeyEvent evt) {
             textFieldKeyReleased(evt);
          }
       });
@@ -130,11 +128,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       addButton.setMnemonic('A');
       addButton.setText("Add");
       addButton.setEnabled(false);
-      addButton.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            addButtonActionPerformed(evt);
-         }
-      });
+      addButton.addActionListener(this::addButtonActionPerformed);
 
       scrollPane.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
       scrollPane.setViewportView(tagPanel);
@@ -155,8 +149,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       setLayer(correctionsRecordedValueLabel, javax.swing.JLayeredPane.DEFAULT_LAYER);
       setLayer(openWexButton, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-      javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-      this.setLayout(layout);
+      final javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+      setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
@@ -196,11 +190,11 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       );
    }// </editor-fold>//GEN-END:initComponents
 
-   private void textFieldKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
+   private void textFieldKeyReleased(final java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldKeyReleased
       debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
-   private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          final String exception = textField.getText().trim();
          if(!parserManager.getWexParser().contains(exception)){
@@ -223,13 +217,14 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
                JOptionPane.WARNING_MESSAGE, null, null, null);
          }
       }
-      catch(final Exception e){
-         LOGGER.info(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
+      catch(final TransformerException | HeadlessException e){
+         LOGGER.error(ParserManager.MARKER_APPLICATION, "Insertion error: {}", e.getMessage());
       }
    }//GEN-LAST:event_addButtonActionPerformed
 
 	@EventHandler
-	public void initialize(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void initialize(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_INITIALIZE)
 			return;
 
@@ -242,7 +237,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 	}
 
 	@EventHandler
-	public void clear(final Integer actionCommand){
+	@SuppressWarnings({"unused", "NumberEquality"})
+	public final void clear(final Integer actionCommand){
 		if(actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_ALL && actionCommand != MainFrame.ACTION_COMMAND_GUI_CLEAR_WORD_EXCEPTIONS)
 			return;
 
@@ -256,7 +252,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	private void filterWordExceptions(){
 		final String unmodifiedException = textField.getText().trim();
-		if(formerFilterWordException != null && formerFilterWordException.equals(unmodifiedException))
+		if(unmodifiedException.equals(formerFilterWordException))
 			return;
 
 		formerFilterWordException = unmodifiedException;
@@ -276,13 +272,13 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void writeObject(final ObjectOutputStream os) throws IOException{
+	private void writeObject(final ObjectOutputStream os) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
 	@SuppressWarnings("unused")
 	@Serial
-	private void readObject(final ObjectInputStream is) throws IOException{
+	private void readObject(final ObjectInputStream is) throws NotSerializableException{
 		throw new NotSerializableException(getClass().getName());
 	}
 
