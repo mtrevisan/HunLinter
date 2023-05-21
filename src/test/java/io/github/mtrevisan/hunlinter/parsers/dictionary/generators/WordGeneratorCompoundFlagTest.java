@@ -694,8 +694,7 @@ class WordGeneratorCompoundFlagTest extends TestBase{
 		Assertions.assertArrayEquals(expected, words);
 	}
 
-//	@Test
-	//FIXME
+	@Test
 	void compoundReplacement() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
