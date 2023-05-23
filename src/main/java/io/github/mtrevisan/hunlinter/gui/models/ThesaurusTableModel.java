@@ -53,7 +53,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	public static final String TAG_NEW_LINE = "<br>";
 //	private static final String TAG = "<html><body style=\"'white-space:nowrap;overflow:hidden;text-overflow:ellipsis'\">{}</body></html>";
-	private static final String TAG = "<html>{}</html>";
+	private static final String TAG_HTML_OPEN = "<html>";
+	private static final String TAG_HTML_CLOSE = "</html>";
+	private static final String TAG_ROW = TAG_HTML_OPEN + "{}" + TAG_HTML_CLOSE;
 
 
 	private List<ThesaurusEntry> synonyms;
@@ -90,8 +92,8 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			case 1 -> {
 				String temp = thesaurus.joinSynonyms(TAG_NEW_LINE);
 				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
-				temp = StringUtils.replace(temp, ")" + WRAPPABLE_COMMA, ") ");
-				yield JavaHelper.textFormat(TAG, temp);
+				temp = temp.replaceAll("(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1 ");
+				yield JavaHelper.textFormat(TAG_ROW, temp);
 			}
 			default -> null;
 		};
@@ -109,8 +111,9 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	public String getSynonyms(final int rowIndex){
 		String temp = (String)getValueAt(rowIndex, 1);
 		temp = StringUtils.replace(temp, WRAPPABLE_COMMA, COMMA);
-		temp = StringUtils.replace(temp, ") ", COLUMN);
-		return StringUtils.replace(temp, ">(", ">");
+		temp = temp.replaceAll("(>\\([^)]+\\)) ", "$1" + COLUMN);
+		temp = StringUtils.replaceOnce(temp, TAG_HTML_OPEN, "");
+		return StringUtils.replaceOnce(temp, TAG_HTML_CLOSE, "");
 	}
 
 	@SuppressWarnings("unused")

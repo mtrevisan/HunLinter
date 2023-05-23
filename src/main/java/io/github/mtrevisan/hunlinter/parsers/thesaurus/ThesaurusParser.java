@@ -160,7 +160,7 @@ public class ThesaurusParser{
 		final int suffix = (StringUtils.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = StringUtils.split(posAndSyns[0].substring(prefix, posAndSyns[0].length() - suffix), ',');
 		for(int i = 0; i < partOfSpeeches.length; i ++)
-			partOfSpeeches[i] = partOfSpeeches[i].trim();
+			partOfSpeeches[i] = StringUtils.replaceChars(partOfSpeeches[i], "()", "").trim();
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
 		final List<String> list = new ArrayList<>(pas.length);
