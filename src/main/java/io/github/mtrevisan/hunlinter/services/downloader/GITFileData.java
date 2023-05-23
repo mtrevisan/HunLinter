@@ -24,8 +24,8 @@
  */
 package io.github.mtrevisan.hunlinter.services.downloader;
 
+import io.github.mtrevisan.hunlinter.services.minimaljson.JsonObject;
 import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
-import org.json.simple.JSONObject;
 
 
 public class GITFileData{
@@ -39,13 +39,13 @@ public class GITFileData{
 	public final String downloadUrl;
 
 
-	GITFileData(final JSONObject jsonObject){
-		name = (String)jsonObject.get("name");
-		size = (Long)jsonObject.get("size");
-		sha = (String)jsonObject.get("sha");
-		content = (String)jsonObject.get("content");
-		encoding = (String)jsonObject.get("encoding");
-		downloadUrl = (String)jsonObject.get("download_url");
+	GITFileData(final JsonObject jsonObject){
+		name = jsonObject.getString("name", null);
+		size = jsonObject.getLong("size", 0l);
+		sha = jsonObject.getString("sha", null);
+		content = jsonObject.getString("content", null);
+		encoding = jsonObject.getString("encoding", null);
+		downloadUrl = jsonObject.getString("download_url", null);
 	}
 
 }

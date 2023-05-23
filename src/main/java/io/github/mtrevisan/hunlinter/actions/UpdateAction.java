@@ -28,7 +28,6 @@ import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +80,7 @@ public class UpdateAction extends AbstractAction{
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.WARNING_MESSAGE);
 		}
-		catch(final IOException | ParseException | VersionException e){
+		catch(final IOException | VersionException e){
 			final String message = e.getMessage();
 			LOGGER.warn(message, e);
 

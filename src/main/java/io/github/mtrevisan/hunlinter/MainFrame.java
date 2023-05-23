@@ -92,7 +92,6 @@ import io.github.mtrevisan.hunlinter.workers.dictionary.WordlistWorker;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import io.github.mtrevisan.hunlinter.workers.exceptions.ProjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,7 +242,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
-				catch(final IOException | ParseException | VersionException ignored){}
+				catch(final IOException | VersionException ignored){}
 			});
 	}
 

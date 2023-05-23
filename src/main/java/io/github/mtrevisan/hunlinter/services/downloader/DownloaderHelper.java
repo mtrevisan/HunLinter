@@ -25,16 +25,15 @@
 package io.github.mtrevisan.hunlinter.services.downloader;
 
 import io.github.mtrevisan.hunlinter.gui.dialogs.HelpDialog;
+import io.github.mtrevisan.hunlinter.services.minimaljson.Json;
+import io.github.mtrevisan.hunlinter.services.minimaljson.JsonArray;
+import io.github.mtrevisan.hunlinter.services.minimaljson.JsonObject;
 import io.github.mtrevisan.hunlinter.services.semanticversioning.Version;
 import io.github.mtrevisan.hunlinter.services.system.PropertiesUTF8;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -118,18 +117,17 @@ public final class DownloaderHelper{
 	 * @throws VersionException	If something went wrong, or current version is already the last one
 	 */
 	@SuppressWarnings("OverlyBroadThrowsClause")
-	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException, ParseException{
+	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException{
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
 			final String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
-			final JSONParser parser = new JSONParser();
-			final JSONArray jsonArray = (JSONArray)parser.parse(response);
+			final JsonArray jsonArray = (JsonArray)Json.parse(response);
 			final List<Pair<Version, String>> whatsNew = new ArrayList<>(jsonArray.size());
 			for(final Object elem : jsonArray){
-				final JSONObject obj = (JSONObject)elem;
-				final Version tagName = new Version((String)obj.get(PROPERTY_KEY_TAG_NAME));
+				final JsonObject obj = (JsonObject)elem;
+				final Version tagName = new Version(obj.getString(PROPERTY_KEY_TAG_NAME, null));
 				if(tagName.isGreaterThan(APPLICATION_VERSION))
-					whatsNew.add(Pair.of(tagName, (String)obj.get(PROPERTY_KEY_WHATS_NEW)));
+					whatsNew.add(Pair.of(tagName, obj.getString(PROPERTY_KEY_WHATS_NEW, null)));
 			}
 
 			if(whatsNew.isEmpty())
@@ -141,7 +139,7 @@ public final class DownloaderHelper{
 	}
 
 	@SuppressWarnings("OverlyBroadThrowsClause")
-	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException, ParseException{
+	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException{
 		//find last build by filename
 		final String filename = "-" + version;
 		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).openStream()){
@@ -173,16 +171,15 @@ public final class DownloaderHelper{
 			throw new DownloadException("SHA mismatch while downloading {}", object.name);
 	}
 
-	private static GITFileData extractData(final String filename, final byte[] directoryContent) throws ParseException{
+	private static GITFileData extractData(final String filename, final byte[] directoryContent){
 		final String content = new String(directoryContent, StandardCharsets.UTF_8);
-		final JSONParser parser = new JSONParser();
-		final JSONArray array = (JSONArray)parser.parse(content);
+		final JsonArray array = (JsonArray)Json.parse(content);
 		for(final Object elem : array){
-			final String repositoryFilename = (String)((JSONObject)elem).get(PROPERTY_KEY_FILENAME);
+			final String repositoryFilename = ((JsonObject)elem).getString(PROPERTY_KEY_FILENAME, "");
 			//either a jar or an exe
 			if(repositoryFilename.endsWith(filename + DEFAULT_PACKAGING_EXTENSION)
 					|| repositoryFilename.endsWith(filename + DEFAULT_EXECUTABLE_EXTENSION))
-				return new GITFileData((JSONObject)elem);
+				return new GITFileData((JsonObject)elem);
 		}
 		return null;
 	}
