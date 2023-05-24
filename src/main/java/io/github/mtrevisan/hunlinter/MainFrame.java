@@ -933,9 +933,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			}
 			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.STARTED)
-					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
-				else if(stateValue == SwingWorker.StateValue.DONE){
+				mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+				if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
 					WorkerManager.callOnEnd(workerName);
 				}
