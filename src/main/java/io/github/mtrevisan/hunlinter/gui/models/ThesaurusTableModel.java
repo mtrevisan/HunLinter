@@ -92,6 +92,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			case 1 -> {
 				String temp = thesaurus.joinSynonyms(TAG_NEW_LINE);
 				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
+				temp = temp.replaceAll("([\\r\\n]+|<br ?/?>)(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1$2 ");
 				temp = temp.replaceAll("^(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1 ");
 				yield JavaHelper.textFormat(TAG_ROW, temp);
 			}
