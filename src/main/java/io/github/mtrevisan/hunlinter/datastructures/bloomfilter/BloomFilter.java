@@ -53,6 +53,7 @@ import java.util.Objects;
  * @param <T> the type of objects to be stored in the filter
  *
  * @see <a href="https://github.com/sangupta/bloomfilter">Bloom Filter 0.9.0</a>
+ * @see <a href="https://github.com/lidanh/BPlusTree/blob/master/IntegerBloomFilter.java">IntegerBloomFilter.java</a>
  */
 public class BloomFilter<T> implements BloomFilterInterface<T>{
 
