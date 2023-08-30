@@ -68,7 +68,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
-		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
 		<maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
@@ -76,11 +76,11 @@
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
 		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
-<!--		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>-->
+<!--		<maven-shade-plugin.version>3.5.0</maven-shade-plugin.version>-->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
 
@@ -88,11 +88,13 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<apache.commons-text.version>1.10.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.12.0</apache.commons-io.version>
+		<apache.commons-io.version>2.13.0</apache.commons-io.version>
 
 		<!-- FastUtil -->
 		<!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
 <!--		<unimi.fastutil.version>8.5.12</unimi.fastutil.version>-->
+		<!-- https://mvnrepository.com/artifact/org.agrona/agrona -->
+<!--		<org.agrona.version>1.19.1</org.agrona.version>-->
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
@@ -107,11 +109,11 @@
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		<logback.logback-classic.version>1.4.7</logback.logback-classic.version>
+		<logback.logback-classic.version>1.4.11</logback.logback-classic.version>
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.9.3</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.10.0</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
@@ -547,6 +549,13 @@
 <!--			<groupId>it.unimi.dsi</groupId>-->
 <!--			<artifactId>fastutil</artifactId>-->
 <!--			<version>${unimi.fastutil.version}</version>-->
+<!--		</dependency>-->
+
+		<!-- Agrona -->
+<!--		<dependency>-->
+<!--			<groupId>org.agrona</groupId>-->
+<!--			<artifactId>agrona</artifactId>-->
+<!--			<version>${org.agrona.version}</version>-->
 <!--		</dependency>-->
 
 
