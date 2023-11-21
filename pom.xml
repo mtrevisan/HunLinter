@@ -70,7 +70,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
 		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
-		<maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
 		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
@@ -80,21 +80,21 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-		<exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.1.1</exec-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
 
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<apache.commons-text.version>1.10.0</apache.commons-text.version>
+		<apache.commons-text.version>1.11.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.14.0</apache.commons-io.version>
+		<apache.commons-io.version>2.15.0</apache.commons-io.version>
 
 		<!-- FastUtil -->
 		<!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
 <!--		<unimi.fastutil.version>8.5.12</unimi.fastutil.version>-->
 		<!-- https://mvnrepository.com/artifact/org.agrona/agrona -->
-<!--		<org.agrona.version>1.19.21</org.agrona.version>-->
+<!--		<org.agrona.version>1.20.0</org.agrona.version>-->
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
@@ -113,7 +113,7 @@
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.10.0</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.10.1</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
