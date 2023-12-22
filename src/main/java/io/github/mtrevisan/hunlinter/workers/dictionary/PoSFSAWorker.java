@@ -79,17 +79,18 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private static final byte POS_FSA_TAG_SEPARATOR = (byte)'+';
 
 
-	public PoSFSAWorker(final ParserManager parserManager, final File outputFile){
+	public PoSFSAWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled, final File outputFile){
 		this(parserManager.getAffixData(), parserManager.getDicParser(), parserManager.getWordGenerator(), parserManager.getLanguage(),
-			outputFile);
+			onCancelled, outputFile);
 	}
 
 	public PoSFSAWorker(final AffixData affixData, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final String language, final File outputFile){
+			final String language, final Consumer<Exception> onCancelled, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(affixData, "Affix data cannot be null");

@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -82,17 +83,18 @@ public class MinimalPairsWorker extends WorkerDictionary{
 	private final Comparator<String> comparator;
 
 
-	public MinimalPairsWorker(final ParserManager parserManager, final File outputFile){
+	public MinimalPairsWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled, final File outputFile){
 		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator(),
-			outputFile);
+			onCancelled, outputFile);
 	}
 
 	public MinimalPairsWorker(final String language, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
-			final WordGenerator wordGenerator, final File outputFile){
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(language, "Language cannot be null");

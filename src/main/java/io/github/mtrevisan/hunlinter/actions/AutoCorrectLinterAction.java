@@ -36,6 +36,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 public class AutoCorrectLinterAction extends AbstractAction{
@@ -45,10 +46,12 @@ public class AutoCorrectLinterAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 
 	@SuppressWarnings("ConstantConditions")
-	public AutoCorrectLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+	public AutoCorrectLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener,
+			final Consumer<Exception> onCancelled){
 		super("autocorrect.linter",
 			new ImageIcon(AutoCorrectLinterAction.class.getResource("/dictionary_correctness.png")));
 
@@ -57,6 +60,7 @@ public class AutoCorrectLinterAction extends AbstractAction{
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 	}
 
 	@Override
@@ -76,7 +80,8 @@ public class AutoCorrectLinterAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 

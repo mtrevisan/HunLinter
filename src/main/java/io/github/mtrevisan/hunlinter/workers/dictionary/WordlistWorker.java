@@ -67,16 +67,18 @@ public class WordlistWorker extends WorkerDictionary{
 	private volatile boolean writerClosed;
 
 
-	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final File outputFile){
-		this(parserManager.getDicParser(), parserManager.getWordGenerator(), type, outputFile);
+	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final Consumer<Exception> onCancelled,
+			final File outputFile){
+		this(parserManager.getDicParser(), parserManager.getWordGenerator(), type, onCancelled, outputFile);
 	}
 
 	public WordlistWorker(final DictionaryParser dicParser, final WordGenerator wordGenerator, final WorkerType type,
-			final File outputFile){
+			final Consumer<Exception> onCancelled, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");

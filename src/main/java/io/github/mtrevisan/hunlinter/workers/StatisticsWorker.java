@@ -63,17 +63,19 @@ public class StatisticsWorker extends WorkerDictionary{
 	private final Orthography orthography;
 
 
-	public StatisticsWorker(final ParserManager parserManager, final boolean performHyphenationStatistics, final Frame parent){
+	public StatisticsWorker(final ParserManager parserManager, final boolean performHyphenationStatistics,
+			final Consumer<Exception> onCancelled, final Frame parent){
 		this(parserManager.getAffParser(), parserManager.getDicParser(),
-			(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), parent);
+			(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), onCancelled, parent);
 	}
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator, final Frame parent){
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled, final Frame parent){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(affParser, "Affix parser cannot be null");

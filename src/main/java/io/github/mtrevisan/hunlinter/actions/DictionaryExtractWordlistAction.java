@@ -44,6 +44,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 
 public class DictionaryExtractWordlistAction extends AbstractAction{
@@ -55,13 +56,14 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 	private final WordlistWorker.WorkerType type;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	@SuppressWarnings("ConstantConditions")
 	public DictionaryExtractWordlistAction(final WordlistWorker.WorkerType type, final WorkerManager workerManager,
-			final PropertyChangeListener propertyChangeListener){
+			final PropertyChangeListener propertyChangeListener, final Consumer<Exception> onCancelled){
 		super("dictionary.extractWordlist",
 			new ImageIcon(DictionaryExtractWordlistAction.class.getResource("/dictionary_wordlist.png")));
 
@@ -72,6 +74,7 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 		this.type = type;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 
 		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
@@ -105,7 +108,8 @@ public class DictionaryExtractWordlistAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 

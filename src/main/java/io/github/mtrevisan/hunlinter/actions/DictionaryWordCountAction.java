@@ -36,6 +36,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 public class DictionaryWordCountAction extends AbstractAction{
@@ -46,10 +47,12 @@ public class DictionaryWordCountAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 
 	@SuppressWarnings("ConstantConditions")
-	public DictionaryWordCountAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+	public DictionaryWordCountAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener,
+			final Consumer<Exception> onCancelled){
 		super("dictionary.wordCount",
 			new ImageIcon(DictionaryWordCountAction.class.getResource("/dictionary_count.png")));
 
@@ -58,6 +61,7 @@ public class DictionaryWordCountAction extends AbstractAction{
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 	}
 
 	@Override
@@ -77,7 +81,8 @@ public class DictionaryWordCountAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 
