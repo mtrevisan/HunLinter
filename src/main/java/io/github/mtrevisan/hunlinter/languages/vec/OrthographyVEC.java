@@ -122,7 +122,12 @@ public final class OrthographyVEC extends Orthography{
 		return word;
 	}
 
-	//Reduce geminates, except `^[ie]nn`, `^d[ei]ss`, or `[eo]nne$`.
+	/**
+	 * Reduces geminates in a given word, excluding cases such as /^[ie]nn/, /^d[ei]ss/, or /[eo]nne$/.
+	 *
+	 * @param word	The word to reduce geminates in.
+	 * @return	The word with geminates reduced.
+	 */
 	//FIXME speed up
 	private static String reduceGeminates(final CharSequence word){
 		final StringBuilder sb = new StringBuilder(word);
