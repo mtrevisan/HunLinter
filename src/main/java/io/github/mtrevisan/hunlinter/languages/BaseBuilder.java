@@ -97,6 +97,12 @@ public final class BaseBuilder{
 
 	private BaseBuilder(){}
 
+	/**
+	 * Retrieves the comparator for sorting strings in a specified language.
+	 *
+	 * @param language	The language code.
+	 * @return	The comparator for the specified language, or a default comparator if the specified language is not supported.
+	 */
 	public static Comparator<String> getComparator(final String language){
 		LanguageData languageData = DATA.get(language);
 		if(languageData == null && language != null && language.contains("-")){
@@ -125,6 +131,11 @@ public final class BaseBuilder{
 		return languageData.comparator;
 	}
 
+	/**
+	 * Checks the default comparator for sorting strings in a specified language.
+	 *
+	 * @param language	The language code.
+	 */
 	public static void checkDefaultComparator(final String language){
 		LanguageData languageData = DATA.get(language);
 		if(languageData == null && language != null && language.contains("-")){
@@ -138,11 +149,24 @@ public final class BaseBuilder{
 			LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(COMPARATOR_DEFAULT_MESSAGE, language));
 	}
 
+	/**
+	 * Retrieves the dictionary base data for a specified language.
+	 *
+	 * @param language	The language code.
+	 * @return	The Bloom filter parameters containing the dictionary base data for the specified language.
+	 */
 	public static BloomFilterParameters getDictionaryBaseData(final String language){
 		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.dictionaryBaseData;
 	}
 
+	/**
+	 * Retrieves the correctness checker for a given affix data and hyphenator.
+	 *
+	 * @param affixData	The affix data for which to retrieve the correctness checker.
+	 * @param hyphenator	The hyphenator interface used by the correctness checker.
+	 * @return	The {@link DictionaryCorrectnessChecker} instance for the specified affixData and hyphenator.
+	 */
 	public static DictionaryCorrectnessChecker getCorrectnessChecker(final AffixData affixData,
 			final HyphenatorInterface hyphenator){
 		final DictionaryCorrectnessChecker checker = DATA.getOrDefault(affixData.getLanguage(), LANGUAGE_DATA_DEFAULT)
@@ -151,16 +175,35 @@ public final class BaseBuilder{
 		return checker;
 	}
 
+	/**
+	 * Retrieves the orthography for a given language.
+	 *
+	 * @param language	The language code.
+	 * @return	The orthography for the specified language, or the default orthography if the specified language is not supported.
+	 */
 	public static Orthography getOrthography(final String language){
 		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.orthography;
 	}
 
+	/**
+	 * Retrieves the {@link WordTokenizer} for a specified language.
+	 *
+	 * @param language	The language code for which to retrieve the {@link WordTokenizer}.
+	 * @return	The {@link WordTokenizer} for the specified language, or a default {@link WordTokenizer} if the specified language is not
+	 * 	supported.
+	 */
 	public static WordTokenizer getWordTokenizer(final String language){
 		return DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)
 			.wordTokenizer;
 	}
 
+	/**
+	 * Retrieves the rules properties for a given language.
+	 *
+	 * @param language	The language code for which to retrieve the rules properties.
+	 * @return	The rules properties for the specified language.
+	 */
 	public static PropertiesUTF8 getRulesProperties(final String language){
 		final PropertiesUTF8 rulesProperties = new PropertiesUTF8();
 		final Class<? extends DictionaryCorrectnessChecker> cl = DATA.getOrDefault(language, LANGUAGE_DATA_DEFAULT)

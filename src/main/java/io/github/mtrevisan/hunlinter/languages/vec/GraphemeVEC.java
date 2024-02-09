@@ -51,6 +51,12 @@ final class GraphemeVEC{
 
 	private GraphemeVEC(){}
 
+	/**
+	 * Determines if a given word contains a diphthong.
+	 *
+	 * @param word	The word to check for diphthongs.
+	 * @return	Whether the word contains a diphthong.
+	 */
 	public static boolean isDiphtong(final CharSequence word){
 		if(RegexHelper.find(word, DIPHTONG1))
 			return true;
@@ -59,10 +65,22 @@ final class GraphemeVEC{
 		return (m.find() && m.start() != WordVEC.getIndexOfStress(word));
 	}
 
+	/**
+	 * Determines if a given word contains a hyatus.
+	 *
+	 * @param word	The word to check for hyatus.
+	 * @return	Whether the word contains a hyatus.
+	 */
 	public static boolean isHyatus(final CharSequence word){
 		return RegexHelper.find(word, HYATUS);
 	}
 
+	/**
+	 * Determines if a given group of characters contains an etereophonic sequence.
+	 *
+	 * @param group	The group of characters to check for an etereophonic sequence.
+	 * @return	Whether the group contains an etereophonic sequence.
+	 */
 	public static boolean isEterophonicSequence(final CharSequence group){
 		return RegexHelper.find(group, ETEROPHONIC_SEQUENCE);
 	}

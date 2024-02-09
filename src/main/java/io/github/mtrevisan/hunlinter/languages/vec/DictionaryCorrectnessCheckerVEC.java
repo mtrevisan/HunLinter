@@ -112,6 +112,9 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		orthography = OrthographyVEC.getInstance();
 	}
 
+	/**
+	 * Loads the rules required for dictionary correctness checking.
+	 */
 	@Override
 	public final void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
@@ -136,6 +139,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			stemCanAdmitStress.add(MorphologicalTag.STEM.getCode() + cas);
 	}
 
+	/**
+	 * Checks the inflection for correctness, performing various checks and validations.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 * @param index	The line number of the inflection in the dictionary.
+	 */
 	@Override
 	public final void checkInflection(final Inflection inflection, final int index){
 		super.checkInflection(inflection, index);
@@ -150,6 +159,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		orthographyCheck(inflection);
 	}
 
+	/**
+	 * Perform stress checks on an inflection.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 */
 	private void stressCheck(final Inflection inflection){
 		final boolean canAdmitStress = canAdmitStress(inflection.getMorphologicalFieldStem());
 		final String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
@@ -164,6 +178,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
+	/**
+	 * Checks the given inflection for language variants and throws exceptions if any inconsistencies are found.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 */
 	private void variantsCheck(final Inflection inflection){
 		String derivedWord = inflection.getWord().toLowerCase(Locale.ROOT);
 		for(int i = 0; i < WORD_SEPARATORS.length(); i ++)
@@ -188,6 +207,15 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS, inflection.getWord());
 	}
 
+	/**
+	 * Performs an incompatibility check on the given inflection.
+	 * <p>
+	 * If the inflection has more than one part of speech, it publishes a linter warning event with the specified index.
+	 * </p>
+	 *
+	 * @param inflection	The inflection to be checked.
+	 * @param index	The line number of the inflection in the dictionary.
+	 */
 	private static void incompatibilityCheck(final Inflection inflection, final int index){
 		final List<String> pos = inflection.getMorphologicalFieldPartOfSpeech();
 		if(pos.size() > 1)
@@ -195,6 +223,11 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 				.withIndex(index));
 	}
 
+	/**
+	 * Checks the orthography of the given inflection by performing various checks and validations.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 */
 	private void orthographyCheck(final Inflection inflection){
 		if(hasToCheckForOrthographyAndSyllabation(inflection)){
 			final String word = inflection.getWord()
@@ -204,17 +237,39 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
+	/**
+	 * Checks whether the given inflection needs to be checked for orthography and syllabation.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 * @return	Whether the inflection needs to be checked for orthography and syllabation.
+	 */
 	private boolean hasToCheckForOrthographyAndSyllabation(final Inflection inflection){
 		return ((rulesLoader.isEnableVerbSyllabationCheck() || !inflection.hasPartOfSpeech(POS_VERB))
 			&& !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
 
+	/**
+	 * Performs an orthography check on the given word.
+	 * <p>
+	 * If the word is misspelled, a {@link LinterException} is thrown with the misspelled word and the corrected word.
+	 * </p>
+	 *
+	 * @param word	The word to be checked for orthography.
+	 * @throws LinterException	If the word is misspelled.
+	 */
 	private void orthographyCheck(final String word){
 		final String correctedDerivedWord = orthography.correctOrthography(word);
 		if(!correctedDerivedWord.equals(word))
 			throw new LinterException(MISSPELLED, word, correctedDerivedWord);
 	}
 
+	/**
+	 * Checks the compound inflection for correctness, performing various checks and validations.
+	 *
+	 * @param subword	The subword being checked.
+	 * @param subwordIndex	The line number of the subword in the dictionary.
+	 * @param inflection	The inflection to be checked.
+	 */
 	@Override
 	protected final void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){
 		if(subwordIndex == 0)
@@ -223,6 +278,14 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		ciuiCheck(subword, inflection);
 	}
 
+	/**
+	 *
+	 * Performs stress checks on a given subword in an inflection.
+	 *
+	 * @param subword	The subword to be checked.
+	 * @param inflection	The inflection containing the subword.
+	 * @param lastSubword	Flag indicating if the subword is the last in the inflection.
+	 */
 	private void stressCheck(final String subword, final Inflection inflection, final boolean lastSubword){
 		if(!rulesLoader.containsValidStressedWords(subword)){
 			final int stresses = WordVEC.countStresses(subword);
@@ -244,6 +307,12 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		}
 	}
 
+	/**
+	 * Retrieves the last applied rule from the given {@link Inflection} object.
+	 *
+	 * @param inflection	The Inflection object from which to retrieve the last applied rule.
+	 * @return	The last applied rule as an {@link AffixEntry} object, or <code>null</code> if no rules have been applied.
+	 */
 	private static AffixEntry getLastAppliedRule(final Inflection inflection){
 		AffixEntry appliedRuleFlag = null;
 		final AffixEntry[] appliedRules = inflection.getAppliedRules();
@@ -252,6 +321,13 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		return appliedRuleFlag;
 	}
 
+	/**
+	 * Checks the given subword of an inflection for specific patterns and throws exceptions if any inconsistencies are found.
+	 *
+	 * @param subword	The subword to be checked.
+	 * @param inflection	The inflection containing the subword.
+	 * @throws LinterException	If the subword matches certain patterns.
+	 */
 	private void ciuiCheck(final String subword, final Inflection inflection){
 		if(!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && RegexHelper.find(subword, patternPhonemeCijjhnhiv))
 			throw new LinterException(WORD_CANNOT_HAVE_CIJJHNHIV, inflection.getWord());
@@ -293,11 +369,23 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //	}
 
 
+	/**
+	 * Checks if a given flag should not be used to check productiveness.
+	 *
+	 * @param flag	The flag to check.
+	 * @return	Whether the flag should not be used for productiveness check.
+	 */
 	@Override
 	public final boolean shouldNotCheckProductiveness(final String flag){
 		return dontCheckProductivenessRules.contains(flag);
 	}
 
+	/**
+	 * Determines whether the given inflection can admit stress.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 * @return	Whether the inflection can admit stress.
+	 */
 	@Override
 	public final boolean canAdmitStress(final Inflection inflection){
 		String derivationalField = null;
@@ -308,17 +396,35 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		return !derivationCanAdminStress.contains(derivationalField);
 	}
 
+	/**
+	 * Determines whether the given stem can admit stress.
+	 *
+	 * @param stem	The stem to be checked.
+	 * @return	Whether the stem can admit stress.
+	 */
 	@Override
 	public final boolean canAdmitStress(final String stem){
 		//NOTE: starting from index 3 removes the prefix `po:`
 		return stemCanAdmitStress.contains(stem);
 	}
 
+	/**
+	 * Determines whether a character is a consonant.
+	 *
+	 * @param chr	The character to be checked.
+	 * @return	Whether the character is a consonant.
+	 */
 	@Override
 	public final boolean isConsonant(final char chr){
 		return WordVEC.isConsonant(chr);
 	}
 
+	/**
+	 * Determines whether the given inflection should be processed for minimal pair.
+	 *
+	 * @param inflection	The inflection to be checked.
+	 * @return	Whether the inflection meets the conditions to be processed for minimal pair.
+	 */
 	@Override
 	public final boolean shouldBeProcessedForMinimalPair(final Inflection inflection){
 		final String word = inflection.getWord();

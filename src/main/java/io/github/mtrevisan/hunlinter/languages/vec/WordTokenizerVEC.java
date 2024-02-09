@@ -47,6 +47,13 @@ public class WordTokenizerVEC extends WordTokenizer{
 	}
 
 
+	/**
+	 * Tokenizes the given text by replacing specified characters with a modified version, and then delegates to the superclass's tokenize
+	 * method.
+	 *
+	 * @param text	The text to be tokenized.
+	 * @return	The tokenized list of strings.
+	 */
 	@Override
 	public final List<String> tokenize(String text){
 		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");

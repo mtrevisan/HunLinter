@@ -116,14 +116,32 @@ public final class WordVEC{
 		return count;
 	}
 
+	/**
+	 * Determines if a given character is an apostrophe.
+	 *
+	 * @param chr	The character to check.
+	 * @return	Whether the character is an apostrophe.
+	 */
 	public static boolean isApostrophe(final char chr){
 		return (chr == HyphenationParser.MODIFIER_LETTER_APOSTROPHE || chr == HyphenationParser.APOSTROPHE.charAt(0));
 	}
 
+	/**
+	 * Determines if a given character is a vowel.
+	 *
+	 * @param chr	The character to check.
+	 * @return	Whether the character is a vowel.
+	 */
 	public static boolean isVowel(final char chr){
 		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
 	}
 
+	/**
+	 * Determines if a given character is a consonant.
+	 *
+	 * @param chr	The character to check.
+	 * @return	Whether the character is a consonant.
+	 */
 	public static boolean isConsonant(final char chr){
 		return !isVowel(chr);
 	}
@@ -360,6 +378,12 @@ public final class WordVEC{
 //		return word;
 //	}
 
+	/**
+	 * Inner method to mark the default stress in a word.
+	 *
+	 * @param word	The input word to mark the stress in.
+	 * @return	The word with the default stress marked.
+	 */
 	private static String innerMarkDefaultStress(String word){
 		int higherIndex = StringUtils.lastIndexOf(word, '’') - 1;
 		final int wordLength = word.length();
@@ -430,10 +454,21 @@ public final class WordVEC{
 		return vowel;
 	}
 
+	/**
+	 * Returns the index of the stressed grapheme in the given word.
+	 *
+	 * @param word	The word to search for a stressed grapheme.
+	 * @return	The index of the stressed grapheme, or {@code -1} if no stressed grapheme is found.
+	 */
 	static int getIndexOfStress(final CharSequence word){
 		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
 	}
 
+	/**
+	 * Returns a Comparator that uses the default sorting order of strings.
+	 *
+	 * @return	A Comparator that uses the default sorting order of strings.
+	 */
 	public static Comparator<String> sorterComparator(){
 		return COLLATOR::compare;
 	}

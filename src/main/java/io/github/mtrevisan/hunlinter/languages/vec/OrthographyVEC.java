@@ -73,6 +73,12 @@ public final class OrthographyVEC extends Orthography{
 		return SingletonHelper.INSTANCE;
 	}
 
+	/**
+	 * Corrects the orthography of a given word.
+	 *
+	 * @param word	The word to be corrected.
+	 * @return	The corrected word.
+	 */
 	@Override
 	public String correctOrthography(final String word){
 		//correct stress
@@ -114,6 +120,12 @@ public final class OrthographyVEC extends Orthography{
 		return correctedWord;
 	}
 
+	/**
+	 * Corrects occurrences of 'i' into 'j' at the beginning of a word followed by a vowel and between vowels, correcting also the converse.
+	 *
+	 * @param word	The word to be corrected.
+	 * @return	The corrected word.
+	 */
 	private static String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
 		//correcting also the converse
@@ -147,6 +159,12 @@ public final class OrthographyVEC extends Orthography{
 		return sb.toString();
 	}
 
+	/**
+	 * This method checks for syllabation errors in a given list of syllabes.
+	 *
+	 * @param syllabes	The list of syllabes to check for errors.
+	 * @return	An array of booleans representing the error status for each syllabe.
+	 */
 	@Override
 	public boolean[] getSyllabationErrors(final List<String> syllabes){
 		final boolean[] errors = new boolean[syllabes.size()];
@@ -160,6 +178,12 @@ public final class OrthographyVEC extends Orthography{
 		return errors;
 	}
 
+	/**
+	 * Returns the index of the stressed syllable in the given list of syllables, counting from the last syllable.
+	 *
+	 * @param syllabes	The list of syllables.
+	 * @return	The index of the stressed syllable counting from the last syllable, or {@code -1} if no stressed syllable is found.
+	 */
 	@Override
 	public int getStressedSyllabeIndexFromLast(final List<String> syllabes){
 		for(int i = syllabes.size() - 1; i >= 0; i --)
@@ -168,16 +192,34 @@ public final class OrthographyVEC extends Orthography{
 		return -1;
 	}
 
+	/**
+	 * Counts the number of graphemes in a given word.
+	 *
+	 * @param word	The word to count the graphemes in.
+	 * @return	The number of graphemes in the word.
+	 */
 	@Override
 	public int countGraphemes(final String word){
 		return WordVEC.countGraphemes(word);
 	}
 
+	/**
+	 * Marks the default stress in a given word.
+	 *
+	 * @param word	The word to mark the default stress in.
+	 * @return	The word with the default stress marked.
+	 */
 	@Override
 	public String markDefaultStress(final String word){
 		return WordVEC.markDefaultStress(word);
 	}
 
+	/**
+	 * Checks if the given word has a stressed grapheme.
+	 *
+	 * @param word	The word to check.
+	 * @return	Whether the word has a stressed grapheme.
+	 */
 	@Override
 	public boolean hasStressedGrapheme(final String word){
 		return WordVEC.hasStressedGrapheme(word);

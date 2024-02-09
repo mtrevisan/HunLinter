@@ -62,11 +62,27 @@ public class DictionaryCorrectnessChecker{
 		this.hyphenator = hyphenator;
 	}
 
+	/**
+	 * Loads the rules for the affix data language and flag parsing strategy.
+	 * <p>
+	 * This method initializes the rules loader field with a new instance of the RulesLoader class, using the language
+	 * and flag parsing strategy obtained from the affix data field. The rules loader is responsible for loading and managing
+	 * the rules used by the {@link DictionaryCorrectnessChecker} class.
+	 * </p>
+	 *
+	 * @throws NullPointerException	If either the affix data or the rules loader field is {@code null}.
+	 */
 	@SuppressWarnings("DesignForExtension")
 	public void loadRules(){
 		rulesLoader = new RulesLoader(affixData.getLanguage(), affixData.getFlagParsingStrategy());
 	}
 
+	/**
+	 * Checks if the given dictionary entry has a matching circumfix flag based on the affix data.
+	 *
+	 * @param dicEntry	The dictionary entry to check.
+	 * @throws LinterException	If the circumfix flag is invalid for the dictionary entry.
+	 */
 	public final void checkCircumfix(final DictionaryEntry dicEntry){
 		final String circumfixFlag = affixData.getCircumfixFlag();
 		if(circumfixFlag != null && dicEntry.hasContinuationFlag(circumfixFlag))
@@ -86,6 +102,12 @@ public class DictionaryCorrectnessChecker{
 		incompatibilityCheck(inflection);
 	}
 
+	/**
+	 * Checks the morphological fields of an inflection and publishes LinterWarnings if necessary.
+	 *
+	 * @param inflection	The inflection to check.
+	 * @param index	The line number of the inflection in the dictionary.
+	 */
 	private void morphologicalFieldCheck(final Inflection inflection, final int index){
 		if(!inflection.hasMorphologicalFields())
 			EventBusService.publish(new LinterWarning(NO_MORPHOLOGICAL_FIELD, inflection.getWord())
@@ -110,6 +132,11 @@ public class DictionaryCorrectnessChecker{
 		}
 	}
 
+	/**
+	 * Performs an incompatibility check on the given inflection.
+	 *
+	 * @param inflection	The inflection to check for incompatibilities.
+	 */
 	private void incompatibilityCheck(final Inflection inflection){
 		rulesLoader.letterToFlagIncompatibilityCheck(inflection);
 
@@ -118,35 +145,82 @@ public class DictionaryCorrectnessChecker{
 		rulesLoader.letterToFlagCompatibilityCheck(inflection);
 	}
 
-	//used by the correctness check worker:
+	/**
+	 * Checks the compound inflection of a subword within an inflection.
+	 * <p>
+	 * This method is used by the correctness check worker to check the compound inflection of a specific subword within an inflection.
+	 * It performs the necessary checks and validations for the compound inflection and publishes any relevant information or warnings
+	 * as needed.
+	 * </p>
+	 *
+	 * @param subword	The subword to check the compound inflection for.
+	 * @param subwordIndex	The index of the subword within the inflection.
+	 * @param inflection	The inflection to check the compound inflection against.
+	 */
 	protected void checkCompoundInflection(final String subword, final int subwordIndex, final Inflection inflection){}
 
+	/**
+	 * Checks if a given flag can have no inflections.
+	 *
+	 * @param flag	The flag to check.
+	 * @return	Whether the flag can have no inflections.
+	 */
 	@SuppressWarnings("DesignForExtension")
 	public boolean canHaveNoInflections(final String flag){
 		return rulesLoader.containsCanHaveNoInflections(flag);
 	}
 
+	/**
+	 * Checks if the given flag should not be checked for productiveness.
+	 *
+	 * @param flag	The flag to check.
+	 * @return	Whether the flag should not be checked for productiveness.
+	 */
 	@SuppressWarnings("DesignForExtension")
 	public boolean shouldNotCheckProductiveness(final String flag){
 		return false;
 	}
 
+	/**
+	 * Checks if the given inflection can admit stress.
+	 *
+	 * @param inflection	The inflection to check.
+	 * @return	Whether the inflection can admit stress.
+	 */
 	@SuppressWarnings("DesignForExtension")
 	public boolean canAdmitStress(final Inflection inflection){
 		return false;
 	}
 
+	/**
+	 * Determines whether the given stem can admit stress.
+	 *
+	 * @param stem	The stem to be checked.
+	 * @return	Whether the stem can admit stress.
+	 */
 	@SuppressWarnings("DesignForExtension")
 	public boolean canAdmitStress(final String stem){
 		return false;
 	}
 
+	/**
+	 * Checks if the given character is a consonant.
+	 *
+	 * @param chr	The character to check.
+	 * @return	Whether the character is a consonant.
+	 */
 	//used by the minimal pairs' worker:
 	@SuppressWarnings("DesignForExtension")
 	public boolean isConsonant(final char chr){
 		return true;
 	}
 
+	/**
+	 * Determines whether the given inflection should be processed for minimal pairs.
+	 *
+	 * @param inflection	The inflection to check.
+	 * @return	Whether the inflection should be processed for minimal pairs.
+	 */
 	//used by the minimal pairs' worker:
 	@SuppressWarnings("DesignForExtension")
 	public boolean shouldBeProcessedForMinimalPair(final Inflection inflection){

@@ -45,16 +45,34 @@ public final class DictionaryBaseData extends BloomFilterParameters{
 
 	private DictionaryBaseData(){}
 
+	/**
+	 * Returns the expected (maximum) number of elements to be added without transcending the false positive probability.
+	 *
+	 * @return	The expected number of elements.
+	 */
 	@Override
 	public int getExpectedNumberOfElements(){
 		return EXPECTED_NUMBER_OF_ELEMENTS;
 	}
 
+	/**
+	 * Retrieves the false positive probability for the Bloom filter.
+	 *
+	 * @return	The false positive probability.
+	 */
 	@Override
 	public double getFalsePositiveProbability(){
 		return FALSE_POSITIVE_PROBABILITY;
 	}
 
+	/**
+	 * Returns the growth rate when the filter is full.
+	 * <p>
+	 * Defaults to 0.2.
+	 * </p>
+	 *
+	 * @return	The growth rate when the filter is full.
+	 */
 	@Override
 	public double getGrowthRateWhenFull(){
 		return GROWTH_RATE_WHEN_FULL;

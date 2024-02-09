@@ -46,6 +46,12 @@ public class LetterMatcherEntry{
 		this.correctRule = correctRule;
 	}
 
+	/**
+	 * Matches an inflection against a set of wrong flags and throws a {@link LinterException} if any of the wrong flags are present.
+	 *
+	 * @param inflection	The inflection to match against.
+	 * @throws LinterException	If any of the wrong flags are present in the inflection.
+	 */
 	public final void match(final Inflection inflection){
 		if(!inflection.getContinuationFlags().isEmpty())
 			for(int i = 0; i < wrongFlags.length; i ++)
