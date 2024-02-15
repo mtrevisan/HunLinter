@@ -134,8 +134,8 @@ public class ThesaurusEntry{
 		return false;
 	}
 
-	public final boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
-		final Collection<String> ss = new ArrayList<>(synonyms);
+	public final boolean intersects(final Collection<String> partOfSpeeches, final String[] synonyms){
+		final Collection<String> ss = new ArrayList<>(List.of(synonyms));
 		final boolean removed = ss.remove(definition);
 		for(int i = 0; i < this.synonyms.size(); i ++){
 			final SynonymsEntry entry = this.synonyms.get(i);

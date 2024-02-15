@@ -72,7 +72,7 @@ public class ThesaurusDictionary{
 	 * @param synonyms	Unique list of synonyms.
 	 * @return	Whether the row was added.
 	 */
-	public final boolean add(final String[] partOfSpeeches, final List<String> synonyms){
+	public final boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
 		for(int i = 0; i < size; i ++)
@@ -80,8 +80,8 @@ public class ThesaurusDictionary{
 		final String wholePartOfSpeeches = sj.toString();
 
 		boolean result = false;
-		for(int i = 0; i < synonyms.size(); i ++){
-			String currentDefinition = synonyms.get(i);
+		for(int i = 0; i < synonyms.length; i ++){
+			String currentDefinition = synonyms[i];
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
 
 			currentDefinition = removeSynonymUse(currentDefinition);
@@ -101,12 +101,12 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
+	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final String[] synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		for(int i = 0; i < synonyms.size(); i ++){
-			final String synonym = synonyms.get(i);
+		for(int i = 0; i < synonyms.length; i ++){
+			final String synonym = synonyms[i];
 			if(!synonym.equals(definition))
 				sj.add(synonym);
 		}
@@ -189,7 +189,7 @@ public class ThesaurusDictionary{
 	}
 
 	/** Find all the entries that have Part-of-Speech and synonyms contained into the given ones. */
-	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
+	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
 		for(final ThesaurusEntry entry : dictionary.values())

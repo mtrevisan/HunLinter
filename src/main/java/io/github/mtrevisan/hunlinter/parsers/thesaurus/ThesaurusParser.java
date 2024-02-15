@@ -163,16 +163,7 @@ public class ThesaurusParser{
 			partOfSpeeches[i] = StringUtils.replaceChars(partOfSpeeches[i], "()", "").trim();
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
-		final List<String> list = new ArrayList<>(pas.length);
-		for(int i = 0; i < pas.length; i ++){
-			final String trim = orthography.correctOrthography(pas[i].trim());
-			if(StringUtils.isNotBlank(trim) && !list.contains(trim))
-				list.add(trim);
-		}
-		if(list.size() < 2)
-			throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
-
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, list);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, pas);
 		boolean forceInsertion = duplicates.isEmpty();
 		if(!forceInsertion){
 			final String duplicatesMessage = duplicates.stream()
@@ -182,13 +173,13 @@ public class ThesaurusParser{
 		}
 
 		if(forceInsertion)
-			dictionary.add(partOfSpeeches, list);
+			dictionary.add(partOfSpeeches, pas);
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same Part-of-Speech. */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
