@@ -41,7 +41,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<java.version>1.17</java.version>
+		<java.version>17</java.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 
@@ -60,11 +60,11 @@
 		<windows.upgrade.uuid>523ce3a3-9838-484b-8219-a3832bde60f9</windows.upgrade.uuid>
 		<app.vendor>Mauro Trevisan</app.vendor>
 		<app.menu>Mauro Trevisan's Tools</app.menu>
-		<app.copyright>(c) 2019-2023 Mauro Trevisan</app.copyright>
+		<app.copyright>(c) 2019-2024 Mauro Trevisan</app.copyright>
 
 		<!-- Profiles & Build -->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
-		<maven-gpg-plugin.version>3.2.1</maven-gpg-plugin.version>
+		<maven-gpg-plugin.version>3.2.2</maven-gpg-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
@@ -88,13 +88,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<apache.commons-text.version>1.11.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.15.1</apache.commons-io.version>
-
-		<!-- FastUtil -->
-		<!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
-<!--		<unimi.fastutil.version>8.5.13</unimi.fastutil.version>-->
-		<!-- https://mvnrepository.com/artifact/org.agrona/agrona -->
-<!--		<org.agrona.version>1.21.0</org.agrona.version>-->
+		<apache.commons-io.version>2.16.0</apache.commons-io.version>
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
@@ -543,20 +537,6 @@
 			<artifactId>commons-io</artifactId>
 			<version>${apache.commons-io.version}</version>
 		</dependency>
-
-		<!-- FastUtil -->
-<!--		<dependency>-->
-<!--			<groupId>it.unimi.dsi</groupId>-->
-<!--			<artifactId>fastutil</artifactId>-->
-<!--			<version>${unimi.fastutil.version}</version>-->
-<!--		</dependency>-->
-
-		<!-- Agrona -->
-<!--		<dependency>-->
-<!--			<groupId>org.agrona</groupId>-->
-<!--			<artifactId>agrona</artifactId>-->
-<!--			<version>${org.agrona.version}</version>-->
-<!--		</dependency>-->
 
 
 		<!-- jFreeChart -->
