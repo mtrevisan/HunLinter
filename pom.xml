@@ -41,9 +41,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<java.version>17</java.version>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<java.version>21</java.version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 
 		<javadoc.html.version>-html5</javadoc.html.version>
 
@@ -64,7 +64,7 @@
 
 		<!-- Profiles & Build -->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
-		<maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
+		<maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
 		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
@@ -86,7 +86,7 @@
 
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<apache.commons-text.version>1.11.0</apache.commons-text.version>
+		<apache.commons-text.version>1.12.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<apache.commons-io.version>2.16.1</apache.commons-io.version>
 
