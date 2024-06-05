@@ -66,23 +66,23 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-gpg-plugin -->
 		<maven-gpg-plugin.version>3.2.4</maven-gpg-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-deploy-plugin -->
-		<maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+		<maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
-		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
 		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
-<!--		<maven-shade-plugin.version>3.5.2</maven-shade-plugin.version>-->
+<!--		<maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>-->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-		<exec-maven-plugin.version>3.2.0</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.3.0</exec-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
-		<maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+		<maven-install-plugin.version>3.1.2</maven-install-plugin.version>
 
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
@@ -103,7 +103,7 @@
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		<logback.logback-classic.version>1.5.5</logback.logback-classic.version>
+		<logback.logback-classic.version>1.5.6</logback.logback-classic.version>
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
