@@ -92,7 +92,7 @@
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
-		<jfree.jfreechart.version>1.5.4</jfree.jfreechart.version>
+		<jfree.jfreechart.version>1.5.5</jfree.jfreechart.version>
 
 		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<github.vsonnier.hppcrt.version>0.7.5</github.vsonnier.hppcrt.version>
@@ -107,7 +107,7 @@
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.10.2</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.10.3</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
