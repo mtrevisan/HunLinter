@@ -70,7 +70,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
-		<maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
