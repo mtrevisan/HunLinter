@@ -56,7 +56,7 @@ public final class DownloaderHelper{
 
 	private static final String ALREADY_UPDATED = "You already have the latest version installed";
 
-	private static final String URL_CONNECTIVITY = "https://www.google.com/";
+	private static final String URL_CONNECTIVITY_TEST = "https://www.google.com/";
 	private static final String URL_ONLINE_REPOSITORY_BASE = "https://api.github.com/repos/mtrevisan/HunLinter/";
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
@@ -101,7 +101,7 @@ public final class DownloaderHelper{
 
 	public static boolean hasInternetConnectivity(){
 		try{
-			final URL url = new URL(URL_CONNECTIVITY);
+			final URL url = new URL(URL_CONNECTIVITY_TEST);
 			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			final int responseCode = httpConnection.getResponseCode();
 			return (responseCode == HttpURLConnection.HTTP_OK);
