@@ -168,7 +168,7 @@ public class WorkerManager{
 			final boolean performHyphenationStatistics = preStart.getAsBoolean();
 			return new StatisticsWorker(parserManager, performHyphenationStatistics, onCancelled, parentFrame);
 		};
-		createWorker(StatisticsWorker.WORKER_NAME, creator, onStart, onEnd);
+		createWorker(StatisticsWorker.WORKER_NAME_DICTIONARY, creator, onStart, onEnd);
 	}
 
 	public final void createWordlistWorker(final WordlistWorker.WorkerType type, final Supplier<File> preStart,

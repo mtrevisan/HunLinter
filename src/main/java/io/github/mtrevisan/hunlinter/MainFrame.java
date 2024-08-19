@@ -415,7 +415,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-		final Consumer<Exception> onDicExtractDuplicatesCancelled = ex -> dicStatisticsMenuItem.setEnabled(true);
+		final Consumer<Exception> onDicExtractDuplicatesCancelled = ex -> dicExtractDuplicatesMenuItem.setEnabled(true);
       dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this,
 			onDicExtractDuplicatesCancelled));
       dicExtractDuplicatesMenuItem.setMnemonic('d');
@@ -447,9 +447,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicMenu.add(dicExtractMinimalPairsMenuItem);
       dicMenu.add(dicFSASeparator);
 
-		final Consumer<Exception> onDicExtractDictionaruFSACancelled = exc -> dicExtractDictionaryFSAMenuItem.setEnabled(true);
+		final Consumer<Exception> onDicExtractDictionaryFSACancelled = exc -> dicExtractDictionaryFSAMenuItem.setEnabled(true);
       dicExtractDictionaryFSAMenuItem.setAction(new DictionaryExtractWordlistFSAAction(parserManager, workerManager,
-			this, onDicExtractDictionaruFSACancelled));
+			this, onDicExtractDictionaryFSACancelled));
       dicExtractDictionaryFSAMenuItem.setText("Extract dictionary FSA…");
       dicMenu.add(dicExtractDictionaryFSAMenuItem);
 

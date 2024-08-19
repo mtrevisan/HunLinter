@@ -55,7 +55,8 @@ import java.util.function.Function;
 
 public class StatisticsWorker extends WorkerDictionary{
 
-	public static final String WORKER_NAME = "Statistics";
+	public static final String WORKER_NAME_DICTIONARY = "(Dictionary) Statistics";
+	public static final String WORKER_NAME_HYPHENATION = "(Hyphenation) Statistics";
 
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
@@ -71,7 +72,7 @@ public class StatisticsWorker extends WorkerDictionary{
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
 			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled, final Frame parent){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+		super(new WorkerDataParser<>((hyphenator == null? WORKER_NAME_DICTIONARY: WORKER_NAME_HYPHENATION), dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
@@ -107,7 +108,12 @@ public class StatisticsWorker extends WorkerDictionary{
 				}
 			}
 		};
-		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
+		final Consumer<Exception> cancelled = exc -> {
+			dicStatistics.close();
+
+			if(onCancelled != null)
+				onCancelled.accept(exc);
+		};
 
 		getWorkerData()
 			.withDataCancelledCallback(cancelled);
