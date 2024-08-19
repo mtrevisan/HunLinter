@@ -73,11 +73,11 @@ public class Frequency<T extends Comparable<?>>{
 	 * @param value	the value to add.
 	 * @param increment	the amount by which the value should be incremented
 	 */
-	public final void incrementValue(final T value, final long increment){
+	public synchronized final void incrementValue(final T value, final long increment){
 		frequencies.put(value, getCount(value) + increment);
 	}
 
-	public final void clear(){
+	public synchronized final void clear(){
 		frequencies.clear();
 	}
 
@@ -93,7 +93,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @return	entry set Iterator
 	 */
-	public final Iterator<Map.Entry<T, Long>> entrySetIterator(){
+	public synchronized final Iterator<Map.Entry<T, Long>> entrySetIterator(){
 		return frequencies.entrySet().iterator();
 	}
 
@@ -124,7 +124,7 @@ public class Frequency<T extends Comparable<?>>{
 			.collect(Collectors.toList());
 	}
 
-	public final List<T> getMostCommonValues(final int limit){
+	public synchronized final List<T> getMostCommonValues(final int limit){
 		final List<Map.Entry<T, Long>> sortedEntries = new ArrayList<>(frequencies.entrySet());
 		sortedEntries.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
 
@@ -141,7 +141,7 @@ public class Frequency<T extends Comparable<?>>{
 	 * @param value	the value to lookup.
 	 * @return	the frequency of the given value.
 	 */
-	public final long getCount(final T value){
+	public synchronized final long getCount(final T value){
 		return frequencies.getOrDefault(value, 0l);
 	}
 
@@ -164,7 +164,7 @@ public class Frequency<T extends Comparable<?>>{
 	 *
 	 * @return	the total frequency count.
 	 */
-	public final long getSumOfFrequencies(){
+	public synchronized final long getSumOfFrequencies(){
 		return sumOfFrequencies.apply(frequencies.hashCode());
 	}
 
@@ -185,7 +185,7 @@ public class Frequency<T extends Comparable<?>>{
 	 */
 	@Override
 	@SuppressWarnings("StringConcatenationInFormatCall")
-	public final String toString(){
+	public synchronized final String toString(){
 		final StringBuilder sb = new StringBuilder("Value \t Freq. \t Perc. \n");
 		for(final T value : frequencies.keySet())
 			sb.append(value)
@@ -198,7 +198,7 @@ public class Frequency<T extends Comparable<?>>{
 	}
 
 	@Override
-	public final boolean equals(final Object obj){
+	public synchronized final boolean equals(final Object obj){
 		if(this == obj)
 			return true;
 		if(obj == null || getClass() != obj.getClass())
@@ -209,7 +209,7 @@ public class Frequency<T extends Comparable<?>>{
 	}
 
 	@Override
-	public final int hashCode(){
+	public synchronized final int hashCode(){
 		return frequencies.hashCode();
 	}
 
