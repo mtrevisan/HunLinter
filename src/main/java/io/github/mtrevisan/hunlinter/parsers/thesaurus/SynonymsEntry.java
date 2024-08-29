@@ -167,7 +167,7 @@ public class SynonymsEntry{
 
 		final SynonymsEntry rhs = (SynonymsEntry)obj;
 		return (partOfSpeeches.equals(rhs.partOfSpeeches)
-			&& synonyms.equals(rhs.synonyms));
+			&& new HashSet<>(synonyms).equals(new HashSet<>(rhs.synonyms)));
 	}
 
 	@Override

@@ -96,7 +96,8 @@ public class ThesaurusEntry{
 	}
 
 	public final void addSynonym(final SynonymsEntry synonymsEntry){
-		synonyms.add(synonymsEntry);
+		if(!synonyms.contains(synonymsEntry))
+			synonyms.add(synonymsEntry);
 	}
 
 	public final List<SynonymsEntry> getSynonyms(){
