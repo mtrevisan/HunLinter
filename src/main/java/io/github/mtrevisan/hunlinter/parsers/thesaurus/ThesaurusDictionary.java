@@ -32,8 +32,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
@@ -129,22 +132,50 @@ public class ThesaurusDictionary{
 		return false;
 	}
 
-	//FIXME? remove only one entry?
-	public final void deleteDefinition(final String definition, final String synonyms){
-		//recover all words (definition and synonyms) from given definition
+	public final void deleteDefinition(final String definition){
+		//collect entries to be removed
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final List<String> definitions = new ArrayList<>(entryToBeDeleted.getSynonymsSet());
-		definitions.add(definition);
-		for(int i = 0; i < definitions.size(); i ++){
-			final int subTypeIndex = StringUtils.indexOfAny(definitions.get(i), '(');
-			if(subTypeIndex >= 0)
-				//NOTE: remove also de space before the open parenthesis (this assumes the subtype be the last thing of the synonym)
-				definitions.set(i, definitions.get(i).substring(0, subTypeIndex - 1));
+		final List<SynonymsEntry> synonymsEntries = entryToBeDeleted.getSynonyms();
+		final List<Set<String>> deleteSets = new ArrayList<>(synonymsEntries.size());
+		for(final SynonymsEntry entry : synonymsEntries){
+			final Set<String> deleteSet = new HashSet<>(entry.getSynonyms());
+			deleteSet.add(definition);
+			deleteSets.add(deleteSet);
 		}
+		//remove all entries that have all the elements in one of `deleteSets`
+		dictionary.values()
+			.forEach(entry -> {
+				final Iterator<SynonymsEntry> itr = entry.getSynonyms().iterator();
+				while(itr.hasNext()){
+					final SynonymsEntry synonymsEntry = itr.next();
 
-		//remove all
+					final Set<String> currentSet = new HashSet<>(synonymsEntry.getSynonyms());
+					currentSet.add(entry.getDefinition());
+					for(final Set<String> deleteSet : deleteSets){
+						if(currentSet.equals(deleteSet))
+							itr.remove();
+					}
+				}
+			});
+		//remove all empty records
 		dictionary.entrySet()
-			.removeIf(entry -> definitions.contains(entry.getKey()));
+			.removeIf(entry -> entry.getValue().getSynonyms().isEmpty());
+
+
+//		//recover all words (definition and synonyms) from given definition
+//		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
+//		final List<String> definitions = new ArrayList<>(entryToBeDeleted.getSynonymsSet());
+//		definitions.add(definition);
+//		for(int i = 0; i < definitions.size(); i ++){
+//			final int subTypeIndex = StringUtils.indexOfAny(definitions.get(i), '(');
+//			if(subTypeIndex >= 0)
+//				//NOTE: remove also de space before the open parenthesis (this assumes the subtype be the last thing of the synonym)
+//				definitions.set(i, definitions.get(i).substring(0, subTypeIndex - 1));
+//		}
+//
+//		//remove all
+//		dictionary.entrySet()
+//			.removeIf(entry -> definitions.contains(entry.getKey()));
 
 //		//recover definition and synonyms pairs (to be deleted)
 //		final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);

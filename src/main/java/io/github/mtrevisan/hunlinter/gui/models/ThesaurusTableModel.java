@@ -46,7 +46,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 	private static final String COMMA = ",";
 	private static final String PIPE = "|";
 	/** Adds a zero-width space to let wrapping occurs after commas. */
-	private static final String ZERO_WIDTH_SPACE = "&#8203;";
+	public static final String ZERO_WIDTH_SPACE = "&#8203;";
 	private static final String WRAPPABLE_COMMA = COMMA + ZERO_WIDTH_SPACE;
 	private static final String COLUMN = ":";
 	private static final String WRAPPABLE_COLUMN = COLUMN + ZERO_WIDTH_SPACE;
@@ -94,6 +94,8 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
 				temp = temp.replaceAll("([\\r\\n]+|<br ?/?>)(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1$2 ");
 				temp = temp.replaceAll("^(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1 ");
+				if(temp.contains("alseta"))
+					System.out.println();
 				yield JavaHelper.textFormat(TAG_ROW, temp);
 			}
 			default -> null;

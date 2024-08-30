@@ -25,10 +25,8 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
-import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

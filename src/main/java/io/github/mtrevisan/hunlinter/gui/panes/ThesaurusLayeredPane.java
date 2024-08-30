@@ -419,7 +419,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 			final String selectedDefinition = (String)dm.getValueAt(selectedRow, 0);
 			final String selectedSynonyms = (String)dm.getValueAt(selectedRow, 1);
 			final ThesaurusParser theParser = parserManager.getTheParser();
-			theParser.deleteDefinitionAndSynonyms(selectedDefinition, selectedSynonyms);
+			theParser.deleteDefinitionAndSynonyms(selectedDefinition);
 
 			dm.setSynonyms(theParser.getSynonymsDictionary());
 			updateSynonymsCounter();

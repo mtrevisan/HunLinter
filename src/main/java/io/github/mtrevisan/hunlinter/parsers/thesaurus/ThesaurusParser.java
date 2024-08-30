@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,17 +80,16 @@ public class ThesaurusParser{
 	private static final Pattern PATTERN_CLEAR_SEARCH = RegexHelper.pattern("\\s+\\([^)]+\\)");
 	private static final Pattern PATTERN_FILTER_EMPTY = RegexHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = RegexHelper.pattern("(,|\\|)+");
+	private static final String ENTRY_SEPARATOR = "([ ,><]|" + ThesaurusTableModel.ZERO_WIDTH_SPACE + ")";
 
 	private static final char[] NEW_LINE = {'\n'};
 
 	private final ThesaurusDictionary dictionary;
-	private final Orthography orthography;
 	private Charset charset;
 
 
 	public ThesaurusParser(final String language){
 		dictionary = new ThesaurusDictionary(language);
-		orthography = BaseBuilder.getOrthography(language);
 	}
 
 	public final ThesaurusDictionary getDictionary(){
@@ -193,8 +191,8 @@ public class ThesaurusParser{
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
-	public final void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
-		dictionary.deleteDefinition(definition, selectedSynonyms);
+	public final void deleteDefinitionAndSynonyms(final String definition){
+		dictionary.deleteDefinition(definition);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text, final Orthography orthography){
@@ -252,7 +250,7 @@ public class ThesaurusParser{
 		//NOTE: whole words
 		final String searchString = "(" + StringUtils.join(quotedSynonyms, PIPE) + ")";
 		final String synonymsFilter = (quotedSynonyms != null
-			? "(^" + searchString + "$|( |,|&#8203;)" + searchString + "( |,|&#8203;)|( |,|&#8203;)" + searchString + "$)"
+			? "(^" + searchString + "$|" + ENTRY_SEPARATOR + searchString + ENTRY_SEPARATOR + "|" + ENTRY_SEPARATOR + searchString + "$)"
 			: ".+");
 
 		//compose filter regexp
