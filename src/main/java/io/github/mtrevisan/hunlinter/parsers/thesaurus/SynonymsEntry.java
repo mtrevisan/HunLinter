@@ -131,7 +131,8 @@ public class SynonymsEntry{
 	}
 
 	public final boolean contains(final Collection<String> partOfSpeeches, final Collection<String> synonyms){
-		return ((partOfSpeeches == null || this.partOfSpeeches.containsAll(partOfSpeeches)) && this.synonyms.containsAll(synonyms));
+		return ((partOfSpeeches == null || new HashSet<>(this.partOfSpeeches).containsAll(partOfSpeeches))
+			&& new HashSet<>(this.synonyms).containsAll(synonyms));
 	}
 
 	public final boolean intersects(final Collection<String> partOfSpeeches, final Collection<String> synonyms){

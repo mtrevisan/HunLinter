@@ -247,7 +247,13 @@ public class ThesaurusParser{
 			for(int i = 0; i < synonyms.length; i ++)
 				quotedSynonyms[i] = Pattern.quote(synonyms[i]);
 		}
-		final String synonymsFilter = (quotedSynonyms != null? "(" + StringUtils.join(quotedSynonyms, PIPE) + ")" : ".+");
+		//NOTE: partial words
+//		final String synonymsFilter = (quotedSynonyms != null? "(" + StringUtils.join(quotedSynonyms, PIPE) + ")": ".+");
+		//NOTE: whole words
+		final String searchString = "(" + StringUtils.join(quotedSynonyms, PIPE) + ")";
+		final String synonymsFilter = (quotedSynonyms != null
+			? "(^" + searchString + "$|( |,|&#8203;)" + searchString + "( |,|&#8203;)|( |,|&#8203;)" + searchString + "$)"
+			: ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);
