@@ -361,7 +361,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final Pair<String[], String[]> pair = ThesaurusParser.extractComponentsForFilter(unmodifiedSearchText, orthography);
 		//if text to be inserted is already fully contained into the thesaurus, do not enable the button
-		final boolean alreadyContained = parserManager.getTheParser().contains(pair.getLeft(), pair.getRight());
+		final boolean alreadyContained = parserManager.getTheParser()
+			.contains(pair.getLeft(), pair.getRight());
 		addButton.setEnabled(!alreadyContained);
 
 		@SuppressWarnings("unchecked")

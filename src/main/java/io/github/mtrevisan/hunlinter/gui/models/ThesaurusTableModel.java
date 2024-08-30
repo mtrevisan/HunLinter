@@ -94,8 +94,6 @@ public class ThesaurusTableModel extends AbstractTableModel{
 				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
 				temp = temp.replaceAll("([\\r\\n]+|<br ?/?>)(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1$2 ");
 				temp = temp.replaceAll("^(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1 ");
-				if(temp.contains("alseta"))
-					System.out.println();
 				yield JavaHelper.textFormat(TAG_ROW, temp);
 			}
 			default -> null;
