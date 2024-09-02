@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class ThesaurusDictionary{
@@ -143,8 +144,10 @@ public class ThesaurusDictionary{
 		final List<SynonymsEntry> synonymsEntries = entryToBeDeleted.getSynonyms();
 		final List<Set<String>> deleteSets = new ArrayList<>(synonymsEntries.size());
 		for(final SynonymsEntry entry : synonymsEntries){
-			final Set<String> deleteSet = new HashSet<>(entry.getSynonyms());
-			deleteSet.add(definition);
+			final Set<String> deleteSet = entry.getSynonyms().stream()
+				.map(ThesaurusDictionary::removeSynonymUse)
+				.collect(Collectors.toSet());
+			deleteSet.add(removeSynonymUse(definition));
 			deleteSets.add(deleteSet);
 		}
 		//remove all entries that have all the elements in one of `deleteSets`
@@ -154,8 +157,10 @@ public class ThesaurusDictionary{
 				while(itr.hasNext()){
 					final SynonymsEntry synonymsEntry = itr.next();
 
-					final Set<String> currentSet = new HashSet<>(synonymsEntry.getSynonyms());
-					currentSet.add(entry.getDefinition());
+					final Set<String> currentSet = synonymsEntry.getSynonyms().stream()
+						.map(ThesaurusDictionary::removeSynonymUse)
+						.collect(Collectors.toSet());
+					currentSet.add(removeSynonymUse(entry.getDefinition()));
 					for(final Set<String> deleteSet : deleteSets){
 						if(currentSet.equals(deleteSet))
 							itr.remove();
