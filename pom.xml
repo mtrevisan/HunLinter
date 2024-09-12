@@ -103,7 +103,7 @@
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		<logback.logback-classic.version>1.5.7</logback.logback-classic.version>
+		<logback.logback-classic.version>1.5.8</logback.logback-classic.version>
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
