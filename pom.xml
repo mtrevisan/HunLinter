@@ -88,7 +88,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<apache.commons-text.version>1.10.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.12.0</apache.commons-io.version>
+		<apache.commons-io.version>2.14.0</apache.commons-io.version>
 
 		<!-- FastUtil -->
 		<!-- https://mvnrepository.com/artifact/it.unimi.dsi/fastutil -->
