@@ -48,6 +48,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.net.NoRouteToHostException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 
@@ -81,7 +82,7 @@ public class UpdateAction extends AbstractAction{
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.WARNING_MESSAGE);
 		}
-		catch(final IOException | ParseException | VersionException e){
+		catch(final IOException | ParseException | URISyntaxException | VersionException e){
 			final String message = e.getMessage();
 			LOGGER.warn(message, e);
 

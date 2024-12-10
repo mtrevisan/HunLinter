@@ -126,6 +126,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -243,7 +244,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
-				catch(final IOException | ParseException | VersionException ignored){}
+				catch(final IOException | ParseException | URISyntaxException | VersionException ignored){}
 			});
 	}
 

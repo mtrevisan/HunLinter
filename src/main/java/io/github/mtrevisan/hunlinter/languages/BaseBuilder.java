@@ -56,8 +56,8 @@ public final class BaseBuilder{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseBuilder.class);
 
-	private static final String COMPARATOR_WITHOUT_COUNTRY_CODE = "Cannot find comparator for language `{}`, use comparator for `{}` instead";
-	private static final String COMPARATOR_DEFAULT_MESSAGE = "Cannot find comparator for language `{}`, use default comparator";
+	private static final String COMPARATOR_WITHOUT_COUNTRY_CODE = "Cannot find comparator for language `{}` (use comparator for `{}` instead)";
+	private static final String COMPARATOR_DEFAULT_MESSAGE = "Cannot find comparator for language `{}` (use default comparator)";
 
 	public static final Comparator<String> COMPARATOR_LENGTH = Comparator.comparingInt(String::length);
 	public static final Comparator<String> COMPARATOR_DEFAULT = Comparator.naturalOrder();
