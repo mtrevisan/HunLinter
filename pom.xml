@@ -70,7 +70,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-source-plugin -->
 		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
-		<maven-javadoc-plugin.version>3.11.1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
 		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
@@ -88,7 +88,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
 		<apache.commons-text.version>1.12.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.17.0</apache.commons-io.version>
+		<apache.commons-io.version>2.18.0</apache.commons-io.version>
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
