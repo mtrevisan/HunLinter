@@ -412,7 +412,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 		if(StringUtils.isNotBlank(text)){
 			final Hyphenation hyphenation = parserManager.getHyphenator().hyphenate(text);
 
-			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, SYLLABATION_PREFIX, SYLLABATION_SUFFIX);
+			final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.MINUS_SIGN, SYLLABATION_PREFIX,
+					SYLLABATION_SUFFIX);
 			final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 			text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 				.toString();
@@ -457,8 +458,8 @@ public class HyphenationLayeredPane extends JLayeredPane{
 					final Hyphenation addedRuleHyphenation = parserManager.getHyphenator().hyphenate(addedRuleText, addedRule,
 						level);
 
-					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.SOFT_HYPHEN, "<html>",
-						"</html>");
+					final Supplier<StringJoiner> sj = () -> new StringJoiner(HyphenationParser.MINUS_SIGN, SYLLABATION_PREFIX,
+							SYLLABATION_SUFFIX);
 					final Function<String, String> errorFormatter = syllabe -> "<b style=\"color:red\">" + syllabe + "</b>";
 					final String text = orthography.formatHyphenation(hyphenation.getSyllabes(), sj.get(), errorFormatter)
 						.toString();
