@@ -26,7 +26,7 @@ public class SuffixGrouper{
 		//costruzione della mappa dei suffissi
 		final Map<String, Set<String>> suffixMap = new HashMap<>();
 		for(final String word : words){
-			for(int i = 6; i < word.length(); i ++){
+			for(int i = 6; i < word.length(); i++){
 				final String suffix = word.substring(word.length() - i);
 				//aggiunge solo se il suffisso è anche una parola valida nella lista
 				if(wordSet.contains(suffix))
@@ -43,17 +43,26 @@ public class SuffixGrouper{
 		//ordina per lunghezza del suffisso (decrescente), poi per numero di parole (decrescente)
 		validSuffixes.sort((a, b) -> {
 			final int lenDiff = b.getKey().length() - a.getKey().length();
-			return (lenDiff != 0? lenDiff: b.getValue().size() - a.getValue().size());
+			return (lenDiff != 0 ? lenDiff : b.getValue().size() - a.getValue().size());
 		});
 
 		//scrive l’output nel file
 		try(final BufferedWriter writer = Files.newBufferedWriter(outputFile.normalize())){
 			for(final Map.Entry<String, Set<String>> entry : validSuffixes){
+				final String suffix = entry.getKey();
 				final List<String> group = new ArrayList<>(entry.getValue());
-				Collections.sort(group);
-				writer.write("Suffix: " + entry.getKey() + " (" + group.size() + " words)\n");
-				for(final String word : group)
-					writer.write(word + "\n");
+
+				//ordina le parole dalla più corta alla più lunga
+				group.sort(Comparator.comparingInt(String::length).thenComparing(Comparator.naturalOrder()));
+
+				writer.write("Suffix: " + suffix + " (" + group.size() + " words)\n");
+
+				for(final String word : group){
+					int prefixLength = word.length() - suffix.length();
+					String prefix = word.substring(0, prefixLength);
+					writer.write(word + " (" + prefix + ")\n");
+				}
+
 				writer.write("\n");
 			}
 		}
