@@ -24,31 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter;
 
-import io.github.mtrevisan.hunlinter.actions.AboutAction;
-import io.github.mtrevisan.hunlinter.actions.AffixRulesReducerAction;
-import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
-import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterFSAAction;
-import io.github.mtrevisan.hunlinter.actions.CheckUpdateOnStartupAction;
-import io.github.mtrevisan.hunlinter.actions.CreatePackageAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractDuplicatesAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractMinimalPairsAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractPoSFSAAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistFSAAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryHyphenationStatisticsAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryLinterAction;
-import io.github.mtrevisan.hunlinter.actions.DictionarySorterAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryWordCountAction;
-import io.github.mtrevisan.hunlinter.actions.ExitAction;
-import io.github.mtrevisan.hunlinter.actions.HyphenationLinterAction;
-import io.github.mtrevisan.hunlinter.actions.IssueReporterAction;
-import io.github.mtrevisan.hunlinter.actions.OnlineHelpAction;
-import io.github.mtrevisan.hunlinter.actions.ProjectLoaderAction;
-import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
-import io.github.mtrevisan.hunlinter.actions.SelectFontAction;
-import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterAction;
-import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
-import io.github.mtrevisan.hunlinter.actions.UpdateAction;
+import io.github.mtrevisan.hunlinter.actions.*;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
@@ -287,6 +263,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicLinterMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicRulesReducerMenuItem = new javax.swing.JMenuItem();
+		dicAffixExtractionMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -400,6 +377,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicRulesReducerMenuItem.setText("Rules reducer…");
       dicRulesReducerMenuItem.setToolTipText("");
       dicMenu.add(dicRulesReducerMenuItem);
+
+      dicAffixExtractionMenuItem.setAction(new AffixExtractionAction(parserManager));
+		dicAffixExtractionMenuItem.setText("Affix extraction…");
+		dicAffixExtractionMenuItem.setToolTipText("");
+      dicMenu.add(dicAffixExtractionMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
 		final Consumer<Exception> onDicWordCountCancelled = exc -> dicWordCountMenuItem.setEnabled(true);
@@ -1038,6 +1020,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem dicLinterMenuItem;
    private javax.swing.JMenu dicMenu;
    private javax.swing.JMenuItem dicRulesReducerMenuItem;
+   private javax.swing.JMenuItem dicAffixExtractionMenuItem;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;

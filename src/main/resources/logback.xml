@@ -45,6 +45,32 @@
 			<pattern>%msg</pattern>
 		</encoder>
 	</appender>
+	<appender name="affix-extractor" class="io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+				<marker>affix-extractor</marker>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="affix-extractor-status" class="io.github.mtrevisan.hunlinter.services.log.ApplicationLogAppender">
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+				<marker>affix-extractor-status</marker>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%msg</pattern>
+		</encoder>
+	</appender>
 
 	<logger name="io.github.mtrevisan.hunlinter" level="info" />
 
@@ -57,5 +83,7 @@
 		<appender-ref ref="application" />
 		<appender-ref ref="rule-reducer" />
 		<appender-ref ref="rule-reducer-status" />
+		<appender-ref ref="affix-extractor" />
+		<appender-ref ref="affix-extractor-status" />
 	</root>
 </configuration>
