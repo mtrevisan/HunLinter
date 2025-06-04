@@ -80,7 +80,7 @@
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
-		<exec-maven-plugin.version>3.5.0</exec-maven-plugin.version>
+		<exec-maven-plugin.version>3.5.1</exec-maven-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 
@@ -92,7 +92,7 @@
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
-		<jfree.jfreechart.version>1.5.5</jfree.jfreechart.version>
+		<jfree.jfreechart.version>1.5.6</jfree.jfreechart.version>
 
 		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<github.vsonnier.hppcrt.version>0.7.5</github.vsonnier.hppcrt.version>
@@ -107,7 +107,7 @@
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.12.2</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.13.0</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
