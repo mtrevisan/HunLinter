@@ -107,7 +107,7 @@
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.13.1</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.13.2</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
