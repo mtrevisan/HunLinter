@@ -86,9 +86,9 @@
 
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<apache.commons-text.version>1.13.1</apache.commons-text.version>
+		<apache.commons-text.version>1.14.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-		<apache.commons-io.version>2.19.0</apache.commons-io.version>
+		<apache.commons-io.version>2.20.0</apache.commons-io.version>
 
 		<!-- jFreeChart -->
 		<!-- https://mvnrepository.com/artifact/org.jfree/jfreechart -->
@@ -107,7 +107,7 @@
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>5.13.3</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>5.13.4</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>
