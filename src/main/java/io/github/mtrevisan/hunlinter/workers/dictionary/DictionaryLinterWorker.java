@@ -159,7 +159,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //					originalRuleEntriesLog.append(originalRuleEntries);
 //					originalRuleEntriesLog.insert(1, "\r\n\t");
 //					originalRuleEntriesLog.insert(originalRuleEntriesLog.length() - 1, "\r\n");
-//					manageException(new LinterException(UNUSED_RULES, flag, StringUtils.replace(originalRuleEntriesLog.toString(), ", ", "\r\n\t"))
+//					manageException(new LinterException(UNUSED_RULES, flag, Strings.CS.replace(originalRuleEntriesLog.toString(), ", ", "\r\n\t"))
 //						.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 //				}
 //			}

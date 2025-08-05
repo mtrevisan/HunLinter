@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,8 +72,8 @@ public class SynonymsEntry{
 			if((firstChar == '(' || firstChar == '[') ^ (lastChart == ')' || lastChart == ']'))
 				throw new LinterException(POS_NOT_IN_PARENTHESIS, partOfSpeechAndSynonyms);
 
-			String pos = StringUtils.removeEnd(StringUtils.removeStart(partOfSpeech, "("), ")");
-			pos = StringUtils.removeEnd(StringUtils.removeStart(pos, "["), "]");
+			String pos = Strings.CS.removeEnd(Strings.CS.removeStart(partOfSpeech, "("), ")");
+			pos = Strings.CS.removeEnd(Strings.CS.removeStart(pos, "["), "]");
 			partOfSpeeches = Arrays.asList(StringUtils.split(pos, ','));
 			for(int i = 0; i < partOfSpeeches.size(); i ++)
 				partOfSpeeches.set(i, partOfSpeeches.get(i).trim());

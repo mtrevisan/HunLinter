@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.gui.models;
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import javax.swing.table.AbstractTableModel;
 import java.io.NotSerializableException;
@@ -91,7 +92,7 @@ public class ThesaurusTableModel extends AbstractTableModel{
 			case 0 -> thesaurus.getDefinition();
 			case 1 -> {
 				String temp = thesaurus.joinSynonyms(TAG_NEW_LINE);
-				temp = StringUtils.replace(temp, PIPE, WRAPPABLE_COMMA);
+				temp = Strings.CS.replace(temp, PIPE, WRAPPABLE_COMMA);
 				temp = temp.replaceAll("([\\r\\n]+|<br ?/?>)(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1$2 ");
 				temp = temp.replaceAll("^(\\([^)]+\\))" + WRAPPABLE_COMMA, "$1 ");
 				yield JavaHelper.textFormat(TAG_ROW, temp);
@@ -111,10 +112,10 @@ public class ThesaurusTableModel extends AbstractTableModel{
 
 	public String getSynonyms(final int rowIndex){
 		String temp = (String)getValueAt(rowIndex, 1);
-		temp = StringUtils.replace(temp, WRAPPABLE_COMMA, COMMA);
+		temp = Strings.CS.replace(temp, WRAPPABLE_COMMA, COMMA);
 		temp = temp.replaceAll("(>\\([^)]+\\)) ", "$1" + COLUMN);
-		temp = StringUtils.replaceOnce(temp, TAG_HTML_OPEN, "");
-		return StringUtils.replaceOnce(temp, TAG_HTML_CLOSE, "");
+		temp = Strings.CS.replaceOnce(temp, TAG_HTML_OPEN, "");
+		return Strings.CS.replaceOnce(temp, TAG_HTML_CLOSE, "");
 	}
 
 	@SuppressWarnings("unused")

@@ -34,6 +34,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
@@ -104,14 +105,14 @@ public class AffixEntry{
 
 		final AffixType type = AffixType.createFromCode(lineParts[0]);
 		final String flag = lineParts[1];
-		final String removal = StringUtils.replace(lineParts[2], SLASH_ESCAPED, SLASH);
+		final String removal = Strings.CS.replace(lineParts[2], SLASH_ESCAPED, SLASH);
 		final Matcher m = RegexHelper.matcher(lineParts[3], PATTERN_LINE);
 		if(!m.find())
 			throw new LinterException(WRONG_FORMAT, line);
 
-		final String addition = StringUtils.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
+		final String addition = Strings.CS.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
-		condition = (lineParts.length > 4? StringUtils.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
+		condition = (lineParts.length > 4? Strings.CS.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
 		morphologicalFields = (lineParts.length > 5
 			? new ArrayList<>(Arrays.asList(StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField))))
 			: null);

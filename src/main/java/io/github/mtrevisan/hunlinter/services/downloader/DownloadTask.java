@@ -28,6 +28,8 @@ import javax.swing.SwingWorker;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -60,11 +62,12 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 			listener.startDownloads(remoteObject);
 
-			final URL url = new URL(remoteObject.downloadUrl);
+			final URL url = new URI(remoteObject.downloadUrl)
+				.toURL();
 			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
 			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
 		}
-		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException e){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final URISyntaxException | IOException e){
 			listener.failed(e);
 
 			cancel(true);

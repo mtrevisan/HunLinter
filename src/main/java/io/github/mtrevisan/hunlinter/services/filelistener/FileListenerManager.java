@@ -25,7 +25,7 @@
 package io.github.mtrevisan.hunlinter.services.filelistener;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,7 +179,7 @@ public class FileListenerManager implements FileListener, Runnable{
 	}
 
 	private static PathMatcher matcherForExpression(final String pattern){
-		final String syntaxAndPattern = "glob:" + pattern.substring(StringUtils.lastIndexOf(pattern, File.separator) + 1);
+		final String syntaxAndPattern = "glob:" + pattern.substring(Strings.CS.lastIndexOf(pattern, File.separator) + 1);
 		return FILE_SYSTEM_DEFAULT.getPathMatcher(syntaxAndPattern);
 	}
 

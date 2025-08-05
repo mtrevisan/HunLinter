@@ -37,6 +37,7 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.parser.ParseException;
 
@@ -203,7 +204,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final String message = whatsNew.stream()
 				.map(line -> "<b>Version " + line.getKey()
 					+ Arrays.stream(StringUtils.split(line.getValue(), "\r\n"))
-						.map(change -> "<li>" + StringUtils.removeStart(change, "- ") + "</li>")
+						.map(change -> "<li>" + Strings.CS.removeStart(change, "- ") + "</li>")
 						.collect(Collectors.joining(StringUtils.EMPTY, "</b><ul>", "</ul>"))
 				)
 				.collect(Collectors.joining("<br><br>"));

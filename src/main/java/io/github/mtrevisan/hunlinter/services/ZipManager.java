@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.services;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public final class ZipManager{
 		final List<String> filesListInDir = extractFilesList(projectFolder, exclusions);
 		for(final File file : excludeFolderBut)
 			if(file != null)
-				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
+				filesListInDir.add(Strings.CS.replace(file.getAbsolutePath(), "\\", "/"));
 		return filesListInDir;
 	}
 
@@ -94,7 +95,7 @@ public final class ZipManager{
 		final List<String> filesListInDir = new ArrayList<>(files.length);
 		for(final File file : files){
 			if(file.isFile())
-				filesListInDir.add(StringUtils.replace(file.getAbsolutePath(), "\\", "/"));
+				filesListInDir.add(Strings.CS.replace(file.getAbsolutePath(), "\\", "/"));
 			else if(!excludeFolderBut.contains(file))
 				filesListInDir.addAll(extractFilesList(file, excludeFolderBut));
 		}

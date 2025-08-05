@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +100,7 @@ public class WordTokenizer{
 
 	@SuppressWarnings("DesignForExtension")
 	public List<String> tokenize(String text){
-		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
+		text = Strings.CS.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
 		final String placeholder = StringUtils.repeat("\0", StringUtils.EMPTY,
 			StringHelper.maxRepeating(text, '\0') + 1);

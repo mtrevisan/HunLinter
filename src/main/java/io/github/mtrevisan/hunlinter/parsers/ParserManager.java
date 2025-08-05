@@ -44,6 +44,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.filelistener.FileChangeListener;
 import io.github.mtrevisan.hunlinter.services.filelistener.FileListenerManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -379,7 +380,7 @@ public class ParserManager implements FileChangeListener{
 		final File dicFile = packager.getDictionaryFile();
 		try(final Stream<String> lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())){
 			return lines
-				.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
+				.map(line -> Strings.CS.replace(line, TAB, TAB_SPACES))
 				.collect(Collectors.toList());
 		}
 	}

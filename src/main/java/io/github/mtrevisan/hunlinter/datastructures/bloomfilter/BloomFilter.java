@@ -153,7 +153,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 		bitArray = BitArrayBuilder.getBitArray(bitArrayType, bitsRequired);
 
 		this.decomposer = decomposer;
-		this.hasher = ObjectUtils.defaultIfNull(hasher, HASHER_DEFAULT);
+		this.hasher = ObjectUtils.getIfNull(hasher, HASHER_DEFAULT);
 
 		addedElements = 0;
 	}

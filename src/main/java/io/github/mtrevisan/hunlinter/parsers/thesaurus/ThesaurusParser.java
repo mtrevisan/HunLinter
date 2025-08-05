@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,8 +155,8 @@ public class ThesaurusParser{
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 
-		final int prefix = (StringUtils.startsWithAny(posAndSyns[0], PART_OF_SPEECH_START)? 1: 0);
-		final int suffix = (StringUtils.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
+		final int prefix = (Strings.CI.startsWithAny(posAndSyns[0], PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (Strings.CI.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = StringUtils.split(posAndSyns[0].substring(prefix, posAndSyns[0].length() - suffix), ',');
 		for(int i = 0; i < partOfSpeeches.length; i ++)
 			partOfSpeeches[i] = StringUtils.replaceChars(partOfSpeeches[i], "()", "").trim();

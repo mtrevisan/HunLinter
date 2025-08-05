@@ -29,6 +29,8 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.FSAAbstract;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,9 +102,10 @@ public class Dictionary{
 		final URL expectedMetadataURL;
 		try{
 			final String external = dictURL.toExternalForm();
-			expectedMetadataURL = new URL(DictionaryMetadata.getExpectedMetadataFileName(external));
+			expectedMetadataURL = new URI(DictionaryMetadata.getExpectedMetadataFileName(external))
+				.toURL();
 		}
-		catch(final MalformedURLException e){
+		catch(final URISyntaxException | MalformedURLException e){
 			throw new IOException("Couldn't construct relative feature map URL for: " + dictURL, e);
 		}
 
