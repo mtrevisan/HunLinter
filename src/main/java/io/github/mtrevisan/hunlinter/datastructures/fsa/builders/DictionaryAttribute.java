@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.DictionaryMetad
 import io.github.mtrevisan.hunlinter.datastructures.fsa.stemming.EncoderType;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.nio.charset.Charset;
@@ -169,7 +170,7 @@ public enum DictionaryAttribute{
 	LOCALE("fsa.dict.speller.locale"){
 		@Override
 		public Locale fromString(final String value){
-			return new Locale(value);
+			return Locale.of(value);
 		}
 	},
 
@@ -252,7 +253,7 @@ public enum DictionaryAttribute{
 			final Map<String, List<String>> replacementPairs = new HashMap<>(replacements.length);
 			for(final String stringPair : replacements){
 				final String[] twoStrings = StringUtils.split(stringPair.trim(), StringUtils.SPACE, 2);
-				final String replacement = StringUtils.replace(twoStrings[1], " ", "_");
+				final String replacement = Strings.CS.replace(twoStrings[1], " ", "_");
 				replacementPairs.computeIfAbsent(twoStrings[0], k -> new ArrayList<>(1))
 					.add(replacement);
 			}

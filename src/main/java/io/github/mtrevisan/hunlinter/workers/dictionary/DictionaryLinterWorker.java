@@ -60,12 +60,13 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 	private static final String UNUSED_RULES = "Unused rules in flag {}: {}";
 
 
-	public DictionaryLinterWorker(final ParserManager parserManager){
-		this(parserManager.getAffParser(), parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator());
+	public DictionaryLinterWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled){
+		this(parserManager.getAffParser(), parserManager.getDicParser(), parserManager.getChecker(), parserManager.getWordGenerator(),
+			onCancelled);
 	}
 
 	public DictionaryLinterWorker(final AffixParser affParser, final DictionaryParser dicParser, final DictionaryCorrectnessChecker checker,
-			final WordGenerator wordGenerator){
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -126,6 +127,9 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 			}
 		};
 
+		getWorkerData()
+			.withDataCancelledCallback(onCancelled);
+
 		final Function<Void, List<IndexDataPair<String>>> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 
@@ -155,7 +159,7 @@ public class DictionaryLinterWorker extends WorkerDictionary{
 //					originalRuleEntriesLog.append(originalRuleEntries);
 //					originalRuleEntriesLog.insert(1, "\r\n\t");
 //					originalRuleEntriesLog.insert(originalRuleEntriesLog.length() - 1, "\r\n");
-//					manageException(new LinterException(UNUSED_RULES, flag, StringUtils.replace(originalRuleEntriesLog.toString(), ", ", "\r\n\t"))
+//					manageException(new LinterException(UNUSED_RULES, flag, Strings.CS.replace(originalRuleEntriesLog.toString(), ", ", "\r\n\t"))
 //						.withIndexDataPair(IndexDataPair.NULL_INDEX_DATA_PAIR));
 //				}
 //			}

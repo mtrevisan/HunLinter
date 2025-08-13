@@ -44,6 +44,7 @@ import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 import io.github.mtrevisan.hunlinter.services.filelistener.FileChangeListener;
 import io.github.mtrevisan.hunlinter.services.filelistener.FileListenerManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -71,6 +72,8 @@ public class ParserManager implements FileChangeListener{
 	public static final Marker MARKER_APPLICATION = MarkerFactory.getMarker("application");
 	public static final Marker MARKER_RULE_REDUCER = MarkerFactory.getMarker("rule-reducer");
 	public static final Marker MARKER_RULE_REDUCER_STATUS = MarkerFactory.getMarker("rule-reducer-status");
+	public static final Marker MARKER_AFFIX_EXTRACTOR = MarkerFactory.getMarker("affix-extractor");
+	public static final Marker MARKER_AFFIX_EXTRACTOR_STATUS = MarkerFactory.getMarker("affix-extractor-status");
 
 	private static final String EXTENSION_AID = ".aid";
 	private static final String FOLDER_AID = "aids";
@@ -377,7 +380,7 @@ public class ParserManager implements FileChangeListener{
 		final File dicFile = packager.getDictionaryFile();
 		try(final Stream<String> lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())){
 			return lines
-				.map(line -> StringUtils.replace(line, TAB, TAB_SPACES))
+				.map(line -> Strings.CS.replace(line, TAB, TAB_SPACES))
 				.collect(Collectors.toList());
 		}
 	}

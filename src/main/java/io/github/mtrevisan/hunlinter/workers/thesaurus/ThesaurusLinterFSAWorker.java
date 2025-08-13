@@ -58,11 +58,12 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 
 
 	public ThesaurusLinterFSAWorker(final ThesaurusParser theParser, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryLookup dictionaryLookup){
+			final Consumer<Exception> onCancelled, final DictionaryLookup dictionaryLookup){
 		super(new WorkerDataParser<>(WORKER_NAME, theParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");

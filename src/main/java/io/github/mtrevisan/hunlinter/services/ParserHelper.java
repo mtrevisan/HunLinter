@@ -64,11 +64,12 @@ public final class ParserHelper{
 		return isComment(line, HYPHENATION_COMMENTS);
 	}
 
-	private static boolean isComment(final String line, final char[] comments){
+	private static boolean isComment(String line, final char[] comments){
+		line = StringUtils.trim(line);
 		if(StringUtils.isBlank(line))
 			return true;
 
-		final char chr = StringUtils.trim(line).charAt(0);
+		final char chr = line.charAt(0);
 		for(final char comment : comments)
 			if(chr == comment)
 				return true;

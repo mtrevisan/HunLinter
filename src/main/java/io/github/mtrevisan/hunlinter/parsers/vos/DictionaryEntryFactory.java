@@ -31,6 +31,7 @@ import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class DictionaryEntryFactory{
 	}
 
 	private static String extractWord(final String word){
-		return StringUtils.replace(word, SLASH_ESCAPED, SLASH);
+		return Strings.CS.replace(word, SLASH_ESCAPED, SLASH);
 	}
 
 	private List<String> extractContinuationFlags(final String flagsGroup){

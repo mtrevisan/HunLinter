@@ -96,7 +96,8 @@ public class ThesaurusEntry{
 	}
 
 	public final void addSynonym(final SynonymsEntry synonymsEntry){
-		synonyms.add(synonymsEntry);
+		if(!synonyms.contains(synonymsEntry))
+			synonyms.add(synonymsEntry);
 	}
 
 	public final List<SynonymsEntry> getSynonyms(){
@@ -134,8 +135,8 @@ public class ThesaurusEntry{
 		return false;
 	}
 
-	public final boolean intersects(final Collection<String> partOfSpeeches, final List<String> synonyms){
-		final Collection<String> ss = new ArrayList<>(synonyms);
+	public final boolean intersects(final Collection<String> partOfSpeeches, final String[] synonyms){
+		final Collection<String> ss = new ArrayList<>(List.of(synonyms));
 		final boolean removed = ss.remove(definition);
 		for(int i = 0; i < this.synonyms.size(); i ++){
 			final SynonymsEntry entry = this.synonyms.get(i);

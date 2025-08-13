@@ -38,6 +38,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 public class AutoCorrectLinterFSAAction extends AbstractAction{
@@ -48,11 +49,12 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final ThesaurusLayeredPane theLayeredPane;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 
 	@SuppressWarnings("ConstantConditions")
 	public AutoCorrectLinterFSAAction(final WorkerManager workerManager, final ThesaurusLayeredPane theLayeredPane,
-			final PropertyChangeListener propertyChangeListener){
+			final PropertyChangeListener propertyChangeListener, final Consumer<Exception> onCancelled){
 		super("autocorrect.linter.fsa",
 			new ImageIcon(AutoCorrectLinterFSAAction.class.getResource("/dictionary_correctness.png")));
 
@@ -63,6 +65,7 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.theLayeredPane = theLayeredPane;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 	}
 
 	@Override
@@ -87,6 +90,7 @@ public class AutoCorrectLinterFSAAction extends AbstractAction{
 
 					setEnabled(true);
 				},
+				onCancelled,
 				dictionaryLookup
 			);
 	}

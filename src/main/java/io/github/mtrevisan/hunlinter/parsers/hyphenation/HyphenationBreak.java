@@ -67,7 +67,8 @@ public class HyphenationBreak{
 	}
 
 	public final String getRule(final int index){
-		return indexesAndRules.getOrDefault(index, EMPTY_PAIR).getData();
+		return indexesAndRules.getOrDefault(index, EMPTY_PAIR)
+			.getData();
 	}
 
 	public final List<String> getRules(){

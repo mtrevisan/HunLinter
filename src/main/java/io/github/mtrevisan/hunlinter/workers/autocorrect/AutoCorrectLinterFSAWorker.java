@@ -54,11 +54,12 @@ public class AutoCorrectLinterFSAWorker extends WorkerAutoCorrect{
 
 
 	public AutoCorrectLinterFSAWorker(final AutoCorrectParser acoParser, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final DictionaryLookup dictionaryLookup){
+			final Consumer<Exception> onCancelled, final DictionaryLookup dictionaryLookup){
 		super(new WorkerDataParser<>(WORKER_NAME, acoParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");

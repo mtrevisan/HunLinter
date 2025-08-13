@@ -167,7 +167,7 @@ public final class JavaHelper{
 			.addShutdownHook(new Thread(() -> {
 				try{
 					Runtime.getRuntime()
-						.exec(cmd.toString());
+						.exec(StringUtils.split(cmd.toString()));
 				}
 				catch(final IOException ioe){
 					ioe.printStackTrace();

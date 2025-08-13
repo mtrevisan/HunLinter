@@ -63,16 +63,18 @@ public class HyphenationLinterWorker extends WorkerDictionary{
 	private static final String WORD_IS_NOT_SYLLABABLE = "{} ({}) is not syllabable";
 
 
-	public HyphenationLinterWorker(final ParserManager parserManager){
-		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator());
+	public HyphenationLinterWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getHyphenator(), parserManager.getWordGenerator(),
+			onCancelled);
 	}
 
 	public HyphenationLinterWorker(final String language, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator){
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
-			.withParallelProcessing();
+			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled);
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 		Objects.requireNonNull(hyphenator, "Hyphenator cannot be null");

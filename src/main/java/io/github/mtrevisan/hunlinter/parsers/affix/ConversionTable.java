@@ -30,6 +30,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -116,7 +117,7 @@ public class ConversionTable{
 	public final String applyConversionTable(final String word){
 		String convertedWord = word;
 		if(table != null){
-			final String inputWord = StringUtils.replace(word, StringUtils.SPACE, "_");
+			final String inputWord = Strings.CS.replace(word, StringUtils.SPACE, "_");
 
 			int maxInputLength = 0;
 
@@ -176,7 +177,7 @@ public class ConversionTable{
 			}
 
 			if(convertedWord != null)
-				convertedWord = StringUtils.replace(convertedWord, "_", StringUtils.SPACE);
+				convertedWord = Strings.CS.replace(convertedWord, "_", StringUtils.SPACE);
 		}
 
 		return convertedWord;

@@ -42,6 +42,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 
 public class DictionaryExtractMinimalPairsAction extends AbstractAction{
@@ -52,11 +53,13 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
-	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractMinimalPairsAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener,
+			final Consumer<Exception> onCancelled){
 		super("dictionary.extractMinimalPairs");
 
 		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
@@ -64,6 +67,7 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 
 		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
@@ -96,7 +100,8 @@ public class DictionaryExtractMinimalPairsAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 

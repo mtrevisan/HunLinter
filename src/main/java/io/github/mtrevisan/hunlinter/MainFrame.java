@@ -24,31 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter;
 
-import io.github.mtrevisan.hunlinter.actions.AboutAction;
-import io.github.mtrevisan.hunlinter.actions.AffixRulesReducerAction;
-import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
-import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterFSAAction;
-import io.github.mtrevisan.hunlinter.actions.CheckUpdateOnStartupAction;
-import io.github.mtrevisan.hunlinter.actions.CreatePackageAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractDuplicatesAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractMinimalPairsAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractPoSFSAAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistFSAAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryHyphenationStatisticsAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryLinterAction;
-import io.github.mtrevisan.hunlinter.actions.DictionarySorterAction;
-import io.github.mtrevisan.hunlinter.actions.DictionaryWordCountAction;
-import io.github.mtrevisan.hunlinter.actions.ExitAction;
-import io.github.mtrevisan.hunlinter.actions.HyphenationLinterAction;
-import io.github.mtrevisan.hunlinter.actions.IssueReporterAction;
-import io.github.mtrevisan.hunlinter.actions.OnlineHelpAction;
-import io.github.mtrevisan.hunlinter.actions.ProjectLoaderAction;
-import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
-import io.github.mtrevisan.hunlinter.actions.SelectFontAction;
-import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterAction;
-import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
-import io.github.mtrevisan.hunlinter.actions.UpdateAction;
+import io.github.mtrevisan.hunlinter.actions.*;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
@@ -126,6 +102,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -243,7 +220,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					dialog.setLocationRelativeTo(this);
 					dialog.setVisible(true);
 				}
-				catch(final IOException | ParseException | VersionException ignored){}
+				catch(final IOException | ParseException | URISyntaxException | VersionException ignored){}
 			});
 	}
 
@@ -286,6 +263,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicLinterMenuItem = new javax.swing.JMenuItem();
       dicSortDictionaryMenuItem = new javax.swing.JMenuItem();
       dicRulesReducerMenuItem = new javax.swing.JMenuItem();
+		dicAffixExtractionMenuItem = new javax.swing.JMenuItem();
       dicDuplicatesSeparator = new javax.swing.JPopupMenu.Separator();
       dicWordCountMenuItem = new javax.swing.JMenuItem();
       dicStatisticsMenuItem = new javax.swing.JMenuItem();
@@ -382,7 +360,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicMenu.setText("Dictionary tools");
       dicMenu.setEnabled(false);
 
-      dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this));
+		final Consumer<Exception> onDicLinterCancelled = exc -> dicLinterMenuItem.setEnabled(true);
+      dicLinterMenuItem.setAction(new DictionaryLinterAction(workerManager, this, onDicLinterCancelled));
       dicLinterMenuItem.setMnemonic('c');
       dicLinterMenuItem.setText("Correctness check");
       dicLinterMenuItem.setToolTipText("");
@@ -398,46 +377,68 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       dicRulesReducerMenuItem.setText("Rules reducer…");
       dicRulesReducerMenuItem.setToolTipText("");
       dicMenu.add(dicRulesReducerMenuItem);
+
+      dicAffixExtractionMenuItem.setAction(new AffixExtractionAction(parserManager));
+		dicAffixExtractionMenuItem.setText("Affix extraction…");
+		dicAffixExtractionMenuItem.setToolTipText("");
+      dicMenu.add(dicAffixExtractionMenuItem);
       dicMenu.add(dicDuplicatesSeparator);
 
-      dicWordCountMenuItem.setAction(new DictionaryWordCountAction(workerManager, this));
+		final Consumer<Exception> onDicWordCountCancelled = exc -> dicWordCountMenuItem.setEnabled(true);
+      dicWordCountMenuItem.setAction(new DictionaryWordCountAction(workerManager, this, onDicWordCountCancelled));
       dicWordCountMenuItem.setMnemonic('w');
       dicWordCountMenuItem.setText("Word count");
       dicMenu.add(dicWordCountMenuItem);
 
-      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager, this, this));
+		final Consumer<Exception> onDicStatisticsCancelled = exc -> dicStatisticsMenuItem.setEnabled(true);
+      dicStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(false, workerManager,
+			this, this, onDicStatisticsCancelled));
       dicStatisticsMenuItem.setMnemonic('S');
       dicStatisticsMenuItem.setText("Statistics");
       dicMenu.add(dicStatisticsMenuItem);
       dicMenu.add(dicStatisticsSeparator);
 
-      dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this));
+		final Consumer<Exception> onDicExtractDuplicatesCancelled = ex -> dicExtractDuplicatesMenuItem.setEnabled(true);
+      dicExtractDuplicatesMenuItem.setAction(new DictionaryExtractDuplicatesAction(workerManager, this,
+			onDicExtractDuplicatesCancelled));
       dicExtractDuplicatesMenuItem.setMnemonic('d');
       dicExtractDuplicatesMenuItem.setText("Extract duplicates…");
       dicMenu.add(dicExtractDuplicatesMenuItem);
 
-      dicExtractWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager, this));
+		final Consumer<Exception> onDicExtractWordlistCancelled = exc -> dicExtractWordlistMenuItem.setEnabled(true);
+      dicExtractWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.COMPLETE, workerManager,
+			this, onDicExtractWordlistCancelled));
       dicExtractWordlistMenuItem.setText("Extract wordlist…");
       dicMenu.add(dicExtractWordlistMenuItem);
 
-      dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS_NO_DUPLICATES, workerManager, this));
+		final Consumer<Exception> onDicExtractWordlistPlainTextCancelled = exp -> dicExtractWordlistPlainTextMenuItem.setEnabled(true);
+		dicExtractWordlistPlainTextMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.PLAIN_WORDS_NO_DUPLICATES,
+			workerManager, this, onDicExtractWordlistPlainTextCancelled));
       dicExtractWordlistPlainTextMenuItem.setText("Extract wordlist (plain words)…");
       dicMenu.add(dicExtractWordlistPlainTextMenuItem);
 
-		dicExtractFullstripWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.FULLSTRIP_WORDS, workerManager, this));
+		final Consumer<Exception> onDicExtractFullstripWordlistCancelled = exc -> dicExtractFullstripWordlistMenuItem.setEnabled(true);
+		dicExtractFullstripWordlistMenuItem.setAction(new DictionaryExtractWordlistAction(WordlistWorker.WorkerType.FULLSTRIP_WORDS,
+			workerManager, this, onDicExtractFullstripWordlistCancelled));
 		dicExtractFullstripWordlistMenuItem.setText("Extract fullstrip wordlist…");
 		dicMenu.add(dicExtractFullstripWordlistMenuItem);
 
-      dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this));
+		final Consumer<Exception> onDicExtractMinimalPairsCancelled = exc -> dicExtractMinimalPairsMenuItem.setEnabled(true);
+		dicExtractMinimalPairsMenuItem.setAction(new DictionaryExtractMinimalPairsAction(workerManager, this,
+			onDicExtractMinimalPairsCancelled));
       dicExtractMinimalPairsMenuItem.setText("Extract minimal pairs…");
       dicMenu.add(dicExtractMinimalPairsMenuItem);
       dicMenu.add(dicFSASeparator);
 
-      dicExtractDictionaryFSAMenuItem.setAction(new DictionaryExtractWordlistFSAAction(parserManager, workerManager, this));
+		final Consumer<Exception> onDicExtractDictionaryFSACancelled = exc -> dicExtractDictionaryFSAMenuItem.setEnabled(true);
+      dicExtractDictionaryFSAMenuItem.setAction(new DictionaryExtractWordlistFSAAction(parserManager, workerManager,
+			this, onDicExtractDictionaryFSACancelled));
       dicExtractDictionaryFSAMenuItem.setText("Extract dictionary FSA…");
       dicMenu.add(dicExtractDictionaryFSAMenuItem);
 
-      dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction(parserManager, workerManager, this));
+		final Consumer<Exception> onDicExtractPoSFSACancelled = exc -> dicExtractPoSFSAMenuItem.setEnabled(true);
+      dicExtractPoSFSAMenuItem.setAction(new DictionaryExtractPoSFSAAction(parserManager, workerManager, this,
+			onDicExtractPoSFSACancelled));
       dicExtractPoSFSAMenuItem.setText("Extract PoS FSA…");
       dicMenu.add(dicExtractPoSFSAMenuItem);
 
@@ -447,12 +448,15 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       theMenu.setText("Thesaurus tools");
       theMenu.setEnabled(false);
 
-      theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this));
+		final Consumer<Exception> onTheLinterCancelled = exc -> theLinterMenuItem.setEnabled(true);
+      theLinterMenuItem.setAction(new ThesaurusLinterAction(workerManager, this, onTheLinterCancelled));
       theLinterMenuItem.setMnemonic('c');
       theLinterMenuItem.setText("Correctness check");
       theMenu.add(theLinterMenuItem);
 
-		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
+		final Consumer<Exception> onTheLinterFSACancelled = exc -> theLinterFSAMenuItem.setEnabled(true);
+		theLinterFSAMenuItem.setAction(new ThesaurusLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane,
+			this, onTheLinterFSACancelled));
 		theLinterFSAMenuItem.setMnemonic('d');
       theLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
 		theMenu.add(theLinterFSAMenuItem);
@@ -463,13 +467,16 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       hypMenu.setText("Hyphenation tools");
       hypMenu.setEnabled(false);
 
-      hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this));
+		final Consumer<Exception> onHypLinterCancelled = exc -> hypLinterMenuItem.setEnabled(true);
+      hypLinterMenuItem.setAction(new HyphenationLinterAction(workerManager, this, onHypLinterCancelled));
       hypLinterMenuItem.setMnemonic('c');
       hypLinterMenuItem.setText("Correctness check");
       hypMenu.add(hypLinterMenuItem);
       hypMenu.add(hypDuplicatesSeparator);
 
-      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager, this, this));
+		final Consumer<Exception> onHypStatisticsCancelled = exc -> hypStatisticsMenuItem.setEnabled(true);
+      hypStatisticsMenuItem.setAction(new DictionaryHyphenationStatisticsAction(true, workerManager,
+			this, this, onHypStatisticsCancelled));
       hypStatisticsMenuItem.setMnemonic('S');
       hypStatisticsMenuItem.setText("Statistics");
       hypMenu.add(hypStatisticsMenuItem);
@@ -480,12 +487,15 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       acoMenu.setText("AutoCorrect tools");
       acoMenu.setEnabled(false);
 
-      acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this));
+		final Consumer<Exception> onAcoLinterCancelled = exc -> acoLinterMenuItem.setEnabled(true);
+      acoLinterMenuItem.setAction(new AutoCorrectLinterAction(workerManager, this, onAcoLinterCancelled));
       acoLinterMenuItem.setMnemonic('c');
       acoLinterMenuItem.setText("Correctness check");
       acoMenu.add(acoLinterMenuItem);
 
-		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane, this));
+		final Consumer<Exception> onAcoLinterFSACancelled = exc -> acoLinterFSAMenuItem.setEnabled(true);
+		acoLinterFSAMenuItem.setAction(new AutoCorrectLinterFSAAction(workerManager, (ThesaurusLayeredPane)theLayeredPane,
+			this, onAcoLinterFSACancelled));
 		acoLinterFSAMenuItem.setMnemonic('d');
 		acoLinterFSAMenuItem.setText("Correctness check using dictionary FSA…");
 		acoMenu.add(acoLinterFSAMenuItem);
@@ -933,9 +943,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			}
 			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
-				if(stateValue == SwingWorker.StateValue.STARTED)
-					mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
-				else if(stateValue == SwingWorker.StateValue.DONE){
+				mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
+				if(stateValue == SwingWorker.StateValue.DONE){
 					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
 					WorkerManager.callOnEnd(workerName);
 				}
@@ -1011,6 +1020,7 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
    private javax.swing.JMenuItem dicLinterMenuItem;
    private javax.swing.JMenu dicMenu;
    private javax.swing.JMenuItem dicRulesReducerMenuItem;
+   private javax.swing.JMenuItem dicAffixExtractionMenuItem;
    private javax.swing.JMenuItem dicSortDictionaryMenuItem;
    private javax.swing.JMenuItem dicStatisticsMenuItem;
    private javax.swing.JPopupMenu.Separator dicStatisticsSeparator;

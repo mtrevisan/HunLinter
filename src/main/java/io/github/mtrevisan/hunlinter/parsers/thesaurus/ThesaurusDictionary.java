@@ -32,10 +32,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class ThesaurusDictionary{
@@ -72,7 +76,7 @@ public class ThesaurusDictionary{
 	 * @param synonyms	Unique list of synonyms.
 	 * @return	Whether the row was added.
 	 */
-	public final boolean add(final String[] partOfSpeeches, final List<String> synonyms){
+	public final boolean add(final String[] partOfSpeeches, final String[] synonyms){
 		final StringJoiner sj = new StringJoiner(LIST_SEPARATOR, PART_OF_SPEECH_START, PART_OF_SPEECH_END);
 		final int size = (partOfSpeeches != null? partOfSpeeches.length: 0);
 		for(int i = 0; i < size; i ++)
@@ -80,8 +84,8 @@ public class ThesaurusDictionary{
 		final String wholePartOfSpeeches = sj.toString();
 
 		boolean result = false;
-		for(int i = 0; i < synonyms.size(); i ++){
-			String currentDefinition = synonyms.get(i);
+		for(int i = 0; i < synonyms.length; i ++){
+			String currentDefinition = synonyms[i];
 			final SynonymsEntry synonymsEntry = extractPartOfSpeechAndSynonyms(wholePartOfSpeeches, synonyms, currentDefinition);
 
 			currentDefinition = removeSynonymUse(currentDefinition);
@@ -101,12 +105,12 @@ public class ThesaurusDictionary{
 		return result;
 	}
 
-	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final List<String> synonyms,
+	private static SynonymsEntry extractPartOfSpeechAndSynonyms(final CharSequence partOfSpeeches, final String[] synonyms,
 			final String definition){
 		final StringJoiner sj = new StringJoiner(ThesaurusEntry.PIPE);
 		sj.add(partOfSpeeches);
-		for(int i = 0; i < synonyms.size(); i ++){
-			final String synonym = synonyms.get(i);
+		for(int i = 0; i < synonyms.length; i ++){
+			final String synonym = synonyms[i];
 			if(!synonym.equals(definition))
 				sj.add(synonym);
 		}
@@ -121,47 +125,51 @@ public class ThesaurusDictionary{
 
 	/** Find if there is a duplicate with the same Part-of-Speech and same synonyms. */
 	public final boolean contains(final String[] partOfSpeeches, final String[] synonyms){
-		final List<String> pos = (partOfSpeeches != null? Arrays.asList(partOfSpeeches): null);
-		final List<String> syns = Arrays.asList(synonyms);
+		final HashSet<String> pos = (partOfSpeeches != null? new HashSet<>(Arrays.asList(partOfSpeeches)): null);
+		final Set<String> syns = new HashSet<>(Arrays.asList(synonyms));
 		for(final ThesaurusEntry entry : dictionary.values())
-			if(entry.contains(pos, syns))
-				return true;
+			for(final SynonymsEntry synonymsEntry : entry.getSynonyms())
+				if(pos == null || new HashSet<>(synonymsEntry.getPartOfSpeeches()).containsAll(pos)){
+					final Set<String> currentSet = new HashSet<>(synonymsEntry.getSynonyms());
+					currentSet.add(entry.getDefinition());
+					if(syns.equals(currentSet))
+						return true;
+				}
 		return false;
 	}
 
-	//FIXME? remove only one entry?
-	public final void deleteDefinition(final String definition, final String synonyms){
-		//recover all words (definition and synonyms) from given definition
+	public final void deleteDefinition(final String definition){
+		//collect entries to be removed
 		final ThesaurusEntry entryToBeDeleted = dictionary.get(definition);
-		final List<String> definitions = new ArrayList<>(entryToBeDeleted.getSynonymsSet());
-		definitions.add(definition);
-		for(int i = 0; i < definitions.size(); i ++){
-			final int subTypeIndex = StringUtils.indexOfAny(definitions.get(i), '(');
-			if(subTypeIndex >= 0)
-				//NOTE: remove also de space before the open parenthesis (this assumes the subtype be the last thing of the synonym)
-				definitions.set(i, definitions.get(i).substring(0, subTypeIndex - 1));
+		final List<SynonymsEntry> synonymsEntries = entryToBeDeleted.getSynonyms();
+		final List<Set<String>> deleteSets = new ArrayList<>(synonymsEntries.size());
+		for(final SynonymsEntry entry : synonymsEntries){
+			final Set<String> deleteSet = entry.getSynonyms().stream()
+				.map(ThesaurusDictionary::removeSynonymUse)
+				.collect(Collectors.toSet());
+			deleteSet.add(removeSynonymUse(definition));
+			deleteSets.add(deleteSet);
 		}
+		//remove all entries that have all the elements in one of `deleteSets`
+		dictionary.values()
+			.forEach(entry -> {
+				final Iterator<SynonymsEntry> itr = entry.getSynonyms().iterator();
+				while(itr.hasNext()){
+					final SynonymsEntry synonymsEntry = itr.next();
 
-		//remove all
+					final Set<String> currentSet = synonymsEntry.getSynonyms().stream()
+						.map(ThesaurusDictionary::removeSynonymUse)
+						.collect(Collectors.toSet());
+					currentSet.add(removeSynonymUse(entry.getDefinition()));
+					for(final Set<String> deleteSet : deleteSets){
+						if(currentSet.equals(deleteSet))
+							itr.remove();
+					}
+				}
+			});
+		//remove all empty records
 		dictionary.entrySet()
-			.removeIf(entry -> definitions.contains(entry.getKey()));
-
-//		//recover definition and synonyms pairs (to be deleted)
-//		final String[] synonymsByDefinition = StringUtils.splitByWholeSeparator(synonyms, ThesaurusTableModel.TAG_NEW_LINE);
-//		final List<SynonymsEntry> entries = Arrays.stream(synonymsByDefinition)
-//			.map(syns -> new SynonymsEntry(GUIHelper.removeHTMLCode(syns) + ThesaurusEntry.PIPE + definition))
-//			.collect(Collectors.toList());
-//
-//		//delete each occurrence of the definition-synonyms pair
-//		dictionary.entrySet()
-//			.removeIf(entry -> {
-//				final String def = entry.getKey();
-//				final List<SynonymsEntry> syns = entry.getValue().getSynonyms().stream()
-//					.map(s -> new SynonymsEntry(s + ThesaurusEntry.PIPE + def))
-//					.collect(Collectors.toList());
-//				return entries.stream()
-//					.anyMatch(e -> syns.stream().anyMatch(s -> e.isSame(s)));
-//			});
+			.removeIf(entry -> entry.getValue().getSynonyms().isEmpty());
 	}
 
 	public final List<ThesaurusEntry> getSynonymsDictionary(){
@@ -189,7 +197,7 @@ public class ThesaurusDictionary{
 	}
 
 	/** Find all the entries that have Part-of-Speech and synonyms contained into the given ones. */
-	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
+	public final List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		final List<String> pos = Arrays.asList(partOfSpeeches);
 		final List<ThesaurusEntry> list = new ArrayList<>(dictionary.size());
 		for(final ThesaurusEntry entry : dictionary.values())

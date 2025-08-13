@@ -196,10 +196,7 @@ public class Hyphenator implements HyphenatorInterface{
 				final SearchResult<String> r = itr.get(i);
 				final String rule = r.getValue();
 
-				//number of non-letter characters
-				final int delta = getKeyLengthFromData(rule) - getKeyLengthFromData(rule);
-				final int startingIndex = r.getIndexBegin() - delta;
-
+				final int startingIndex = r.getIndexBegin();
 				//cycle the pattern's characters searching for numbers
 				//start from -1 since the initial dot has to be skipped
 				int j = -1;
@@ -210,7 +207,7 @@ public class Hyphenator implements HyphenatorInterface{
 					else{
 						//check if a break point should be skipped based on left and right min options
 						final int idx = startingIndex + j;
-						final int normalizedIdx = (normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
+						final int normalizedIdx = (idx > 0 && normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
 						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 							final int dd = Character.digit(chr, 10);
 							//check if the break number is great than the one stored so far

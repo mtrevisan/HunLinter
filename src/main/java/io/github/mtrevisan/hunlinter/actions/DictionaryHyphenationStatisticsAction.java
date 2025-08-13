@@ -37,6 +37,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 
 public class DictionaryHyphenationStatisticsAction extends AbstractAction{
@@ -49,11 +50,12 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 	private final WorkerManager workerManager;
 	private final Frame parentFrame;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 
 	@SuppressWarnings("ConstantConditions")
 	public DictionaryHyphenationStatisticsAction(final boolean performHyphenationStatistics, final WorkerManager workerManager,
-			final Frame parentFrame, final PropertyChangeListener propertyChangeListener){
+			final Frame parentFrame, final PropertyChangeListener propertyChangeListener, final Consumer<Exception> onCancelled){
 		super("dictionary.statistics",
 			new ImageIcon(DictionarySorterAction.class.getResource("/dictionary_statistics.png")));
 
@@ -65,6 +67,7 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 		this.workerManager = workerManager;
 		this.parentFrame = parentFrame;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 	}
 
 	@Override
@@ -86,6 +89,7 @@ public class DictionaryHyphenationStatisticsAction extends AbstractAction{
 
 				setEnabled(true);
 			},
+			onCancelled,
 			parentFrame
 		);
 	}

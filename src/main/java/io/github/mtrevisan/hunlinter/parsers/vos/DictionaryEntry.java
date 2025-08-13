@@ -86,7 +86,7 @@ public class DictionaryEntry{
 //		if(!m.find())
 //			throw new HunLintException("Cannot parse dictionary line `" + line + "`");
 //
-//		return StringUtils.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
+//		return Strings.CS.replace(m.group(PARAM_WORD), SLASH_ESCAPED, SLASH);
 //	}
 
 	public final String getWord(){

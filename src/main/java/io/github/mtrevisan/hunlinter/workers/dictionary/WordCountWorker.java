@@ -58,11 +58,12 @@ public class WordCountWorker extends WorkerDictionary{
 	private final BloomFilterInterface<String> dictionary;
 
 
-	public WordCountWorker(final ParserManager parserManager){
-		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator());
+	public WordCountWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), onCancelled);
 	}
 
-	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	public WordCountWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator,
+			final Consumer<Exception> onCancelled){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
@@ -83,7 +84,12 @@ public class WordCountWorker extends WorkerDictionary{
 			for(int i = 0; i < inflections.size(); i ++)
 				dictionary.add(inflections.get(i).getWord());
 		};
-		final Consumer<Exception> cancelled = exception -> dictionary.close();
+		final Consumer<Exception> cancelled = exc -> {
+			dictionary.close();
+
+			if(onCancelled != null)
+				onCancelled.accept(exc);
+		};
 
 		getWorkerData()
 			.withDataCancelledCallback(cancelled);

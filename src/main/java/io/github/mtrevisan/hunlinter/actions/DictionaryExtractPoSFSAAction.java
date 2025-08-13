@@ -43,6 +43,7 @@ import java.io.Serial;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 
 public class DictionaryExtractPoSFSAAction extends AbstractAction{
@@ -54,12 +55,13 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 	private final ParserManager parserManager;
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	public DictionaryExtractPoSFSAAction(final ParserManager parserManager, final WorkerManager workerManager,
-			final PropertyChangeListener propertyChangeListener){
+			final PropertyChangeListener propertyChangeListener, final Consumer<Exception> onCancelled){
 		super("dictionary.posFSA");
 
 		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
@@ -69,6 +71,7 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 		this.parserManager = parserManager;
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 
 		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
@@ -101,7 +104,8 @@ public class DictionaryExtractPoSFSAAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 

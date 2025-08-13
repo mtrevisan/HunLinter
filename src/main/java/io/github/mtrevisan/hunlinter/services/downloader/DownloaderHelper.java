@@ -41,10 +41,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import org.json.simple.parser.JSONParser;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -56,7 +59,7 @@ public final class DownloaderHelper{
 
 	private static final String ALREADY_UPDATED = "You already have the latest version installed";
 
-	private static final String URL_CONNECTIVITY = "https://www.google.com/";
+	private static final String URL_CONNECTIVITY_TEST = "https://www.google.com/";
 	private static final String URL_ONLINE_REPOSITORY_BASE = "https://api.github.com/repos/mtrevisan/HunLinter/";
 	private static final String URL_ONLINE_REPOSITORY_RELEASES = "releases";
 	private static final String URL_ONLINE_REPOSITORY_CONTENTS_APP = "contents/bin/";
@@ -101,12 +104,13 @@ public final class DownloaderHelper{
 
 	public static boolean hasInternetConnectivity(){
 		try{
-			final URL url = new URL(URL_CONNECTIVITY);
+			final URL url = new URI(URL_CONNECTIVITY_TEST)
+				.toURL();
 			final HttpURLConnection httpConnection = (HttpURLConnection)url.openConnection();
 			final int responseCode = httpConnection.getResponseCode();
 			return (responseCode == HttpURLConnection.HTTP_OK);
 		}
-		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){
+		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException | URISyntaxException ignored){
 			return false;
 		}
 	}
@@ -118,8 +122,9 @@ public final class DownloaderHelper{
 	 * @throws VersionException	If something went wrong, or current version is already the last one
 	 */
 	@SuppressWarnings("OverlyBroadThrowsClause")
-	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException, ParseException{
-		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).openStream()){
+	public static List<Pair<Version, String>> extractNewerVersions() throws VersionException, IOException, URISyntaxException,
+			ParseException{
+		try(final InputStream is = new URI(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_RELEASES).toURL().openStream()){
 			final String response = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
 			final JSONParser parser = new JSONParser();
@@ -141,10 +146,11 @@ public final class DownloaderHelper{
 	}
 
 	@SuppressWarnings("OverlyBroadThrowsClause")
-	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException, ParseException{
+	public static GITFileData extractVersionData(final Version version) throws VersionException, IOException, ParseException,
+			URISyntaxException{
 		//find last build by filename
 		final String filename = "-" + version;
-		try(final InputStream is = new URL(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).openStream()){
+		try(final InputStream is = new URI(URL_ONLINE_REPOSITORY_BASE + URL_ONLINE_REPOSITORY_CONTENTS_APP).toURL().openStream()){
 			final byte[] dataBytes = is.readAllBytes();
 			final GITFileData fileData = extractData(filename, dataBytes);
 

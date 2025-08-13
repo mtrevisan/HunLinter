@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2022 Mauro Trevisan
+ * Copyright (c) 2025 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,66 +24,59 @@
  */
 package io.github.mtrevisan.hunlinter.actions;
 
-import io.github.mtrevisan.hunlinter.workers.WorkerManager;
+import io.github.mtrevisan.hunlinter.gui.GUIHelper;
+import io.github.mtrevisan.hunlinter.gui.dialogs.AffixExtractorDialog;
+import io.github.mtrevisan.hunlinter.parsers.ParserManager;
+import io.github.mtrevisan.hunlinter.services.eventbus.EventBusService;
 
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
-import javax.swing.MenuSelectionManager;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serial;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 
-public class HyphenationLinterAction extends AbstractAction{
+public class AffixExtractionAction extends AbstractAction{
 
 	@Serial
-	private static final long serialVersionUID = 6891821671117338302L;
+	private static final long serialVersionUID = 2744533759471318637L;
 
 
-	private final WorkerManager workerManager;
-	private final PropertyChangeListener propertyChangeListener;
-	private final Consumer<Exception> onCancelled;
+	private final ParserManager parserManager;
 
 
-	@SuppressWarnings("ConstantConditions")
-	public HyphenationLinterAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener,
-			final Consumer<Exception> onCancelled){
-		super("hyphenation.linter",
-			new ImageIcon(HyphenationLinterAction.class.getResource("/dictionary_correctness.png")));
+	public AffixExtractionAction(final ParserManager parserManager){
+		super("affix.extraction");
 
-		Objects.requireNonNull(workerManager, "Worker manager cannot be null");
-		Objects.requireNonNull(propertyChangeListener, "Property change listener cannot be null");
+		Objects.requireNonNull(parserManager, "Parser manager cannot be null");
 
-		this.workerManager = workerManager;
-		this.propertyChangeListener = propertyChangeListener;
-		this.onCancelled = onCancelled;
+		this.parserManager = parserManager;
 	}
 
 	@Override
 	public final void actionPerformed(final ActionEvent event){
 		MenuSelectionManager.defaultManager().clearSelectedPath();
 
-		workerManager.createHyphenationLinterWorker(
-			worker -> {
-				setEnabled(false);
+		setEnabled(false);
 
-				worker.addPropertyChangeListener(propertyChangeListener);
-				worker.execute();
-			},
-			worker -> {
-				//change color of progress bar to reflect an error
-				if(worker.isCancelled())
-					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
-
-				setEnabled(true);
-			},
-			onCancelled
-		);
+		final Frame parentFrame = GUIHelper.getParentFrame((JMenuItem)event.getSource());
+		try{
+			final AffixExtractorDialog rulesReducerDialog = new AffixExtractorDialog(parserManager, parentFrame);
+			EventBusService.subscribe(rulesReducerDialog);
+			rulesReducerDialog.setLocationRelativeTo(parentFrame);
+			rulesReducerDialog.addWindowListener(new WindowAdapter(){
+				@Override
+				public void windowDeactivated(final WindowEvent e){
+					setEnabled(true);
+				}
+			});
+			rulesReducerDialog.setVisible(true);
+		}
+		catch(final IOException ioe){
+			throw new RuntimeException(ioe);
+		}
 	}
 
 

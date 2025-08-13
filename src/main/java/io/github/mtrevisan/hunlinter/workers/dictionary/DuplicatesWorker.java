@@ -64,6 +64,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -113,16 +114,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private final BloomFilterParameters dictionaryBaseData;
 
 
-	public DuplicatesWorker(final ParserManager parserManager, final File outputFile){
-		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), outputFile);
+	public DuplicatesWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled, final File outputFile){
+		this(parserManager.getLanguage(), parserManager.getDicParser(), parserManager.getWordGenerator(), onCancelled, outputFile);
 	}
 
 	public DuplicatesWorker(final String language, final DictionaryParser dicParser, final WordGenerator wordGenerator,
-			final File outputFile){
+			final Consumer<Exception> onCancelled, final File outputFile){
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(language, "Language cannot be null");

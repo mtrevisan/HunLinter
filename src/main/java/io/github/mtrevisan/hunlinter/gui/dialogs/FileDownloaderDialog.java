@@ -37,6 +37,7 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.parser.ParseException;
 
@@ -74,7 +75,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 	private DownloadTask task;
 
 
-	public FileDownloaderDialog(final Frame parent) throws IOException, ParseException, VersionException{
+	public FileDownloaderDialog(final Frame parent) throws IOException, VersionException, ParseException, URISyntaxException{
 		super(parent, "File downloader", true);
 
 		initComponents();
@@ -203,7 +204,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 			final String message = whatsNew.stream()
 				.map(line -> "<b>Version " + line.getKey()
 					+ Arrays.stream(StringUtils.split(line.getValue(), "\r\n"))
-						.map(change -> "<li>" + StringUtils.removeStart(change, "- ") + "</li>")
+						.map(change -> "<li>" + Strings.CS.removeStart(change, "- ") + "</li>")
 						.collect(Collectors.joining(StringUtils.EMPTY, "</b><ul>", "</ul>"))
 				)
 				.collect(Collectors.joining("<br><br>"));
@@ -218,7 +219,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 
 			JOptionPane.showMessageDialog(this, scrollPane, "What's new", JOptionPane.INFORMATION_MESSAGE);
 		}
-		catch(final VersionException | IOException | ParseException | HeadlessException ignored){}
+		catch(final VersionException | IOException | ParseException | URISyntaxException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
    private void downloadButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed

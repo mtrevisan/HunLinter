@@ -68,11 +68,12 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 
 	public AutoCorrectLinterWorker(final AutoCorrectParser acoParser, final String language, final DictionaryParser dicParser,
-			final WordGenerator wordGenerator){
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled){
 		super(new WorkerDataParser<>(WORKER_NAME, acoParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");

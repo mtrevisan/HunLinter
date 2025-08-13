@@ -213,7 +213,51 @@ public class Packager{
 	}
 
 	public final List<String> getLanguages(){
-		return languages;
+		try{
+			final Map<Integer, List<String>> allFolders = new HashMap<>();
+			for(final String language : languages){
+				final Map<String, Object> folders = processDictionariesConfigurationFile(language);
+				final Map<String, Object> folders2 = extractPathsConfigurationFile(language);
+				if(folders2 != null)
+					folders.putAll(folders2);
+
+				for(final Map.Entry<String, Object> entry : folders.entrySet()){
+					final Object value = entry.getValue();
+					final int hash = (value instanceof File[] array? Arrays.hashCode(array): Objects.hash(value));
+					allFolders.computeIfAbsent(hash, k -> new ArrayList<>(1))
+						.add(language);
+				}
+			}
+
+			//check that all keys have the same number of strings in the value
+			int size = -1;
+			boolean sameSize = true;
+			for(final List<String> value : allFolders.values()){
+				if(size == -1)
+					size = value.size();
+				else if(size != value.size()){
+					sameSize = false;
+					break;
+				}
+			}
+
+			if(sameSize){
+				String shortest = null;
+				//peek one (they are all equals)
+				final List<String> values = allFolders.values().iterator()
+					.next();
+				//extract the shortest language code
+				for(final String value : values)
+					if(shortest == null || value.length() < shortest.length())
+						shortest = value;
+				return (shortest != null? List.of(shortest): Collections.emptyList());
+			}
+			else
+				return languages;
+		}
+		catch(final Exception ignored){
+			return Collections.emptyList();
+		}
 	}
 
 	public final void extractConfigurationFolders(final String language){
@@ -223,8 +267,11 @@ public class Packager{
 		try{
 			this.language = language;
 
-			processDictionariesConfigurationFile();
-			processPathsConfigurationFile();
+			Map<String, Object> folders = processDictionariesConfigurationFile(language);
+			configurationFiles.putAll(folders);
+			folders = extractPathsConfigurationFile(language);
+			if(folders != null)
+				configurationFiles.putAll(folders);
 
 			//extract all .dat in autocorr folder
 			if(autoCorrectPath != null){
@@ -278,34 +325,36 @@ public class Packager{
 		return Collections.unmodifiableList(langs);
 	}
 
-	private void processDictionariesConfigurationFile() throws IOException, SAXException{
+	private Map<String, Object> processDictionariesConfigurationFile(final String language) throws IOException, SAXException{
 		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
 		final Path path = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node == null)
 			throw new IllegalArgumentException("Cannot find " + CONFIGURATION_NODE_NAME_SERVICE_MANAGER + " in files: "
 				+ manifestFiles.stream().map(File::getName).collect(Collectors.joining(", ", "[", "]")));
-		else
-			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), path.getParent()));
+
+		return getFolders(language, node, mainManifestPath.getParent(), path.getParent());
 	}
 
-	private void processPathsConfigurationFile() throws IOException, SAXException{
+	private Map<String, Object> extractPathsConfigurationFile(final String language) throws IOException, SAXException{
+		Map<String, Object> folders = null;
 		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_PATHS, manifestFiles);
 		final Path path = pair.getLeft();
 		final Node node = pair.getRight();
 		if(node != null){
-			configurationFiles.putAll(getFolders(node, mainManifestPath.getParent(), path.getParent()));
-			final Collection<String> uniqueFolders = new HashSet<>(configurationFiles.values().size());
-			final Collection<Object> collection = configurationFiles.values();
+			folders = getFolders(language, node, mainManifestPath.getParent(), path.getParent());
+			final Collection<Object> collection = folders.values();
+			final Collection<String> uniqueFolders = new HashSet<>(collection.size());
 			for(final Object f : collection)
 				uniqueFolders.add(f.toString());
-			if(configurationFiles.size() != uniqueFolders.size())
+			if(folders.size() != uniqueFolders.size())
 				throw new IllegalArgumentException("Duplicate folders detected, they must be unique: "
-					+ StringUtils.join(configurationFiles));
+					+ StringUtils.join(folders));
 			for(final String folder : uniqueFolders)
 				if(folder.isEmpty())
 					throw new IllegalArgumentException("Empty folders detected, it must be something other than the base folder");
 		}
+		return folders;
 	}
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")
@@ -526,7 +575,8 @@ public class Packager{
 		return Pair.of(null, null);
 	}
 
-	private Map<String, Object> getFolders(final Node parentNode, final Path basePath, final Path originPath) throws IOException{
+	private Map<String, Object> getFolders(final String language, final Node parentNode, final Path basePath, final Path originPath)
+			throws IOException{
 		final Map<String, Object> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
@@ -537,14 +587,14 @@ public class Packager{
 			//extract folder(s)
 			final String nodeValue = node.getNodeValue();
 			if(CONFIGURATION_NODE_NAME_DICTIONARIES.equals(nodeValue))
-				getFoldersForDictionaries(child, basePath, originPath, folders);
+				getFoldersForDictionaries(language, child, basePath, originPath, folders);
 			else
 				folders.putAll(getFoldersForInternalPaths(child, nodeValue, basePath, originPath));
 		}
 		return folders;
 	}
 
-	private void getFoldersForDictionaries(final Node entry, final Path basePath, final Path originPath,
+	private void getFoldersForDictionaries(final String language, final Node entry, final Path basePath, final Path originPath,
 			final Map<String, Object> folders) throws IOException{
 		//restrict to given language
 		final List<Node> children = extractChildren(entry);

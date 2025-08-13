@@ -43,6 +43,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 
 public class DictionaryExtractDuplicatesAction extends AbstractAction{
@@ -53,12 +54,14 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 
 	private final WorkerManager workerManager;
 	private final PropertyChangeListener propertyChangeListener;
+	private final Consumer<Exception> onCancelled;
 
 	private final Future<JFileChooser> futureSaveResultFileChooser;
 
 
 	@SuppressWarnings("ConstantConditions")
-	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener){
+	public DictionaryExtractDuplicatesAction(final WorkerManager workerManager, final PropertyChangeListener propertyChangeListener,
+			final Consumer<Exception> onCancelled){
 		super("dictionary.extractDuplicates",
 			new ImageIcon(DictionaryExtractDuplicatesAction.class.getResource("/dictionary_duplicates.png")));
 
@@ -67,6 +70,7 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 
 		this.workerManager = workerManager;
 		this.propertyChangeListener = propertyChangeListener;
+		this.onCancelled = onCancelled;
 
 		futureSaveResultFileChooser = JavaHelper.executeFuture(() -> {
 			final JFileChooser saveResultFileChooser = new JFileChooser();
@@ -99,7 +103,8 @@ public class DictionaryExtractDuplicatesAction extends AbstractAction{
 					propertyChangeListener.propertyChange(worker.propertyChangeEventWorkerCancelled);
 
 				setEnabled(true);
-			}
+			},
+			onCancelled
 		);
 	}
 

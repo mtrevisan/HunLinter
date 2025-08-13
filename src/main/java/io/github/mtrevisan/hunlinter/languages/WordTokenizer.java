@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.languages;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class WordTokenizer{
 		+ "\u2028\u2029\u202a\u202b\u202c\u202d\u202e\u202f"
 		+ "\u205F\u2060\u2061\u2062\u2063\u206A\u206b\u206c\u206d"
 		+ "\u206E\u206F\u3000ㅤ\ufeffﾠ\ufff9\ufffa\ufffb"
-		+ ",.;()[]{}=*#∗×·+÷<>!?:/|\\\"'«»„”“`´‘’‛′›‹…¿¡→‼⁇⁈⁉_"
+		+ ",.;()[]{}=*#∗×·+÷<>!?:/|\\\"'«»„”“`´‘‛′›‹…¿¡→‼⁇⁈⁉_"
 		//em dash
 		+ "—"
 		+ "\t\n\r";
@@ -99,7 +100,7 @@ public class WordTokenizer{
 
 	@SuppressWarnings("DesignForExtension")
 	public List<String> tokenize(String text){
-		text = StringUtils.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
+		text = Strings.CS.replace(text, HORIZONTAL_EXPANDED_ELLIPSIS, HORIZONTAL_ELLIPSIS);
 
 		final String placeholder = StringUtils.repeat("\0", StringUtils.EMPTY,
 			StringHelper.maxRepeating(text, '\0') + 1);

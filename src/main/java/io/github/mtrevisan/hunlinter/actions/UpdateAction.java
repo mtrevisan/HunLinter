@@ -27,14 +27,19 @@ package io.github.mtrevisan.hunlinter.actions;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.services.downloader.VersionException;
+import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.AbstractAction;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.MenuSelectionManager;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -43,6 +48,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.net.NoRouteToHostException;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 
@@ -76,12 +82,29 @@ public class UpdateAction extends AbstractAction{
 			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
 				JOptionPane.WARNING_MESSAGE);
 		}
-		catch(final IOException | ParseException | VersionException e){
+		catch(final IOException | ParseException | URISyntaxException | VersionException e){
 			final String message = e.getMessage();
-			LOGGER.info(message);
+			LOGGER.warn(message, e);
 
-			JOptionPane.showMessageDialog(parentFrame, message, "Application update",
-				JOptionPane.INFORMATION_MESSAGE);
+			//for copying style
+			final JLabel label = new JLabel();
+			final Font font = label.getFont();
+			//create some css from the label's font
+			final String style = "font-family:" + font.getFamily() + ";"
+				+ "font-weight:" + (font.isBold()? "bold": "normal") + ";"
+				+ "font-size:" + font.getSize() + "pt;";
+			//html content
+			final JEditorPane ep = new JEditorPane("text/html", "<html><body style=\"" + style + "\">"
+				+ "Cannot check for update, please do it manually visiting <a href=\"https://github.com/mtrevisan/HunLinter/releases/\">HunLinter page</a>"
+				+ "</body></html>");
+			//handle link events
+			ep.addHyperlinkListener(e1 -> {
+				if(e1.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED))
+					FileHelper.browseURL(e1.getURL().toString());
+			});
+			ep.setEditable(false);
+			ep.setBackground(label.getBackground());
+			JOptionPane.showMessageDialog(parentFrame, ep, "Application update", JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 

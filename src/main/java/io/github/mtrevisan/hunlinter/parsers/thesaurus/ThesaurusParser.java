@@ -24,7 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.thesaurus;
 
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
+import io.github.mtrevisan.hunlinter.gui.models.ThesaurusTableModel;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
@@ -32,6 +32,7 @@ import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,17 +81,16 @@ public class ThesaurusParser{
 	private static final Pattern PATTERN_CLEAR_SEARCH = RegexHelper.pattern("\\s+\\([^)]+\\)");
 	private static final Pattern PATTERN_FILTER_EMPTY = RegexHelper.pattern("^\\(.+?\\)((?<!\\\\)\\|)?|^(?<!\\\\)\\||(?<!\\\\)\\|$|\\/.*$");
 	private static final Pattern PATTERN_FILTER_OR = RegexHelper.pattern("(,|\\|)+");
+	private static final String ENTRY_SEPARATOR = "([ ,><]|" + ThesaurusTableModel.ZERO_WIDTH_SPACE + ")";
 
 	private static final char[] NEW_LINE = {'\n'};
 
 	private final ThesaurusDictionary dictionary;
-	private final Orthography orthography;
 	private Charset charset;
 
 
 	public ThesaurusParser(final String language){
 		dictionary = new ThesaurusDictionary(language);
-		orthography = BaseBuilder.getOrthography(language);
 	}
 
 	public final ThesaurusDictionary getDictionary(){
@@ -156,23 +155,14 @@ public class ThesaurusParser{
 		if(posAndSyns.length != 2)
 			throw new LinterException(WRONG_FORMAT, partOfSpeechAndSynonyms);
 
-		final int prefix = (StringUtils.startsWithAny(posAndSyns[0], PART_OF_SPEECH_START)? 1: 0);
-		final int suffix = (StringUtils.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
+		final int prefix = (Strings.CI.startsWithAny(posAndSyns[0], PART_OF_SPEECH_START)? 1: 0);
+		final int suffix = (Strings.CI.endsWithAny(posAndSyns[0], PART_OF_SPEECH_END)? 1: 0);
 		final String[] partOfSpeeches = StringUtils.split(posAndSyns[0].substring(prefix, posAndSyns[0].length() - suffix), ',');
 		for(int i = 0; i < partOfSpeeches.length; i ++)
-			partOfSpeeches[i] = partOfSpeeches[i].trim();
+			partOfSpeeches[i] = StringUtils.replaceChars(partOfSpeeches[i], "()", "").trim();
 
 		final String[] pas = StringUtils.split(posAndSyns[1], ThesaurusEntry.SYNONYMS_SEPARATOR);
-		final List<String> list = new ArrayList<>(pas.length);
-		for(int i = 0; i < pas.length; i ++){
-			final String trim = orthography.correctOrthography(pas[i].trim());
-			if(StringUtils.isNotBlank(trim) && !list.contains(trim))
-				list.add(trim);
-		}
-		if(list.size() < 2)
-			throw new LinterException(NOT_ENOUGH_SYNONYMS, partOfSpeechAndSynonyms);
-
-		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, list);
+		final List<ThesaurusEntry> duplicates = extractDuplicates(partOfSpeeches, pas);
 		boolean forceInsertion = duplicates.isEmpty();
 		if(!forceInsertion){
 			final String duplicatesMessage = duplicates.stream()
@@ -182,13 +172,13 @@ public class ThesaurusParser{
 		}
 
 		if(forceInsertion)
-			dictionary.add(partOfSpeeches, list);
+			dictionary.add(partOfSpeeches, pas);
 
 		return new DuplicationResult<>(duplicates, forceInsertion);
 	}
 
 	/** Find if there is a duplicate with the same Part-of-Speech. */
-	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final List<String> synonyms){
+	private List<ThesaurusEntry> extractDuplicates(final String[] partOfSpeeches, final String[] synonyms){
 		return dictionary.extractDuplicates(partOfSpeeches, synonyms);
 	}
 
@@ -202,8 +192,8 @@ public class ThesaurusParser{
 		return dictionary.contains(partOfSpeeches, synonyms);
 	}
 
-	public final void deleteDefinitionAndSynonyms(final String definition, final String selectedSynonyms){
-		dictionary.deleteDefinition(definition, selectedSynonyms);
+	public final void deleteDefinitionAndSynonyms(final String definition){
+		dictionary.deleteDefinition(definition);
 	}
 
 	public static Pair<String[], String[]> extractComponentsForFilter(String text, final Orthography orthography){
@@ -256,7 +246,13 @@ public class ThesaurusParser{
 			for(int i = 0; i < synonyms.length; i ++)
 				quotedSynonyms[i] = Pattern.quote(synonyms[i]);
 		}
-		final String synonymsFilter = (quotedSynonyms != null? "(" + StringUtils.join(quotedSynonyms, PIPE) + ")" : ".+");
+		//NOTE: partial words
+//		final String synonymsFilter = (quotedSynonyms != null? "(" + StringUtils.join(quotedSynonyms, PIPE) + ")": ".+");
+		//NOTE: whole words
+		final String searchString = "(" + StringUtils.join(quotedSynonyms, PIPE) + ")";
+		final String synonymsFilter = (quotedSynonyms != null
+			? "(^" + searchString + "$|" + ENTRY_SEPARATOR + searchString + ENTRY_SEPARATOR + "|" + ENTRY_SEPARATOR + searchString + "$)"
+			: ".+");
 
 		//compose filter regexp
 		return Pair.of(posFilter, synonymsFilter);

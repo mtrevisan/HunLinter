@@ -40,16 +40,26 @@ public class WordTokenizerVEC extends WordTokenizer{
 	static{
 		final String quotedTokenizingChars = Pattern.quote(DEFAULT_TOKENIZING_CHARACTERS);
 		TOKENIZING_CHARACTERS = Pattern.compile("(?i)"
-			+ "(a[lƚnv]|di|e[lƚn]|[gks][oó]|[iu]n|[lƚ][aài]|v[aàeèéiíoòóuú])[" + APOSTROPHES + "](?=[" + quotedTokenizingChars + "]|$)"
+			+ "(a[lƚnv]|[àdéí]|e[lƚn]|[eè]r|[gks][oó]|[iu]n|[ai]n[st]|[lƚ][aài]|v[aàeèéiíoòóuú])[" + APOSTROPHES + "](?=[" + quotedTokenizingChars + "]|$)"
 			+ "|"
-			+ "[" + APOSTROPHES + "](a[nrsŧ]|b[iuú]|e[cdglƚmnrstv-]|i[eégklƚmnoóstv]|[kpsv]a|[lntuéíòóú]|o[klƚmnrsx]|s[eé]|à[nrs]|èc|[ñv][aàeèéiíoòóuú]|[lƚ]o)"
+			+ "[" + APOSTROPHES + "](a[nrsŧ]|b[iuú]|e[cdglƚmnrstv-]|i[eégklƚmnoóstv]|[kpsv]a|[lntuéíòóú]|o[klƚmnrsx]|s[eé]|à[nrs]|èc|[ñv][aàeèéiíoòóuú]|[lƚ]o|té)"
+			+ "|"
+			+ "[" + APOSTROPHES + "][st][" + APOSTROPHES + "]"
 		);
 	}
 
 
+	/**
+	 * Tokenizes the given text by replacing specified characters with a modified version, and then delegates to the
+	 * superclass' tokenize method.
+	 *
+	 * @param text	The text to be tokenized.
+	 * @return	The tokenized list of strings.
+	 */
 	@Override
 	public final List<String> tokenize(String text){
-		text = RegExUtils.replaceAll(text, TOKENIZING_CHARACTERS, "$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");
+		text = RegExUtils.replaceAll((CharSequence)text, TOKENIZING_CHARACTERS,
+			"$1" + HyphenationParser.MODIFIER_LETTER_APOSTROPHE + "$2");
 		return super.tokenize(text);
 	}
 

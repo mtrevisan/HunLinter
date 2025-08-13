@@ -1870,8 +1870,7 @@ class RulesReducerSuffixTest{
 		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, originalLines);
 	}
 
-//	@Test
-	//FIXME
+	@Test
 	void caseSuffix23() throws IOException{
 		String language = "vec";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
@@ -1880,25 +1879,25 @@ class RulesReducerSuffixTest{
 			"FLAG long",
 			"FULLSTRIP",
 			"SFX '9 Y 19",
-			"SFX '9 r ʼ r",
-			"SFX '9 u ʼ u",
-			"SFX '9 ra ʼ ra",
-			"SFX '9 axa àʼ axa",
-			"SFX '9 èđa àʼ èđa",
-			"SFX '9 èxa àʼ èxa",
-			"SFX '9 de ʼ .de",
-			"SFX '9 me ʼ me",
-			"SFX '9 te ʼ te",
-			"SFX '9 do ʼ do",
-			"SFX '9 ko ʼ ko",
-			"SFX '9 to ʼ nto",
-			"SFX '9 to ʼ tuto",
-			"SFX '9 to ʼ sto",
-			"SFX '9 o ʼ [^n]to",
-			"SFX '9 a ʼ [^rx]a",
-			"SFX '9 e ʼ [^mt]e",
-			"SFX '9 o ʼ [^dkt]o",
-			"SFX '9 ove óʼ ove"
+			"SFX '9 r ’ r",
+			"SFX '9 u ’ u",
+			"SFX '9 ra ’ ra",
+			"SFX '9 axa à’ axa",
+			"SFX '9 èđa à’ èđa",
+			"SFX '9 èxa à’ èxa",
+			"SFX '9 de ’ .de",
+			"SFX '9 me ’ me",
+			"SFX '9 te ’ te",
+			"SFX '9 do ’ do",
+			"SFX '9 ko ’ ko",
+			"SFX '9 to ’ nto",
+			"SFX '9 to ’ tuto",
+			"SFX '9 to ’ sto",
+			"SFX '9 o ’ [^n]to",
+			"SFX '9 a ’ [^rx]a",
+			"SFX '9 e ’ [^mt]e",
+			"SFX '9 o ’ [^dkt]o",
+			"SFX '9 ove ó’ ove"
 		);
 		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
 		RulesReducer reducer = pair.getLeft();
@@ -1917,36 +1916,36 @@ class RulesReducerSuffixTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("to", "ʼ", "nto", Arrays.asList("santo", "tanto")),
-			new LineEntry("o", "ʼ", "[^n]to", Arrays.asList("kuarto", "sèsto", "tuto", "sto")),
-			new LineEntry("do", "ʼ", "do", Arrays.asList("komòdo", "kuando")),
-			new LineEntry("o", "ʼ", "[^dkt]o", Arrays.asList("no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
-			new LineEntry("ko", "ʼ", "ko", Arrays.asList("pòko", "puòko", "poko"))
+			new LineEntry("to", "’", "nto", Arrays.asList("santo", "tanto")),
+			new LineEntry("o", "’", "[^n]to", Arrays.asList("kuarto", "sèsto", "tuto", "sto")),
+			new LineEntry("do", "’", "do", Arrays.asList("komòdo", "kuando")),
+			new LineEntry("o", "’", "[^dkt]o", Arrays.asList("no", "òño", "kuarto", "sèsto", "tèrso", "tuto", "tèrŧo", "so", "sto")),
+			new LineEntry("ko", "’", "ko", Arrays.asList("pòko", "puòko", "poko"))
 		);
 		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
 
 		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
 		List<String> expectedRules = Arrays.asList(
 			"SFX '9 Y 19",
-			"SFX '9 r ʼ r",
-			"SFX '9 u ʼ u",
-			"SFX '9 ra ʼ ra",
-			"SFX '9 axa àʼ axa",
-			"SFX '9 èđa àʼ èđa",
-			"SFX '9 èxa àʼ èxa",
-			"SFX '9 de ʼ .de",
-			"SFX '9 me ʼ me",
-			"SFX '9 te ʼ te",
-			"SFX '9 do ʼ do",
-			"SFX '9 ko ʼ ko",
-			"SFX '9 to ʼ nto",
-			"SFX '9 to ʼ tuto",
-			"SFX '9 to ʼ sto",
-			"SFX '9 o ʼ [^n]to",
-			"SFX '9 a ʼ [^rx]a",
-			"SFX '9 e ʼ [^mt]e",
-			"SFX '9 o ʼ [^dkt]o",
-			"SFX '9 ove óʼ ove"
+			"SFX '9 r ’ r",
+			"SFX '9 u ’ u",
+			"SFX '9 ra ’ ra",
+			"SFX '9 axa à’ axa",
+			"SFX '9 èđa à’ èđa",
+			"SFX '9 èxa à’ èxa",
+			"SFX '9 de ’ .de",
+			"SFX '9 me ’ me",
+			"SFX '9 te ’ te",
+			"SFX '9 do ’ do",
+			"SFX '9 ko ’ ko",
+			"SFX '9 to ’ nto",
+			"SFX '9 to ’ tuto",
+			"SFX '9 to ’ sto",
+			"SFX '9 o ’ [^n]to",
+			"SFX '9 a ’ [^rx]a",
+			"SFX '9 e ’ [^mt]e",
+			"SFX '9 o ’ [^dkt]o",
+			"SFX '9 ove ó’ ove"
 		);
 		Assertions.assertEquals(expectedRules, rules);
 

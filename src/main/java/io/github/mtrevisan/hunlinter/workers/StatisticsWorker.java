@@ -55,7 +55,8 @@ import java.util.function.Function;
 
 public class StatisticsWorker extends WorkerDictionary{
 
-	public static final String WORKER_NAME = "Statistics";
+	public static final String WORKER_NAME_DICTIONARY = "(Dictionary) Statistics";
+	public static final String WORKER_NAME_HYPHENATION = "(Hyphenation) Statistics";
 
 	private static final String POS_UNIT_OF_MEASURE = MorphologicalTag.PART_OF_SPEECH.attachValue("unit_of_measure");
 
@@ -63,17 +64,19 @@ public class StatisticsWorker extends WorkerDictionary{
 	private final Orthography orthography;
 
 
-	public StatisticsWorker(final ParserManager parserManager, final boolean performHyphenationStatistics, final Frame parent){
+	public StatisticsWorker(final ParserManager parserManager, final boolean performHyphenationStatistics,
+			final Consumer<Exception> onCancelled, final Frame parent){
 		this(parserManager.getAffParser(), parserManager.getDicParser(),
-			(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), parent);
+			(performHyphenationStatistics? parserManager.getHyphenator(): null), parserManager.getWordGenerator(), onCancelled, parent);
 	}
 
 	public StatisticsWorker(final AffixParser affParser, final DictionaryParser dicParser, final HyphenatorInterface hyphenator,
-			final WordGenerator wordGenerator, final Frame parent){
-		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
+			final WordGenerator wordGenerator, final Consumer<Exception> onCancelled, final Frame parent){
+		super(new WorkerDataParser<>((hyphenator == null? WORKER_NAME_DICTIONARY: WORKER_NAME_HYPHENATION), dicParser));
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(affParser, "Affix parser cannot be null");
@@ -105,7 +108,12 @@ public class StatisticsWorker extends WorkerDictionary{
 				}
 			}
 		};
-		final Consumer<Exception> cancelled = exception -> dicStatistics.close();
+		final Consumer<Exception> cancelled = exc -> {
+			dicStatistics.close();
+
+			if(onCancelled != null)
+				onCancelled.accept(exc);
+		};
 
 		getWorkerData()
 			.withDataCancelledCallback(cancelled);

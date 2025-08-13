@@ -35,7 +35,6 @@ import io.github.mtrevisan.hunlinter.gui.models.InflectionTableModel;
 import io.github.mtrevisan.hunlinter.gui.renderers.TableRenderer;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.languages.DictionaryCorrectnessChecker;
-import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
@@ -403,7 +402,6 @@ public class DictionaryLayeredPane extends JLayeredPane{
 
 	private void calculateInflections(){
 		final String language = parserManager.getLanguage();
-		final Orthography orthography = BaseBuilder.getOrthography(language);
 		final String text = inputTextField.getText().trim();
 
 		if(text.equals(formerInputText))
