@@ -66,15 +66,11 @@ public class ThesaurusParser{
 
 
 	private static final String WRONG_FORMAT = "Wrong format, it must be one of '(<pos1, pos2, …>)|synonym1|synonym2|…' or 'pos1, pos2, …:synonym1,synonym2,…': `{}`";
-	private static final String NOT_ENOUGH_SYNONYMS = "Not enough synonyms are supplied (at least one should be present): `{}`";
 
 	private static final String PIPE = "|";
 
 	private static final String PART_OF_SPEECH_START = "([";
 	private static final String PART_OF_SPEECH_END = ")]";
-
-	private static final Pattern PART_OF_SPEECH_SPLITTER = RegexHelper.pattern("\\s*,\\s*");
-	private static final Pattern FILTER_SPLITTER = RegexHelper.pattern(", *");
 
 	private static final Pattern PATTERN_PARENTHESIS = RegexHelper.pattern("\\([^)]+\\)");
 
