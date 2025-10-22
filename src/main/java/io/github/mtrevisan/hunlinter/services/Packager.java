@@ -530,6 +530,34 @@ public class Packager{
 				return (a != null && b != null && equalsPath(a, b));
 			}
 
+			private static boolean equalsPath(final Path a, final Path b){
+				try{
+					return a.toRealPath()
+						.equals(b.toRealPath());
+				}
+				catch(final IOException ignored){
+					return a.toAbsolutePath().normalize()
+						.equals(b.toAbsolutePath().normalize());
+				}
+			}
+
+			private static boolean equalsPath(final Path a, final Set<Path> pathsB){
+				try{
+					final Path realPathA = a.toRealPath();
+					for(final Path pathB : pathsB)
+						if(pathB.toRealPath().equals(realPathA))
+							return true;
+				}
+				catch(final IOException ignored){
+					final Path absolutePathA = a.toAbsolutePath()
+						.normalize();
+					for(final Path pathB : pathsB)
+						if(pathB.toAbsolutePath().normalize().equals(absolutePathA))
+							return true;
+				}
+				return false;
+			}
+
 			@Override
 			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
 				//skip output file
@@ -551,35 +579,36 @@ public class Packager{
 				}
 				return FileVisitResult.CONTINUE;
 			}
+
+			private static boolean shouldStrip(final String fileName){
+				return (fileName.endsWith(FILE_EXTENSION_AFFIX) || fileName.endsWith(FILE_EXTENSION_DICTIONARY));
+			}
+
+			private static void copyStrippingComments(final Path path, final ZipOutputStream out) throws IOException{
+				try(final BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)){
+					String line;
+					while((line = br.readLine()) != null){
+						line = stripComment(line);
+						if(line != null){
+							final byte[] bytes = (line + '\n').getBytes(StandardCharsets.UTF_8);
+							out.write(bytes);
+						}
+					}
+				}
+			}
+
+			private static void copyBinary(final Path path, final ZipOutputStream out) throws IOException{
+				try(final InputStream in = new BufferedInputStream(new FileInputStream(path.toFile()))){
+					in.transferTo(out);
+				}
+			}
+
+			private static String stripComment(final String line){
+				final String out = CUT_PATTERN.matcher(line)
+					.replaceFirst(StringUtils.EMPTY);
+				return (out.trim().isEmpty()? null: out);
+			}
 		});
-	}
-
-	private static boolean equalsPath(final Path a, final Path b){
-		try{
-			return a.toRealPath()
-				.equals(b.toRealPath());
-		}
-		catch(final IOException ignored){
-			return a.toAbsolutePath().normalize()
-				.equals(b.toAbsolutePath().normalize());
-		}
-	}
-
-	private static boolean equalsPath(final Path a, final Set<Path> pathsB){
-		try{
-			final Path realPathA = a.toRealPath();
-			for(final Path pathB : pathsB)
-				if(pathB.toRealPath().equals(realPathA))
-					return true;
-		}
-		catch(final IOException ignored){
-			final Path absolutePathA = a.toAbsolutePath()
-				.normalize();
-			for(final Path pathB : pathsB)
-				if(pathB.toAbsolutePath().normalize().equals(absolutePathA))
-					return true;
-		}
-		return false;
 	}
 
 	private static String relativeEntryName(final Path base, final Path path){
@@ -587,35 +616,6 @@ public class Packager{
 			.toString()
 			.replace('\\', '/');
 		return (relativeName.isEmpty()? null: relativeName);
-	}
-
-	private static boolean shouldStrip(final String fileName){
-		return (fileName.endsWith(FILE_EXTENSION_AFFIX) || fileName.endsWith(FILE_EXTENSION_DICTIONARY));
-	}
-
-	private static void copyStrippingComments(final Path path, final ZipOutputStream out) throws IOException{
-		try(final BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)){
-			String line;
-			while((line = br.readLine()) != null){
-				line = stripComment(line);
-				if(line != null){
-					final byte[] bytes = (line + '\n').getBytes(StandardCharsets.UTF_8);
-					out.write(bytes);
-				}
-			}
-		}
-	}
-
-	private static void copyBinary(final Path path, final ZipOutputStream out) throws IOException{
-		try(final InputStream in = new BufferedInputStream(new FileInputStream(path.toFile()))){
-			in.transferTo(out);
-		}
-	}
-
-	public static String stripComment(final String line){
-		final String out = CUT_PATTERN.matcher(line)
-			.replaceFirst(StringUtils.EMPTY);
-		return (out.trim().isEmpty()? null: out);
 	}
 
 	public final String getLanguage(){
