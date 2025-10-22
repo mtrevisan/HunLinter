@@ -404,7 +404,7 @@ public class Packager{
 		}
 	}
 
-	private void packageExtension(final Path projectFolder, final Path outputPath) throws IOException{
+	private void packageExtension(final Path baseFolder, final Path outputPath) throws IOException{
 		final Path autoCorrectPath = getAutoCorrectPath();
 		final Set<Path> autoTextPaths = getAutoTextPaths();
 
@@ -418,52 +418,7 @@ public class Packager{
 		try(final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outputPath.toFile())))){
 			zos.setLevel(Deflater.BEST_COMPRESSION);
 
-			Files.walkFileTree(projectFolder, new SimpleFileVisitor<>(){
-				@Override
-				public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-						throws IOException{
-					//skip special folders
-					if(isSamePath(dir, skipPaths))
-						return FileVisitResult.SKIP_SUBTREE;
-
-					String entryName = relativeEntryName(projectFolder, dir);
-					if(entryName != null){
-						if(!entryName.endsWith(SLASH))
-							entryName = entryName + SLASH;
-						zos.putNextEntry(new ZipEntry(entryName));
-
-						zos.closeEntry();
-					}
-
-					return FileVisitResult.CONTINUE;
-				}
-
-				private static boolean isSamePath(final Path a, final Set<Path> b){
-					return (a != null && b != null && equalsPath(a, b));
-				}
-
-				@Override
-				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
-					//skip output file
-					if(equalsPath(file, outputPath))
-						return FileVisitResult.CONTINUE;
-
-					final String entryName = relativeEntryName(projectFolder, file);
-					if(entryName != null){
-						zos.putNextEntry(new ZipEntry(entryName));
-
-						final String nameOnly = file.getFileName()
-							.toString();
-						if(shouldStrip(nameOnly))
-							copyStrippingComments(file, zos);
-						else
-							copyBinary(file, zos);
-
-						zos.closeEntry();
-					}
-					return FileVisitResult.CONTINUE;
-				}
-			});
+			extracted(baseFolder, skipPaths, zos, outputPath);
 
 
 			//add autocorrect:
@@ -471,7 +426,7 @@ public class Packager{
 				final String packageFilename = FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
 				final Path autoCorrectOutputPath = Path.of(autoCorrectPath.toString(), packageFilename);
 				final byte[] nested = buildNestedZip(autoCorrectPath, autoCorrectOutputPath);
-				final String entryName = relativeEntryName(projectFolder, autoCorrectOutputPath);
+				final String entryName = relativeEntryName(baseFolder, autoCorrectOutputPath);
 				zos.putNextEntry(new ZipEntry(entryName));
 				zos.write(nested);
 				zos.closeEntry();
@@ -483,7 +438,7 @@ public class Packager{
 					final String packageFilename = FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
 					final Path autoTextOutputPath = Path.of(path.toString(), packageFilename);
 					final byte[] nested = buildNestedZip(path, autoTextOutputPath);
-					final String entryName = relativeEntryName(projectFolder, autoTextOutputPath);
+					final String entryName = relativeEntryName(baseFolder, autoTextOutputPath);
 					zos.putNextEntry(new ZipEntry(entryName));
 					zos.write(nested);
 					zos.closeEntry();
@@ -533,45 +488,13 @@ public class Packager{
 	 */
 	private static byte[] buildNestedZip(final Path dir, final Path outputPath) throws IOException{
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
-		try(final ZipOutputStream nested = new ZipOutputStream(new BufferedOutputStream(baos))){
-			nested.setLevel(Deflater.BEST_COMPRESSION);
+		try(final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(baos))){
+			zos.setLevel(Deflater.BEST_COMPRESSION);
 
-			final Path base = dir.toRealPath(LinkOption.NOFOLLOW_LINKS);
+			final Path baseFolder = dir.toRealPath(LinkOption.NOFOLLOW_LINKS);
+			final Set<Path> skipPaths = new HashSet<>(0);
 
-			Files.walkFileTree(base, new SimpleFileVisitor<>(){
-				@Override
-				public FileVisitResult preVisitDirectory(final Path d, final BasicFileAttributes attrs) throws IOException{
-					String entryName = relativeEntryName(base, d);
-					if(entryName != null){
-						if(!entryName.endsWith(SLASH))
-							entryName = entryName + SLASH;
-						nested.putNextEntry(new ZipEntry(entryName));
-						nested.closeEntry();
-					}
-					return FileVisitResult.CONTINUE;
-				}
-
-				@Override
-				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
-					//skip output file
-					if(equalsPath(file, outputPath))
-						return FileVisitResult.CONTINUE;
-
-					final String entryName = relativeEntryName(base, file);
-					if(entryName != null){
-						nested.putNextEntry(new ZipEntry(entryName));
-
-						final String nameOnly = file.getFileName().toString();
-						if(shouldStrip(nameOnly))
-							copyStrippingComments(file, nested);
-						else
-							copyBinary(file, nested);
-
-						nested.closeEntry();
-					}
-					return FileVisitResult.CONTINUE;
-				}
-			});
+			extracted(baseFolder, skipPaths, zos, outputPath);
 		}
 		catch(final IOException ioe){
 			LOGGER.error("Cannot package folder `{}`", dir.toFile().getName(), ioe);
@@ -579,6 +502,56 @@ public class Packager{
 			throw ioe;
 		}
 		return baos.toByteArray();
+	}
+
+	private static void extracted(final Path baseFolder, final Set<Path> skipPaths, final ZipOutputStream zos,
+			final Path outputPath) throws IOException{
+		Files.walkFileTree(baseFolder, new SimpleFileVisitor<>(){
+			@Override
+			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+					throws IOException{
+				//skip special folders
+				if(isSamePath(dir, skipPaths))
+					return FileVisitResult.SKIP_SUBTREE;
+
+				String entryName = relativeEntryName(baseFolder, dir);
+				if(entryName != null){
+					if(!entryName.endsWith(SLASH))
+						entryName = entryName + SLASH;
+					zos.putNextEntry(new ZipEntry(entryName));
+
+					zos.closeEntry();
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			private static boolean isSamePath(final Path a, final Set<Path> b){
+				return (a != null && b != null && equalsPath(a, b));
+			}
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
+				//skip output file
+				if(equalsPath(file, outputPath))
+					return FileVisitResult.CONTINUE;
+
+				final String entryName = relativeEntryName(baseFolder, file);
+				if(entryName != null){
+					zos.putNextEntry(new ZipEntry(entryName));
+
+					final String nameOnly = file.getFileName()
+						.toString();
+					if(shouldStrip(nameOnly))
+						copyStrippingComments(file, zos);
+					else
+						copyBinary(file, zos);
+
+					zos.closeEntry();
+				}
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 
 	private static boolean equalsPath(final Path a, final Path b){
