@@ -394,7 +394,7 @@ public class ParserManager implements FileChangeListener{
 	}
 
 	public final void createPackage(){
-		packager.createPackage(packager.getProjectPath(), getLanguage());
+		packager.createPackage(packager.getProjectPath());
 	}
 
 }
