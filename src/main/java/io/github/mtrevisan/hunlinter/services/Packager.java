@@ -438,6 +438,10 @@ public class Packager{
 					return FileVisitResult.CONTINUE;
 				}
 
+				private static boolean isSamePath(final Path a, final Set<Path> b){
+					return (a != null && b != null && equalsPath(a, b));
+				}
+
 				@Override
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
 					//skip output file
@@ -459,46 +463,15 @@ public class Packager{
 					}
 					return FileVisitResult.CONTINUE;
 				}
-
-				private static boolean isSamePath(final Path a, final Set<Path> b){
-					return (a != null && b != null && equalsPath(a, b));
-				}
-
-				private static boolean equalsPath(final Path a, final Path b){
-					try{
-						return a.toRealPath()
-							.equals(b.toRealPath());
-					}
-					catch(final IOException ignored){
-						return a.toAbsolutePath().normalize()
-							.equals(b.toAbsolutePath().normalize());
-					}
-				}
-
-				private static boolean equalsPath(final Path a, final Set<Path> pathsB){
-					try{
-						final Path realPathA = a.toRealPath();
-						for(final Path pathB : pathsB)
-							if(pathB.toRealPath().equals(realPathA))
-								return true;
-					}
-					catch(final IOException ignored){
-						final Path absolutePathA = a.toAbsolutePath()
-							.normalize();
-						for(final Path pathB : pathsB)
-							if(pathB.toAbsolutePath().normalize().equals(absolutePathA))
-								return true;
-					}
-					return false;
-				}
 			});
 
 
 			//add autocorrect:
 			if(autoCorrectPath != null){
-				final byte[] nested = buildNestedZip(autoCorrectPath);
 				final String packageFilename = FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
-				final String entryName = relativeEntryName(projectFolder, autoCorrectPath) + SLASH + packageFilename;
+				final Path autoCorrectOutputPath = Path.of(autoCorrectPath.toString(), packageFilename);
+				final byte[] nested = buildNestedZip(autoCorrectPath, autoCorrectOutputPath);
+				final String entryName = relativeEntryName(projectFolder, autoCorrectOutputPath);
 				zos.putNextEntry(new ZipEntry(entryName));
 				zos.write(nested);
 				zos.closeEntry();
@@ -507,9 +480,10 @@ public class Packager{
 			//add autotext:
 			if(autoTextPaths != null)
 				for(final Path path : autoTextPaths){
-					final byte[] nested = buildNestedZip(path);
 					final String packageFilename = FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
-					final String entryName = relativeEntryName(projectFolder, path) + SLASH + packageFilename;
+					final Path autoTextOutputPath = Path.of(path.toString(), packageFilename);
+					final byte[] nested = buildNestedZip(path, autoTextOutputPath);
+					final String entryName = relativeEntryName(projectFolder, autoTextOutputPath);
 					zos.putNextEntry(new ZipEntry(entryName));
 					zos.write(nested);
 					zos.closeEntry();
@@ -553,12 +527,13 @@ public class Packager{
 	 * </p>
 	 *
 	 * @param dir	The root directory to be archived into a nested ZIP. Must be a valid, readable path.
+	 * @param outputPath	Name of the output ZIP file. Must be a valid, writable path.
 	 * @return	A byte array containing the resulting ZIP archive.
 	 * @throws IOException	If an I/O error occurs while reading the directory or writing the ZIP archive.
 	 */
-	private static byte[] buildNestedZip(final Path dir) throws IOException{
-		ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
-		try(ZipOutputStream nested = new ZipOutputStream(new BufferedOutputStream(baos))){
+	private static byte[] buildNestedZip(final Path dir, final Path outputPath) throws IOException{
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
+		try(final ZipOutputStream nested = new ZipOutputStream(new BufferedOutputStream(baos))){
 			nested.setLevel(Deflater.BEST_COMPRESSION);
 
 			final Path base = dir.toRealPath(LinkOption.NOFOLLOW_LINKS);
@@ -578,6 +553,10 @@ public class Packager{
 
 				@Override
 				public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
+					//skip output file
+					if(equalsPath(file, outputPath))
+						return FileVisitResult.CONTINUE;
+
 					final String entryName = relativeEntryName(base, file);
 					if(entryName != null){
 						nested.putNextEntry(new ZipEntry(entryName));
@@ -600,6 +579,34 @@ public class Packager{
 			throw ioe;
 		}
 		return baos.toByteArray();
+	}
+
+	private static boolean equalsPath(final Path a, final Path b){
+		try{
+			return a.toRealPath()
+				.equals(b.toRealPath());
+		}
+		catch(final IOException ignored){
+			return a.toAbsolutePath().normalize()
+				.equals(b.toAbsolutePath().normalize());
+		}
+	}
+
+	private static boolean equalsPath(final Path a, final Set<Path> pathsB){
+		try{
+			final Path realPathA = a.toRealPath();
+			for(final Path pathB : pathsB)
+				if(pathB.toRealPath().equals(realPathA))
+					return true;
+		}
+		catch(final IOException ignored){
+			final Path absolutePathA = a.toAbsolutePath()
+				.normalize();
+			for(final Path pathB : pathsB)
+				if(pathB.toAbsolutePath().normalize().equals(absolutePathA))
+					return true;
+		}
+		return false;
 	}
 
 	private static String relativeEntryName(final Path base, final Path path){
