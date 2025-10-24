@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.parsers.affix;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.ParsingStrategyFactory;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixOption;
+import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
 import io.github.mtrevisan.hunlinter.services.Packager;
@@ -413,6 +414,16 @@ public class AffixData{
 		final List<RuleEntry> list = new ArrayList<>(data.size());
 		for(final Object entry : data.values())
 			if(RuleEntry.class.isAssignableFrom(entry.getClass()))
+				list.add((RuleEntry)entry);
+		return list;
+	}
+
+	public final List<RuleEntry> getComplexRuleEntries(){
+		final boolean complexPrefixes = isComplexPrefixes();
+		final List<RuleEntry> list = new ArrayList<>(data.size());
+		for(final Object entry : data.values())
+			if(RuleEntry.class.isAssignableFrom(entry.getClass())
+					&& complexPrefixes ^ ((RuleEntry)entry).getType() == AffixType.SUFFIX)
 				list.add((RuleEntry)entry);
 		return list;
 	}
