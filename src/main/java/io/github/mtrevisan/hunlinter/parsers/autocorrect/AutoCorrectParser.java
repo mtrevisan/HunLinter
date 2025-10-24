@@ -207,7 +207,7 @@ public class AutoCorrectParser{
 			root.appendChild(elem);
 		}
 
-		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_US_ASCII);
+		XMLManager.createXML(acoFile, doc, XMLManager.XML_PROPERTIES_UTF_8);
 	}
 
 	public final void clear(){

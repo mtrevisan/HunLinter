@@ -60,7 +60,6 @@ public final class XMLManager{
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLManager.class);
 
 	public static final Pair<String, String>[] XML_PROPERTIES_UTF_8 = getXMLProperties(StandardCharsets.UTF_8);
-	public static final Pair<String, String>[] XML_PROPERTIES_US_ASCII = getXMLProperties(StandardCharsets.US_ASCII);
 	public static final String ROOT_ATTRIBUTE_NAME = "xmlns:block-list";
 	@SuppressWarnings("HttpUrlsUsage")
 	public static final String ROOT_ATTRIBUTE_VALUE = "http://openoffice.org/2001/block-list";

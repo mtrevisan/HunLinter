@@ -339,11 +339,13 @@ public class Packager{
 	private static List<String> getLanguages(final Node entry){
 		final Set<String> languageSets = new HashSet<>(0);
 		final List<Node> children = extractChildren(entry);
-		for(final Node child : children)
-			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+		for(final Node child : children){
+			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
+			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
-				languageSets.addAll(Arrays.asList(locales));
+				languageSets.addAll(java.util.Arrays.asList(locales));
 			}
+		}
 		final List<String> langs = new ArrayList<>(languageSets);
 		Collections.sort(langs);
 		return Collections.unmodifiableList(langs);
