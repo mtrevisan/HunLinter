@@ -246,7 +246,7 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		ruleComboBoxActionPerformed(null);
 
 		final AffixData affixData = parserManager.getAffixData();
-		final List<RuleEntry> affixes = affixData.getRuleEntries();
+		final List<RuleEntry> affixes = affixData.getComplexRuleEntries();
 		final List<String> affixEntries = new ArrayList<>(affixes.size());
 		final StringBuilder sb = new StringBuilder(6);
 		for(final RuleEntry affix : affixes){

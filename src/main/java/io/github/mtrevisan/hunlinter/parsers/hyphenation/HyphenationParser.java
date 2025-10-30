@@ -101,7 +101,7 @@ public class HyphenationParser{
 	 * https://en.wikipedia.org/wiki/Modifier_letter_apostrophe
 	 * https://en.wikipedia.org/wiki/Quotation_mark
 	 */
-	public static final char MODIFIER_LETTER_APOSTROPHE = '’';
+	public static final char MODIFIER_LETTER_APOSTROPHE = 'ʼ';
 
 	public static final String BREAK_CHARACTER = SOFT_HYPHEN;
 

@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 
 public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecker{
 
-	public static final String LANGUAGE = "vec";
+	public static final String LANGUAGE = "vec-IT";
 
 	private static final String POS_PROPER_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("proper_noun");
 	private static final String POS_NOUN = MorphologicalTag.PART_OF_SPEECH.attachValue("noun");
@@ -344,7 +344,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 //				entry.match(inflection);
 //	}
 //
-//	//(^[‘’']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
+//	//(^[‘ʼ']?l|[aeiouàèéíòóú]l)[aeiouàèéíòóú]
 //	private static boolean canContainVanishingEl(final String word){
 //		boolean result = false;
 //		final int size = word.length();

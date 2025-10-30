@@ -105,7 +105,7 @@ public class ProjectLoaderAction extends AbstractAction{
 				packager.reload(projectPath);
 
 				final List<String> availableLanguages = packager.getLanguages();
-				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.get(0));
+				final AtomicReference<String> language = new AtomicReference<>(availableLanguages.isEmpty()? null: availableLanguages.getFirst());
 				if(availableLanguages.size() > 1){
 					//choose between available languages
 					final Consumer<String> onSelection = language::set;

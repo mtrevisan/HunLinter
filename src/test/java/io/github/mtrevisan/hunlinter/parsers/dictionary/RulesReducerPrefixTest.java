@@ -47,7 +47,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix1() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -112,7 +112,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix2() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -200,7 +200,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix3() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -241,7 +241,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix4() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -288,7 +288,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix5() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -332,7 +332,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix6() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -376,7 +376,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix7() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,
@@ -423,7 +423,7 @@ class RulesReducerPrefixTest{
 
 	@Test
 	void casePrefix8() throws IOException{
-		String language = "vec";
+		String language = "vec-IT";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
 			"SET UTF-8",
 			"LANG " + language,

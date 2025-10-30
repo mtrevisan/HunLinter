@@ -6618,11 +6618,11 @@ sumaŧion
 superstiŧion
 tajakantoi
 tajakantoni
-tajakantó’
+tajakantóʼ
 tajakantuni
 taɉakantoi
 taɉakantoni
-taɉakantó’
+taɉakantóʼ
 taɉakantuni
 tantaŧion
 teòlogo
@@ -9783,7 +9783,7 @@ intrigamestièr
 intrigamistièr
 invernesa
 iñanfo
-jan’
+janʼ
 janpikon
 jaon
 jasaròtol
@@ -20937,7 +20937,7 @@ trivelina
 triveƚina
 xguatre
 xlavieŧo
-’tà
+ʼtà
 abundanŧia
 antimama
 argumentador
@@ -21004,7 +21004,7 @@ marinante
 maròta
 medama
 metin
-mé’
+méʼ
 mokajardo
 mokaɉardo
 nansadura
@@ -21042,8 +21042,8 @@ terièr
 xeƚuxía
 xenxía
 xiƚuxía
-’olariva
-’oƚariva
+ʼolariva
+ʼoƚariva
 aguaral
 aguaŧo
 ajèr
@@ -21320,7 +21320,7 @@ inŧision
 inŧokimento
 inveriadura
 íntima
-jan’
+janʼ
 jetadura
 jéskol
 jirlanda
@@ -21616,7 +21616,7 @@ raspadora
 raspamento
 rataparaŧion
 ràsego
-re-’oltin
+re-ʼoltin
 rebaltamento
 redóxega
 reja
@@ -24022,13 +24022,13 @@ inkantareso
 jàol
 jàola
 kanpanade
-katregà’
+katregàʼ
 kaxakin
 kokuŧa
 kratura
 litaŧo
 maravea
-mà’
+màʼ
 muriòl
 partesion
 patakè
@@ -25359,9 +25359,9 @@ tanpèl
 troteto
 videđèla
 videxèla
-’ol
-’oƚo
-’xeo
+ʼol
+ʼoƚo
+ʼxeo
 abokada
 abokado
 abreada
@@ -27656,7 +27656,7 @@ cucante
 cucasangue
 cucaxbréndoli
 cunga
-da’
+daʼ
 dado
 dain
 damúsola
@@ -29715,7 +29715,7 @@ pïoleso
 pïoƚeso
 pígol
 píxol
-pla’
+plaʼ
 plado
 planèla
 plao

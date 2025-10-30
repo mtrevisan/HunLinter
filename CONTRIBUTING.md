@@ -167,7 +167,7 @@ As stated [here](https://www.freecodecamp.org/news/writing-good-commit-messages-
 6. Capitalize the subject line and each paragraph.
    1. Additional paragraphs come after blank lines.
    2. Bullet points are okay, too.
-7. Use the imperative mood, present tense, in the subject line (We use an imperative verb because it’s going to complete the sentence “If applied, this commit will…”).
+7. Use the imperative mood, present tense, in the subject line (We use an imperative verb because itʼs going to complete the sentence “If applied, this commit will…”).
 8. Use the body to explain what changes you have made and why you made them.
    1. Wrap the body at 72 characters.
 9. Do not assume the reviewer understands what the original problem was, ensure you add it.

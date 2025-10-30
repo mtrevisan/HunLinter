@@ -40,13 +40,25 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,11 +74,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 
 public class Packager{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Packager.class);
+
+	private static final String SLASH = "/";
 
 	private static final Pattern LANGUAGE_SAMPLE_EXTRACTOR = RegexHelper.pattern("(?:TRY |FX [^ ]+ )([^\r\n\\d]+)[\r\n]+");
 
@@ -124,6 +140,11 @@ public class Packager{
 	private static final String FOLDER_ORIGIN = "%origin%";
 	private static final Pattern FOLDER_SPLITTER = RegexHelper.pattern("[/\\\\]");
 	private static final String FILENAME_PREFIX_AUTO_CORRECT = "acor_";
+	private static final String FILENAME_PREFIX_AUTO_TEXT = "atext_";
+	private static final String FILE_EXTENSION_AFFIX = ".aff";
+	private static final String FILE_EXTENSION_DICTIONARY = ".dic";
+
+	private static final Pattern CUT_PATTERN = Pattern.compile("(\\s*#|^/).*$");
 
 	private static final Map<String, String> KEY_FILE_MAPPER = Map.of(
 		KEY_FILE_AFFIX, CONFIGURATION_NODE_PROPERTY_SPELLCHECK_AFFIX,
@@ -137,8 +158,8 @@ public class Packager{
 		KEY_FILE_AUTO_TEXT, CONFIGURATION_NODE_NAME_AUTO_TEXT);
 
 	private record ConfigurationData(String foldersSeparator, String nodePropertyFile1, String nodePropertyFile2){
-
-		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath) throws IOException{
+		Map<String, File> getDoubleFolders(final String childFolders, final Path basePath, final Path originPath)
+				throws IOException{
 			final Map<String, File> folders = new HashMap<>(2);
 			final int splitIndex = childFolders.indexOf(foldersSeparator);
 			final String folderAff = childFolders.substring(0, splitIndex + foldersSeparator.length() - 1);
@@ -179,16 +200,18 @@ public class Packager{
 		clear();
 
 		if(!isDirectoryExisting(projectPath))
-			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath + " doesn't exists, cannot load project");
+			throw new ProjectNotFoundException(projectPath, "Folder " + projectPath
+				+ " doesn't exists, cannot load project");
 
 		mainManifestPath = Paths.get(projectPath.toString(), FOLDER_META_INF, FILENAME_MANIFEST_XML);
 		if(!isFileExisting(mainManifestPath))
-			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under " + projectPath
-				+ ", cannot load project");
+			throw new ProjectNotFoundException(projectPath, "No " + FILENAME_MANIFEST_XML + " file found under "
+				+ projectPath + ", cannot load project");
 
 		final List<String> collection = extractFileEntries(mainManifestPath.toFile());
 		for(final String configurationFile : collection)
-			manifestFiles.add(Paths.get(projectPath.toString(), RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile());
+			manifestFiles.add(Paths.get(projectPath.toString(),
+				RegexHelper.split(configurationFile, FOLDER_SPLITTER)).toFile());
 
 		languages = extractLanguages(manifestFiles);
 		if(languages.isEmpty())
@@ -287,7 +310,8 @@ public class Packager{
 					stream.filter(file -> !Files.isDirectory(file))
 						.filter(path -> path.getFileName().toString().endsWith(EXTENSION_BAU))
 						.forEach(path -> {
-							final Path outputPath = Path.of(autoTextPath.toString(), FilenameUtils.getBaseName(path.toFile().getName()));
+							final Path outputPath = Path.of(autoTextPath.toString(),
+								FilenameUtils.getBaseName(path.toFile().getName()));
 							ZipManager.unzipFile(path.toFile(), outputPath);
 						});
 				}
@@ -315,17 +339,20 @@ public class Packager{
 	private static List<String> getLanguages(final Node entry){
 		final Set<String> languageSets = new HashSet<>(0);
 		final List<Node> children = extractChildren(entry);
-		for(final Node child : children)
-			if(XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME).startsWith(FILENAME_PREFIX_SPELLING)){
+		for(final Node child : children){
+			final String attributeValue = XMLManager.extractAttributeValue(child, CONFIGURATION_NODE_NAME);
+			if(attributeValue.startsWith(FILENAME_PREFIX_SPELLING)){
 				final String[] locales = extractLocale(child);
-				languageSets.addAll(Arrays.asList(locales));
+				languageSets.addAll(java.util.Arrays.asList(locales));
 			}
+		}
 		final List<String> langs = new ArrayList<>(languageSets);
 		Collections.sort(langs);
 		return Collections.unmodifiableList(langs);
 	}
 
-	private Map<String, Object> processDictionariesConfigurationFile(final String language) throws IOException, SAXException{
+	private Map<String, Object> processDictionariesConfigurationFile(final String language) throws IOException,
+			SAXException{
 		final Pair<Path, Node> pair = findConfiguration(CONFIGURATION_NODE_NAME_SERVICE_MANAGER, manifestFiles);
 		final Path path = pair.getLeft();
 		final Node node = pair.getRight();
@@ -357,20 +384,16 @@ public class Packager{
 		return folders;
 	}
 
-	@SuppressWarnings("ResultOfMethodCallIgnored")
-	public final void createPackage(final Path projectPath, final String language){
-		//package entire folder into a ZIP file
+	public final void createPackage(final Path projectPath){
+		//package the entire folder into a ZIP file
 		try{
-			final File autoCorrectOutputFile = packageAutoCorrectFiles(language);
-			final List<File> autoTextOutputFiles = packageAutoTextFiles();
+			final Path projectFolder = projectPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+			final Path outputPath = Path.of(projectFolder.toString(),
+					FilenameUtils.getBaseName(projectFolder.toString()) + EXTENSION_ZIP)
+				.toAbsolutePath()
+				.normalize();
 
-			packageExtension(projectPath.toFile(), autoCorrectOutputFile, autoTextOutputFiles);
-
-			//remove created sub-packages
-			if(autoCorrectOutputFile != null)
-				autoCorrectOutputFile.delete();
-			for(final File file : autoTextOutputFiles)
-				file.delete();
+			packageExtension(projectFolder, outputPath);
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Package created");
 
@@ -383,62 +406,218 @@ public class Packager{
 		}
 	}
 
-	private File packageAutoCorrectFiles(final String language){
+	private void packageExtension(final Path baseFolder, final Path outputPath) throws IOException{
+		final Path autoCorrectPath = getAutoCorrectPath();
+		final Set<Path> autoTextPaths = getAutoTextPaths();
+
+		//routes to skip in the main walk
+		final Set<Path> skipPaths = new HashSet<>(3);
+		if(autoCorrectPath != null)
+			skipPaths.add(autoCorrectPath);
+		if(autoTextPaths != null)
+			skipPaths.addAll(autoTextPaths);
+
+		try(final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outputPath.toFile())))){
+			zos.setLevel(Deflater.BEST_COMPRESSION);
+
+			extracted(baseFolder, skipPaths, zos, outputPath);
+
+
+			//add autocorrect:
+			if(autoCorrectPath != null){
+				final String packageFilename = FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
+				final Path autoCorrectOutputPath = Path.of(autoCorrectPath.toString(), packageFilename);
+				final byte[] nested = buildNestedZip(autoCorrectPath, autoCorrectOutputPath);
+				final String entryName = relativeEntryName(baseFolder, autoCorrectOutputPath);
+				zos.putNextEntry(new ZipEntry(entryName));
+				zos.write(nested);
+				zos.closeEntry();
+			}
+
+			//add autotext:
+			if(autoTextPaths != null)
+				for(final Path path : autoTextPaths){
+					final String packageFilename = FILENAME_PREFIX_AUTO_TEXT + language + EXTENSION_BAU;
+					final Path autoTextOutputPath = Path.of(path.toString(), packageFilename);
+					final byte[] nested = buildNestedZip(path, autoTextOutputPath);
+					final String entryName = relativeEntryName(baseFolder, autoTextOutputPath);
+					zos.putNextEntry(new ZipEntry(entryName));
+					zos.write(nested);
+					zos.closeEntry();
+				}
+		}
+		catch(final RuntimeException rte){
+			if(rte.getCause() instanceof IOException)
+				throw (IOException)rte.getCause();
+
+			throw rte;
+		}
+	}
+
+	private Path getAutoCorrectPath(){
 		File autoCorrectFile = (File)configurationFiles.get(FILENAME_AUTO_CORRECT);
 		if(autoCorrectFile == null)
 			autoCorrectFile = (File)configurationFiles.get(FILENAME_SENTENCE_EXCEPTIONS);
 		if(autoCorrectFile == null)
 			autoCorrectFile = (File)configurationFiles.get(FILENAME_WORD_EXCEPTIONS);
-		if(autoCorrectFile != null){
-			try{
-				final File inputFolder = autoCorrectFile.getParentFile();
-				final String packageFilename = FILENAME_PREFIX_AUTO_CORRECT + language + EXTENSION_DAT;
-				final File outputFile = Path.of(inputFolder.getAbsolutePath(), packageFilename)
-					.toFile();
-				packageFiles(inputFolder, outputFile);
-				return outputFile;
+		return (autoCorrectFile != null? autoCorrectFile.toPath().getParent(): null);
+	}
+
+	private Set<Path> getAutoTextPaths(){
+		final File[] autoTextFiles = (File[])configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
+		if(autoTextFiles != null){
+			final Set<Path> set = new HashSet<>(autoTextFiles.length);
+			for(final File file : autoTextFiles){
+				final File inputFolder = new File(FilenameUtils.removeExtension(file.getAbsolutePath()));
+				set.add(inputFolder.toPath().getParent());
 			}
-			catch(final IOException ioe){
-				LOGGER.error("Cannot package autocorr file `{}`", autoCorrectFile.getName(), ioe);
-			}
+			return set;
 		}
 		return null;
 	}
 
-	private List<File> packageAutoTextFiles(){
-		final List<File> files = new ArrayList<>(0);
-		final File[] autoTextFiles = (File[])configurationFiles.get(CONFIGURATION_NODE_NAME_AUTO_TEXT);
-		for(final File file : autoTextFiles){
-			try{
-				final File inputFolder = new File(FilenameUtils.removeExtension(file.getAbsolutePath()));
-				final File outputFile = Path.of(inputFolder.getParentFile().getAbsolutePath(), file.getName() + EXTENSION_BAU)
-					.toFile();
-				packageFiles(inputFolder, outputFile);
-				files.add(outputFile);
-			}
-			catch(final IOException ioe){
-				LOGGER.error("Cannot package autotext file `{}`", file.getName(), ioe);
-			}
+	/**
+	 * Builds a nested ZIP archive from the contents of the specified directory.
+	 * <p>
+	 * This method traverses the directory tree, adds directories and files to the ZIP archive, and applies specific
+	 * logic, such as stripping comments from certain file types.
+	 * </p>
+	 *
+	 * @param dir	The root directory to be archived into a nested ZIP. Must be a valid, readable path.
+	 * @param outputPath	Name of the output ZIP file. Must be a valid, writable path.
+	 * @return	A byte array containing the resulting ZIP archive.
+	 * @throws IOException	If an I/O error occurs while reading the directory or writing the ZIP archive.
+	 */
+	private static byte[] buildNestedZip(final Path dir, final Path outputPath) throws IOException{
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream(64 * 1024);
+		try(final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(baos))){
+			zos.setLevel(Deflater.BEST_COMPRESSION);
+
+			final Path baseFolder = dir.toRealPath(LinkOption.NOFOLLOW_LINKS);
+			final Set<Path> skipPaths = new HashSet<>(0);
+
+			extracted(baseFolder, skipPaths, zos, outputPath);
 		}
-		return files;
+		catch(final IOException ioe){
+			LOGGER.error("Cannot package folder `{}`", dir.toFile().getName(), ioe);
+
+			throw ioe;
+		}
+		return baos.toByteArray();
 	}
 
-	private static void packageFiles(final File inputFolder, final File outputFile) throws IOException{
-		if(inputFolder != null)
-			ZipManager.zipDirectory(inputFolder, Deflater.BEST_COMPRESSION, outputFile);
+	private static void extracted(final Path baseFolder, final Set<Path> skipPaths, final ZipOutputStream zos,
+			final Path outputPath) throws IOException{
+		Files.walkFileTree(baseFolder, new SimpleFileVisitor<>(){
+			@Override
+			public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+					throws IOException{
+				//skip special folders
+				if(isSamePath(dir, skipPaths))
+					return FileVisitResult.SKIP_SUBTREE;
+
+				String entryName = relativeEntryName(baseFolder, dir);
+				if(entryName != null){
+					if(!entryName.endsWith(SLASH))
+						entryName = entryName + SLASH;
+					zos.putNextEntry(new ZipEntry(entryName));
+
+					zos.closeEntry();
+				}
+
+				return FileVisitResult.CONTINUE;
+			}
+
+			private static boolean isSamePath(final Path a, final Set<Path> b){
+				return (a != null && b != null && equalsPath(a, b));
+			}
+
+			private static boolean equalsPath(final Path a, final Path b){
+				try{
+					return a.toRealPath()
+						.equals(b.toRealPath());
+				}
+				catch(final IOException ignored){
+					return a.toAbsolutePath().normalize()
+						.equals(b.toAbsolutePath().normalize());
+				}
+			}
+
+			private static boolean equalsPath(final Path a, final Set<Path> pathsB){
+				try{
+					final Path realPathA = a.toRealPath();
+					for(final Path pathB : pathsB)
+						if(pathB.toRealPath().equals(realPathA))
+							return true;
+				}
+				catch(final IOException ignored){
+					final Path absolutePathA = a.toAbsolutePath()
+						.normalize();
+					for(final Path pathB : pathsB)
+						if(pathB.toAbsolutePath().normalize().equals(absolutePathA))
+							return true;
+				}
+				return false;
+			}
+
+			@Override
+			public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException{
+				//skip output file
+				if(equalsPath(file, outputPath))
+					return FileVisitResult.CONTINUE;
+
+				final String entryName = relativeEntryName(baseFolder, file);
+				if(entryName != null){
+					zos.putNextEntry(new ZipEntry(entryName));
+
+					final String nameOnly = file.getFileName()
+						.toString();
+					if(shouldStrip(nameOnly))
+						copyStrippingComments(file, zos);
+					else
+						copyBinary(file, zos);
+
+					zos.closeEntry();
+				}
+				return FileVisitResult.CONTINUE;
+			}
+
+			private static boolean shouldStrip(final String fileName){
+				return (fileName.endsWith(FILE_EXTENSION_AFFIX) || fileName.endsWith(FILE_EXTENSION_DICTIONARY));
+			}
+
+			private static void copyStrippingComments(final Path path, final ZipOutputStream out) throws IOException{
+				try(final BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)){
+					String line;
+					while((line = br.readLine()) != null){
+						line = stripComment(line);
+						if(line != null){
+							final byte[] bytes = (line + '\n').getBytes(StandardCharsets.UTF_8);
+							out.write(bytes);
+						}
+					}
+				}
+			}
+
+			private static void copyBinary(final Path path, final ZipOutputStream out) throws IOException{
+				try(final InputStream in = new BufferedInputStream(new FileInputStream(path.toFile()))){
+					in.transferTo(out);
+				}
+			}
+
+			private static String stripComment(final String line){
+				final String out = CUT_PATTERN.matcher(line)
+					.replaceFirst(StringUtils.EMPTY);
+				return (out.trim().isEmpty()? null: out);
+			}
+		});
 	}
 
-	private static void packageExtension(final File projectFolder, final File autoCorrectOutputFile,
-			final Collection<File> autoTextOutputFiles) throws IOException{
-		final File outputFile = Path.of(projectFolder.toString(), FilenameUtils.getBaseName(projectFolder.toString()) + EXTENSION_ZIP)
-			.toFile();
-		//exclude all content inside CONFIGURATION_NODE_NAME_AUTO_CORRECT and CONFIGURATION_NODE_NAME_AUTO_TEXT folders
-		//that are not autoCorrectOutputFilename or autoTextOutputFilename
-		final List<File> outputFiles = new ArrayList<>(autoTextOutputFiles.size() + (autoCorrectOutputFile != null? 1: 0));
-		if(autoCorrectOutputFile != null)
-			outputFiles.add(autoCorrectOutputFile);
-		outputFiles.addAll(autoTextOutputFiles);
-		ZipManager.zipDirectory(projectFolder, Deflater.BEST_COMPRESSION, outputFile, outputFiles.toArray(new File[0]));
+	private static String relativeEntryName(final Path base, final Path path){
+		final String relativeName = base.relativize(path)
+			.toString()
+			.replace('\\', '/');
+		return (relativeName.isEmpty()? null: relativeName);
 	}
 
 	public final String getLanguage(){
@@ -446,7 +625,7 @@ public class Packager{
 	}
 
 	/**
-	 * Extracts a sample from affix file
+	 * Extracts a sample from an affix file
 	 *
 	 * @return	A sample text
 	 *
@@ -565,8 +744,8 @@ public class Packager{
 
 			final Element rootElement = doc.getDocumentElement();
 			if(!CONFIGURATION_ROOT_ELEMENT.equals(rootElement.getNodeName()))
-				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT + "', was "
-					+ rootElement.getNodeName());
+				throw new IllegalArgumentException("Invalid root element, expected '" + CONFIGURATION_ROOT_ELEMENT
+					+ "', was " + rootElement.getNodeName());
 
 			final Node foundNode = onNodeNameApply(rootElement, configurationName, Function.identity());
 			if(foundNode != null)
@@ -575,8 +754,8 @@ public class Packager{
 		return Pair.of(null, null);
 	}
 
-	private Map<String, Object> getFolders(final String language, final Node parentNode, final Path basePath, final Path originPath)
-			throws IOException{
+	private Map<String, Object> getFolders(final String language, final Node parentNode, final Path basePath,
+			final Path originPath) throws IOException{
 		final Map<String, Object> folders = new HashMap<>(0);
 		final List<Node> children = extractChildren(parentNode);
 		for(final Node child : children){
@@ -594,8 +773,8 @@ public class Packager{
 		return folders;
 	}
 
-	private void getFoldersForDictionaries(final String language, final Node entry, final Path basePath, final Path originPath,
-			final Map<String, Object> folders) throws IOException{
+	private void getFoldersForDictionaries(final String language, final Node entry, final Path basePath,
+			final Path originPath, final Map<String, Object> folders) throws IOException{
 		//restrict to given language
 		final List<Node> children = extractChildren(entry);
 		children.removeIf(node -> !ArrayUtils.contains(extractLocale(node), language));
@@ -684,7 +863,7 @@ public class Packager{
 
 	private static String extractFolder(final Node parentNode){
 		final List<Node> children = extractChildren(parentNode);
-		return (!children.isEmpty()? XMLManager.extractAttributeValue(children.get(0), CONFIGURATION_NODE_NAME): null);
+		return (!children.isEmpty()? XMLManager.extractAttributeValue(children.getFirst(), CONFIGURATION_NODE_NAME): null);
 	}
 
 	private static <T> T onNodeNameApply(final Node parentNode, final String nodeName, final Function<Node, T> fun){
