@@ -86,6 +86,13 @@ public class RulesLoader{
 		dataFields.put(MorphologicalTag.STEM, null);
 		dataFields.put(MorphologicalTag.ALLOMORPH, null);
 		fillDataFields(MorphologicalTag.PART_OF_SPEECH, "partOfSpeeches");
+		dataFields.put(MorphologicalTag.VERB_TENSE, null);
+
+		dataFields.put(MorphologicalTag.LANGUAGE, null);
+		dataFields.put(MorphologicalTag.VARIANT, null);
+		dataFields.put(MorphologicalTag.CLASS, null);
+		dataFields.put(MorphologicalTag.COUNTABILITY, null);
+		dataFields.put(MorphologicalTag.PARA_LINGUISTIC, null);
 
 		fillDataFields(MorphologicalTag.DERIVATIONAL_PREFIX, "derivationalPrefixes");
 

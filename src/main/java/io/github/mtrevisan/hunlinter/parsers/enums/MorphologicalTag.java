@@ -32,6 +32,14 @@ public enum MorphologicalTag{
 	ALLOMORPH("al:"),
 	PART_OF_SPEECH("po:"),
 
+	VERB_TENSE("vt:"),
+
+	LANGUAGE("lg:"),
+	VARIANT("va:"),
+	CLASS("cl:"),
+	COUNTABILITY("ct:"),
+	PARA_LINGUISTIC("pl:"),
+
 	DERIVATIONAL_PREFIX("dp:"),
 	INFLECTIONAL_PREFIX("ip:"),
 	TERMINAL_PREFIX("tp:"),
