@@ -329,7 +329,8 @@ class WordGeneratorBase{
 		final List<Inflection> inflections = new ArrayList<>(applicableAffixes.length);
 		for(final AffixEntry entry : applicableAffixes){
 			if(shouldApplyEntry(entry, forbidCompoundFlag, permitCompoundFlag, isCompound)){
-				//if entry has circumfix constraint and inflection has the same contraint then remove it from postponedAffixes
+				//if entry has circumfix constraint and inflection has the same constraint then remove it from
+				// postponedAffixes
 				boolean removeCircumfixFlag = false;
 				if(circumfixFlag != null && appliedRules != null)
 					removeCircumfixFlag = (entry.hasContinuationFlag(circumfixFlag)

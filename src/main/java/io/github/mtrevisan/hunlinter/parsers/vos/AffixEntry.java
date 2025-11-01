@@ -184,43 +184,14 @@ public class AffixEntry{
 		return new ArrayList<>(flags);
 	}
 
-	//FIXME is this documentation updated/true?
 	/**
-	 *
-	 * Derivational Suffix: stemming doesn't remove derivational suffixes (morphological generation depends on the order of the
-	 * 	suffix fields)
-	 * Inflectional Suffix: all inflectional suffixes are removed by stemming (morphological generation depends on the order of the
-	 * 	suffix fields)
-	 * Terminal Suffix: inflectional suffix fields removed by additional (not terminal) suffixes, useful for zero morphemes and
-	 * 	affixes removed by splitting rules
-	 *
-	 * @param dicEntry	The dictionary entry to combine from
-	 * @return	The list of new morphological fields
+	 * @param dicEntry	The dictionary entry to combine from.
+	 * @return	The list of new morphological fields.
 	 */
 	public final List<String> combineMorphologicalFields(final DictionaryEntry dicEntry){
 		final List<String> baseMorphFields = (dicEntry.morphologicalFields != null? new ArrayList<>(dicEntry.morphologicalFields):
 			new ArrayList<>(0));
 		final List<String> ruleMorphFields = (morphologicalFields != null? morphologicalFields: new ArrayList<>(0));
-
-		//NOTE: Part-of-Speech is NOT overwritten, both in simple application of an affix rule and of a compound rule
-		final boolean containsInflectionalAffix = containsAffixes(ruleMorphFields, INFLECTIONAL_AFFIXES);
-//		final boolean containsTerminalAffixes = containsAffixes(ruleMorphFields, MorphologicalTag.TERMINAL_SUFFIX,
-//			MorphologicalTag.TERMINAL_PREFIX);
-		final boolean containsDerivationalAffixes = containsAffixes(ruleMorphFields, DERIVATIONAL_AFFIXES);
-		//remove inflectional and terminal suffixes
-//		baseMorphFields = removeIf(baseMorphFields, field ->
-//			containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-//			|| !containsTerminalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field) || MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
-		final Iterator<String> itr = baseMorphFields.iterator();
-		while(itr.hasNext()){
-			final String field = itr.next();
-			final boolean filter = (containsInflectionalAffix && (MorphologicalTag.INFLECTIONAL_SUFFIX.isSupertypeOf(field)
-					|| MorphologicalTag.INFLECTIONAL_PREFIX.isSupertypeOf(field))
-				|| containsDerivationalAffixes && (MorphologicalTag.TERMINAL_SUFFIX.isSupertypeOf(field)
-					|| MorphologicalTag.TERMINAL_PREFIX.isSupertypeOf(field)));
-			if(filter)
-				itr.remove();
-		}
 
 		//add morphological fields from the applied affix
 		baseMorphFields.addAll((parent.getType() == AffixType.SUFFIX? baseMorphFields.size(): 0), ruleMorphFields);
