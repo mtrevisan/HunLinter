@@ -201,7 +201,7 @@ public class HyphenationParser{
 	 * Parse the hyphenation rules out from a .dic file.
 	 *
 	 * @param hypFile	The content of the hyphenation file
-	 * @throws LinterException   If something is wrong while parsing the file
+	 * @throws LinterException If something is wrong while parsing the file
 	 */
 	public final void parse(final File hypFile){
 		final Path hypPath = hypFile.toPath();
@@ -353,8 +353,8 @@ public class HyphenationParser{
 	/**
 	 * NOTE: Calling the method {@link Orthography#correctOrthography(String)} may be necessary
 	 *
-	 * @param rule   The rule to add
-	 * @param level   Level to add the rule to
+	 * @param rule The rule to add
+	 * @param level	Level to add the rule to
 	 * @return The value of a rule if already in place, {@code null} if the insertion has completed successfully
 	 */
 	public final String addRule(final String rule, final Level level){
@@ -415,8 +415,8 @@ public class HyphenationParser{
 	/**
 	 * Line must contain exactly one hyphenation point.
 	 *
-	 * @param rule   Rule to be validated.
-	 * @param level   Level to add the rule to.
+	 * @param rule Rule to be validated.
+	 * @param level	Level to add the rule to.
 	 */
 	public static void validateRule(final String rule, final Level level){
 		validateBasicRules(rule);

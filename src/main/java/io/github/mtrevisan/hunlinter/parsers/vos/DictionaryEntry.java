@@ -142,8 +142,8 @@ public class DictionaryEntry{
 	/**
 	 * Get last applied rule of type {@code type}
 	 *
-	 * @param type    The type used to filter the last applied rule
-	 * @return    The last applied rule of the specified type
+	 * @param type The type used to filter the last applied rule
+	 * @return	The last applied rule of the specified type
 	 */
 	@SuppressWarnings("DesignForExtension")
 	public AffixEntry getLastAppliedRule(final AffixType type){
@@ -153,7 +153,7 @@ public class DictionaryEntry{
 	/**
 	 * Get last applied rule
 	 *
-	 * @return    The last applied rule of the specified type
+	 * @return	The last applied rule of the specified type
 	 */
 	@SuppressWarnings("DesignForExtension")
 	public AffixEntry getLastAppliedRule(){
@@ -261,8 +261,8 @@ public class DictionaryEntry{
 	}
 
 	/**
-	 * @param affixData   Affix data
-	 * @param reverse   Whether the complex prefixes is used
+	 * @param affixData	Affix data
+	 * @param reverse Whether the complex prefixes is used
 	 * @return	A list of prefixes, suffixes, and terminal affixes (the first two may be exchanged if
 	 * 			COMPLEXPREFIXES is defined)
 	 */

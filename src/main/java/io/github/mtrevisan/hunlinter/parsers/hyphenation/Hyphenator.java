@@ -122,7 +122,7 @@ public class Hyphenator implements HyphenatorInterface{
 
 			//apply second level hyphenation for the word parts
 			int offset = 0;
-			for(int  i = 0, length = compounds.size(); i < length; i ++){
+			for(int i = 0, length = compounds.size(); i < length; i ++){
 				final String compound = compounds.get(i);
 				options = hypParser.getOptions().getCompoundOptions();
 				final HyphenationBreak subHyph = hyphenate(compound, patterns, HyphenationParser.Level.COMPOUND, options);

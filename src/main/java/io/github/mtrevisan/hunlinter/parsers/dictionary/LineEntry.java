@@ -37,11 +37,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
@@ -222,7 +224,91 @@ public class LineEntry implements Serializable{
 		}
 	}
 
-	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar, final int size){
+	public static List<LineEntry> eliminateCollisions(final List<LineEntry> entries,
+			final Comparator<String> comparator){
+		final List<LineEntry> result = new ArrayList<>(entries);
+		final int length = result.size();
+
+		boolean changed;
+		do{
+			changed = false;
+
+			//sort by condition length (more generic first)
+			result.sort(Comparator.comparingInt(e -> RegexSequencer.splitSequence(e.condition).length));
+
+			for(int i = 0; !changed && i < length; i ++){
+				final LineEntry a = result.get(i);
+				final String[] seqA = RegexSequencer.splitSequence(a.condition);
+
+				//base case: condition is empty
+				if(a.condition.isEmpty() && length > 1){
+					changed = isChanged(a, seqA.length, comparator);
+
+					continue;
+				}
+
+
+				//condition is always non-empty here
+
+				for(int j = i + 1; !changed && j < length; j ++){
+					final LineEntry b = result.get(j);
+					final String[] seqB = RegexSequencer.splitSequence(b.condition);
+					if(!RegexSequencer.endsWith(seqA, seqB) && !RegexSequencer.endsWith(seqB, seqA))
+						continue;
+
+					if(seqA.length == seqB.length){
+						changed = isChanged(a, seqA.length, comparator);
+						changed |= isChanged(b, seqB.length, comparator);
+						continue;
+					}
+
+					final LineEntry generic = (seqA.length < seqB.length? a: b);
+					final int genericSequenceLength = Math.min(seqA.length, seqB.length);
+					changed = isChanged(generic, genericSequenceLength, comparator);
+				}
+			}
+		}while(changed);
+
+		return result;
+	}
+
+	private static boolean isChanged(final LineEntry generic, final int genericSequenceLength,
+			final Comparator<String> comparator){
+		boolean changed = false;
+		final String[] refined = inferSuffixSequence(genericSequenceLength, generic.from);
+		if(refined.length > 0)
+			if(!Arrays.equals(RegexSequencer.splitSequence(generic.condition), refined)){
+				generic.condition = RegexHelper.makeGroup(toCharArray(refined), comparator) + generic.condition;
+				changed = true;
+			}
+		return changed;
+	}
+
+	private static char[] toCharArray(final String[] strings){
+		final int length = strings.length;
+		final char[] result = new char[length];
+		for(int i = 0; i < length; i ++)
+			result[i] = strings[i].charAt(0);
+		return result;
+	}
+
+	private static String[] inferSuffixSequence(final int sequenceLength, final Set<String> words){
+		//find the maximum common suffix among all words
+		final Set<String> preceding = new HashSet<>(0);
+		for(final String word : words){
+			final String[] sequence = RegexSequencer.splitSequence(word);
+			if(sequence.length > sequenceLength)
+				//take the element before the suffix
+				preceding.add(sequence[sequence.length - sequenceLength - 1]);
+			else
+				//FIXME there's a word that is too short (current rule MUST BE separated from the rule set)
+				return new String[0];
+		}
+		return preceding.toArray(new String[preceding.size()]);
+	}
+
+	public static String toHunspellHeader(final AffixType type, final String flag, final char combinableChar,
+			final int size){
 		final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 		return sj.add(type.getOption().getCode())
 			.add(flag)
@@ -247,9 +333,9 @@ public class LineEntry implements Serializable{
 	@Override
 	public final String toString(){
 		return new ToStringBuilder(this, ShortPrefixNotNullToStringStyle.SHORT_PREFIX_NOT_NULL_STYLE)
+			.append("cond", condition)
 			.append("rem", removal)
 			.append("add", addition)
-			.append("cond", condition)
 			.append("from", from)
 			.toString();
 	}
