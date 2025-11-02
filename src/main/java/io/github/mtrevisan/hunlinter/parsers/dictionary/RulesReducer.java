@@ -138,7 +138,7 @@ public class RulesReducer{
 
 	private static List<LineEntry> redistributeRules(final List<LineEntry> plainRules, final Comparator<String> comparator){
 		final Map<String, LineEntry> map = new HashMap<>(0);
-		for(int i = 0; i < plainRules.size(); i ++)
+		for(int i = 0, length = plainRules.size(); i < length; i ++)
 			redistributeRule(plainRules.get(i), map);
 
 		final List<LineEntry> redistributedRules = redistributeRules(map, comparator);
@@ -180,7 +180,7 @@ public class RulesReducer{
 	private static List<LineEntry> compactRules(final List<LineEntry> rules, final Comparator<String> comparator){
 		//same removal, addition, and condition parts
 		final Map<String, LineEntry> compaction = new HashMap<>(rules.size());
-		for(int i = 0; i < rules.size(); i ++){
+		for(int i = 0, length = rules.size(); i < length; i ++){
 			final LineEntry entry = rules.get(i);
 			final String key = entry.removal + TAB + RegexHelper.sortAndMergeSet(entry.addition, comparator) + TAB + entry.condition;
 			final LineEntry rule = compaction.putIfAbsent(key, entry);
@@ -207,7 +207,7 @@ public class RulesReducer{
 
 		final List<LineEntry> temporaryRules = new ArrayList<>(0);
 		final List<String> keys = new ArrayList<>(0);
-		for(int i = 0; i < rules.size(); i ++){
+		for(int i = 0, length = rules.size(); i < length; i ++){
 			final LineEntry rule = rules.get(i);
 			temporaryRules.clear();
 
@@ -220,7 +220,7 @@ public class RulesReducer{
 				keys.sort(Comparator.comparingInt(String::length).reversed());
 				final List<String> additionsToBeRemoved = retrieveAdditionsToBeRemoved(rules, rule, temporaryRules, lcss, keys);
 
-				for(int j = 0; j < temporaryRules.size(); j ++)
+				for(int j = 0, length2 = temporaryRules.size(); j < length2; j ++)
 					insertRuleOrUpdateFrom(disjointedRules, temporaryRules.get(j));
 				final Set<String> strings = rule.addition;
 				for(final String s : additionsToBeRemoved)
@@ -240,7 +240,7 @@ public class RulesReducer{
 	private static List<String> retrieveAdditionsToBeRemoved(final Collection<LineEntry> rules, final LineEntry rule,
 			final Collection<LineEntry> temporaryRules, final Map<String, List<String>> lcss, final List<String> keys){
 		final List<String> additionsToBeRemoved = new ArrayList<>(0);
-		for(int i = 0; i < keys.size(); i ++){
+		for(int i = 0, length = keys.size(); i < length; i ++){
 			final String key = keys.get(i);
 			final int keyLength = key.length();
 			final int conditionLength = rule.condition.length() - keyLength;
@@ -251,7 +251,7 @@ public class RulesReducer{
 			final String removal = (conditionLength <= rule.removal.length()? condition: rule.removal);
 			final List<String> list = lcss.get(key);
 			final Set<String> addition = new HashSet<>(list.size());
-			for(int j = 0; j < list.size(); j ++)
+			for(int j = 0, length2 = list.size(); j < length2; j ++)
 				addition.add(list.get(j).substring(keyLength));
 			final LineEntry newEntry = new LineEntry(removal, addition, condition, rule.from);
 			if(rules.contains(newEntry)){
@@ -268,7 +268,7 @@ public class RulesReducer{
 		if(ruleIndex >= 0)
 			expandedRules.get(ruleIndex).from.addAll(rule.from);
 		else{
-			for(int i = 0; i < expandedRules.size(); i ++){
+			for(int i = 0, length = expandedRules.size(); i < length; i ++){
 				final LineEntry expandedRule = expandedRules.get(i);
 				if(expandedRule.isContainedInto(rule)){
 					rule.addition.removeAll(expandedRule.addition);
@@ -288,7 +288,7 @@ public class RulesReducer{
 			restart = false;
 			extractTree(branches, rules);
 
-			for(int i = 0; !restart && i < branches.size(); i ++){
+			for(int i = 0, length = branches.size(); !restart && i < length; i ++){
 				final List<LineEntry> branch = branches.get(i);
 				final int branchSize = branch.size();
 				if(branchSize == 1){
@@ -464,8 +464,8 @@ public class RulesReducer{
 
 	private static int extractSameConditionLength(final List<LineEntry> branch){
 		final int conditionLength = branch.get(0).condition.length();
-		for(int j = 0; j < branch.size(); j ++){
-			final LineEntry entry = branch.get(j);
+		for(int i = 0, length = branch.size(); i < length; i ++){
+			final LineEntry entry = branch.get(i);
 			if(conditionLength != entry.condition.length())
 				return -1;
 		}
@@ -476,7 +476,7 @@ public class RulesReducer{
 	private static void disjoinSameConditionLength(final List<LineEntry> branch, final Comparator<String> comparator){
 		final Map<LineEntry, Set<Character>> branchGroup = new HashMap<>(branch.size());
 		final int conditionLength = branch.get(0).condition.length();
-		for(int i = 0; i < branch.size(); i ++){
+		for(int i = 0, length = branch.size(); i < length; i ++){
 			final LineEntry rule = branch.get(i);
 			branchGroup.put(rule, rule.extractGroup(conditionLength));
 		}
@@ -487,7 +487,7 @@ public class RulesReducer{
 
 		final StringBuilder condition = new StringBuilder();
 		final Collection<Character> negatedGroup = new HashSet<>(0);
-		for(int i = 0; i < branch.size(); i ++){
+		for(int i = 0, length = branch.size(); i < length; i ++){
 			final LineEntry entry = branch.get(i);
 
 			final Set<Character> ratifyingGroup = branchGroup.get(entry);
@@ -513,8 +513,8 @@ public class RulesReducer{
 		final List<LineEntry> properChildren = new ArrayList<>(branch.size());
 		final LineEntry parent = branch.get(0);
 		properChildren.add(parent);
-		for(int j = 1; j < branch.size(); j ++){
-			final LineEntry child = branch.get(j);
+		for(int i = 1, length = branch.size(); i < length; i ++){
+			final LineEntry child = branch.get(i);
 			if(parent.condition.length() < child.condition.length() && parent.from.containsAll(child.from))
 				properChildren.add(child);
 		}
@@ -528,14 +528,14 @@ public class RulesReducer{
 
 		final Set<Character> childrenGroup = new HashSet<>(0);
 		final StringBuilder condition = new StringBuilder();
-		for(int i = 1; i < branch.size(); i ++){
+		for(int i = 1, length = branch.size(); i < length; i ++){
 			//augment parent condition to avoid any intersection:
 			final int parentConditionLength = parent.condition.length();
 			final Set<Character> parentGroup = parent.extractGroup(parentConditionLength);
 
 			//FIXME useful?
 //			childrenGroup.clear();
-			for(int j = 1; j < branch.size(); j ++){
+			for(int j = 1, length2 = branch.size(); j < length2; j ++){
 				final LineEntry child = branch.get(j);
 				childrenGroup.addAll(child.extractGroup(parentConditionLength));
 			}
@@ -626,7 +626,7 @@ public class RulesReducer{
 
 	private static void extractRules(final Collection<LineEntry> rules, final List<List<LineEntry>> branches){
 		rules.clear();
-		for(int i = 0; i < branches.size(); i ++)
+		for(int i = 0, length = branches.size(); i < length; i ++)
 			rules.addAll(branches.get(i));
 	}
 
@@ -647,7 +647,7 @@ public class RulesReducer{
 				final String[] commonPostCondition = RegexSequencer.subSequence(aCondition, 2);
 				//extract all the rules from `similarities` that has the condition compatible with `firstEntry.condition`
 				group.clear();
-				for(int i = 0; i < similarities.size(); i ++)
+				for(int i = 0, length = similarities.size(); i < length; i ++)
 					group.add(RegexSequencer.splitSequence(similarities.get(i).condition)[1].charAt(0));
 
 				condition.setLength(0);
@@ -659,11 +659,11 @@ public class RulesReducer{
 				condition.toString();
 
 				final LineEntry newRule = LineEntry.createFrom(anEntry, condition.toString());
-				for(int i = 1; i < similarities.size(); i ++)
+				for(int i = 1, length = similarities.size(); i < length; i ++)
 					newRule.from.addAll(similarities.get(i).from);
 				rules.add(newRule);
 
-				for(int i = 0; i < similarities.size(); i ++)
+				for(int i = 0, length = similarities.size(); i < length; i ++)
 					rules.remove(similarities.get(i));
 			}
 	}
@@ -689,7 +689,7 @@ public class RulesReducer{
 		if(!entries.isEmpty()){
 			//restore original rules
 			final ArrayList<LineEntry> restoredRules = new ArrayList<>(0);
-			for(int i = 0; i < entries.size(); i ++){
+			for(int i = 0, length = entries.size(); i < length; i ++){
 				final LineEntry rule = entries.get(i);
 				restoredRules.ensureCapacity(rule.addition.size());
 				for(final String addition : rule.addition){
@@ -708,7 +708,7 @@ public class RulesReducer{
 
 	private List<LineEntry> prepareRules(final boolean keepLongestCommonAffix, final List<LineEntry> entries){
 		if(keepLongestCommonAffix)
-			for(int i = 0; i < entries.size(); i ++)
+			for(int i = 0, length = entries.size(); i < length; i ++)
 				entries.get(i).expandConditionToMaxLength(comparator);
 
 		final List<LineEntry> list = (entries != null? new ArrayList<>(entries): new ArrayList<>(0));
@@ -718,7 +718,7 @@ public class RulesReducer{
 
 	private static List<String> composeAffixRules(final String flag, final AffixType type, final List<LineEntry> entries){
 		final List<String> list = new ArrayList<>(entries.size());
-		for(int i = 0; i < entries.size(); i ++)
+		for(int i = 0, length = entries.size(); i < length; i ++)
 			list.add(entries.get(i).toHunspellRule(type, flag));
 		return list;
 	}
@@ -736,7 +736,7 @@ public class RulesReducer{
 		final RuleEntry overriddenParent = new RuleEntry(type, flag, ruleToBeReduced.combinableChar());
 		//extract rules (skip the header)
 		final List<AffixEntry> entries = new ArrayList<>(reducedRules.size() - 1);
-		for(int i = 1; i < reducedRules.size(); i ++){
+		for(int i = 1, length = reducedRules.size(); i < length; i ++){
 			final String reducedRule = reducedRules.get(i);
 			final AffixEntry entry = new AffixEntry(reducedRule, i - 1, type, flag, strategy, null, null)
 				.setParent(overriddenParent);
@@ -749,17 +749,17 @@ public class RulesReducer{
 		final int progressStep = (int)Math.ceil(originalLines.size() / 100.f);
 		final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(0);
 		final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(0);
-		for(int i = 0; i < originalLines.size(); i ++){
+		for(int i = 0, length = originalLines.size(); i < length; i ++){
 			final String line = originalLines.get(i);
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenParent);
 
 			originalInflectionsWhole.clear();
-			for(int j = 0; j < originalInflections.size(); j ++)
+			for(int j = 0, length2 = originalInflections.size(); j < length2; j ++)
 				originalInflectionsWhole.add(new DictionaryEntry(originalInflections.get(j)));
 			inflectionsWhole.clear();
-			for(int j = 0; j < inflections.size(); j ++)
+			for(int j = 0, length2 = inflections.size(); j < length2; j ++)
 				inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
 			if(!originalInflectionsWhole.equals(inflectionsWhole))
 				throw new LinterException(VERY_BAD_ERROR, line, originalInflectionsWhole, inflectionsWhole);
@@ -777,7 +777,7 @@ public class RulesReducer{
 
 		final List<LineEntry> filteredRules = new ArrayList<>(inflections.size() - 1);
 		//skip base inflection
-		for(int i = WordGenerator.BASE_INFLECTION_INDEX + 1; i < inflections.size(); i ++){
+		for(int i = WordGenerator.BASE_INFLECTION_INDEX + 1, length = inflections.size(); i < length; i ++){
 			final Inflection inflection = inflections.get(i);
 			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
@@ -794,7 +794,7 @@ public class RulesReducer{
 			//retrieve rule with the longest condition (all the other conditions must be this long)
 			LineEntry maxConditionEntry = null;
 			int maxConditionLength = 0;
-			for(int i = 0; i < rules.size(); i ++){
+			for(int i = 0, length = rules.size(); i < length; i ++){
 				final LineEntry elem = rules.get(i);
 				if(maxConditionEntry == null || elem.condition.length() > maxConditionLength){
 					maxConditionEntry = elem;
@@ -813,7 +813,7 @@ public class RulesReducer{
 	private static void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
 		final String from = rules.get(0).from.iterator().next();
 		final int longestConditionLength = compactedRule.condition.length();
-		for(int i = 0; i < rules.size(); i ++){
+		for(int i = 0, length = rules.size(); i < length; i ++){
 			final LineEntry rule = rules.get(i);
 			//recover the missing characters for the current condition to become of length the maximum found earlier
 			final int startIndex = from.length() - longestConditionLength;

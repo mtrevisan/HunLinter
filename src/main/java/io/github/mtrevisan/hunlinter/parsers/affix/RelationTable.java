@@ -94,7 +94,7 @@ public class RelationTable{
 
 	public final String extractAsList(){
 		final StringJoiner sj = new StringJoiner(", ");
-		for(int i = 0; i < table.size(); i ++){
+		for(int i = 0, length = table.size(); i < length; i ++){
 			final String[] list = table.get(i);
 			final String base = list[0];
 			for(int j = 1; j < list.length; j ++)

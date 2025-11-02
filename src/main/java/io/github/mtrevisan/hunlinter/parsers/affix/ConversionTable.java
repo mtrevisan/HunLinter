@@ -123,7 +123,7 @@ public class ConversionTable{
 
 			//whole
 			List<Pair<String, String>> list = table.getOrDefault(KEY_WHOLE, Collections.emptyList());
-			for(int i = 0; i < list.size(); i ++){
+			for(int i = 0, length = list.size(); i < length; i ++){
 				final Pair<String, String> entry = list.get(i);
 				final String key = entry.getKey();
 				if(inputWord.equals(key.substring(1, key.length() - 1))){
@@ -135,7 +135,7 @@ public class ConversionTable{
 
 			//starts with
 			list = table.getOrDefault(KEY_STARTS_WITH, Collections.emptyList());
-			for(int i = 0; i < list.size(); i ++){
+			for(int i = 0, length = list.size(); i < length; i ++){
 				final Pair<String, String> entry = list.get(i);
 				final String key = entry.getKey();
 				final int keyLength = key.length() - 1;
@@ -149,7 +149,7 @@ public class ConversionTable{
 
 			//ends with
 			list = table.getOrDefault(KEY_ENDS_WITH, Collections.emptyList());
-			for(int i = 0; i < list.size(); i ++){
+			for(int i = 0, length = list.size(); i < length; i ++){
 				final Pair<String, String> entry = list.get(i);
 				final String key = entry.getKey();
 				final int keyLength = key.length() - 1;
@@ -163,7 +163,7 @@ public class ConversionTable{
 
 			//inside
 			list = table.getOrDefault(KEY_INSIDE, Collections.emptyList());
-			for(int i = 0; i < list.size(); i ++){
+			for(int i = 0, length = list.size(); i < length; i ++){
 				final Pair<String, String> entry = list.get(i);
 				final String key = entry.getKey();
 				final int keyLength = key.length();
@@ -198,8 +198,8 @@ public class ConversionTable{
 	public final String extractAsList(){
 		final StringJoiner sj = new StringJoiner(", ");
 		for(final List<Pair<String, String>> pairs : table.values())
-			for(int j = 0; j < pairs.size(); j ++){
-				final Pair<String, String> entry = pairs.get(j);
+			for(int i = 0, length = pairs.size(); i < length; i ++){
+				final Pair<String, String> entry = pairs.get(i);
 				sj.add(entry.getKey() + StringUtils.SPACE + entry.getValue());
 			}
 		return sj.toString();

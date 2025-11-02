@@ -82,11 +82,11 @@ public class ThesaurusLinterFSAWorker extends WorkerThesaurus{
 
 			//check if each part of `entry`, with appropriate PoS, exists
 			final List<SynonymsEntry> syns = data.getSynonyms();
-			for(int i = 0; i < syns.size(); i ++){
+			for(int i = 0, length = syns.size(); i < length; i ++){
 				final SynonymsEntry syn = syns.get(i);
 				final List<String> definitions = syn.getSynonyms();
 				final List<String> partOfSpeeches = syn.getPartOfSpeeches();
-				for(int j = 0; j < definitions.size(); j ++){
+				for(int j = 0, length2 = definitions.size(); j < length2; j ++){
 					final String definition = ThesaurusDictionary.removeSynonymUse(definitions.get(j));
 					//check also that the found PoS has `originalDefinition` among its synonyms
 					if(!theParser.contains(definition, partOfSpeeches, originalDefinition))

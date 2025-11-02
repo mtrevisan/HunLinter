@@ -103,7 +103,7 @@ public class WordlistFSAWorker extends WorkerDictionary{
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			for(int i = 0; i < inflections.size(); i ++){
+			for(int i = 0, length = inflections.size(); i < length; i ++){
 				final byte[] assembled = StringHelper.getRawBytes(inflections.get(i).getWord().toLowerCase(Locale.ROOT));
 				encodings.add(assembled);
 			}

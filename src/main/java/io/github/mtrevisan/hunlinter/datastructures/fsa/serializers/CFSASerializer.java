@@ -265,7 +265,7 @@ public class CFSASerializer implements FSASerializerInterface{
 		linearized.clear();
 
 		//linearize states with most in-links first
-		for(int i = 0; i < states.size(); i ++)
+		for(int i = 0, length = states.size(); i < length; i ++)
 			linearizeState(fsa, nodes, linearized, visited, states.get(i));
 
 		//linearize the remaining states by chaining them one after another, in depth-order
@@ -280,7 +280,7 @@ public class CFSASerializer implements FSASerializerInterface{
 
 		//calculate new state offsets iteratively (start with maximum potential offsets and recalculate until converged)
 		final int maxOffset = Integer.MAX_VALUE;
-		for(int i = 0; i < linearized.size(); i ++)
+		for(int i = 0, length = linearized.size(); i < length; i ++)
 			offsets.put(linearized.get(i), maxOffset);
 
 		int i;

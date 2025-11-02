@@ -152,14 +152,14 @@ public final class FontHelper{
 
 	public static List<String> getFamilyNamesAll(){
 		final List<String> names = new ArrayList<>(FAMILY_NAMES_ALL.size());
-		for(int i = 0; i < FAMILY_NAMES_ALL.size(); i ++)
+		for(int i = 0, length = FAMILY_NAMES_ALL.size(); i < length; i ++)
 			names.add(FAMILY_NAMES_ALL.get(i).getName());
 		return names;
 	}
 
 	public static List<String> getFamilyNamesMonospaced(){
 		final List<String> names = new ArrayList<>(FAMILY_NAMES_MONOSPACED.size());
-		for(int i = 0; i < FAMILY_NAMES_MONOSPACED.size(); i ++)
+		for(int i = 0, length = FAMILY_NAMES_MONOSPACED.size(); i < length; i ++)
 			names.add(FAMILY_NAMES_MONOSPACED.get(i).getName());
 		return names;
 	}

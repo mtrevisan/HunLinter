@@ -297,7 +297,7 @@ public class ThesaurusParser{
 			//save data
 			int idx = hunspellCharsetName.length() + 1;
 			final List<ThesaurusEntry> synonyms = dictionary.getSortedSynonyms();
-			for(int i = 0; i < synonyms.size(); i ++){
+			for(int i = 0, length = synonyms.size(); i < length; i ++){
 				final ThesaurusEntry synonym = synonyms.get(i);
 				synonym.saveToIndex(indexWriter, idx);
 

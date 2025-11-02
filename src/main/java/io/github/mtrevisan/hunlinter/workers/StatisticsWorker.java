@@ -94,14 +94,14 @@ public class StatisticsWorker extends WorkerDictionary{
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(int i = 0; i < inflections.size(); i ++){
+				for(int i = 0, length = inflections.size(); i < length; i ++){
 					//collect statistics
 					final String word = inflections.get(i).getWord();
 					final List<String> subwords = (hyphenator != null? hyphenator.splitIntoCompounds(word): null);
 					if(subwords == null || subwords.isEmpty())
 						dicStatistics.addData(word);
 					else
-						for(int j = 0; j < subwords.size(); j ++){
+						for(int j = 0, length2 = subwords.size(); j < length2; j ++){
 							final Hyphenation hyph = hyphenator.hyphenate(orthography.markDefaultStress(subwords.get(j)));
 							dicStatistics.addData(word, hyph);
 						}

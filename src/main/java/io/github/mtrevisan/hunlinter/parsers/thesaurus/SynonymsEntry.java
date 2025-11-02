@@ -75,7 +75,7 @@ public class SynonymsEntry{
 			String pos = Strings.CS.removeEnd(Strings.CS.removeStart(partOfSpeech, "("), ")");
 			pos = Strings.CS.removeEnd(Strings.CS.removeStart(pos, "["), "]");
 			partOfSpeeches = Arrays.asList(StringUtils.split(pos, ','));
-			for(int i = 0; i < partOfSpeeches.size(); i ++)
+			for(int i = 0, length = partOfSpeeches.size(); i < length; i ++)
 				partOfSpeeches.set(i, partOfSpeeches.get(i).trim());
 			partOfSpeeches.sort(Comparator.naturalOrder());
 
@@ -125,7 +125,7 @@ public class SynonymsEntry{
 
 	public final boolean containsSynonym(final String synonym){
 		if(synonyms != null)
-			for(int i = 0; i < synonyms.size(); i ++)
+			for(int i = 0, length = synonyms.size(); i < length; i ++)
 				if(ThesaurusDictionary.removeSynonymUse(synonyms.get(i)).equals(synonym))
 					return true;
 		return false;

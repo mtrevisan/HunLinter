@@ -390,7 +390,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	public final boolean canAdmitStress(final Inflection inflection){
 		String derivationalField = null;
 		final List<String> morphologicalFields = inflection.getMorphologicalFieldsAsList();
-		for(int i = 0; derivationalField == null && i < morphologicalFields.size(); i ++)
+		for(int i = 0, length = morphologicalFields.size(); derivationalField == null && i < length; i ++)
 			if(morphologicalFields.get(i).startsWith(MorphologicalTag.DERIVATIONAL_SUFFIX.getCode()))
 				derivationalField = morphologicalFields.get(i);
 		return !derivationCanAdminStress.contains(derivationalField);

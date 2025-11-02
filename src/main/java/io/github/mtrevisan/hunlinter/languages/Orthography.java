@@ -78,7 +78,7 @@ public class Orthography{
 	public final StringJoiner formatHyphenation(final List<String> syllabes, final StringJoiner sj,
 			final Function<String, String> errorFormatter){
 		final boolean[] errors = getSyllabationErrors(syllabes);
-		for(int i = 0; i < syllabes.size(); i ++){
+		for(int i = 0, length = syllabes.size(); i < length; i ++){
 			final Function<String, String> fun = (errors[i]? errorFormatter: Function.identity());
 			sj.add(fun.apply(syllabes.get(i)));
 		}

@@ -134,7 +134,7 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(int i = 0; i < inflections.size(); i ++){
+				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final String str = inflections.get(i).getWord();
 					bloomFilter.add(str);
 				}

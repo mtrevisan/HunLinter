@@ -184,7 +184,7 @@ public class DictionaryEntry{
 		distribution.put(compoundMiddleFlag, new ArrayList<>(0));
 		distribution.put(compoundEndFlag, new ArrayList<>(0));
 		if(continuationFlags != null)
-			for(int i = 0; i < continuationFlags.size(); i ++)
+			for(int i = 0, length = continuationFlags.size(); i < length; i ++)
 				distribution.get(continuationFlags.get(i))
 					.add(this);
 		return distribution;
@@ -283,7 +283,7 @@ public class DictionaryEntry{
 		final List<String> prefixes = new ArrayList<>(maxSize);
 		final List<String> suffixes = new ArrayList<>(maxSize);
 		if(continuationFlags != null){
-			for(int i = 0; i < continuationFlags.size(); i ++){
+			for(int i = 0, length = continuationFlags.size(); i < length; i ++){
 				final String affix = continuationFlags.get(i);
 				if(affixData.isTerminalAffix(affix)){
 					terminals.add(affix);

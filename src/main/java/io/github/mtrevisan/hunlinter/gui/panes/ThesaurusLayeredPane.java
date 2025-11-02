@@ -287,7 +287,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 
 				final StringJoiner duplicatedWords = new StringJoiner(", ");
 				final List<ThesaurusEntry> duplicates = duplicationResult.getDuplicates();
-				for(int i = 0; i < duplicates.size(); i ++)
+				for(int i = 0, length = duplicates.size(); i < length; i ++)
 					duplicatedWords.add(duplicates.get(i).getDefinition());
             LOGGER.warn(ParserManager.MARKER_APPLICATION, "Duplicate detected: {}", duplicatedWords);
          }
@@ -387,7 +387,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		//filter synonyms with same part-of-speech
 		final List<SynonymsEntry> filteredSynonymsEntries = new ArrayList<>(0);
 		final List<SynonymsEntry> syns = synonyms.getSynonyms();
-		for(int i = 0; i < syns.size(); i ++){
+		for(int i = 0, length = syns.size(); i < length; i ++){
 			final SynonymsEntry syn = syns.get(i);
 			if(syn.hasSamePartOfSpeeches(newSynonyms.getPartOfSpeeches()))
 				filteredSynonymsEntries.add(syn);

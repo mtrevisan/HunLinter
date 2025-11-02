@@ -84,16 +84,16 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final List<List<List<Inflection>>> entries = new ArrayList<>(0);
 		final Map<String, List<Inflection>> dicEntries = new HashMap<>(0);
 		outer:
-		for(int i = 0; i < permutations.size(); i ++){
+		for(int i = 0, length = permutations.size(); i < length; i ++){
 			final List<String> permutation = permutations.get(i);
 			//expand permutation
 			final List<List<Inflection>> expandedPermutationEntries = new ArrayList<>(permutation.size());
-			for(int j = 0; j < permutation.size(); j ++){
+			for(int j = 0, length2 = permutation.size(); j < length2; j ++){
 				final String flag = permutation.get(j);
 				if(!dicEntries.containsKey(flag)){
 					final List<Inflection> dicEntriesPerFlag = new ArrayList<>(0);
 					final List<DictionaryEntry> flagEntries = inputs.get(flag);
-					for(int k = 0; k < flagEntries.size(); k ++){
+					for(int k = 0, length3 = flagEntries.size(); k < length3; k ++){
 						final List<Inflection> inflections = applyAffixRules(flagEntries.get(k), true, null);
 
 						final int size = (inflections != null? inflections.size(): 0);
@@ -132,7 +132,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		final StringBuffer sb = new StringBuffer();
 		final Set<Inflection> inflections = new LinkedHashSet<>(0);
 		//generate compounds:
-		for(int i = 0; i < entries.size(); i ++){
+		for(int i = 0, length = entries.size(); i < length; i ++){
 			final List<List<Inflection>> entry = entries.get(i);
 			//compose compound:
 			boolean completed = false;
@@ -193,7 +193,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 
 		final List<Inflection> inflections = new ArrayList<>(1);
 		final List<String> flags = new ArrayList<>(continuationFlags.size());
-		for(int i = 0; i < continuationFlags.size(); i ++)
+		for(int i = 0, length = continuationFlags.size(); i < length; i ++)
 			flags.addAll(continuationFlags.get(i));
 		final Inflection p = Inflection.createFromCompound(compoundWord, flags, compoundEntries);
 		if(hasForbidCompoundFlag || hasPermitCompoundFlag)
@@ -358,7 +358,7 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 		list.addAll(distribution.entrySet());
 
 		final Map<String, List<DictionaryEntry>> map = new HashMap<>(list.size());
-		for(int i = 0; i < list.size(); i ++){
+		for(int i = 0, length = list.size(); i < length; i ++){
 			final Map.Entry<String, List<DictionaryEntry>> m = list.get(i);
 			final List<DictionaryEntry> entries = m.getValue();
 			final List<DictionaryEntry> value = new ArrayList<>(0);

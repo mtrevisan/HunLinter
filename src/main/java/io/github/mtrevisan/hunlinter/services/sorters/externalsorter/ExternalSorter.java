@@ -154,7 +154,7 @@ public final class ExternalSorter{
 		try(final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, options.getCharset()))){
 			final boolean removeDuplicates = options.isRemoveDuplicates();
 			String lastLine = null;
-			for(int i = 0; i < sortedLines.size(); i ++){
+			for(int i = 0, length = sortedLines.size(); i < length; i ++){
 				final String line = sortedLines.get(i);
 				//skip duplicated lines
 				if(!removeDuplicates || !line.equals(lastLine)){

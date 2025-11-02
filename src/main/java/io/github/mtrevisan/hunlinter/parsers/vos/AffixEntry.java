@@ -208,11 +208,11 @@ public class AffixEntry{
 
 	public static List<String> extractMorphologicalFields(final List<DictionaryEntry> compoundEntries){
 		int size = 0;
-		for(int i = 0; i < compoundEntries.size(); i ++)
+		for(int i = 0, length = compoundEntries.size(); i < length; i ++)
 			size += compoundEntries.get(i).morphologicalFields.size() + 1;
 
 		final List<String> mf = new ArrayList<>(size);
-		for(int i = 0; i < compoundEntries.size(); i ++){
+		for(int i = 0, length = compoundEntries.size(); i < length; i ++){
 			final DictionaryEntry compoundEntry = compoundEntries.get(i);
 			final String compound = compoundEntry.getWord();
 			mf.add(MorphologicalTag.PART.attachValue(compound));

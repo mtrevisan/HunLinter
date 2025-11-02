@@ -134,7 +134,7 @@ class WordGeneratorBase{
 	private void printInflections(final String title, final List<Inflection> inflections){
 		if(LOGGER.isDebugEnabled() && !inflections.isEmpty()){
 			LOGGER.debug(title);
-			for(int i = 0; i < inflections.size(); i ++){
+			for(int i = 0, length = inflections.size(); i < length; i ++){
 				final Inflection inflection = inflections.get(i);
 				LOGGER.debug("   {} from {}", inflection.toString(affixData.getFlagParsingStrategy()), inflection.getRulesSequence());
 			}
@@ -155,14 +155,14 @@ class WordGeneratorBase{
 	private List<Inflection> getTwofoldInflections(final List<Inflection> onefoldInflections, final boolean isCompound,
 			final boolean reverse, final RuleEntry overriddenRule) throws NoApplicableRuleException{
 		final List<Inflection> twofoldInflections = new ArrayList<>(0);
-		for(int i = 0; i < onefoldInflections.size(); i ++){
+		for(int i = 0, length = onefoldInflections.size(); i < length; i ++){
 			final Inflection inflection = onefoldInflections.get(i);
 			if(inflection.isCombinable()){
 				final List<Inflection> prods = getOnefoldInflections(inflection, isCompound, reverse, overriddenRule);
 
 				final AffixEntry[] appliedRules = inflection.getAppliedRules();
 				//add parent derivations
-				for(int j = 0; j < prods.size(); j ++)
+				for(int j = 0, length2 = prods.size(); j < length2; j ++)
 					prods.get(j).prependAppliedRules(appliedRules);
 
 				twofoldInflections.addAll(prods);
@@ -173,7 +173,7 @@ class WordGeneratorBase{
 
 	private void checkTwofoldCorrectness(final List<Inflection> twofoldInflections){
 		final boolean complexPrefixes = affixData.isComplexPrefixes();
-		for(int i = 0; i < twofoldInflections.size(); i ++){
+		for(int i = 0, length = twofoldInflections.size(); i < length; i ++){
 			final Inflection prod = twofoldInflections.get(i);
 			final List<List<String>> affixes = prod.extractAllAffixes(affixData, false);
 			final List<String> aff = affixes.get(complexPrefixes? Affixes.INDEX_SUFFIXES: Affixes.INDEX_PREFIXES);
@@ -275,7 +275,7 @@ class WordGeneratorBase{
 
 		final List<Inflection> inflections = new ArrayList<>(0);
 		if(hasToBeExpanded(dicEntry, appliedAffixes, forbiddenWordFlag))
-			for(int i = 0; i < appliedAffixes.size(); i ++){
+			for(int i = 0, length = appliedAffixes.size(); i < length; i ++){
 				final String affix = appliedAffixes.get(i);
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);

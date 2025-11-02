@@ -205,7 +205,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			final SequenceEncoderInterface sequenceEncoder){
 		ByteBuffer tag = ByteBuffer.allocate(0);
 
-		for(int i = 0; i < inflections.size(); i ++){
+		for(int i = 0, length = inflections.size(); i < length; i ++){
 			final Inflection inflection = inflections.get(i);
 			//subdivide morphologicalFields into PART_OF_SPEECH, INFLECTIONAL_SUFFIX, INFLECTIONAL_PREFIX, and STEM
 			final Map<MorphologicalTag, List<String>> bucket = extractMorphologicalTags(inflection);
@@ -231,7 +231,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 			extractInflection(prefixInflection, tag);
 			tag.flip();
 
-			for(int j = 0; j < stems.size(); j ++){
+			for(int j = 0, length2 = stems.size(); j < length2; j ++){
 				final byte[] assembled = encode(inflectedWord, tag, stems.get(j), separator, sequenceEncoder);
 				encodings.add(assembled);
 			}
@@ -276,7 +276,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 
 	private static void extractInflection(final List<String> suffixInflection, final ByteBuffer output){
 		if(suffixInflection != null)
-			for(int i = 0; i < suffixInflection.size(); i ++){
+			for(int i = 0, length = suffixInflection.size(); i < length; i ++){
 				final String[] tags = InflectionTag.createFromCodeAndValue(suffixInflection.get(i)).getTags();
 				for(int j = 0; j < tags.length; j ++)
 					output.put(POS_FSA_TAG_SEPARATOR)
@@ -288,7 +288,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 	private static Map<MorphologicalTag, List<String>> extractMorphologicalTags(final Inflection inflection){
 		final Map<MorphologicalTag, List<String>> bucket = new EnumMap<>(MorphologicalTag.class);
 		final List<String> morphologicalFieldsAsList = inflection.getMorphologicalFieldsAsList();
-		for(int i = 0; i < morphologicalFieldsAsList.size(); i ++){
+		for(int i = 0, length = morphologicalFieldsAsList.size(); i < length; i ++){
 			final String entry = morphologicalFieldsAsList.get(i);
 			final MorphologicalTag key = MorphologicalTag.createFromCode(entry);
 			if(key != null)

@@ -170,7 +170,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-				for(int i = 0; i < inflections.size(); i ++){
+				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final String str = inflections.get(i).toStringWithPartOfSpeech();
 					if(!bloomFilter.add(str)){
 						duplicatesBloomFilter.add(str);
@@ -228,7 +228,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 					if(!inflections.isEmpty()){
 						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();
-						for(int i = 0; i < inflections.size(); i ++){
+						for(int i = 0, length = inflections.size(); i < length; i ++){
 							final Inflection inflection = inflections.get(i);
 							final String text = inflection.toStringWithPartOfSpeech();
 							if(duplicatesBloomFilter.contains(text))

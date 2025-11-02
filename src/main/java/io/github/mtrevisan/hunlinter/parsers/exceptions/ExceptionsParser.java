@@ -93,7 +93,7 @@ public class ExceptionsParser{
 			throw new LinterException(INVALID_ROOT, configurationFilename, WORD_EXCEPTIONS_ROOT_ELEMENT, rootElement.getNodeName());
 
 		final List<Node> children = XMLManager.extractChildren(rootElement, node -> XMLManager.isElement(node, AUTO_CORRECT_BLOCK));
-		for(int i = 0; i < children.size(); i ++){
+		for(int i = 0, length = children.size(); i < length; i ++){
 			final Node mediaType = XMLManager.extractAttribute(children.get(i), WORD_EXCEPTIONS_WORD);
 			if(mediaType != null)
 				dictionary.add(mediaType.getNodeValue());
@@ -107,7 +107,7 @@ public class ExceptionsParser{
 		//check for duplications
 		int index = 0;
 		final Collection<String> map = new HashSet<>(dictionary.size());
-		for(int i = 0; i < dictionary.size(); i ++){
+		for(int i = 0, length = dictionary.size(); i < length; i ++){
 			final String exception = dictionary.get(i);
 			if(!map.add(exception))
 				EventBusService.publish(new LinterWarning(DUPLICATED_ENTRY, configurationFilename, exception)
@@ -151,7 +151,7 @@ public class ExceptionsParser{
 		root.setAttribute(XMLManager.ROOT_ATTRIBUTE_NAME, XMLManager.ROOT_ATTRIBUTE_VALUE);
 		doc.appendChild(root);
 
-		for(int i = 0; i < dictionary.size(); i ++){
+		for(int i = 0, length = dictionary.size(); i < length; i ++){
 			//correction element
 			final Element elem = doc.createElement(AUTO_CORRECT_BLOCK);
 			elem.setAttribute(WORD_EXCEPTIONS_WORD, dictionary.get(i));

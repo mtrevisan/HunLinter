@@ -68,7 +68,7 @@ public class CompoundRulesWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithCompounds(dicEntry);
-			for(int i = 0; i < inflections.size(); i ++)
+			for(int i = 0, length = inflections.size(); i < length; i ++)
 				inflectionReader.accept(inflections.get(i), indexData.getIndex());
 		};
 

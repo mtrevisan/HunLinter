@@ -81,7 +81,7 @@ public class WordCountWorker extends WorkerDictionary{
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
 			totalInflections.addAndGet(inflections.size());
-			for(int i = 0; i < inflections.size(); i ++)
+			for(int i = 0, length = inflections.size(); i < length; i ++)
 				dictionary.add(inflections.get(i).getWord());
 		};
 		final Consumer<Exception> cancelled = exc -> {

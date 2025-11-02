@@ -57,7 +57,7 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 		try{
 			final AutoCorrectParser acoParser = workerData.getParser();
 			final List<CorrectionEntry> dictionary = acoParser.getCorrectionsDictionary();
-			for(int i = 0; i < dictionary.size(); i ++){
+			for(int i = 0, length = dictionary.size(); i < length; i ++){
 				data = dictionary.get(i);
 				dataProcessor.accept(data);
 			}

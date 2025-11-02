@@ -150,7 +150,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 				throw e;
 			}
 
-			for(int i = 0; i < reducedRules.size(); i ++)
+			for(int i = 0, length = reducedRules.size(); i < length; i ++)
 				LOGGER.info(ParserManager.MARKER_RULE_REDUCER, reducedRules.get(i));
 
 			finalizeProcessing("Successfully processed " + workerData.getWorkerName());

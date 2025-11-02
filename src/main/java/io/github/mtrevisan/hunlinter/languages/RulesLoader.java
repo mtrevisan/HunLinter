@@ -119,7 +119,7 @@ public class RulesLoader{
 
 			final Map<String, List<RuleMatcherEntry>> ruleAndRulesNotCombinable = new HashMap<>(0);
 			List<String> rules = readPropertyAsList("notCombinableRules", '/');
-			for(int i = 0; i < rules.size(); i ++){
+			for(int i = 0, length = rules.size(); i < length; i ++){
 				final String masterFlag = rules.get(i ++);
 				final String[] wrongFlags = strategy.parseFlags(rules.get(i));
 				ruleAndRulesNotCombinable.computeIfAbsent(masterFlag, k -> new ArrayList<>(1))
@@ -136,7 +136,7 @@ public class RulesLoader{
 			Character letter = null;
 			rules = readPropertyAsList("letterAndRulesCombinable", '/');
 			final Map<Character, List<LetterMatcherEntry>> letterAndRulesCombinable = new HashMap<>(0);
-			for(int i = 0; i < rules.size(); i ++){
+			for(int i = 0, length = rules.size(); i < length; i ++){
 				final String elem = rules.get(i);
 				if(elem.length() == 1)
 					letter = elem.charAt(0);
@@ -161,7 +161,7 @@ public class RulesLoader{
 
 			rules = readPropertyAsList("letterAndRulesNotCombinable", '/');
 			final Map<Character, List<LetterMatcherEntry>> letterAndRulesNotCombinable = new HashMap<>(0);
-			for(int i = 0; i < rules.size(); i ++){
+			for(int i = 0, length = rules.size(); i < length; i ++){
 				final String elem = rules.get(i);
 				if(elem.length() == 1)
 					letter = elem.charAt(0);
@@ -189,7 +189,7 @@ public class RulesLoader{
 	private void fillDataFields(final MorphologicalTag tag, final String property){
 		final List<String> itr = readPropertyAsList(property, ',');
 		final Set<String> set = new HashSet<>(itr.size());
-		for(int i = 0; i < itr.size(); i ++)
+		for(int i = 0, length = itr.size(); i < length; i ++)
 			set.add(tag.getCode() + itr.get(i));
 		dataFields.put(tag, set);
 	}
@@ -250,7 +250,7 @@ public class RulesLoader{
 
 	public final boolean containsHasToContainStressDerivationalSuffix(final List<String> derivationalSuffixes){
 		if(!hasToContainStressDerivationalSuffix.isEmpty())
-			for(int i = 0; i < derivationalSuffixes.size(); i ++)
+			for(int i = 0, length = derivationalSuffixes.size(); i < length; i ++)
 				if(hasToContainStressDerivationalSuffix.contains(derivationalSuffixes.get(i)))
 					return true;
 		return false;

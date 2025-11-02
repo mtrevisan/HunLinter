@@ -256,7 +256,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				if(used[begin])
 					continue;
 
-				for(int i = 1; i < siblings.size(); i ++)
+				for(int i = 1, length = siblings.size(); i < length; i ++)
 					if(trie.check[begin + siblings.get(i).getIndex()] != 0)
 						continue outer;
 

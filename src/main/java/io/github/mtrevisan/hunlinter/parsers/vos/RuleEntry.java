@@ -98,7 +98,7 @@ public class RuleEntry{
 
 	public final boolean isProductiveFor(final String word){
 		if(entries != null)
-			for(int i = 0; i < entries.size(); i ++)
+			for(int i = 0, length = entries.size(); i < length; i ++)
 				if(entries.get(i).canApplyTo(word))
 					return true;
 		return false;

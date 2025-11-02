@@ -105,7 +105,7 @@ class WordGeneratorCompoundFlag extends WordGeneratorCompound{
 	private List<List<List<Inflection>>> generateCompounds(final List<int[]> permutations, final List<DictionaryEntry> inputs){
 		final Map<Integer, List<Inflection>> dicEntries = new HashMap<>(0);
 		final List<List<List<Inflection>>> list = new ArrayList<>(permutations.size());
-		for(int i = 0; i < permutations.size(); i ++){
+		for(int i = 0, length = permutations.size(); i < length; i ++){
 			final List<List<Inflection>> inflections = generateCompound(permutations.get(i), dicEntries, inputs);
 			if(inflections != null)
 				list.add(inflections);

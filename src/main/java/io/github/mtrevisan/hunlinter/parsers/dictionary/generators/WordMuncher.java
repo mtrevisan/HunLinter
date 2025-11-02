@@ -89,7 +89,7 @@ public class WordMuncher{
 		//TODO
 
 		if(LOGGER.isTraceEnabled())
-			for(int i = 0; i < originators.size(); i ++)
+			for(int i = 0, length = originators.size(); i < length; i ++)
 				LOGGER.trace("Inferred inflection: {}", originators.get(i));
 		return originators;
 	}
@@ -101,11 +101,11 @@ public class WordMuncher{
 		final List<DictionaryEntry> originators = new ArrayList<>(0);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		//for each rule
-		for(int i = 0; i < ruleEntries.size(); i ++){
+		for(int i = 0, length = ruleEntries.size(); i < length; i ++){
 			final RuleEntry ruleEntry = ruleEntries.get(i);
 			//for each affix entry in rule
 			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
-			for(int j = 0; j < affixEntries.size(); j ++){
+			for(int j = 0, length2 = affixEntries.size(); j < length2; j ++){
 				final AffixEntry affixEntry = affixEntries.get(j);
 				if(affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);
@@ -133,11 +133,11 @@ public class WordMuncher{
 		final DictionaryEntry nullDicEntry = dictionaryEntryFactory.createFromDictionaryLine(word);
 		final List<RuleEntry> ruleEntries = affixData.getRuleEntries();
 		final Collection<Inflection> originatingRulesFromEntry = new ArrayList<>(0);
-		for(int i = 0; i < ruleEntries.size(); i ++){
+		for(int i = 0, length = ruleEntries.size(); i < length; i ++){
 			final RuleEntry ruleEntry = ruleEntries.get(i);
 			originatingRulesFromEntry.clear();
 			final List<AffixEntry> affixEntries = ruleEntry.getEntries();
-			for(int j = 0; j < affixEntries.size(); j ++){
+			for(int j = 0, length2 = affixEntries.size(); j < length2; j ++){
 				final AffixEntry affixEntry = affixEntries.get(j);
 				if(!affixEntry.hasContinuationFlags() && affixEntry.canInverseApplyTo(word)){
 					final String originatingWord = affixEntry.undoRule(word);

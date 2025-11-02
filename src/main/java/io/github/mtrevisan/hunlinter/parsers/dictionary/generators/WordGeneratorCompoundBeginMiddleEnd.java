@@ -100,7 +100,7 @@ class WordGeneratorCompoundBeginMiddleEnd extends WordGeneratorCompound{
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(inputCompound);
 
 			final List<Inflection> inflections = applyAffixRules(dicEntry, false, null);
-			for(int i = 0; i < inflections.size(); i ++){
+			for(int i = 0, length = inflections.size(); i < length; i ++){
 				final Map<String, List<DictionaryEntry>> distribution = inflections.get(i).distributeByCompoundBeginMiddleEnd(compoundBeginFlag,
 					compoundMiddleFlag, compoundEndFlag);
 				compoundRules = mergeDistributions(compoundRules, distribution, compoundMinimumLength, forbiddenWordFlag);

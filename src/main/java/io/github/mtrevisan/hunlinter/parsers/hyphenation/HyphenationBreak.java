@@ -82,7 +82,7 @@ public class HyphenationBreak{
 	public final void enforceNoHyphens(final List<String> syllabes, final Iterable<String> noHyphen){
 		if(syllabes.size() > 1){
 			int wordLength = 0;
-			for(int i = 0; i < syllabes.size(); i ++)
+			for(int i = 0, length = syllabes.size(); i < length; i ++)
 				wordLength += syllabes.get(i).length();
 			for(final String nohyp : noHyphen){
 				final String reducedKey = reduceKey(nohyp);
@@ -99,7 +99,7 @@ public class HyphenationBreak{
 		final int nohypLength = nohyp.length();
 
 		int index = 0;
-		for(int i = 0; syllabes.size() > 1 && i < syllabes.size(); i ++){
+		for(int i = 0, length = syllabes.size(); length > 1 && i < length; i ++){
 			final String syllabe = syllabes.get(i);
 
 			if(syllabe.contentEquals(nohyp)){

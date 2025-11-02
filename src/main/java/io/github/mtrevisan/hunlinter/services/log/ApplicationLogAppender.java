@@ -109,7 +109,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
 				if(textAreas != null)
-					for(int i = 0; i < textAreas.size(); i ++){
+					for(int i = 0, length = textAreas.size(); i < length; i ++){
 						final JTextArea textArea = textAreas.get(i);
 						final Document doc = textArea.getDocument();
 						textArea.setCaretPosition(doc.getLength());
@@ -118,7 +118,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 				final List<JTextPane> textPanes = TEXT_PANES.get(marker);
 				if(textPanes != null)
-					for(int i = 0; i < textPanes.size(); i ++){
+					for(int i = 0, length = textPanes.size(); i < length; i ++){
 						final Color color;
 						if(level == Level.ERROR)
 							color = Color.RED;
@@ -131,7 +131,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 
 				final List<JLabel> labels = LABELS.get(marker);
 				if(labels != null)
-					for(int i = 0; i < labels.size(); i ++)
+					for(int i = 0, length = labels.size(); i < length; i ++)
 						labels.get(i).setText(message);
 			});
 		}

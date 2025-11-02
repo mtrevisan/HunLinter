@@ -168,7 +168,7 @@ public final class OrthographyVEC extends Orthography{
 	@Override
 	public boolean[] getSyllabationErrors(final List<String> syllabes){
 		final boolean[] errors = new boolean[syllabes.size()];
-		for(int i = 0; i < syllabes.size(); i ++){
+		for(int i = 0, length = syllabes.size(); i < length; i ++){
 			final String syllabe = syllabes.get(i);
 			errors[i] = (!syllabe.contains(HyphenationParser.APOSTROPHE)
 				&& !StringUtils.contains(syllabe, HyphenationParser.MODIFIER_LETTER_APOSTROPHE)
