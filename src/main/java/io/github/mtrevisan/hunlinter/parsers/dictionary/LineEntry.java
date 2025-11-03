@@ -235,7 +235,7 @@ public class LineEntry implements Serializable{
 			changed = false;
 
 			//sort by condition length (more generic first)
-			result.sort(Comparator.comparingInt(e -> RegexSequencer.splitSequence(e.condition).length));
+			result.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
 			for(int i = 0; !changed && i < length; i ++){
 				final LineEntry a = result.get(i);
@@ -538,13 +538,10 @@ public class LineEntry implements Serializable{
 
 	private static Set<Character> extractCharacters(final String str){
 		final Set<Character> result = new HashSet<>();
-		if(str.startsWith("[") && str.endsWith("]")){
-			final String inner = str.substring(1, str.length() - 1);
-			for(final char chr : inner.toCharArray())
-				result.add(chr);
-		}
-		else if(str.length() == 1)
-			result.add(str.charAt(0));
+		for(final char c : str.toCharArray())
+			result.add(c);
+		result.remove('[');
+		result.remove(']');
 		return result;
 	}
 

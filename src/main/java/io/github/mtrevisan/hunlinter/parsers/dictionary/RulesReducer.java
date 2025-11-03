@@ -43,17 +43,22 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class RulesReducer{
@@ -63,7 +68,6 @@ public class RulesReducer{
 
 	private static final String TAB = "\t";
 	private static final String PIPE = "|";
-	private static final String ZERO = "0";
 
 
 	private final AffixData affixData;
@@ -104,8 +108,8 @@ public class RulesReducer{
 		final int lastCommonLetter = StringHelper.getLastCommonLetterIndex(word, producedWord);
 
 		final int wordLength = word.length();
-		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): ZERO);
-		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): ZERO);
+		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): StringUtils.EMPTY);
+		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): StringUtils.EMPTY);
 		final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 		if(lastAppliedRule != null)
 			addition += lastAppliedRule.toString(strategy);
@@ -129,11 +133,21 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(33);
 
-		final List<LineEntry> compactedRulesSameFrom = compactRulesSameFrom(compactedRulesAddition, comparator);
+		final List<LineEntry> compactedRulesSameFrom = compactRulesByFrom(compactedRulesAddition);
 
 		if(progressCallback != null)
 			progressCallback.accept(50);
 
+//		compactedRulesSameFrom.sort(
+//			Comparator.comparingInt(rule -> RegexHelper.conditionLength(((LineEntry)rule).condition))
+//				.thenComparing(rule -> ((LineEntry)rule).condition));
+
+//		final String[] seqA = RegexSequencer.splitSequence(a.condition);
+//		final String[] seqB = RegexSequencer.splitSequence(b.condition);
+//		RegexSequencer.endsWith(seqB, seqA);
+
+		//FIXME fin kuà -- apply collision detection e resolution
+		final List<LineEntry> nonCollidingRules0 = resolveCollisions(compactedRulesSameFrom);
 		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
 
 		//reshuffle originating list to place the correct inflections in the correct rule
@@ -161,83 +175,121 @@ public class RulesReducer{
 		return lazyCompactedRules;
 	}
 
-	private static List<LineEntry> compactRulesFrom(final Collection<LineEntry> plainRules,
+	private static List<LineEntry> compactRulesFrom(final Collection<LineEntry> entries,
 			final Comparator<String> comparator){
-		final Map<String, LineEntry> map = new HashMap<>(0);
-		for(final LineEntry entry : plainRules){
-			final int addition = sortAndMergeAndHash(entry.addition, comparator);
-
-			final StringJoiner key = new StringJoiner(PIPE);
-			key.add(entry.condition);
-			key.add(entry.removal);
-			key.add(Integer.toString(addition));
-			final String keyString = key.toString();
-
-			final LineEntry rule = map.get(keyString);
-			if(rule == null)
-				map.put(keyString, entry);
-			else
-				rule.from.addAll(entry.from);
-		}
-		return new ArrayList<>(map.values());
+		return compactRules(
+			entries,
+			entry -> new StringJoiner(PIPE)
+				.add(entry.condition)
+				.add(entry.removal)
+				.add(Integer.toString(sortAndMergeAndHash(entry.addition, comparator)))
+				.toString(),
+			(rule, entry) -> rule.from.addAll(entry.from)
+		);
 	}
 
-	private static List<LineEntry> compactRulesAddition(final Collection<LineEntry> plainRules,
+	private static List<LineEntry> compactRulesAddition(final Collection<LineEntry> entries,
 			final Comparator<String> comparator){
-		final Map<String, LineEntry> map = new HashMap<>(0);
-		for(final LineEntry entry : plainRules){
-			final int from = sortAndMergeAndHash(entry.from, comparator);
-
-			final StringJoiner key = new StringJoiner(PIPE);
-			key.add(entry.condition);
-			key.add(entry.removal);
-			key.add(Integer.toString(from));
-			final String keyString = key.toString();
-
-			final LineEntry rule = map.get(keyString);
-			if(rule == null)
-				map.put(keyString, entry);
-			else
-				rule.addition.addAll(entry.addition);
-		}
-		return new ArrayList<>(map.values());
+		return compactRules(
+			entries,
+			entry -> new StringJoiner(PIPE)
+				.add(entry.condition)
+				.add(entry.removal)
+				.add(Integer.toString(sortAndMergeAndHash(entry.from, comparator)))
+				.toString(),
+			(rule, entry) -> rule.addition.addAll(entry.addition)
+		);
 	}
 
-	private static List<LineEntry> compactRulesSameFrom(final List<LineEntry> plainRules,
-			final Comparator<String> comparator){
-		//sort by condition length (more generic first)
-		plainRules.sort(Comparator.comparingInt(e -> RegexSequencer.splitSequence(e.condition).length));
+	private static List<LineEntry> compactRulesByFrom(List<LineEntry> entries){
+		//group by `from`
+		final Map<Set<String>, List<LineEntry>> fromGroups = entries.stream()
+			.collect(Collectors.groupingBy(e -> new HashSet<>(e.from)));
 
-		final Map<Integer, LineEntry> map = new HashMap<>(0);
-		for(final LineEntry entry : plainRules){
-			final int key = sortAndMergeAndHash(entry.from, comparator);
+		final List<LineEntry> result = new ArrayList<>();
+		for(final Map.Entry<Set<String>, List<LineEntry>> group : fromGroups.entrySet()){
+			final List<LineEntry> sameFrom = group.getValue();
+			if(sameFrom.size() == 1){
+				result.add(sameFrom.getFirst());
+				continue;
+			}
 
-			final LineEntry rule = map.get(key);
-			if(rule == null)
-				map.put(key, entry);
-			else{
-				//NOTE: assume `entry.condition` is simple (that is, that don't have regex groups)
-				final String baseCondition = entry.condition.substring(0,
-					entry.condition.length() - RegexSequencer.splitSequence(rule.condition).length);
-				for(final String addition : rule.addition)
-					entry.addition.add(baseCondition + addition);
-				//overwrite rule
-				map.put(key, entry);
+			//find longest `removal`
+			final LineEntry longest = sameFrom.stream()
+				.max(Comparator.comparingInt(e -> e.removal.length()))
+				.orElseThrow();
+
+			final int newRemovalLength = longest.removal.length();
+			final Set<String> mergedAdd = new LinkedHashSet<>();
+			for(final LineEntry e : sameFrom){
+				final int delta = newRemovalLength - e.removal.length();
+				final String baseRemoval = longest.removal.substring(0, delta);
+				for(final String add : e.addition)
+					mergedAdd.add(baseRemoval + add);
+			}
+
+			final LineEntry newEntry = new LineEntry(longest.removal, mergedAdd, longest.condition, group.getKey());
+			result.add(newEntry);
+		}
+
+		return result;
+	}
+
+	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries){
+		final int length = entries.size();
+		boolean changed;
+		do{
+			changed = false;
+
+			//sort by condition length (more generic first)
+			entries.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
+
+			for(int i = 0; !changed && i < length; i ++){
+				//candidate generic
+				final LineEntry generic = entries.get(i);
+				final String[] genericCondition = RegexSequencer.splitSequence(generic.condition);
+
+				for(int j = i + 1; !changed && j < length; j ++){
+					//candidate specific
+					final LineEntry specific = entries.get(j);
+					final String[] specificCondition = RegexSequencer.splitSequence(specific.condition);
+
+					if(!RegexSequencer.endsWith(specificCondition, genericCondition) || generic.from.equals(specific.from))
+						continue;
+
+					//collision detected: `generic` is too generic compared to `specific`
+
+					//FIXME fin kuà -- apply collision detection e resolution
+					//try to refine `generic` using its `from` words
+					final String refined = refineCondition(generic, genericCondition);
+					assert (refined != null && !refined.equals(generic.condition));
+					generic.condition = refined;
+
+					changed = true;
+				}
+			}
+		}while(changed);
+
+		return entries;
+	}
+
+	/** Attempt to refine a generic condition by analyzing its `from` words */
+	private static String refineCondition(final LineEntry generic, final String[] specificCondition){
+		final Set<String> suffixes = new HashSet<>();
+		for(final String w : generic.from){
+			if(w.length() >= specificCondition.length){
+				//extract the actual suffix of the word with same length as condition
+				final String suffix = w.substring(w.length() - specificCondition.length);
+				suffixes.add(suffix);
 			}
 		}
-		return new ArrayList<>(map.values());
-	}
 
-	public static <V> int sortAndMergeAndHash(final Collection<V> set, final Comparator<String> comparator){
-		final List<String> list = new ArrayList<>(set.size());
-		for(final V v : set)
-			list.add(String.valueOf(v));
-		list.sort(comparator);
+		//if all words share the same suffix, we can refine
+		if(suffixes.size() == 1)
+			return suffixes.iterator().next();
 
-		final StringJoiner sj = new StringJoiner(PIPE);
-		for(final String elem : list)
-			sj.add(elem);
-		return sj.toString().hashCode();
+		//cannot refine
+		return null;
 	}
 
 	private static List<LineEntry> compactRulesButConditionAndFrom(final List<LineEntry> plainRules,
@@ -283,6 +335,28 @@ public class RulesReducer{
 			}
 		}
 		return new ArrayList<>(map.values());
+	}
+
+	private static <K> List<LineEntry> compactRules(final Collection<LineEntry> plainRules,
+			final Function<LineEntry, K> keyBuilder, final BiConsumer<LineEntry, LineEntry> merger){
+		final Map<K, LineEntry> map = new HashMap<>();
+		for(final LineEntry entry : plainRules){
+			final K key = keyBuilder.apply(entry);
+			final LineEntry existing = map.get(key);
+			if(existing == null)
+				map.put(key, entry);
+			else
+				merger.accept(existing, entry);
+		}
+		return new ArrayList<>(map.values());
+	}
+
+	private static <V> int sortAndMergeAndHash(final Collection<V> set, final Comparator<String> comparator){
+		return set.stream()
+			.map(String::valueOf)
+			.sorted(comparator)
+			.collect(Collectors.joining(PIPE))
+			.hashCode();
 	}
 
 	private static List<LineEntry> redistributeRules(final List<LineEntry> plainRules){
@@ -874,8 +948,8 @@ public class RulesReducer{
 				for(final String addition : rule.addition){
 					final int lcp = StringHelper.longestCommonPrefix(rule.removal, addition).length();
 					final String removal = rule.removal.substring(lcp);
-					final LineEntry entry = new LineEntry((removal.isEmpty()? ZERO: removal), addition.substring(lcp),
-						rule.condition, rule.from);
+					final LineEntry entry = new LineEntry((removal.isEmpty()? StringUtils.EMPTY: removal),
+						addition.substring(lcp), rule.condition, rule.from);
 					restoredRules.add(type == AffixType.SUFFIX? entry: entry.reverse());
 				}
 			}
