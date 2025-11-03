@@ -45,8 +45,10 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -85,16 +87,17 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final AffixType type = ruleToBeReduced.getType();
 
-		final List<String> originalLines = new ArrayList<>(0);
+		final Set<String> originalLines = new HashSet<>(0);
 		final List<LineEntry> originalRules = new ArrayList<>(0);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
+			final String data = indexData.getData();
+			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(data);
 			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
 
-			final LineEntry filteredRule = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
-			if(filteredRule != null){
-				originalLines.add(indexData.getData());
-				originalRules.add(filteredRule);
+			final List<LineEntry> rules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
+			if(rules != null && !rules.isEmpty()){
+				originalLines.add(data);
+				originalRules.addAll(rules);
 			}
 		};
 

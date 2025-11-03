@@ -43,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -240,31 +241,281 @@ public class LineEntry implements Serializable{
 				final LineEntry a = result.get(i);
 				final String[] seqA = RegexSequencer.splitSequence(a.condition);
 
-				//base case: condition is empty
-				if(a.condition.isEmpty() && length > 1){
-					changed = isChanged(a, seqA.length, comparator);
-
-					continue;
-				}
-
-
-				//condition is always non-empty here
-
 				for(int j = i + 1; !changed && j < length; j ++){
 					final LineEntry b = result.get(j);
 					final String[] seqB = RegexSequencer.splitSequence(b.condition);
-					if(!RegexSequencer.endsWith(seqA, seqB) && !RegexSequencer.endsWith(seqB, seqA))
+					if(!RegexSequencer.endsWith(seqB, seqA) || a.from.equals(b.from))
 						continue;
 
 					if(seqA.length == seqB.length){
-						changed = isChanged(a, seqA.length, comparator);
-						changed |= isChanged(b, seqB.length, comparator);
+						//TODO if seqA intersect seqB is non-empty, then subdivide rules into only-A, A-B, only B
+						if(seqA.length > 0){
+							final Set<Character> seqA0 = extractCharacters(seqA[0]);
+							final Set<Character> seqB0 = extractCharacters(seqB[0]);
+
+							final Set<Character> onlyIntersection = new HashSet<>(seqA0);
+							onlyIntersection.retainAll(seqB0);
+
+							if(!onlyIntersection.isEmpty()){
+								final Set<Character> onlyInA = new HashSet<>(seqA0);
+								onlyInA.removeAll(seqB0);
+
+								final Set<Character> onlyInB = new HashSet<>(seqB0);
+								onlyInB.removeAll(seqA0);
+
+								if(!onlyInA.isEmpty() && onlyInB.isEmpty()){
+									//TODO split A into only-A, A-B
+									final String onlyA = RegexHelper.makeGroup(onlyInA, comparator);
+									String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+									//split rules
+									final StringBuilder sb = new StringBuilder();
+									seqA[0] = intersection;
+									for(final String s : seqA)
+										sb.append(s);
+									intersection = sb.toString();
+									final String intersectionRegex = ".*" + intersection + "$";
+
+									final Set<String> intersectionWords	= new HashSet<>(0);
+									Iterator<String> itr = a.from.iterator();
+									while(itr.hasNext()){
+										final String from = itr.next();
+										if(from.matches(intersectionRegex)){
+											intersectionWords.add(from);
+											itr.remove();
+										}
+									}
+									final LineEntry inters = new LineEntry(a.removal, a.addition, intersection, intersectionWords);
+									seqA[0] = onlyA;
+									sb.setLength(0);
+									for(final String s : seqA)
+										sb.append(s);
+									a.condition = sb.toString();
+									result.add(inters);
+
+									changed = true;
+								}
+								else if(onlyInA.isEmpty() && !onlyInB.isEmpty()){
+									//TODO split B into only-B, A-B
+									final String onlyB = RegexHelper.makeGroup(onlyInB, comparator);
+									String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+									//split rules
+									final StringBuilder sb = new StringBuilder();
+									seqB[0] = intersection;
+									for(final String s : seqB)
+										sb.append(s);
+									intersection = sb.toString();
+									final String intersectionRegex = ".*" + intersection + "$";
+
+									final Set<String> intersectionWords	= new HashSet<>(0);
+									Iterator<String> itr = b.from.iterator();
+									while(itr.hasNext()){
+										final String from = itr.next();
+										if(from.matches(intersectionRegex)){
+											intersectionWords.add(from);
+											itr.remove();
+										}
+									}
+									final LineEntry inters = new LineEntry(b.removal, b.addition, intersection, intersectionWords);
+									seqB[0] = onlyB;
+									sb.setLength(0);
+									for(final String s : seqB)
+										sb.append(s);
+									b.condition = sb.toString();
+									result.add(inters);
+
+									changed = true;
+								}
+								else if(!onlyInA.isEmpty() && !onlyInB.isEmpty()){
+									//split A and B into only-A, A-B, only B
+									final String onlyA = RegexHelper.makeGroup(onlyInA, comparator);
+									final String onlyB = RegexHelper.makeGroup(onlyInB, comparator);
+									String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+									//split rules
+									final StringBuilder sb = new StringBuilder();
+									seqA[0] = intersection;
+									for(final String s : seqA)
+										sb.append(s);
+									intersection = sb.toString();
+									final String intersectionRegex = ".*" + intersection + "$";
+
+									//split rules
+									final Set<String> intersectionWords	= new HashSet<>(0);
+									Iterator<String> itr = a.from.iterator();
+									while(itr.hasNext()){
+										final String from = itr.next();
+										if(from.matches(intersectionRegex)){
+											intersectionWords.add(from);
+											itr.remove();
+										}
+									}
+									itr = b.from.iterator();
+									while(itr.hasNext()){
+										final String word = itr.next();
+										if(word.matches(intersectionRegex)){
+											intersectionWords.add(word);
+											itr.remove();
+										}
+									}
+									final LineEntry inters = new LineEntry(a.removal, a.addition, intersection, intersectionWords);
+									seqA[0] = onlyA;
+									seqB[0] = onlyB;
+									sb.setLength(0);
+									for(final String s : seqA)
+										sb.append(s);
+									a.condition = sb.toString();
+									sb.setLength(0);
+									for(final String s : seqB)
+										sb.append(s);
+									b.condition = sb.toString();
+									result.add(inters);
+
+									changed = true;
+								}
+							}
+						}
+						if(!changed){
+							changed = isChanged(a, seqA.length, comparator);
+							changed |= isChanged(b, seqB.length, comparator);
+						}
 						continue;
 					}
+					else if(seqA.length > 0){
+						//TODO split rule A
+						final Set<Character> seqA0 = extractCharacters(seqA[0]);
+						final Set<Character> seqB0 = b.extractGroup(seqA.length - 1);
 
-					final LineEntry generic = (seqA.length < seqB.length? a: b);
-					final int genericSequenceLength = Math.min(seqA.length, seqB.length);
-					changed = isChanged(generic, genericSequenceLength, comparator);
+						final Set<Character> onlyIntersection = new HashSet<>(seqA0);
+						onlyIntersection.retainAll(seqB0);
+
+						if(!onlyIntersection.isEmpty()){
+							final Set<Character> onlyInA = new HashSet<>(seqA0);
+							onlyInA.removeAll(seqB0);
+
+							final Set<Character> onlyInB = new HashSet<>(seqB0);
+							onlyInB.removeAll(seqA0);
+
+							if(!onlyInA.isEmpty() && onlyInB.isEmpty()){
+								//TODO split A into only-A, A-B
+								final String onlyA = RegexHelper.makeGroup(onlyInA, comparator);
+								String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+								//split rules
+								final StringBuilder sb = new StringBuilder();
+								seqA[0] = intersection;
+								for(final String s : seqA)
+									sb.append(s);
+								intersection = sb.toString();
+								final String intersectionRegex = ".*" + intersection + "$";
+
+								final Set<String> intersectionWords	= new HashSet<>(0);
+								Iterator<String> itr = a.from.iterator();
+								while(itr.hasNext()){
+									final String from = itr.next();
+									if(from.matches(intersectionRegex)){
+										intersectionWords.add(from);
+										itr.remove();
+									}
+								}
+								final LineEntry inters = new LineEntry(a.removal, a.addition, intersection, intersectionWords);
+								seqA[0] = onlyA;
+								sb.setLength(0);
+								for(final String s : seqA)
+									sb.append(s);
+								a.condition = sb.toString();
+								result.add(inters);
+
+								changed = true;
+							}
+							else if(onlyInA.isEmpty() && !onlyInB.isEmpty()){
+								//TODO split B into only-B, A-B
+								final String onlyB = RegexHelper.makeGroup(onlyInB, comparator);
+								String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+								//split rules
+								final StringBuilder sb = new StringBuilder();
+								seqB[0] = intersection;
+								for(final String s : seqB)
+									sb.append(s);
+								intersection = sb.toString();
+								final String intersectionRegex = ".*" + intersection + "$";
+
+								final Set<String> intersectionWords	= new HashSet<>(0);
+								Iterator<String> itr = b.from.iterator();
+								while(itr.hasNext()){
+									final String from = itr.next();
+									if(from.matches(intersectionRegex)){
+										intersectionWords.add(from);
+										itr.remove();
+									}
+								}
+								final LineEntry inters = new LineEntry(b.removal, b.addition, intersection, intersectionWords);
+								seqB[0] = onlyB;
+								sb.setLength(0);
+								for(final String s : seqB)
+									sb.append(s);
+								b.condition = sb.toString();
+								result.add(inters);
+
+								changed = true;
+							}
+							else if(!onlyInA.isEmpty() && !onlyInB.isEmpty()){
+								//split A and B into only-A, A-B, only B
+								final String onlyA = RegexHelper.makeGroup(onlyInA, comparator);
+								final String onlyB = RegexHelper.makeGroup(onlyInB, comparator);
+								String intersection = RegexHelper.makeGroup(onlyIntersection, comparator);
+
+								//split rules
+								final StringBuilder sb = new StringBuilder();
+								seqA[0] = intersection;
+								for(final String s : seqA)
+									sb.append(s);
+								intersection = sb.toString();
+								final String intersectionRegex = ".*" + intersection + "$";
+
+								//split rules
+								final Set<String> intersectionWords	= new HashSet<>(0);
+								Iterator<String> itr = a.from.iterator();
+								while(itr.hasNext()){
+									final String from = itr.next();
+									if(from.matches(intersectionRegex)){
+										intersectionWords.add(from);
+										itr.remove();
+									}
+								}
+								itr = b.from.iterator();
+								while(itr.hasNext()){
+									final String word = itr.next();
+									if(word.matches(intersectionRegex)){
+										intersectionWords.add(word);
+										itr.remove();
+									}
+								}
+								final LineEntry inters = new LineEntry(a.removal, a.addition, intersection, intersectionWords);
+								seqA[0] = onlyA;
+								seqB[0] = onlyB;
+								sb.setLength(0);
+								for(final String s : seqA)
+									sb.append(s);
+								a.condition = sb.toString();
+								sb.setLength(0);
+								for(final String s : seqB)
+									sb.append(s);
+								b.condition = sb.toString();
+								result.add(inters);
+
+								changed = true;
+							}
+						}
+					}
+
+					if(!changed){
+						final LineEntry generic = (seqA.length < seqB.length? a: b);
+						final int genericSequenceLength = Math.min(seqA.length, seqB.length);
+						changed = isChanged(generic, genericSequenceLength, comparator);
+					}
 				}
 			}
 		}while(changed);
@@ -282,6 +533,19 @@ public class LineEntry implements Serializable{
 				changed = true;
 			}
 		return changed;
+	}
+
+
+	private static Set<Character> extractCharacters(final String str){
+		final Set<Character> result = new HashSet<>();
+		if(str.startsWith("[") && str.endsWith("]")){
+			final String inner = str.substring(1, str.length() - 1);
+			for(final char chr : inner.toCharArray())
+				result.add(chr);
+		}
+		else if(str.length() == 1)
+			result.add(str.charAt(0));
+		return result;
 	}
 
 	private static char[] toCharArray(final String[] strings){
