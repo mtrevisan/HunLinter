@@ -140,7 +140,7 @@ public class RulesReducer{
 			progressCallback.accept(50);
 
 		//FIXME fin kuà -- apply collision detection e resolution
-		final List<LineEntry> nonCollidingRules0 = resolveCollisions(compactedRulesSameFrom);
+		final List<LineEntry> nonCollidingRules0 = resolveCollisions(compactedRulesSameFrom, comparator);
 		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
 
 		//reshuffle originating list to place the correct inflections in the correct rule
@@ -229,7 +229,7 @@ public class RulesReducer{
 		return result;
 	}
 
-	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries){
+	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries, final Comparator<String> comparator){
 		//group by condition
 //		final Map<String, List<LineEntry>> groupByCondition = new HashMap<>(0);
 //		for(int i = 0, length = entries.size(); i < length; i ++){
@@ -296,13 +296,12 @@ public class RulesReducer{
 					final LineEntry specific = result.get(j);
 					final String[] specificCondition = RegexSequencer.splitSequence(specific.condition);
 
-					if(!RegexSequencer.endsWith(specificCondition, genericCondition))
-						continue;
-
-					//collision detected: `generic` is too generic compared to `specific`
-
-					//try to refine `generic` using its `from` words
-					changed = refineCondition(generic, genericCondition, specific, specificCondition, result);
+					if(RegexSequencer.endsWith(specificCondition, genericCondition)){
+						//collision detected: `generic` is too generic compared to `specific`
+						//try to refine `generic` using its `from` words
+						refineCondition(generic, genericCondition, specific, specificCondition, result, comparator);
+						changed = true;
+					}
 				}
 			}
 		}while(changed);
@@ -371,45 +370,99 @@ public class RulesReducer{
 	}
 
 	/** Attempt to refine a generic condition by analyzing its `from` words */
-	private static boolean refineCondition(final LineEntry generic, final String[] genericCondition,
-			final LineEntry specific, final String[] specificCondition, final List<LineEntry> entries){
-/*
-Risoluzione collisioni (loop esterno, 'token' può rappresentare sia una singola lettera che un gruppo):
-- Ordina le regole per lunghezza token (crescente).
-- Scansiona in ordine cercando la prima coppia in conflitto.
-- Calcolare l'intersezione (I = T1 ∩ T2)
-- Se l'intersezione non è vuota:
-	- calcolare la differenza tra il primo e il secondo token con l'intersezione (S1 = T1 \ I e S2 = T2 \ I)
-	- se le condizioni solo del primo e solo del secondo sono entrambe vuote (S1 = ∅ ∧ S2 = ∅), tenere le condizioni originarie e aggiungere un token in testa a ciascuna usando extractGroup(currentTokenLength, from) per ricavare il token.
-	- altrimenti sostituire entrambe le regole con tre regole, ciascuna con la condizione solo del primo (S1), solo del secondo (S2), e dell'intersezione (I), redistribuire le parole in "from" in maniera appropriata
-- Altrimenti se la condizione della regola più corta a cui premettere il token incomincia con un gruppo:
-   - sostituire la regole con altrettante regole espandendo e rimuovendo il gruppo, redistribuire le parole in "from" in maniera appropriata
-	- per ciascuna regola derivata, calcolare il token da premettere calcolandolo sul sottoinsieme di from relativo alla regola espansa, e aggiungilo in testa a ciascuna condizione
-- Altrimenti specializzare la regola più corta aggiungendo un token in testa alla condizione usando extractGroup(currentTokenLength, from) per ricavare il token.
-- Dopo ogni modifica si riavvia il ciclo: il sistema converge perché ogni passo o aumenta la lunghezza di una regola o riduce la cardinalità di un gruppo (operazioni finite).
-*/
+	private static void refineCondition(final LineEntry generic, final String[] genericCondition,
+			final LineEntry specific, final String[] specificCondition, final List<LineEntry> entries,
+			final Comparator<String> comparator){
 
-		//FIXME fin kuà -- apply collision detection e resolution
-		final Set<String> suffixes = new HashSet<>();
-		for(final String w : generic.from){
-			if(w.length() >= genericCondition.length){
-				//extract the actual suffix of the word with same length as condition
-				final String suffix = w.substring(w.length() - genericCondition.length);
-				suffixes.add(suffix);
+		//calculate intersection (I = T1 ∩ T2):
+		final int parentConditionLength = genericCondition.length;
+		final Set<Character> genericToken = generic.extractGroup(parentConditionLength);
+		final Set<Character> specificToken = specific.extractGroup(parentConditionLength);
+		final Set<Character> intersectionToken = SetHelper.intersection(genericToken, specificToken);
+
+		if(!intersectionToken.isEmpty()){
+			//calculate the differences (S1 = T1 \ I e S2 = T2 \ I)
+			final Set<Character> genericOnlyToken = new HashSet<>(genericToken);
+			genericOnlyToken.removeAll(intersectionToken);
+			final Set<Character> specificOnlyToken = new HashSet<>(specificToken);
+			specificOnlyToken.removeAll(intersectionToken);
+
+			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty()){
+				//if the conditions of only the generic token and only the specific token are both empty
+				// (S1 = ∅ ∧ S2 = ∅), keep the original conditions and add a token to the head of each...
+				generic.condition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				specific.condition = RegexHelper.makeGroup(specificToken, comparator) + specific.condition;
+			}
+			else{
+				//... otherwise, replace both rules with three rules, each with the condition of only the first (S1), only
+				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
+				if(!genericOnlyToken.isEmpty()){
+					entries.remove(generic);
+					final LineEntry newGenericOnly = LineEntry.createFrom(generic,
+						RegexHelper.makeGroup(genericOnlyToken, comparator) + generic.condition);
+					entries.add(newGenericOnly);
+				}
+				if(!specificOnlyToken.isEmpty()){
+					entries.remove(specific);
+					final LineEntry newSpecificOnly = LineEntry.createFrom(specific,
+						RegexHelper.makeGroup(specificOnlyToken, comparator) + specific.condition);
+					entries.add(newSpecificOnly);
+				}
+				if(!intersectionToken.isEmpty()){
+					final LineEntry newIntersectionOnly = LineEntry.createFrom(generic,
+						RegexHelper.makeGroup(intersectionToken, comparator) + generic.condition);
+					entries.add(newIntersectionOnly);
+				}
+			}
+		}
+		else{
+			//check if the condition of the generic rule to be preceded by the token begins with a group
+			if(genericCondition.length > 1){
+				//replace the generic rule with the same number of rules of the first token by expanding and removing it,
+				// redistribute the words in "from" appropriately
+				final String newGenericOnlyCondition = RegexHelper.makeGroup(
+					generic.extractGroup(generic.condition.length() + 1), comparator);
+				final char[] charArray = genericCondition[0].toCharArray();
+				final String newGenericOnlyBaseCondition = generic.condition.substring(charArray.length);
+				entries.remove(generic);
+				for(int i = 1, length = charArray.length - 1; i < length; i ++){
+					final char chr = charArray[i];
+
+					//for each derived rule, calculate the token to prepend by calculating it on the subset of from related
+					// to the expanded rule, and add it to the head of each condition
+					final LineEntry newGenericOnly = LineEntry.createFrom(generic,
+						newGenericOnlyCondition + chr + newGenericOnlyBaseCondition);
+					entries.add(newGenericOnly);
+				}
+			}
+			else{
+				//specialize the generic rule by adding a token at the head of the condition
+				final String newGenericCondition = RegexHelper.makeGroup(
+					generic.extractGroup(generic.condition.length() + 1), comparator);
+				final LineEntry newGeneric = new LineEntry(generic.removal, generic.addition, newGenericCondition,
+					generic.from);
+				entries.add(newGeneric);
 			}
 		}
 
-		//if all words share the same suffix, we can refine
-		if(suffixes.size() == 1){
-			final String refined = suffixes.iterator()
-				.next();
-			assert (refined != null && !refined.equals(generic.condition));
-			generic.condition = refined;
-			return true;
-		}
 
-		//cannot refine
-		return false;
+		//FIXME fin kuà -- apply collision detection e resolution
+//		final Set<String> suffixes = new HashSet<>();
+//		for(final String w : generic.from){
+//			if(w.length() >= genericCondition.length){
+//				//extract the actual suffix of the word with same length as condition
+//				final String suffix = w.substring(w.length() - genericCondition.length);
+//				suffixes.add(suffix);
+//			}
+//		}
+//
+//		//if all words share the same suffix, we can refine
+//		if(suffixes.size() == 1){
+//			final String refined = suffixes.iterator()
+//				.next();
+//			assert (refined != null && !refined.equals(generic.condition));
+//			generic.condition = refined;
+//		}
 	}
 
 	private static List<LineEntry> compactRulesButConditionAndFrom(final List<LineEntry> plainRules,
