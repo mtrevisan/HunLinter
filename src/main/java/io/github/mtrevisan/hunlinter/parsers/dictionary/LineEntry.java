@@ -62,6 +62,7 @@ public class LineEntry implements Serializable{
 	private static final String PATTERN_END_OF_WORD = "$";
 	private static final String TAB = "\t";
 	private static final String DOT = ".";
+	private static final String ZERO = "0";
 
 
 	final Set<String> from;
@@ -76,7 +77,8 @@ public class LineEntry implements Serializable{
 		return createFromWithWords(entry, condition, words);
 	}
 
-	public static LineEntry createFromWithWords(final LineEntry entry, final String condition, final Collection<String> words){
+	public static LineEntry createFromWithWords(final LineEntry entry, final String condition,
+			final Collection<String> words){
 		return new LineEntry(entry.removal, entry.addition, condition, words);
 	}
 
@@ -117,8 +119,9 @@ public class LineEntry implements Serializable{
 		return !from.isEmpty();
 	}
 
-	public final String anAddition(){
-		return addition.iterator().next();
+	public final String firstAddition(){
+		return addition.iterator()
+			.next();
 	}
 
 	public final LineEntry reverse(){
@@ -579,15 +582,18 @@ public class LineEntry implements Serializable{
 	}
 
 	public final String toHunspellRule(final AffixType type, final String flag){
-		String anAddition = anAddition();
+		String firstAddition = firstAddition();
 		String morphologicalRules = StringUtils.EMPTY;
-		final int idx = anAddition.indexOf(TAB);
+		final int idx = firstAddition.indexOf(TAB);
 		if(idx >= 0){
-			morphologicalRules = anAddition.substring(idx);
-			anAddition = anAddition.substring(0, idx);
+			morphologicalRules = firstAddition.substring(idx);
+			firstAddition = firstAddition.substring(0, idx);
 		}
-		final String line = type.getOption().getCode() + StringUtils.SPACE + flag + StringUtils.SPACE + removal + StringUtils.SPACE
-			+ anAddition + StringUtils.SPACE + (condition.isEmpty()? DOT: condition);
+		final String line = type.getOption().getCode() + StringUtils.SPACE
+			+ flag + StringUtils.SPACE
+			+ (removal.isEmpty()? ZERO: removal) + StringUtils.SPACE
+			+ firstAddition + StringUtils.SPACE
+			+ (condition.isEmpty()? DOT: condition);
 		return (idx >= 0? line + morphologicalRules: line);
 	}
 

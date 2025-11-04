@@ -43,13 +43,14 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -93,8 +94,8 @@ public class RulesReducer{
 			.thenComparingInt(entry -> entry.removal.length())
 			.thenComparing(entry -> StringUtils.reverse(entry.condition), comparator)
 			.thenComparing(entry -> entry.removal, comparator)
-			.thenComparingInt(entry -> entry.anAddition().length())
-			.thenComparing(LineEntry::anAddition, comparator);
+			.thenComparingInt(entry -> entry.firstAddition().length())
+			.thenComparing(LineEntry::firstAddition, comparator);
 	}
 
 
@@ -137,14 +138,6 @@ public class RulesReducer{
 
 		if(progressCallback != null)
 			progressCallback.accept(50);
-
-//		compactedRulesSameFrom.sort(
-//			Comparator.comparingInt(rule -> RegexHelper.conditionLength(((LineEntry)rule).condition))
-//				.thenComparing(rule -> ((LineEntry)rule).condition));
-
-//		final String[] seqA = RegexSequencer.splitSequence(a.condition);
-//		final String[] seqB = RegexSequencer.splitSequence(b.condition);
-//		RegexSequencer.endsWith(seqB, seqA);
 
 		//FIXME fin kuà -- apply collision detection e resolution
 		final List<LineEntry> nonCollidingRules0 = resolveCollisions(compactedRulesSameFrom);
@@ -221,7 +214,8 @@ public class RulesReducer{
 
 			final int newRemovalLength = longest.removal.length();
 			final Set<String> mergedAdd = new LinkedHashSet<>();
-			for(final LineEntry e : sameFrom){
+			for(int i = 0, length = sameFrom.size(); i < length; i ++){
+				final LineEntry e = sameFrom.get(i);
 				final int delta = newRemovalLength - e.removal.length();
 				final String baseRemoval = longest.removal.substring(0, delta);
 				for(final String add : e.addition)
@@ -236,60 +230,177 @@ public class RulesReducer{
 	}
 
 	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries){
+		//sort by condition length (more generic first)
+		entries.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
+
+//TODO fin kuà
+System.gc();
+
+		//group by condition
+//		final Map<String, List<LineEntry>> groupByCondition = new HashMap<>(0);
+//		for(int i = 0, length = entries.size(); i < length; i ++){
+//			final LineEntry entry = entries.get(i);
+//			groupByCondition.computeIfAbsent(entry.condition, k -> new ArrayList<>(0))
+//				.add(entry);
+//		}
+
+		//separate the various `from`s so that they don't intersect with each other
+//		for(final Map.Entry<String, List<LineEntry>> group : groupByCondition.entrySet()){
+//			final List<LineEntry> sameConditionList = group.getValue();
+//			if(sameConditionList.size() > 1){
+//				final List<LineEntry> disjointList = makeFromsDisjoint(sameConditionList);
+//				group.setValue(disjointList);
+//			}
+//		}
+
+//		for(final Map.Entry<String, List<LineEntry>> group : groupByCondition.entrySet()){
+//			final String condition = group.getKey();
+//			final List<LineEntry> sameConditionList = group.getValue();
+//			if(sameConditionList.size() == 1)
+//				continue;
+//
+//
+//			//build per-length buckets
+//			final Map<Integer, List<LineEntry>> buckets = new HashMap<>(0);
+//			for(final LineEntry entry : sameConditionList){
+//				final int conditionLength = RegexSequencer.splitSequence(entry.condition).length;
+//				buckets.computeIfAbsent(conditionLength, k -> new ArrayList<>(0))
+//					.add(entry);
+//			}
+//
+//			//process each fixed-length bucket independently
+//			for(final Map.Entry<Integer, List<LineEntry>> bucket : buckets.entrySet()){
+//				final Integer bucketLength = bucket.getKey();
+//				final List<LineEntry> bucketEntries = bucket.getValue();
+//
+//				for(int i = 0, length = bucketEntries.size(); i < length; i ++){
+//					final LineEntry entry = bucketEntries.get(i);
+//
+//					final String[] entryCondition = RegexSequencer.splitSequence(entry.condition);
+//					//TODO
+//				}
+//			}
+//		}
+//---
+
+		final List<LineEntry> result = new ArrayList<>(entries);
 		final int length = entries.size();
 		boolean changed;
 		do{
 			changed = false;
 
 			//sort by condition length (more generic first)
-			entries.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
+			result.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
 			for(int i = 0; !changed && i < length; i ++){
 				//candidate generic
-				final LineEntry generic = entries.get(i);
+				final LineEntry generic = result.get(i);
 				final String[] genericCondition = RegexSequencer.splitSequence(generic.condition);
 
 				for(int j = i + 1; !changed && j < length; j ++){
 					//candidate specific
-					final LineEntry specific = entries.get(j);
+					final LineEntry specific = result.get(j);
 					final String[] specificCondition = RegexSequencer.splitSequence(specific.condition);
 
+					//NOTE: if `from` are equals, that means it's a valid collision and should not be resolved
 					if(!RegexSequencer.endsWith(specificCondition, genericCondition) || generic.from.equals(specific.from))
 						continue;
 
 					//collision detected: `generic` is too generic compared to `specific`
 
-					//FIXME fin kuà -- apply collision detection e resolution
 					//try to refine `generic` using its `from` words
-					final String refined = refineCondition(generic, genericCondition);
-					assert (refined != null && !refined.equals(generic.condition));
-					generic.condition = refined;
-
-					changed = true;
+					changed = refineCondition(generic, genericCondition, specific, specificCondition, result);
 				}
 			}
 		}while(changed);
 
-		return entries;
+		return result;
+	}
+
+	/**
+	 * Given a list of sets (possibly overlapping), produce a new list of sets that are
+	 * pairwise disjoint and whose union equals the union of all input sets.
+	 *
+	 * The algorithm computes, for each element, its membership pattern across the input sets
+	 * (as a BitSet). Elements with identical membership patterns are grouped into the same "atom".
+	 * Each atom is a disjoint block. The original sets can be reconstructed as the union of all
+	 * atoms whose BitSet has the corresponding index set.
+	 *
+	 * Properties:
+	 * - Coverage preserved: the union of the output sets equals the union of the input sets.
+	 * - Pairwise disjoint output: no two output sets share an element.
+	 * - Stable element order: elements appear in the order of their first appearance across inputs.
+	 * - Efficient: O(U * (k/wordSize)) to build membership, where U=#unique elements, k=#input sets.
+	 *
+	 * @param entries	List of input sets (may contain nulls or empty sets)
+	 * @return	A new list of pairwise-disjoint sets ("atoms of membership")
+	 */
+	private static List<LineEntry> makeFromsDisjoint(final List<LineEntry> entries){
+		final int size = entries.size();
+
+		//1) Build element -> BitSet (membership pattern across input sets).
+		final Map<String, BitSet> membership = new HashMap<>();
+		for(int idx = 0; idx < size; idx ++){
+			final LineEntry entry = entries.get(idx);
+			for(final String elem : entry.from){
+				BitSet bs = membership.get(elem);
+				if(bs == null){
+					bs = new BitSet(size);
+					membership.put(elem, bs);
+				}
+				bs.set(idx);
+			}
+		}
+
+		// If there were no valid elements, return empty.
+		if(membership.isEmpty())
+			return Collections.emptyList();
+
+		final LineEntry first = entries.getFirst();
+		final String removal = first.removal;
+		final Set<String> addition = first.addition;
+		final String condition = first.condition;
+		// 2) Group elements by identical BitSet (the "atoms").
+		// BitSet equals/hashCode are content-based, so they can be used as keys.
+		// We clone them to avoid any accidental mutation in the map keys.
+		final Map<BitSet, LineEntry> atoms = new LinkedHashMap<>();
+		for(final Map.Entry<String, BitSet> en : membership.entrySet()){
+			final String elem = en.getKey();
+			final BitSet owners = en.getValue();
+
+			final LineEntry entry = atoms.computeIfAbsent(owners,
+				k -> new LineEntry(removal, addition, condition, new HashSet<>(1)));
+			entry.from.add(elem);
+		}
+
+		// 3) Materialize result as a list of disjoint sets, preserving atom order by first appearance.
+		return new ArrayList<>(atoms.values());
 	}
 
 	/** Attempt to refine a generic condition by analyzing its `from` words */
-	private static String refineCondition(final LineEntry generic, final String[] specificCondition){
+	private static boolean refineCondition(final LineEntry generic, final String[] genericCondition,
+			final LineEntry specific, final String[] specificCondition, final List<LineEntry> entries){
+		//FIXME fin kuà -- apply collision detection e resolution
 		final Set<String> suffixes = new HashSet<>();
 		for(final String w : generic.from){
-			if(w.length() >= specificCondition.length){
+			if(w.length() >= genericCondition.length){
 				//extract the actual suffix of the word with same length as condition
-				final String suffix = w.substring(w.length() - specificCondition.length);
+				final String suffix = w.substring(w.length() - genericCondition.length);
 				suffixes.add(suffix);
 			}
 		}
 
 		//if all words share the same suffix, we can refine
-		if(suffixes.size() == 1)
-			return suffixes.iterator().next();
+		if(suffixes.size() == 1){
+			final String refined = suffixes.iterator()
+				.next();
+			assert (refined != null && !refined.equals(generic.condition));
+			generic.condition = refined;
+			return true;
+		}
 
 		//cannot refine
-		return null;
+		return false;
 	}
 
 	private static List<LineEntry> compactRulesButConditionAndFrom(final List<LineEntry> plainRules,
@@ -325,8 +436,9 @@ public class RulesReducer{
 							ruleConditions = ruleConditions.substring(1, ruleConditions.length() - 1);
 
 						final Set<Character> addedGroup = entry.extractGroup(0);
-						for(final char c : ruleConditions.toCharArray())
-							addedGroup.add(c);
+						final char[] charArray = ruleConditions.toCharArray();
+						for(int j = 0, length2 = charArray.length; j < length2; j ++)
+							addedGroup.add(charArray[j]);
 
 						rule.condition = RegexHelper.makeGroup(addedGroup, comparator);
 						rule.from.addAll(entry.from);
@@ -473,8 +585,8 @@ public class RulesReducer{
 				for(int j = 0, length2 = temporaryRules.size(); j < length2; j ++)
 					insertRuleOrUpdateFrom(disjointedRules, temporaryRules.get(j));
 				final Set<String> strings = rule.addition;
-				for(final String s : additionsToBeRemoved)
-					strings.remove(s);
+				for(int j = 0, length2 = additionsToBeRemoved.size(); j < length2; j ++)
+					strings.remove(additionsToBeRemoved.get(j));
 				if(!rule.addition.isEmpty())
 					temporaryRules.clear();
 			}
@@ -902,11 +1014,11 @@ public class RulesReducer{
 					group.add(RegexSequencer.splitSequence(similarities.get(i).condition)[1].charAt(0));
 
 				condition.setLength(0);
-				for(final String cpc : commonPreCondition)
-					condition.append(cpc);
+				for(int i = 0, length = commonPreCondition.length; i < length; i ++)
+					condition.append(commonPreCondition[i]);
 				condition.append(RegexHelper.makeGroup(group, comparator));
-				for(final String cpc : commonPostCondition)
-					condition.append(cpc);
+				for(int i = 0, length = commonPostCondition.length; i < length; i ++)
+					condition.append(commonPostCondition[i]);
 				condition.toString();
 
 				final LineEntry newRule = LineEntry.createFrom(anEntry, condition.toString());
@@ -925,6 +1037,10 @@ public class RulesReducer{
 
 	public final List<String> convertFormat(final String flag, final boolean keepLongestCommonAffix,
 			final List<LineEntry> compactedRules){
+		compactedRules.sort(
+			Comparator.comparingInt(rule -> RegexHelper.conditionLength(((LineEntry)rule).condition))
+				.thenComparing(rule -> ((LineEntry)rule).condition));
+
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
 		if(ruleToBeReduced == null)
 			throw new LinterException(NON_EXISTENT_RULE, flag);
