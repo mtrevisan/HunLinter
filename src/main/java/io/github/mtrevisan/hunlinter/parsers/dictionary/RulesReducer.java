@@ -299,7 +299,7 @@ public class RulesReducer{
 					if(RegexSequencer.endsWith(specificCondition, genericCondition)){
 						//collision detected: `generic` is too generic compared to `specific`
 						//try to refine `generic` using its `from` words
-						refineCondition(generic, genericCondition, specific, specificCondition, result, comparator);
+						refineCondition(generic, genericCondition, specific, result, comparator);
 						changed = true;
 					}
 				}
@@ -371,13 +371,11 @@ public class RulesReducer{
 
 	/** Attempt to refine a generic condition by analyzing its `from` words */
 	private static void refineCondition(final LineEntry generic, final String[] genericCondition,
-			final LineEntry specific, final String[] specificCondition, final List<LineEntry> entries,
-			final Comparator<String> comparator){
-
+			final LineEntry specific, final List<LineEntry> entries, final Comparator<String> comparator){
 		//calculate intersection (I = T1 ∩ T2):
-		final int parentConditionLength = genericCondition.length;
-		final Set<Character> genericToken = generic.extractGroup(parentConditionLength);
-		final Set<Character> specificToken = specific.extractGroup(parentConditionLength);
+		final int genericConditionLength = genericCondition.length;
+		final Set<Character> genericToken = generic.extractGroup(genericConditionLength);
+		final Set<Character> specificToken = specific.extractGroup(genericConditionLength);
 		final Set<Character> intersectionToken = SetHelper.intersection(genericToken, specificToken);
 
 		if(!intersectionToken.isEmpty()){
@@ -398,9 +396,25 @@ public class RulesReducer{
 				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
 				if(!genericOnlyToken.isEmpty()){
 					entries.remove(generic);
-					final LineEntry newGenericOnly = LineEntry.createFrom(generic,
-						RegexHelper.makeGroup(genericOnlyToken, comparator) + generic.condition);
-					entries.add(newGenericOnly);
+					if(genericCondition.length > 0 && genericCondition[0].length() > 1){
+						//replace the generic rule with the same number of rules of the first token by expanding and removing it,
+						// redistribute the words in "from" appropriately
+						final char[] charArray = genericCondition[0].toCharArray();
+						final String newGenericOnlyBaseCondition = generic.condition.substring(charArray.length);
+						entries.remove(generic);
+						for(int i = 1, length = charArray.length - 1; i < length; i ++){
+							final char chr = charArray[i];
+
+							final LineEntry newGenericOnly = LineEntry.createFrom(generic,
+								chr + newGenericOnlyBaseCondition);
+							entries.add(newGenericOnly);
+						}
+					}
+					else{
+						final LineEntry newGenericOnly = LineEntry.createFrom(generic,
+							RegexHelper.makeGroup(genericOnlyToken, comparator) + generic.condition);
+						entries.add(newGenericOnly);
+					}
 				}
 				if(!specificOnlyToken.isEmpty()){
 					entries.remove(specific);
@@ -417,31 +431,24 @@ public class RulesReducer{
 		}
 		else{
 			//check if the condition of the generic rule to be preceded by the token begins with a group
-			if(genericCondition.length > 1){
+			if(genericCondition.length > 0 && genericCondition[0].length() > 1){
 				//replace the generic rule with the same number of rules of the first token by expanding and removing it,
 				// redistribute the words in "from" appropriately
-				final String newGenericOnlyCondition = RegexHelper.makeGroup(
-					generic.extractGroup(generic.condition.length() + 1), comparator);
 				final char[] charArray = genericCondition[0].toCharArray();
 				final String newGenericOnlyBaseCondition = generic.condition.substring(charArray.length);
 				entries.remove(generic);
 				for(int i = 1, length = charArray.length - 1; i < length; i ++){
 					final char chr = charArray[i];
 
-					//for each derived rule, calculate the token to prepend by calculating it on the subset of from related
-					// to the expanded rule, and add it to the head of each condition
 					final LineEntry newGenericOnly = LineEntry.createFrom(generic,
-						newGenericOnlyCondition + chr + newGenericOnlyBaseCondition);
+						chr + newGenericOnlyBaseCondition);
 					entries.add(newGenericOnly);
 				}
 			}
 			else{
 				//specialize the generic rule by adding a token at the head of the condition
-				final String newGenericCondition = RegexHelper.makeGroup(
-					generic.extractGroup(generic.condition.length() + 1), comparator);
-				final LineEntry newGeneric = new LineEntry(generic.removal, generic.addition, newGenericCondition,
-					generic.from);
-				entries.add(newGeneric);
+				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator);
+				generic.condition = newGenericCondition + generic.condition;
 			}
 		}
 
@@ -449,9 +456,9 @@ public class RulesReducer{
 		//FIXME fin kuà -- apply collision detection e resolution
 //		final Set<String> suffixes = new HashSet<>();
 //		for(final String w : generic.from){
-//			if(w.length() >= genericCondition.length){
+//			if(w.length() >= genericConditionLength){
 //				//extract the actual suffix of the word with same length as condition
-//				final String suffix = w.substring(w.length() - genericCondition.length);
+//				final String suffix = w.substring(w.length() - genericConditionLength);
 //				suffixes.add(suffix);
 //			}
 //		}
