@@ -230,12 +230,6 @@ public class RulesReducer{
 	}
 
 	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries){
-		//sort by condition length (more generic first)
-		entries.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
-
-//TODO fin kuà
-System.gc();
-
 		//group by condition
 //		final Map<String, List<LineEntry>> groupByCondition = new HashMap<>(0);
 //		for(int i = 0, length = entries.size(); i < length; i ++){
@@ -283,8 +277,8 @@ System.gc();
 //		}
 //---
 
+//TODO fin kuà
 		final List<LineEntry> result = new ArrayList<>(entries);
-		final int length = entries.size();
 		boolean changed;
 		do{
 			changed = false;
@@ -292,7 +286,7 @@ System.gc();
 			//sort by condition length (more generic first)
 			result.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
-			for(int i = 0; !changed && i < length; i ++){
+			for(int i = 0, length = entries.size(); !changed && i < length; i ++){
 				//candidate generic
 				final LineEntry generic = result.get(i);
 				final String[] genericCondition = RegexSequencer.splitSequence(generic.condition);
@@ -302,8 +296,7 @@ System.gc();
 					final LineEntry specific = result.get(j);
 					final String[] specificCondition = RegexSequencer.splitSequence(specific.condition);
 
-					//NOTE: if `from` are equals, that means it's a valid collision and should not be resolved
-					if(!RegexSequencer.endsWith(specificCondition, genericCondition) || generic.from.equals(specific.from))
+					if(!RegexSequencer.endsWith(specificCondition, genericCondition))
 						continue;
 
 					//collision detected: `generic` is too generic compared to `specific`
@@ -380,6 +373,22 @@ System.gc();
 	/** Attempt to refine a generic condition by analyzing its `from` words */
 	private static boolean refineCondition(final LineEntry generic, final String[] genericCondition,
 			final LineEntry specific, final String[] specificCondition, final List<LineEntry> entries){
+/*
+Risoluzione collisioni (loop esterno, 'token' può rappresentare sia una singola lettera che un gruppo):
+- Ordina le regole per lunghezza token (crescente).
+- Scansiona in ordine cercando la prima coppia in conflitto.
+- Calcolare l'intersezione (I = T1 ∩ T2)
+- Se l'intersezione non è vuota:
+	- calcolare la differenza tra il primo e il secondo token con l'intersezione (S1 = T1 \ I e S2 = T2 \ I)
+	- se le condizioni solo del primo e solo del secondo sono entrambe vuote (S1 = ∅ ∧ S2 = ∅), tenere le condizioni originarie e aggiungere un token in testa a ciascuna usando extractGroup(currentTokenLength, from) per ricavare il token.
+	- altrimenti sostituire entrambe le regole con tre regole, ciascuna con la condizione solo del primo (S1), solo del secondo (S2), e dell'intersezione (I), redistribuire le parole in "from" in maniera appropriata
+- Altrimenti se la condizione della regola più corta a cui premettere il token incomincia con un gruppo:
+   - sostituire la regole con altrettante regole espandendo e rimuovendo il gruppo, redistribuire le parole in "from" in maniera appropriata
+	- per ciascuna regola derivata, calcolare il token da premettere calcolandolo sul sottoinsieme di from relativo alla regola espansa, e aggiungilo in testa a ciascuna condizione
+- Altrimenti specializzare la regola più corta aggiungendo un token in testa alla condizione usando extractGroup(currentTokenLength, from) per ricavare il token.
+- Dopo ogni modifica si riavvia il ciclo: il sistema converge perché ogni passo o aumenta la lunghezza di una regola o riduce la cardinalità di un gruppo (operazioni finite).
+*/
+
 		//FIXME fin kuà -- apply collision detection e resolution
 		final Set<String> suffixes = new HashSet<>();
 		for(final String w : generic.from){
