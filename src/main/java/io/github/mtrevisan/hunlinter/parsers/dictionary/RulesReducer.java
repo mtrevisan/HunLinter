@@ -139,33 +139,35 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(50);
 
-		//FIXME fin kuà -- apply collision detection e resolution
-		final List<LineEntry> nonCollidingRules0 = resolveCollisions(compactedRulesSameFrom, comparator);
-		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
+		final List<LineEntry> nonCollidingRules = resolveCollisions(compactedRulesSameFrom, comparator);
+//		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
 
-		//reshuffle originating list to place the correct inflections in the correct rule
+		//reshuffle the originating list to place the correct inflections in the correct rule
 //		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		if(progressCallback != null)
 			progressCallback.accept(67);
 
+		final List<LineEntry> compactedRules = compactRulesFrom(nonCollidingRules, comparator);
+
 //		compactedRules = disjoinConditions(compactedRules);
 
-//		if(progressCallback != null)
-//			progressCallback.accept(75);
+		if(progressCallback != null)
+			progressCallback.accept(83);
 
 //		mergeSimilarRules(compactedRules, comparator);
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		final List<LineEntry> redistributedRules = redistributeRules(nonCollidingRules);
+		//TODO same removal, same add, then add condition, add from
+		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules);
 
-		if(progressCallback != null)
-			progressCallback.accept(88);
+//		if(progressCallback != null)
+//			progressCallback.accept(88);
 
-		final List<LineEntry> lazyCompactedRules = compactRulesButConditionAndFrom(redistributedRules, comparator);
+//		final List<LineEntry> lazyCompactedRules = compactRulesButConditionAndFrom(redistributedRules, comparator);
 
-		return lazyCompactedRules;
+		return redistributedRules;
 	}
 
 	private static List<LineEntry> compactRulesFrom(final Collection<LineEntry> entries,
@@ -277,7 +279,6 @@ public class RulesReducer{
 //		}
 //---
 
-//TODO fin kuà
 		final List<LineEntry> result = new ArrayList<>(entries);
 		boolean changed;
 		do{
@@ -296,10 +297,10 @@ public class RulesReducer{
 					final LineEntry specific = result.get(j);
 					final String[] specificCondition = RegexSequencer.splitSequence(specific.condition);
 
-					if(RegexSequencer.endsWith(specificCondition, genericCondition)){
+					if(RegexSequencer.endsWith(specificCondition, genericCondition) && !generic.from.equals(specific.from)){
 						//collision detected: `generic` is too generic compared to `specific`
 						//try to refine `generic` using its `from` words
-						refineCondition(generic, genericCondition, specific, result, comparator);
+						refineCondition(generic, genericCondition, specific, specificCondition, result, comparator);
 						changed = true;
 					}
 				}
@@ -371,9 +372,15 @@ public class RulesReducer{
 
 	/** Attempt to refine a generic condition by analyzing its `from` words */
 	private static void refineCondition(final LineEntry generic, final String[] genericCondition,
-			final LineEntry specific, final List<LineEntry> entries, final Comparator<String> comparator){
+			final LineEntry specific, final String[] specificCondition,
+			final List<LineEntry> entries, final Comparator<String> comparator){
 		//calculate intersection (I = T1 ∩ T2):
-		final int genericConditionLength = genericCondition.length;
+		final int genericConditionLength = genericCondition.length
+			//NOTE: If the general and specific conditions have the same length, and one starts with a group, no token will
+			// be added, but a change will be made to the current conditions
+			- (genericCondition.length == specificCondition.length
+				&& (genericCondition.length > 1 && genericCondition[0].length() > 1
+				|| specificCondition.length > 0 && specificCondition[0].length() > 1)? 1: 0);
 		final Set<Character> genericToken = generic.extractGroup(genericConditionLength);
 		final Set<Character> specificToken = specific.extractGroup(genericConditionLength);
 		final Set<Character> intersectionToken = SetHelper.intersection(genericToken, specificToken);
@@ -385,47 +392,38 @@ public class RulesReducer{
 			final Set<Character> specificOnlyToken = new HashSet<>(specificToken);
 			specificOnlyToken.removeAll(intersectionToken);
 
-			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty()){
+			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty())
 				//if the conditions of only the generic token and only the specific token are both empty
-				// (S1 = ∅ ∧ S2 = ∅), keep the original conditions and add a token to the head of each...
+				// (S1 = ∅ ∧ S2 = ∅), add a token to the head of the generic condition...
 				generic.condition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
-				specific.condition = RegexHelper.makeGroup(specificToken, comparator) + specific.condition;
-			}
 			else{
 				//... otherwise, replace both rules with three rules, each with the condition of only the first (S1), only
 				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
 				if(!genericOnlyToken.isEmpty()){
 					entries.remove(generic);
-					if(genericCondition.length > 0 && genericCondition[0].length() > 1){
-						//replace the generic rule with the same number of rules of the first token by expanding and removing it,
-						// redistribute the words in "from" appropriately
-						final char[] charArray = genericCondition[0].toCharArray();
-						final String newGenericOnlyBaseCondition = generic.condition.substring(charArray.length);
-						entries.remove(generic);
-						for(int i = 1, length = charArray.length - 1; i < length; i ++){
-							final char chr = charArray[i];
-
-							final LineEntry newGenericOnly = LineEntry.createFrom(generic,
-								chr + newGenericOnlyBaseCondition);
-							entries.add(newGenericOnly);
-						}
-					}
-					else{
-						final LineEntry newGenericOnly = LineEntry.createFrom(generic,
-							RegexHelper.makeGroup(genericOnlyToken, comparator) + generic.condition);
+					final String genericOnlyCondition = RegexHelper.makeGroup(genericOnlyToken, comparator)
+						+ generic.condition.substring(genericCondition.length > 0 ? genericCondition[0].length() : 0);
+					final LineEntry newGenericOnly = LineEntry.createFrom(generic, genericOnlyCondition);
+					if(!entries.contains(newGenericOnly))
 						entries.add(newGenericOnly);
-					}
 				}
 				if(!specificOnlyToken.isEmpty()){
 					entries.remove(specific);
-					final LineEntry newSpecificOnly = LineEntry.createFrom(specific,
-						RegexHelper.makeGroup(specificOnlyToken, comparator) + specific.condition);
-					entries.add(newSpecificOnly);
+					final String specificOnlyCondition = RegexHelper.makeGroup(specificOnlyToken, comparator)
+						+ specific.condition.substring(specificCondition.length > 0 ? specificCondition[0].length() : 0);
+					final LineEntry newSpecificOnly = LineEntry.createFrom(specific, specificOnlyCondition);
+					if(!entries.contains(newSpecificOnly))
+						entries.add(newSpecificOnly);
 				}
 				if(!intersectionToken.isEmpty()){
-					final LineEntry newIntersectionOnly = LineEntry.createFrom(generic,
-						RegexHelper.makeGroup(intersectionToken, comparator) + generic.condition);
-					entries.add(newIntersectionOnly);
+					final String intersectionCondition = RegexHelper.makeGroup(intersectionToken, comparator)
+						+ generic.condition.substring(genericCondition.length > 0 ? genericCondition[0].length() : 0);
+					final LineEntry newIntersectionFromGeneric = LineEntry.createFrom(generic, intersectionCondition);
+					final LineEntry newIntersectionFromSpecific = LineEntry.createFrom(specific, intersectionCondition);
+					if(!entries.contains(newIntersectionFromGeneric))
+						entries.add(newIntersectionFromGeneric);
+					if(!entries.contains(newIntersectionFromSpecific))
+						entries.add(newIntersectionFromSpecific);
 				}
 			}
 		}
@@ -442,7 +440,8 @@ public class RulesReducer{
 
 					final LineEntry newGenericOnly = LineEntry.createFrom(generic,
 						chr + newGenericOnlyBaseCondition);
-					entries.add(newGenericOnly);
+					if(!entries.contains(newGenericOnly))
+						entries.add(newGenericOnly);
 				}
 			}
 			else{
@@ -540,30 +539,24 @@ public class RulesReducer{
 			.hashCode();
 	}
 
-	private static List<LineEntry> redistributeRules(final List<LineEntry> plainRules){
-		final Map<String, LineEntry> map = new HashMap<>(0);
-		for(int i = 0, length = plainRules.size(); i < length; i ++)
-			redistributeRule(plainRules.get(i), map);
-		return new ArrayList<>(map.values());
-	}
-
-	/** Collect sets of same addition and condition. */
-	private static void redistributeRule(final LineEntry entry, final Map<String, LineEntry> map){
-		final StringBuilder key = new StringBuilder(entry.condition + PIPE + entry.removal + PIPE);
-		final int baseOffset = key.length();
-		for(final String addition : entry.addition){
-			key.setLength(baseOffset);
-			key.append(addition);
-			final String keyString = key.toString();
-
-			final LineEntry rule = map.get(keyString);
-			if(rule == null){
+	/**
+	 * Redistributes rules from the given list by splitting each entry's additions into separate entries.
+	 * For each addition, a new element is created and added to the resulting list.
+	 *
+	 * @param entries	The input list of objects to be redistributed. Each element in this list can have multiple
+	 * 	additions that will be split into separate entries.
+	 * @return	A list of objects where each addition from the original entries has been separated into its own element.
+	 */
+	private static List<LineEntry> flattenRulesByAddition(final List<LineEntry> entries){
+		final List<LineEntry> list = new ArrayList<>(entries.size());
+		for(int i = 0, length = entries.size(); i < length; i ++){
+			final LineEntry entry = entries.get(i);
+			for(final String addition : entry.addition){
 				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
-				map.put(keyString, newEntry);
+				list.add(newEntry);
 			}
-			else
-				rule.from.addAll(entry.from);
 		}
+		return list;
 	}
 
 //	private static List<LineEntry> redistributeRules(final List<LineEntry> plainRules, final Comparator<String> comparator){
