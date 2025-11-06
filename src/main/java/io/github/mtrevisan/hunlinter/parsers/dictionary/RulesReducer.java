@@ -43,6 +43,7 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,47 +128,176 @@ public class RulesReducer{
 		final List<LineEntry> compactedRulesFrom = compactRulesFrom(plainRules, comparator);
 
 		if(progressCallback != null)
-			progressCallback.accept(17);
+			progressCallback.accept(14);
 
 		final List<LineEntry> compactedRulesAddition = compactRulesAddition(compactedRulesFrom, comparator);
 
 		if(progressCallback != null)
-			progressCallback.accept(33);
+			progressCallback.accept(29);
 
 		final List<LineEntry> compactedRulesSameFrom = compactRulesByFrom(compactedRulesAddition);
 
 		if(progressCallback != null)
-			progressCallback.accept(50);
+			progressCallback.accept(43);
 
-		final List<LineEntry> nonCollidingRules = resolveCollisions(compactedRulesSameFrom, comparator);
+		final List<LineEntry> disjoinFromsRules = disjoinFroms(compactedRulesSameFrom);
+
+		if(progressCallback != null)
+			progressCallback.accept(57);
+
+		//TODO %2 HERE
+		final List<LineEntry> nonCollidingRules = resolveCollisions(disjoinFromsRules, comparator);
 //		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
 
 		//reshuffle the originating list to place the correct inflections in the correct rule
 //		compactedRules = makeAdditionsDisjoint(compactedRules);
 
 		if(progressCallback != null)
-			progressCallback.accept(67);
+			progressCallback.accept(71);
 
-		final List<LineEntry> compactedRules = compactRulesFrom(nonCollidingRules, comparator);
+		//FIXME
+//		final List<LineEntry> compactedRules = compactRulesFrom(nonCollidingRules, comparator);
+		final List<LineEntry> compactedRules = nonCollidingRules;
 
 //		compactedRules = disjoinConditions(compactedRules);
 
-		if(progressCallback != null)
-			progressCallback.accept(83);
+//		if(progressCallback != null)
+//			progressCallback.accept(71);
 
 //		mergeSimilarRules(compactedRules, comparator);
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		//TODO same removal, same add, then add condition, add from
 		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules);
 
-//		if(progressCallback != null)
-//			progressCallback.accept(88);
+		if(progressCallback != null)
+			progressCallback.accept(86);
 
+		//TODO same removal, same add, then add condition, add from
+		final List<LineEntry> lazyCompactedRules = compactRulesCondition(redistributedRules, comparator);
 //		final List<LineEntry> lazyCompactedRules = compactRulesButConditionAndFrom(redistributedRules, comparator);
 
-		return redistributedRules;
+		return lazyCompactedRules;
+	}
+
+	private static List<LineEntry> disjoinFroms(final Collection<LineEntry> entries){
+		final List<LineEntry> result = new ArrayList<>(entries);
+		boolean changed;
+		do{
+			changed = false;
+
+			//sort by number of `from` elements
+			result.sort(Comparator.comparingInt(rule -> rule.from.size()));
+
+			for(int i = 0, length = result.size(); !changed && i < length; i ++){
+				//candidate generic
+				final LineEntry generic = result.get(i);
+
+				for(int j = i + 1; !changed && j < length; j ++){
+					//candidate specific
+					final LineEntry specific = result.get(j);
+
+					//rules can be split if removal is the same
+					if(specific.from.containsAll(generic.from)
+							&& specific.from.size() > generic.from.size()
+							&& generic.condition.equals(specific.condition)){
+						generic.addition.addAll(specific.addition);
+						specific.from.removeAll(generic.from);
+						changed = true;
+					}
+				}
+			}
+		}while(changed);
+
+
+		do{
+			changed = false;
+
+				//sort by number of `from` elements
+			result.sort(Comparator.comparingInt(rule -> ((LineEntry)rule).from.size())
+				.thenComparingInt(rule -> ((LineEntry)rule).condition.length()));
+
+			for(int i = 0, length = result.size(); !changed && i < length; i ++){
+				//candidate generic
+				final LineEntry generic = result.get(i);
+
+				for(int j = i + 1; !changed && j < length; j ++){
+					//candidate specific
+					final LineEntry specific = result.get(j);
+
+					//rules can be merged if `from` is the same
+					if(specific.from.equals(generic.from)){
+						final String deltaRemoval = specific.removal
+							.substring(0, specific.removal.length() - generic.removal.length());
+						final Set<String> newGenericAddition = new HashSet<>(generic.addition.size());
+						for(final String addition : generic.addition)
+							newGenericAddition.add(deltaRemoval + addition);
+						generic.addition.clear();
+						generic.addition.addAll(newGenericAddition);
+						generic.addition.addAll(specific.addition);
+						generic.removal = specific.removal;
+						generic.condition = specific.condition;
+						specific.from.removeAll(generic.from);
+						if(specific.from.isEmpty())
+							result.remove(specific);
+						changed = true;
+					}
+				}
+			}
+		}while(changed);
+
+		return result;
+	}
+
+	private static List<LineEntry> compactRulesCondition(final Collection<LineEntry> entries,
+			final Comparator<String> comparator){
+		final List<LineEntry> result = new ArrayList<>(entries);
+		final Map<String, List<LineEntry>> map = new HashMap<>();
+		for(final LineEntry entry : entries){
+			final String key = new StringJoiner(PIPE)
+				.add(entry.removal)
+				.add(Integer.toString(sortAndMergeAndHash(entry.addition, comparator)))
+				.toString();
+			final List<LineEntry> existingList = map.computeIfAbsent(key, k -> new ArrayList<>(0));
+			if(existingList.isEmpty())
+				existingList.add(entry);
+			else{
+				final String[] entryCondition = RegexSequencer.splitSequence(entry.condition);
+
+				boolean removed = false;
+				for(int i = 0, length = existingList.size(); !removed && i < length; i ++){
+					final LineEntry existing = existingList.get(i);
+
+					final String[] ruleCondition = RegexSequencer.splitSequence(existing.condition);
+					final String[] ruleFollowingConditions = Arrays.copyOfRange(ruleCondition, 1, ruleCondition.length);
+					final String[] entryFollowingConditions = Arrays.copyOfRange(entryCondition, 1, entryCondition.length);
+					if(Arrays.equals(ruleFollowingConditions, entryFollowingConditions)
+							&& existing.removal.equals(entry.removal)
+							&& existing.addition.equals(entry.addition)){
+						existing.from.addAll(entry.from);
+						final Set<Character> ruleConditions = extractCharacters(ruleCondition[0]);
+						final Set<Character> entryConditions = extractCharacters(entryCondition[0]);
+						ruleConditions.addAll(entryConditions);
+						ruleCondition[0] = RegexHelper.makeGroup(ruleConditions, comparator);
+						existing.condition = StringUtils.join(ruleCondition);
+						result.remove(entry);
+						removed = true;
+					}
+				}
+				if(!removed)
+					existingList.add(entry);
+			}
+		}
+		return result;
+	}
+
+	private static Set<Character> extractCharacters(final String str){
+		final Set<Character> result = new HashSet<>();
+		for(final char c : str.toCharArray())
+			result.add(c);
+		result.remove('[');
+		result.remove(']');
+		return result;
 	}
 
 	private static List<LineEntry> compactRulesFrom(final Collection<LineEntry> entries,
@@ -287,7 +417,7 @@ public class RulesReducer{
 			//sort by condition length (more generic first)
 			result.sort(Comparator.comparingInt(rule -> RegexHelper.conditionLength(rule.condition)));
 
-			for(int i = 0, length = entries.size(); !changed && i < length; i ++){
+			for(int i = 0, length = result.size(); !changed && i < length; i ++){
 				//candidate generic
 				final LineEntry generic = result.get(i);
 				final String[] genericCondition = RegexSequencer.splitSequence(generic.condition);
@@ -306,7 +436,6 @@ public class RulesReducer{
 				}
 			}
 		}while(changed);
-
 		return result;
 	}
 
@@ -401,23 +530,30 @@ public class RulesReducer{
 				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
 				if(!genericOnlyToken.isEmpty()){
 					entries.remove(generic);
-					final String genericOnlyCondition = RegexHelper.makeGroup(genericOnlyToken, comparator)
-						+ generic.condition.substring(genericCondition.length > 0 ? genericCondition[0].length() : 0);
+					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(genericOnlyToken, comparator));
+					for(int i = (genericCondition.length > 1? 1: 0), length = genericCondition.length - genericConditionLength + 1; i < length; i ++)
+						sb.append(genericCondition[i]);
+					final String genericOnlyCondition = sb.toString();
 					final LineEntry newGenericOnly = LineEntry.createFrom(generic, genericOnlyCondition);
 					if(!entries.contains(newGenericOnly))
 						entries.add(newGenericOnly);
 				}
 				if(!specificOnlyToken.isEmpty()){
 					entries.remove(specific);
-					final String specificOnlyCondition = RegexHelper.makeGroup(specificOnlyToken, comparator)
-						+ specific.condition.substring(specificCondition.length > 0 ? specificCondition[0].length() : 0);
+
+					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(specificOnlyToken, comparator));
+					for(int i = (specificCondition.length > 1? 1: 0), length = specificCondition.length - genericConditionLength + 1; i < length; i ++)
+						sb.append(specificCondition[i]);
+					final String specificOnlyCondition = sb.toString();
 					final LineEntry newSpecificOnly = LineEntry.createFrom(specific, specificOnlyCondition);
 					if(!entries.contains(newSpecificOnly))
 						entries.add(newSpecificOnly);
 				}
 				if(!intersectionToken.isEmpty()){
-					final String intersectionCondition = RegexHelper.makeGroup(intersectionToken, comparator)
-						+ generic.condition.substring(genericCondition.length > 0 ? genericCondition[0].length() : 0);
+					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(intersectionToken, comparator));
+					for(int i = (genericCondition.length > 1? 1: 0), length = genericCondition.length - genericConditionLength + 1; i < length; i ++)
+						sb.append(genericCondition[i]);
+					final String intersectionCondition = sb.toString();
 					final LineEntry newIntersectionFromGeneric = LineEntry.createFrom(generic, intersectionCondition);
 					final LineEntry newIntersectionFromSpecific = LineEntry.createFrom(specific, intersectionCondition);
 					if(!entries.contains(newIntersectionFromGeneric))
