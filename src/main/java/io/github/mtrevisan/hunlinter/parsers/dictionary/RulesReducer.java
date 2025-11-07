@@ -145,7 +145,6 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(57);
 
-		//TODO %2 HERE
 		final List<LineEntry> nonCollidingRules = resolveCollisions(disjoinFromsRules, comparator);
 //		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
 
@@ -168,7 +167,8 @@ public class RulesReducer{
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules);
+		//TODO %2 HERE
+		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules, comparator);
 
 		if(progressCallback != null)
 			progressCallback.accept(86);
@@ -300,6 +300,16 @@ public class RulesReducer{
 		return result;
 	}
 
+	/**
+	 * Compacts a collection of {@code LineEntry}s by grouping and merging the entries based on their  corresponding
+	 * keys built from conditions, removals, and sorted/hashed additions. Entries with the same key are merged,
+	 * consolidating their `from` fields.
+	 *
+	 * @param entries	The collection of {@code LineEntry} objects to be compacted.
+	 * @param comparator	A {@code Comparator<String>} used to sort and merge additions during the key comparison and
+	 * 	hashing.
+	 * @return	A list of {@code LineEntry} objects where entries with matching keys have been merged and compacted.
+	 */
 	private static List<LineEntry> compactRulesFrom(final Collection<LineEntry> entries,
 			final Comparator<String> comparator){
 		return compactRules(
@@ -313,6 +323,16 @@ public class RulesReducer{
 		);
 	}
 
+	/**
+	 * Compacts a collection of {@code LineEntry} objects by grouping and merging entries based on their conditions,
+	 * removals, and hashed/sorted additions. Entries with matching keys are combined, consolidating their `addition`
+	 * fields.
+	 *
+	 * @param entries	The collection of {@code LineEntry} objects to be compacted.
+	 * @param comparator	A {@code Comparator<String>} used to sort and hash the `from` field during the key generation
+	 * 	and merging process.
+	 * @return	A list of {@code LineEntry} objects resulting from the compacted and merged entries.
+	 */
 	private static List<LineEntry> compactRulesAddition(final Collection<LineEntry> entries,
 			final Comparator<String> comparator){
 		return compactRules(
@@ -326,6 +346,14 @@ public class RulesReducer{
 		);
 	}
 
+	/**
+	 * Compacts a list of {@code LineEntry} objects by grouping them based on their `from` property and merging entries
+	 * with the same `from` set into a single LineEntry.
+	 *
+	 * @param entries	The list of {@code LineEntry} objects to be compacted.
+	 * @return	A new list of LineEntry objects where entries with the same `from` set are combined into a single
+	 * 	entry, with additions and removal data merged.
+	 */
 	private static List<LineEntry> compactRulesByFrom(List<LineEntry> entries){
 		//group by `from`
 		final Map<Set<String>, List<LineEntry>> fromGroups = entries.stream()
@@ -361,6 +389,15 @@ public class RulesReducer{
 		return result;
 	}
 
+	/**
+	 * Resolves potential collisions in a list of {@code LineEntry} objects by refining entries so that more specific
+	 * conditions do not conflict with generic ones. It adjusts the conditions of entries to eliminate overlaps between
+	 * conditions while maintaining the order.
+	 *
+	 * @param entries	The list of {@code LineEntry} objects to be analyzed and refined.
+	 * @param comparator	A {@link Comparator} for comparing string entries within the {@code LineEntry} objects.
+	 * @return	A new list of {@code LineEntry} objects with collisions resolved and conditions refined.
+	 */
 	private static List<LineEntry> resolveCollisions(final List<LineEntry> entries, final Comparator<String> comparator){
 		//group by condition
 //		final Map<String, List<LineEntry>> groupByCondition = new HashMap<>(0);
@@ -653,6 +690,17 @@ public class RulesReducer{
 		return new ArrayList<>(map.values());
 	}
 
+	/**
+	 * Compacts a collection of {@code LineEntry} objects by merging entries with the same key.
+	 * The key for each {@code LineEntry} is determined using the provided keyBuilder function. When multiple
+	 * {@code LineEntry} objects share the same key, the merger consumer is used to combine them.
+	 *
+	 * @param <K>	The type of the key used for grouping LineEntry objects.
+	 * @param plainRules	The input collection of LineEntry objects to be compacted.
+	 * @param keyBuilder	A function that generates a key for each LineEntry object for grouping purposes.
+	 * @param merger	A consumer that defines how two LineEntry objects with the same key are merged.
+	 * @return	A list of compacted {@code LineEntry} objects, each representing a unique key.
+	 */
 	private static <K> List<LineEntry> compactRules(final Collection<LineEntry> plainRules,
 			final Function<LineEntry, K> keyBuilder, final BiConsumer<LineEntry, LineEntry> merger){
 		final Map<K, LineEntry> map = new HashMap<>();
@@ -667,6 +715,15 @@ public class RulesReducer{
 		return new ArrayList<>(map.values());
 	}
 
+	/**
+	 * Sorts the provided collection of elements using the given comparator, merges them into a single string
+	 * separated by a pipe symbol, and returns the hash code of the resulting string.
+	 *
+	 * @param <V>	The type of elements in the collection.
+	 * @param set	The collection of elements to be sorted, merged, and hashed.
+	 * @param comparator	The comparator used to define the order of sorting.
+	 * @return	The hash code of the concatenated string resulting from the sorted collection.
+	 */
 	private static <V> int sortAndMergeAndHash(final Collection<V> set, final Comparator<String> comparator){
 		return set.stream()
 			.map(String::valueOf)
@@ -681,17 +738,75 @@ public class RulesReducer{
 	 *
 	 * @param entries	The input list of objects to be redistributed. Each element in this list can have multiple
 	 * 	additions that will be split into separate entries.
+	 * @param comparator	A {@code Comparator<String>} used to sort and merge additions during the key comparison and
+	 * 	hashing.
 	 * @return	A list of objects where each addition from the original entries has been separated into its own element.
 	 */
-	private static List<LineEntry> flattenRulesByAddition(final List<LineEntry> entries){
-		final List<LineEntry> list = new ArrayList<>(entries.size());
+	private static List<LineEntry> flattenRulesByAddition(final List<LineEntry> entries,
+			final Comparator<String> comparator){
+		final Map<String, List<LineEntry>> map = new HashMap<>(entries.size());
 		for(int i = 0, length = entries.size(); i < length; i ++){
 			final LineEntry entry = entries.get(i);
-			for(final String addition : entry.addition){
-				final LineEntry newEntry = new LineEntry(entry.removal, addition, entry.condition, entry.from);
-				list.add(newEntry);
+			for(final String addition : entry.addition)
+				map.computeIfAbsent(addition, k -> new ArrayList<>(1))
+					.add(new LineEntry(entry.removal, addition, entry.condition, entry.from));
+		}
+
+		//FIXME
+		for(final Map.Entry<String, List<LineEntry>> entry : map.entrySet()){
+			final int size = entry.getValue()
+				.size();
+			if(size > 1){
+				//bucket by same `removal`
+				final Map<String, List<LineEntry>> merged = new HashMap<>(size);
+				for(final LineEntry e : entry.getValue()){
+					final String[] condition = RegexSequencer.splitSequence(e.condition);
+					merged.computeIfAbsent(e.removal + PIPE + condition.length, k -> new ArrayList<>(1))
+						.add(e);
+				}
+				for(final Map.Entry<String, List<LineEntry>> kv : merged.entrySet()){
+					final List<LineEntry> v = kv.getValue();
+					if(v.size() > 1){
+						final String removal = kv.getKey().substring(0, kv.getKey().indexOf(PIPE));
+
+						//merge `condition`, `addition`, and `from`
+						final Set<Character> newConditionSet = new HashSet<>(v.size());
+						for(final LineEntry e : v){
+							final String[] condition = RegexSequencer.splitSequence(e.condition);
+							if(condition.length == 0)
+								continue;
+//FIXME %0
+//	0 = {LineEntry@6489} "LineEntry[cond=[ov]e,rem=e,add=[eneta/F2\tds:eto],from=[dexnove, ñove, nove, noe, dixnove, dexenove, dixenove]]"
+//	1 = {LineEntry@6490} "LineEntry[cond=iexe,rem=e,add=[eneta/F2\tds:eto],from=[diexe]]"
+//							if(condition.length > 1)
+//								throw new IllegalStateException("Condition length is more than 1! that must be handled, please contact developer");
+
+							if(condition.length == 1)
+								newConditionSet.addAll(extractCharacters(condition[0]));
+						}
+						final String newCondition = RegexHelper.makeGroup(newConditionSet, comparator);
+						final Set<String> newAddition = v.stream()
+							.flatMap(le -> le.addition.stream())
+							.collect(Collectors.toSet());
+						final Set<String> newFrom = v.stream()
+							.flatMap(le -> le.from.stream())
+							.collect(Collectors.toSet());
+						final LineEntry newEntry = new LineEntry(removal, newAddition, newCondition, newFrom);
+						v.clear();
+						v.add(newEntry);
+					}
+				}
+				entry.getValue().clear();
+				for(final List<LineEntry> e : merged.values())
+					entry.getValue().addAll(e);
 			}
 		}
+
+		final List<LineEntry> list = map.values()
+			.stream()
+			.map(List::getFirst)
+			.toList();
+
 		return list;
 	}
 
