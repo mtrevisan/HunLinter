@@ -167,7 +167,7 @@ public class RulesReducer{
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		//TODO %a HERE
+		//TODO '9 HERE
 		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules, comparator);
 
 		if(progressCallback != null)
@@ -561,10 +561,15 @@ public class RulesReducer{
 			final Set<Character> specificOnlyToken = new HashSet<>(specificToken);
 			specificOnlyToken.removeAll(intersectionToken);
 
-			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty())
+			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty()){
 				//if the conditions of only the generic token and only the specific token are both empty
 				// (S1 = ∅ ∧ S2 = ∅), add a token to the head of the generic condition...
-				generic.condition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				final LineEntry newGeneric = LineEntry.createFrom(generic, newGenericCondition);
+				entries.remove(generic);
+				if(!entries.contains(newGeneric))
+					entries.add(newGeneric);
+			}
 			else{
 				//... otherwise, replace both rules with three rules, each with the condition of only the first (S1), only
 				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
@@ -622,8 +627,11 @@ public class RulesReducer{
 			}
 			else{
 				//specialize the generic rule by adding a token at the head of the condition
-				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator);
-				generic.condition = newGenericCondition + generic.condition;
+				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				final LineEntry newGeneric = LineEntry.createFrom(generic, newGenericCondition);
+				entries.remove(generic);
+				if(!entries.contains(newGeneric))
+					entries.add(newGeneric);
 			}
 		}
 
