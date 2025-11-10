@@ -167,7 +167,6 @@ public class RulesReducer{
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		//TODO '9 HERE
 		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules, comparator);
 
 		if(progressCallback != null)
@@ -180,7 +179,180 @@ public class RulesReducer{
 		return lazyCompactedRules;
 	}
 
+	//TODO
 	private static List<LineEntry> disjoinFroms(final Collection<LineEntry> entries){
+		//TODO '9 HERE
+		//build a map where for each word in `from` stores which entry indices contain it
+		final Map<String, Set<LineEntry>> ownersByFrom = new HashMap<>();
+		for(final LineEntry entry : entries)
+			for(final String word : entry.from)
+				ownersByFrom.computeIfAbsent(word, k -> new LinkedHashSet<>())
+					.add(entry);
+
+		//group `from` by identical owners set
+		final Map<List<LineEntry>, List<String>> groupByOwners = new LinkedHashMap<>();
+		for(Map.Entry<String, Set<LineEntry>> e : ownersByFrom.entrySet()){
+			final String f = e.getKey();
+			final List<LineEntry> key = new ArrayList<>(e.getValue());
+
+			key.sort(Comparator.comparingInt(rule -> rule.from.hashCode()));
+			groupByOwners.computeIfAbsent(key, k -> new ArrayList<>())
+				.add(f);
+		}
+
+
+		final List<LineEntry> result = new ArrayList<>();
+
+		//process each group independently
+		for(final Map.Entry<List<LineEntry>, List<String>> group : groupByOwners.entrySet()){
+			final List<LineEntry> owners = group.getKey();     // indices of entries
+			final List<String> groupFrom = group.getValue(); // from-values in this group
+
+			if(groupFrom.isEmpty())
+				continue;
+
+			//build union across owners of (owner.from - groupFrom)
+			final Set<String> groupSet = new HashSet<>(groupFrom);
+			final List<String> nonTargetsUnion = new ArrayList<>();
+			for(final LineEntry e : owners)
+				for(final String u : e.from){
+					if(!groupSet.contains(u))
+						nonTargetsUnion.add(u);
+				}
+
+
+			//FIXME problem: length of `condition` less than length of `removal`
+			//partition groupFrom into maximal clean subsets using a reverse trie
+			final List<SubsetBySuffix> subsets = partitionByCleanSuffixes(groupFrom, nonTargetsUnion);
+
+			//emit clones: for each subset, produce one rule per owner with the same 'from' set
+			for(final SubsetBySuffix ss : subsets){
+				final String suffix = ss.suffix;
+				for(final LineEntry ownerEntry : owners)
+					result.add(LineEntry.createFrom(ownerEntry, suffix));
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * A small holder: the subset of 'from' (as a list) defined by a clean suffix.
+	 */
+	private static final class SubsetBySuffix{
+		final String suffix;
+		final List<String> froms;
+
+		SubsetBySuffix(final String suffix, final List<String> froms){
+			this.suffix = suffix;
+			this.froms = froms;
+		}
+	}
+
+	/**
+	 * Partition 'groupFrom' into maximal subsets, each identified by a suffix 's' such that:
+	 * - s length >= minLen,
+	 * - no 'nonTarget' ends with s,
+	 * - the subset is exactly the set of 'groupFrom' strings that end with s,
+	 * - and no ancestor suffix of s satisfies the same property (maximality by depth).
+	 * <p>
+	 * We use a reverse trie over 'groupFrom' to discover deepest clean suffixes.
+	 */
+	private static List<SubsetBySuffix> partitionByCleanSuffixes(final List<String> groupFrom,
+			final List<String> nonTargetsUnion){
+		//build reverse trie and store at each node the indices of groupFrom covered by the subtree
+		final TrieNode root = new TrieNode();
+		for(int i = 0; i < groupFrom.size(); i ++)
+			insertReversed(root, groupFrom.get(i), i);
+
+		final List<SubsetBySuffix> result = new ArrayList<>();
+		//DFS to collect maximal clean nodes
+		dfsCollect(root, "", groupFrom, nonTargetsUnion, result);
+		return result;
+	}
+
+	/**
+	 * Trie node for reversed strings. Each node aggregates the indices of all strings in its subtree.
+	 */
+	private static final class TrieNode{
+		Map<Character, TrieNode> child = new HashMap<>();
+		//indices of groupFrom under this node
+		List<Integer> indices = new ArrayList<>();
+	}
+
+	/**
+	 * Insert a string into the reverse trie, storing its index along the path.
+	 * We traverse from last char to first.
+	 */
+	private static void insertReversed(final TrieNode root, final String s, final int index){
+		TrieNode cur = root;
+		cur.indices.add(index);
+		for(int p = s.length() - 1; p >= 0; p --){
+			final char c = s.charAt(p);
+			cur = cur.child.computeIfAbsent(c, k -> new TrieNode());
+			cur.indices.add(index);
+		}
+	}
+
+	/**
+	 * Depth-first traversal: at each node, we know the suffix represented by the path.
+	 * Because we traverse from last character to first, we build the human-readable suffix
+	 * by prepending the current character to 'suffixSoFar'.
+	 * <p>
+	 * If the suffix is "clean" (length >= minLen and no non-target ends with it), we emit
+	 * a subset for all strings under this node and DO NOT descend further (maximality).
+	 * Otherwise we keep descending.
+	 */
+	private static void dfsCollect(final TrieNode node, final String suffixSoFar, final List<String> groupFrom,
+			final List<String> nonTargetsUnion, final List<SubsetBySuffix> out){
+		//check cleanliness only if suffix length is enough
+		if(!anyEndsWith(nonTargetsUnion, suffixSoFar)){
+			//clean: emit the subset defined by this suffix (all strings under this node)
+			List<String> subset = new ArrayList<>(node.indices.size());
+			for(final int idx : node.indices)
+				subset.add(groupFrom.get(idx));
+
+			//de-duplicate: 'indices' is appended along multiple paths; remove duplicates while preserving order
+			subset = dedupPreserveOrder(subset);
+			out.add(new SubsetBySuffix(suffixSoFar, subset));
+			//maximal: do not go deeper
+			return;
+		}
+
+		//not clean (or too short): descend to children
+		for(final Map.Entry<Character, TrieNode> e : node.child.entrySet()){
+			final char c = e.getKey();
+			final TrieNode child = e.getValue();
+
+			//prepend current reversed char to build the forward suffix
+			dfsCollect(child, c + suffixSoFar, groupFrom, nonTargetsUnion, out);
+		}
+	}
+
+	/**
+	 * Return true if any string in the list ends with the given suffix.
+	 */
+	private static boolean anyEndsWith(final List<String> xs, final String suffix){
+		for(final String s : xs)
+			if(s.endsWith(suffix))
+				return true;
+		return false;
+	}
+
+	/**
+	 * Remove duplicates while preserving first occurrence order.
+	 */
+	private static <T> List<T> dedupPreserveOrder(final List<T> xs){
+		final List<T> res = new ArrayList<>(xs.size());
+		final Set<T> seen = new HashSet<>();
+		for(final T x : xs)
+			if(seen.add(x))
+				res.add(x);
+		return res;
+	}
+
+
+	private static List<LineEntry> disjoinFroms2(final Collection<LineEntry> entries){
 		final List<LineEntry> result = new ArrayList<>(entries);
 		boolean changed;
 		do{
