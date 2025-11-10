@@ -167,7 +167,7 @@ public class RulesReducer{
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		//TODO %2 HERE
+		//TODO %a HERE
 		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules, comparator);
 
 		if(progressCallback != null)
@@ -256,6 +256,7 @@ public class RulesReducer{
 		for(final LineEntry entry : entries){
 			final String key = new StringJoiner(PIPE)
 				.add(entry.removal)
+//				.add(RegexHelper.sortAndMergeSet(entry.addition, comparator))
 				.add(Integer.toString(sortAndMergeAndHash(entry.addition, comparator)))
 				.toString();
 			final List<LineEntry> existingList = map.computeIfAbsent(key, k -> new ArrayList<>(0));
@@ -317,6 +318,7 @@ public class RulesReducer{
 			entry -> new StringJoiner(PIPE)
 				.add(entry.condition)
 				.add(entry.removal)
+//				.add(RegexHelper.sortAndMergeSet(entry.addition, comparator))
 				.add(Integer.toString(sortAndMergeAndHash(entry.addition, comparator)))
 				.toString(),
 			(rule, entry) -> rule.from.addAll(entry.from)
@@ -340,6 +342,7 @@ public class RulesReducer{
 			entry -> new StringJoiner(PIPE)
 				.add(entry.condition)
 				.add(entry.removal)
+//				.add(RegexHelper.sortAndMergeSet(entry.from, comparator))
 				.add(Integer.toString(sortAndMergeAndHash(entry.from, comparator)))
 				.toString(),
 			(rule, entry) -> rule.addition.addAll(entry.addition)
@@ -650,11 +653,10 @@ public class RulesReducer{
 		for(int i = 0, length = plainRules.size(); i < length; i ++){
 			final LineEntry entry = plainRules.get(i);
 
-			final int addition = sortAndMergeAndHash(entry.addition, comparator);
-
-			final StringJoiner key = new StringJoiner(PIPE);
-			key.add(entry.removal);
-			key.add(Integer.toString(addition));
+			final StringJoiner key = new StringJoiner(PIPE)
+				.add(entry.removal)
+//				.add(RegexHelper.sortAndMergeSet(entry.addition, comparator));
+				.add(Integer.toString(sortAndMergeAndHash(entry.addition, comparator)));
 			final String keyString = key.toString();
 
 			final String[] conditions = RegexSequencer.splitSequence(entry.condition);
@@ -804,9 +806,8 @@ public class RulesReducer{
 
 		final List<LineEntry> list = map.values()
 			.stream()
-			.map(List::getFirst)
+			.flatMap(Collection::stream)
 			.toList();
-
 		return list;
 	}
 
