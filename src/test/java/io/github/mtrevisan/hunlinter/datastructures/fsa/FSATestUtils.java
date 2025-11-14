@@ -100,7 +100,7 @@ public class FSATestUtils{
 
 			public boolean accept(int state){
 				List<byte[]> rightLanguage = allSequences(fsa, state);
-				Collections.sort(rightLanguage, LexicographicalComparator.lexicographicalComparator());
+				rightLanguage.sort(LexicographicalComparator.lexicographicalComparator());
 
 				sb.setLength(0);
 				for(byte[] seq : rightLanguage)

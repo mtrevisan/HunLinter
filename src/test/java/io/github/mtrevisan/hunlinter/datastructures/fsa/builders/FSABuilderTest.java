@@ -55,7 +55,7 @@ class FSABuilderTest{
 		List<String> input = Arrays.asList("01", "02", "11", "21");
 		List<byte[]> in = input.stream()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract fsa = builder.build(in);
@@ -69,7 +69,7 @@ class FSABuilderTest{
 		List<String> input = Arrays.asList("abc", "bbc", "d");
 		List<byte[]> in = input.stream()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract fsa = builder.build(in);

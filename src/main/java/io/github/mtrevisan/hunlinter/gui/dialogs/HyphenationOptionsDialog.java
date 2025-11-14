@@ -267,7 +267,7 @@ public class HyphenationOptionsDialog extends javax.swing.JDialog implements Act
 		final ListModel<String> model = noHyphenationList.getModel();
 		final List<String> noHyphen = IntStream.range(0, model.getSize())
 			.mapToObj(model::getElementAt)
-			.collect(Collectors.toList());
+			.toList();
 
 		final HyphenationOptionsParser options = new HyphenationOptionsParser();
 		final HyphenationOptions nonCompoundOptions = options.getNonCompoundOptions();

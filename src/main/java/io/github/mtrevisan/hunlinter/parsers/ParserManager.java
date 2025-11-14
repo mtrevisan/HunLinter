@@ -381,7 +381,7 @@ public class ParserManager implements FileChangeListener{
 		try(final Stream<String> lines = Files.lines(dicFile.toPath(), affParser.getAffixData().getCharset())){
 			return lines
 				.map(line -> Strings.CS.replace(line, TAB, TAB_SPACES))
-				.collect(Collectors.toList());
+				.toList();
 		}
 	}
 

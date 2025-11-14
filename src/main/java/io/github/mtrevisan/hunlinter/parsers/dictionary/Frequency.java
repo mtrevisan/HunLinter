@@ -121,7 +121,7 @@ public class Frequency<T extends Comparable<?>>{
 		return frequencies.entrySet().stream()
 			.filter(ent -> ent.getValue() == mostPopular)
 			.map(Map.Entry::getKey)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	public synchronized final List<T> getMostCommonValues(final int limit){
@@ -131,7 +131,7 @@ public class Frequency<T extends Comparable<?>>{
 		return sortedEntries.stream()
 			.limit(limit)
 			.map(Map.Entry::getKey)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	/**

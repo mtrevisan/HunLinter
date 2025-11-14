@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 
 class RulesReducerUtils{
@@ -26,7 +27,7 @@ class RulesReducerUtils{
 	}
 
 	static void checkReductionCorrectness(final RulesReducer reducer, final String flag, final List<String> reducedRules,
-			final List<String> originalLines){
+			final Set<String> originalLines){
 		reducer.checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
 

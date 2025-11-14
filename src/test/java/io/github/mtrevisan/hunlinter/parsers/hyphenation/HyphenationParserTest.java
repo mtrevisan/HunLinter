@@ -602,7 +602,8 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN ^_,_$,-,'," + HyphenationParser.MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN ^_,_$," + HyphenationParser.MINUS_SIGN + "," + HyphenationParser.APOSTROPHE + ","
+			+ HyphenationParser.MODIFIER_LETTER_APOSTROPHE);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 
@@ -628,7 +629,8 @@ class HyphenationParserTest{
 		optParser.parseLine("RIGHTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDLEFTHYPHENMIN 1");
 		optParser.parseLine("COMPOUNDRIGHTHYPHENMIN 1");
-		optParser.parseLine("NOHYPHEN -,',=," + HyphenationParser.MODIFIER_LETTER_APOSTROPHE);
+		optParser.parseLine("NOHYPHEN " + HyphenationParser.MINUS_SIGN + "," + HyphenationParser.APOSTROPHE + ",=,"
+			+ HyphenationParser.MODIFIER_LETTER_APOSTROPHE);
 		Comparator<String> comparator = BaseBuilder.getComparator("xx");
 		HyphenationParser parser = new HyphenationParser(comparator, allPatterns, null, optParser);
 

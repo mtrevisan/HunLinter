@@ -87,8 +87,8 @@ class CFSASerializerTest{
 		input.sort(Comparator.naturalOrder());
 
 		List<byte[]> in = input.stream()
-			.map(word -> StringHelper.getRawBytes(word))
-			.collect(Collectors.toList());
+			.map(StringHelper::getRawBytes)
+			.toList();
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract fsa = builder.build(in);
 
@@ -123,7 +123,7 @@ class CFSASerializerTest{
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa1)
 			input.add(bb.array());
-		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
+		input.sort(LexicographicalComparator.lexicographicalComparator());
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract fsa2 = builder.build(input);
@@ -157,7 +157,7 @@ class CFSASerializerTest{
 
 		List<byte[]> in = input.stream()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract fsa1 = builder.build(in);
 

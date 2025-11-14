@@ -56,7 +56,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);
@@ -70,7 +70,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);
@@ -84,7 +84,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);
@@ -98,7 +98,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);
@@ -120,7 +120,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);
@@ -161,7 +161,7 @@ public class SerializerTestBase{
 		List<byte[]> input = new ArrayList<>();
 		for(ByteBuffer bb : fsa)
 			input.add(Arrays.copyOf(bb.array(), bb.remaining()));
-		Collections.sort(input, LexicographicalComparator.lexicographicalComparator());
+		input.sort(LexicographicalComparator.lexicographicalComparator());
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract root = builder.build(input);
@@ -195,7 +195,7 @@ public class SerializerTestBase{
 		List<byte[]> in = input.stream()
 			.sorted()
 			.map(StringHelper::getRawBytes)
-			.collect(Collectors.toList());
+			.toList();
 
 		FSABuilder builder = new FSABuilder();
 		FSAAbstract s = builder.build(in);

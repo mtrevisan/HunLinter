@@ -99,7 +99,8 @@ public class HyphenationBreak{
 		final int nohypLength = nohyp.length();
 
 		int index = 0;
-		for(int i = 0, length = syllabes.size(); length > 1 && i < length; i ++){
+		int length = syllabes.size();
+		for(int i = 0; length > 1 && i < length; i ++){
 			final String syllabe = syllabes.get(i);
 
 			if(syllabe.contentEquals(nohyp)){
@@ -114,6 +115,7 @@ public class HyphenationBreak{
 					mergeIndexWithPrevious(syllabes, syllabes.size() - 1);
 				else
 					mergeIndexAndNextWithPrevious(syllabes, i);
+				length = syllabes.size();
 
 				i --;
 			}
