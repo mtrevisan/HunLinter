@@ -81,7 +81,7 @@ public class AffixHandler implements Handler{
 		final FlagParsingStrategy strategy = affixData.getFlagParsingStrategy();
 
 		final int numEntries = Integer.parseInt(context.getThirdParameter());
-		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+		if(numEntries < 0 || numEntries > Short.MAX_VALUE)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getThirdParameter());
 
 		final List<AffixEntry> entries = new ArrayList<>(numEntries);

@@ -74,7 +74,7 @@ public class ConversionTable{
 		if(!NumberUtils.isCreatable(context.getFirstParameter()))
 			throw new LinterException(BAD_FIRST_PARAMETER, context);
 		final int numEntries = Integer.parseInt(context.getFirstParameter());
-		if(numEntries <= 0 || numEntries > Short.MAX_VALUE)
+		if(numEntries < 0 || numEntries > Short.MAX_VALUE)
 			throw new LinterException(BAD_NUMBER_OF_ENTRIES, context, context.getFirstParameter());
 
 		table = new HashMap<>(4);
