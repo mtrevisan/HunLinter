@@ -47,10 +47,10 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] NB_NP = {"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])");
-	private static final Pattern PATTERN_V_IUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ï");
-	private static final Pattern PATTERN_V_UUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ü");
+	private static final Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
+	private static final Pattern PATTERN_U_DIAERESIS_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])");
+	private static final Pattern PATTERN_V_I_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ï");
+	private static final Pattern PATTERN_V_U_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ü");
 
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)");
 
@@ -98,11 +98,11 @@ public final class OrthographyVEC extends Orthography{
 		correctedWord = replaceEach(correctedWord, MB_MP, NB_NP);
 
 		//correct ïC/üC occurrences into iC/uC
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_IUMLAUT_C, "i$1");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_UUMLAUT_C, "u$1");
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_U_DIAERESIS_C, "u$1");
 		//correct Vï/Vü occurrences into Vi/Vu
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_IUMLAUT, "$1i");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_UUMLAUT, "$1u");
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_I_DIAERESIS, "$1i");
+		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_U_DIAERESIS, "$1u");
 
 		correctedWord = correctIJOccurrences(correctedWord);
 

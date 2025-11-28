@@ -52,9 +52,9 @@ public final class WordVEC{
 	private static final char[] VOWELS_UNNECESSARY_STRESS = "aAeEoO".toCharArray();
 	private static final char[] SURE_VOWELS_GRAVE_STRESSED = "èÈòÒ".toCharArray();
 	private static final char[] VOWELS_PLAIN_ARRAY2 = "aAeEoOíÍïÏúÚüÜ".toCharArray();
-	private static final char[] VOWELS_NOT_UMLAUT_ARRAY = "iIuU".toCharArray();
+	private static final char[] VOWELS_NOT_DIAERESIS_ARRAY = "iIuU".toCharArray();
 	private static final char[] VOWELS_IU_ARRAY = "iIuUíÍúÚïÏüÜ".toCharArray();
-	private static final char[] VOWELS_UMLAUT_ARRAY = "ïÏüÜ".toCharArray();
+	private static final char[] VOWELS_DIAERESIS_ARRAY = "ïÏüÜ".toCharArray();
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_UNSTRESSED_ARRAY = VOWELS_UNSTRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
@@ -66,9 +66,9 @@ public final class WordVEC{
 		Arrays.sort(VOWELS_UNNECESSARY_STRESS);
 		Arrays.sort(SURE_VOWELS_GRAVE_STRESSED);
 		Arrays.sort(VOWELS_PLAIN_ARRAY2);
-		Arrays.sort(VOWELS_NOT_UMLAUT_ARRAY);
+		Arrays.sort(VOWELS_NOT_DIAERESIS_ARRAY);
 		Arrays.sort(VOWELS_IU_ARRAY);
-		Arrays.sort(VOWELS_UMLAUT_ARRAY);
+		Arrays.sort(VOWELS_DIAERESIS_ARRAY);
 		Arrays.sort(VOWELS_STRESSED_ARRAY);
 		Arrays.sort(VOWELS_UNSTRESSED_ARRAY);
 		Arrays.sort(VOWELS_EXTENDED_ARRAY);
@@ -188,7 +188,7 @@ public final class WordVEC{
 					break;
 
 				final int idx = (word.charAt(lastLetterIndex - 1) == '-'? lastLetterIndex - 2: lastLetterIndex - 1);
-				if(idx < 0 || Arrays.binarySearch(VOWELS_UMLAUT_ARRAY, word.charAt(idx)) < 0)
+				if(idx < 0 || Arrays.binarySearch(VOWELS_DIAERESIS_ARRAY, word.charAt(idx)) < 0)
 					break;
 			}
 		}
@@ -448,7 +448,7 @@ public final class WordVEC{
 		if(insideWord){
 			final char previousChar = word.charAt(index - 1);
 			final char nextChar = word.charAt(index + 1);
-			final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_UMLAUT_ARRAY, currentChar) >= 0);
+			final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_DIAERESIS_ARRAY, currentChar) >= 0);
 			vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
 		}
 		return vowel;
