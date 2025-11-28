@@ -47,8 +47,8 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] NB_NP = {"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü–-])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü–-])");
+	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
+	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])");
 	private static final Pattern PATTERN_V_IUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ï");
 	private static final Pattern PATTERN_V_UUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ü");
 
