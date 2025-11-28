@@ -27,6 +27,7 @@ package io.github.mtrevisan.hunlinter.languages.vec;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
+import io.github.mtrevisan.hunlinter.services.TrieReplacer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -46,8 +47,8 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] NB_NP = {"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
-	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü])");
-	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_IUMLAUT_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü–-])");
+	private static final Pattern PATTERN_UUMLAUT_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü–-])");
 	private static final Pattern PATTERN_V_IUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ï");
 	private static final Pattern PATTERN_V_UUMLAUT = RegexHelper.pattern("([aeiouàèéíòóú])ü");
 
@@ -56,7 +57,7 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])");
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))");
 	private static final String FALSE_S_INTO_X = "èsre";
@@ -82,19 +83,19 @@ public final class OrthographyVEC extends Orthography{
 	@Override
 	public String correctOrthography(final String word){
 		//correct stress
-		String correctedWord = StringUtils.replaceEach(word, STRESS_CODES, TRUE_STRESS);
+		String correctedWord = replaceEach(word, STRESS_CODES, TRUE_STRESS);
 
 		correctedWord = WordVEC.markDefaultStress(correctedWord);
 
 		//correct h occurrences after d, j, l, n, t
-		correctedWord = StringUtils.replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
+		correctedWord = replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
 
 		//remove other occurrences of h not into fhV
 		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
-		correctedWord = StringUtils.replaceEach(correctedWord, MB_MP, NB_NP);
+		correctedWord = replaceEach(correctedWord, MB_MP, NB_NP);
 
 		//correct ïC/üC occurrences into iC/uC
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_IUMLAUT_C, "i$1");
@@ -118,6 +119,21 @@ public final class OrthographyVEC extends Orthography{
 		correctedWord = reduceGeminates(correctedWord);
 
 		return correctedWord;
+	}
+
+	/**
+	 * Replaces occurrences of strings from searchList in the given text with corresponding strings from replacementList.
+	 * After each replacement, the search continues from the position immediately after the replaced substring.
+	 *
+	 * @param text	The original text where replacements will occur.
+	 * @param searchList	An array of strings to search for in the text.
+	 * @param replacementList	An array of strings to replace the found strings with. Must have the same length as {@code searchList}.
+	 * @return	The modified text after performing all replacements.
+	 * @throws IllegalArgumentException	If {@code searchList} and {@code replacementList} have different lengths.
+	 */
+	private static String replaceEach(final String text, final String[] searchList, final String[] replacementList){
+		final TrieReplacer trie = new TrieReplacer(searchList, replacementList);
+		return trie.replaceEach(text);
 	}
 
 	/**

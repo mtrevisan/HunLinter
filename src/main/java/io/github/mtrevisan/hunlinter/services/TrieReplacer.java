@@ -1,0 +1,102 @@
+package io.github.mtrevisan.hunlinter.services;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * Trie-based replacer that respects the exact semantics:
+ * - at each current position, try to match any search pattern starting THERE;
+ * - if matched, replace, then resume from AFTER the replacement in the MUTATED string;
+ * - if not matched, advance by one character.
+ */
+public class TrieReplacer{
+
+	/** Node of the prefix trie. */
+	private static final class Node{
+		final Map<Character, Node> children = new HashMap<>();
+		//index of pattern ending here; -1 means no pattern ends here
+		int outIndex = -1;
+	}
+
+
+	private final Node root = new Node();
+	private final String[] searchList;
+	private final String[] replacementList;
+
+	/**
+	 * Constructs the trie from the given search and replacement lists.
+	 *
+	 * @throws IllegalArgumentException	If lengths differ.
+	 */
+	public TrieReplacer(final String[] searchList, final String[] replacementList){
+		int length = searchList.length;
+		if(length != replacementList.length)
+			throw new IllegalArgumentException("Search and replacement lists must have equal length.");
+
+		this.searchList = Arrays.copyOf(searchList, length);
+		this.replacementList = Arrays.copyOf(replacementList, replacementList.length);
+		for(int i = 0; i < length; i ++)
+			insert(searchList[i], i);
+	}
+
+	/** Inserts one pattern into the trie with its terminal index. */
+	private void insert(final String pattern, final int index){
+		Node node = root;
+		for(int i = 0, length = pattern.length(); i < length; i ++){
+			final char c = pattern.charAt(i);
+			node = node.children.computeIfAbsent(c, k -> new Node());
+		}
+		node.outIndex = index;
+	}
+
+	/**
+	 * Performs the replacement respecting the mutated-string semantics.
+	 * Efficient: avoids substring creation and checks via trie at the current position only.
+	 */
+	public String replaceEach(final String text){
+		final StringBuilder sb = new StringBuilder(text);
+		int position = 0;
+		while(position < sb.length()){
+			Node node = root;
+			int j = position;
+			int matchedIndex = -1;
+
+			//traverse the trie along characters from the current position
+			while(j < sb.length()){
+				final char c = sb.charAt(j);
+				node = node.children.get(c);
+				if(node == null)
+					//no match starting at this position
+					break;
+
+				if(node.outIndex != -1){
+					matchedIndex = node.outIndex;
+
+					//earliest match at current position
+					break;
+				}
+
+				j++;
+			}
+
+			if(matchedIndex != -1){
+				final String search = searchList[matchedIndex];
+				final String replacement = replacementList[matchedIndex];
+
+				//replace [position, position + search.length())
+				sb.replace(position, position + search.length(), replacement);
+
+				//resume from after the replacement (in the mutated string)
+				position += replacement.length();
+			}
+			else
+				//no match at current position: advance by one
+				position ++;
+		}
+
+		return sb.toString();
+	}
+
+}

@@ -57,7 +57,6 @@ public class RulesLoader{
 	private final PropertiesUTF8 rulesProperties;
 
 	private final boolean morphologicalFieldsCheck;
-	private final boolean enableVerbSyllabationCheck;
 	private final boolean wordCanHaveMultipleStresses;
 	private final Map<MorphologicalTag, Set<String>> dataFields = new EnumMap<>(MorphologicalTag.class);
 	private final Set<String> unsyllabableWords;
@@ -80,7 +79,6 @@ public class RulesLoader{
 		rulesProperties = BaseBuilder.getRulesProperties(language);
 
 		morphologicalFieldsCheck = Boolean.parseBoolean(rulesProperties.getProperty("morphologicalFieldsCheck"));
-		enableVerbSyllabationCheck = Boolean.parseBoolean(rulesProperties.getProperty("verbSyllabationCheck"));
 		wordCanHaveMultipleStresses = Boolean.parseBoolean(rulesProperties.getProperty("wordCanHaveMultipleStresses"));
 
 		dataFields.put(MorphologicalTag.STEM, null);
@@ -218,10 +216,6 @@ public class RulesLoader{
 
 	public final boolean isMorphologicalFieldsCheck(){
 		return morphologicalFieldsCheck;
-	}
-
-	public final boolean isEnableVerbSyllabationCheck(){
-		return enableVerbSyllabationCheck;
 	}
 
 	public final boolean isWordCanHaveMultipleStresses(){

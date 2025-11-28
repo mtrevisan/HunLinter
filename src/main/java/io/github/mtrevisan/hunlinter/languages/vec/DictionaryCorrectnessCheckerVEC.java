@@ -244,8 +244,7 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 	 * @return	Whether the inflection needs to be checked for orthography and syllabation.
 	 */
 	private boolean hasToCheckForOrthographyAndSyllabation(final Inflection inflection){
-		return ((rulesLoader.isEnableVerbSyllabationCheck() || !inflection.hasPartOfSpeech(POS_VERB))
-			&& !inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
+		return (!inflection.hasPartOfSpeech(POS_NUMERAL_LATIN) && !inflection.hasPartOfSpeech(POS_UNIT_OF_MEASURE));
 	}
 
 	/**
