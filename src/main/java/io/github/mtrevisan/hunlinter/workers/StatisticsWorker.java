@@ -92,7 +92,7 @@ public class StatisticsWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(indexData.getData());
 			if(!dicEntry.hasPartOfSpeech(POS_UNIT_OF_MEASURE)){
-				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 				for(int i = 0, length = inflections.size(); i < length; i ++){
 					//collect statistics

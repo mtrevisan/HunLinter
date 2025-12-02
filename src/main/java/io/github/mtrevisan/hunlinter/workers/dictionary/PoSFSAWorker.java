@@ -117,7 +117,7 @@ public class PoSFSAWorker extends WorkerDictionary{
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String line = indexData.getData();
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 			encode(encodings, inflections, separator, sequenceEncoder);
 

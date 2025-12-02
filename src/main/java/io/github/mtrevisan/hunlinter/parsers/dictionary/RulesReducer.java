@@ -1617,7 +1617,7 @@ public class RulesReducer{
 		for(final String line : originalLines){
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(line);
 			final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
-			final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry, overriddenParent);
+			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry, overriddenParent);
 
 			originalInflectionsWhole.clear();
 			for(int j = 0, length2 = originalInflections.size(); j < length2; j ++)

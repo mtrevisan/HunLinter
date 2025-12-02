@@ -168,7 +168,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 					return;
 
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final String str = inflections.get(i).toStringWithPartOfSpeech();
@@ -224,7 +224,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 			final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 				try{
 					final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-					final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+					final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 					if(!inflections.isEmpty()){
 						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();

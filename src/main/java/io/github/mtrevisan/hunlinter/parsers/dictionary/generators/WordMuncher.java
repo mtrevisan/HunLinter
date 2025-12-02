@@ -111,7 +111,7 @@ public class WordMuncher{
 					final String originatingWord = affixEntry.undoRule(word);
 					final DictionaryEntry originatorEntry = wordGenerator.createFromDictionaryLineNoStemTag(originatingWord + SLASH + affixEntry.getFlag());
 
-					final List<Inflection> inflections = wordGenerator.applyAffixRules(originatorEntry, ruleEntry);
+					final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(originatorEntry, ruleEntry);
 					//remove base inflection
 					inflections.remove(WordGenerator.BASE_INFLECTION_INDEX);
 

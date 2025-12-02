@@ -76,6 +76,24 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 		return inflections;
 	}
 
+	public final List<Inflection> applyAffixRulesWithoutOutputConversion(final DictionaryEntry dicEntry){
+		return applyAffixRulesWithoutOutputConversion(dicEntry, null, true);
+	}
+
+	private List<Inflection> applyAffixRulesWithoutOutputConversion(final DictionaryEntry dicEntry,
+			final RuleEntry overriddenRule, final boolean enforceOnlyInCompound){
+		final List<Inflection> inflections = applyAffixRules(dicEntry, false, overriddenRule);
+
+		if(enforceOnlyInCompound)
+			enforceOnlyInCompound(inflections);
+
+		if(LOGGER.isTraceEnabled())
+			for(int i = 0, length = inflections.size(); i < length; i ++)
+				LOGGER.trace("Inflected word: {}", inflections.get(i));
+
+		return inflections;
+	}
+
 	/** Remove rules that invalidate the onlyInCompound rule. */
 	private void enforceOnlyInCompound(final Iterable<Inflection> inflections){
 		final String onlyInCompoundFlag = affixData.getOnlyInCompoundFlag();

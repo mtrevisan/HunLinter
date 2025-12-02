@@ -70,7 +70,16 @@ public class WordGenerator{
 		return wordGeneratorAffixRules.applyAffixRulesWithCompounds(dicEntry);
 	}
 
+	public final List<Inflection> applyAffixRulesWithoutOutputConversion(final DictionaryEntry dicEntry){
+		return wordGeneratorAffixRules.applyAffixRulesWithoutOutputConversion(dicEntry);
+	}
+
 	public final List<Inflection> applyAffixRules(final DictionaryEntry dicEntry, final RuleEntry overriddenRule){
+		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
+	}
+
+	public final List<Inflection> applyAffixRulesWithoutOutputConversion(final DictionaryEntry dicEntry,
+			final RuleEntry overriddenRule){
 		return wordGeneratorAffixRules.applyAffixRules(dicEntry, overriddenRule);
 	}
 

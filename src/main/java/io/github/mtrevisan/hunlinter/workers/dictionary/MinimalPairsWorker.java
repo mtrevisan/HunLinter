@@ -148,7 +148,7 @@ public class MinimalPairsWorker extends WorkerDictionary{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final Inflection inflection = inflections.get(i);
 					if(checker.shouldBeProcessedForMinimalPair(inflection))

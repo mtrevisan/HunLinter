@@ -148,10 +148,11 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
-				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 				for(int i = 0, length = inflections.size(); i < length; i ++){
-					final String str = inflections.get(i).getWord().toLowerCase(Locale.ROOT);
+					final String str = inflections.get(i).getWord()
+						.toLowerCase(Locale.ROOT);
 					bloomFilter.add(str);
 				}
 			}

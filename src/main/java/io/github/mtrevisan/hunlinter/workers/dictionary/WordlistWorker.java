@@ -94,7 +94,7 @@ public class WordlistWorker extends WorkerDictionary{
 				: Inflection::getWord);
 			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-				final List<Inflection> inflections = wordGenerator.applyAffixRules(dicEntry);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 				final int size = inflections.size();
 				if(type != WorkerType.FULLSTRIP_WORDS)
