@@ -1,81 +1,70 @@
 UTF-8
 
-t0/l0/70: theme 2, 5, 6, 7 (-àr, -ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
-t4/1F/7F: theme 4 (-àr, -ér, '-er, -ír, -ír/is: base/northern variant/northern variant for unstressed word)
-n0/n4: theme 2, 4, 7, 11, 12 (-àr, -ér, '-er, -ír, -ír/is: northern variant)
-t1/n1/N9: theme 1 (-àr, -ér, '-er, -ír, -ír/is: base/northern variant/northern variant for unstressed word)
-t2: theme 1 (-ér, '-er: buranèl and coxòto variant)
-p4/l4/74: theme 1, 2, 4 (base central variant/no vanishing el variant central variant/vanishing el variant central variant)
-t8/u8/n8/l8/78: theme 8 (base/base with ü/northern variant/no vanishing el variant/vanishing el variant)
-T8/N8: theme 8 for stressed word (base/northern variant)
-tA/lA/7A: theme 9, 10 (-àr: base/no vanishing el variant/vanishing el variant)
-tE/lE/7E: theme 9, 10 (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
-tB/lB/7B: theme 9, 10 for stressed words (-àr: base/no vanishing el variant/vanishing el variant)
-tC/lC/7C: theme 9, 10 for stressed words (-ér, '-er, -ír, -ír/is: base/no vanishing el variant/vanishing el variant)
-tG/lG/7G: gerund simple (-àr, '-er: base/no vanishing el variant/vanishing el variant)
+T0/t0/t1/T1/T2/t2/t3/T3/T4/T5/T6/T7: conjugation for -àr, -ér, '-er, -ír, -ír/is (T0 is indicative present, t0 is T0 for words without vanishing el, t1 is T0 for words with vanishing el, T1 is indicative imperfect, indicative future, subjunctive imperfect, and conditional present, T2 is subjunctive present, t2 is T2 for words ending in /ie/, t3 is T2 for words ending in /je/, T3 is imperative present, T4 is conjugation for -ír/is, T5 is indicative present second singular for stressed third person of '-er, T6 is for padoan vowel lowering for '-er, T7 is stressed root indicative present second singular person interrogative)
+L0/L1/L2/L3/L4/L5: conjugation for -àr, -ér, '-er, -ír, -ír/is for third person pronomenal verbs, non-vanishing el (L0 is indicative present, L1 is indicative imperfect, indicative future, subjunctive imperfect, and conditional present, L2 is imperative present, L3 is indefinitive form, L4 is conjugation for -ír/is, L5 is for padoan vowel lowering for '-er)
+l0/l1/l2/l3/l4/l5: conjugation for -àr, -ér, '-er, -ír, -ír/is for third person pronomenal verbs, vanishing el (l0 is indicative present, l1 is indicative imperfect, indicative future, subjunctive imperfect, and conditional present, l2 is imperative present, l3 is indefinitive form, l4 is conjugation for -ír/is, l5 is for padoan vowel lowering for '-er)
+N0/N1/N2/N3/N4/N5/N6/N7: conjugation for -àr, -ér, '-er, -ír, -ír/is, northern variant (N0 is indicative present, N1 is indicative imperfect, indicative future, subjunctive imperfect, and conditional present, N2 is subjunctive present, N3 is imperative present, N4 is indefinitive form, N5 is indicative present for -ír/is, N6 is for padoan vowel lowering for '-er, N7 is stressed root indicative present second singular person interrogative)
+W0: conjugation for -ír, -ír/is, northern variant
+W1/w1: infinitive simple for -àr, -ír, -ír/is, lagunar variant (non-vanishing el variant/vanishing el variant)
+W2/w2: infinitive simple for -ér, padoan and coxòto variants (non-vanishing el variant/vanishing el variant)
+W3/w3: infinitive simple for '-er, padoan and coxòto variants (non-vanishing el variant/vanishing el variant)
+W4: infinitive simple for '-er, non-vanishing el variant
 
-xA: irregular verb (re-?)andar
-xB/xC: irregular verb (re-?)av?er, (re-?)g(av)er, ʼ(v)er
-xD : irregular verb (a(s)|apar|de|(in)kon|intra|man|(re)o|re|sos|tra)[ct][èé]ñer, (a(r)|ben|de(x)|(des|re)kon|in|inter|intr[ae]|kontra|mal|per|pre|(re)so|pro|rin|sko(n)|sora|x)v[èéí]ñer/ʼñer
-xE : irregular verb (des|re)(c|ti?)oler, (ben|mal|re)(vu?|ʼ)oler
-xF : irregular verb (dex)dar, ((dex)asue|des|kon(tra)|[lƚ]iku[ei]|putre|(ra)?re|sastu|sat[iu]s|sodis|sora|stra|stupe|tore|tume)far, (kon(tra)|mal|move|o|re|so(ra|to))star
-xG : irregular verb liku[ei]far senŧa èle vanesente
-xH : irregular verb ƚiku[ei]far ko èle vanesente
-xI : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|ma[lƚ][ae]|pre|re)díxer
-xJ : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|mal[ae]|pre|re)díxer senŧa èle vanesente
-xK : irregular verb déver
-xL/xM : irregular verb (re)èser/rïèser
-xN : irregular verb poder
-xO : irregular verb (pre|re|stra)sav?er
-xP : irregular verb (a|as|de|des|es|kon|pro|re|so)tràer
-xQ : irregular verb vardar
-xR : verb fir/[ie]n-dir/re-?dir
+xA: irregular verb (re)?andar
+xB: irregular verb (re)?av?er, (re)?g(av)?er, ʼv?er
+xC : irregular verb (as?|apar|de|(in)?kon|intra|man|(re)?o|re|sos|tra)?[ct][èé]ñer, (ar?|ben|dex?|(des|re)?kon|in|inter|intr[ae]|kontra|mal|per|pre|(re)?so|pro|rin|skon?|sora|x)?v[èéí]ñer/ʼñer
+xD/xE/xF/xG : irregular verb (des|re)?(t[iu]?|c)o[lƚ]er, (ben|mal|re)?(vu?|ʼ)o[lƚ]er (xE is non-vanishing el, xF is vanishing el, xG is norther variant)
+xH/xI/xJ/xK : irregular verb (dex)?dar, ((dex)?asue|des|kon(tra)?|[lƚ]iku[ei]|putre|(ra)?re|sastu|sat[iu]s|sodis|sora|stra|stupe|tore|tume)?far, (kon(tra)?|mal|move|o|re|so(ra|to)?)?star (xI is non-vanishing el, xJ is vanishing el, xK is norther variant)
+xL/xM/xN/xO : irregular verb (bene|d[ei]x|in|inter|intr[ae]|kontra|ma[lƚ][ae]|pre|re)?díxer, (a|(pre)?de|re|re(kon|pro)?|in(tro)?|pre|se|tra)?dúxer (xM is non-vanishing el, xN is vanishing el, xO is norther variant)
+xP : irregular verb di?éver
+xQ/xR/xS : irregular verb (re)?èser, rïèser (xQ is for èser, xR for rïèser, xS for common part)
+xT : irregular verb pu?oder
+xU : irregular verb (pre|re|stra)?sav?er
+xV : irregular verb (as?|des?|es|kon|pro|re|so)?tràer
+xX : irregular verb fir
 
-P0/Pl/P7: pronomenal verbs, detached (-[gmnstv]e(ne) / -([gmstv]e)l[oaie] / -([gmstv]e)ƚ[oaie])
-Q0/Ql/Q7: pronomenal verbs, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
-R0/Rl/R7: pronomenal verbs for '-er, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
-S0/Sl/S7: pronomenal verbs for the imperative, detached (-[gmnstv]e(ne) / -([gmstv]e)l[oaie] / -([gmstv]e)ƚ[oaie])
-D0/Dl/D7: pronomenal verbs for the imperative, attached ([gmnstv]e(ne) / ([gmstv]e)l[oaie] / ([gmstv]e)ƚ[oaie])
-FS: sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>n|ñ[oei], ñ.>ñ|ñ[oei], b.>p|b[oei], p.>p|p[oei], ...)
-J1/I1: interrogatives for first singular, detached (-(m)i, -n(t)[ei], -[ei]) / attached ((m)i, n(t)[ei], [ei])
-J2/I2: interrogatives for first plural, detached (-i, -n(t)[ei], -[ei]) / attached (i, n(t)[ei], [ei])
-J3/I3/j3: interrogatives for second singular, detached (-(s)tu, -to) / attached ((s)tu, to)
-J4/I4: interrogatives for second plural, detached (-[uo]) / attached ([uo])
-J5/j5: interrogatives for third, detached (-l[oaie] / -ƚ[oaie])
-I5/i5: interrogatives for third, attached (l[oaie] / ƚ[oaie])
-J6/I6: interrogatives for conditional present first singular, detached (-ïo) / attached (ïo)
-J7/j7: interrogatives for conditional present third, detached (-ave > -ise-l[oaie] / -ave > -ise-ƚ[oaie])
-I7/i7: interrogatives for conditional present third, attached (-ave > -ísel[oaie], -ave > -íseƚ[oaie])
+P0/P1/P2: pronomenals (-(gi)?ne?, -[gmstv]en?, -[gmstv]end?e, -n?(de)?|[^r] / -([gmstv]e)?l[oaie]? / -([gmstv]e)?ƚ[oaie])
+I1: interrogatives for first singular (-[ei], -[jɉ]o, -ɉu, -m?i, [eo]>-io, -v?e, -nt?[ei])
+I2: interrogatives for first plural (-i, -t?[ei], -nt?[ei])
+I3: interrogatives for second singular (-s?tu, -to)
+I4: interrogatives for second plural (-[uo], -vu)
+I5/I6: interrogatives for third (-l[oaie]?, -lo>-l[aie]?)
+I7/I8: interrogatives for third (-ƚ[oaie], -ƚo>-ƚ[aie])
 
-A1: all declinations, adjectives of first class (a>[oaie]|[^oaie], o>i|[^ij]o, .o>i|[ij]o, o>[ae])
-A2: adjectives of second class (a>[aie]|[^oaie], a>[ie])
-F0: feminine plural nouns, adjectives of third class (a>[ei]|[^oaie], a>e, e>i)
-M0: masculine plural nouns (a>[oi]|[^oaie], o>i|[^i]o, .o>i|io, [ae]>i)
-MF: masculine plural nouns (0>e|[èélnr], e>i, 0>i|[aèélnr])
-M1: adding of -io/a to the words in -o/a ([lnr]>.io, [oe]>io, a>ia)
-X0: genderless plural nouns (e>i, [nr]>[nr]i)
+A0: sonorization of final consonants (ñ.>nc|ñ[oei], ñ.>in|ñ[oei], ñ.>[nñ]|ñ[oei], [bp].>p|[bp][oei], ...)
+M0: masculine singular (C>-o, à>ao, ó>oo, é>ee)
+M1: masculine singular (C>-e, o>e)
+M2: masculine plural (C>-i, o>i|[^i]o, io>i, [ae]>i, à>ai, é>ei, ó>oi)
+M3: masculine plural monosyllabic words (o>i|io)
+M4: ancient masculine plural -igo words (go>xi|igo)
+F0: feminine singular (C>-a, o>a)
+F1: feminine singular (C>-e)
+F2: feminine plural (C>-i, e>i|[^i]e, ie>i, a>e)
+F3: feminine plural (C>-e, o>e)
+A1: adding of -io/a to the words in -o/a (a>ia, o>io|[^cijɉñ]o, [lnr]>-io)
+X0: genderless plural ([aeo]>i, [lnr]>-e/i)
+X1: genderless abstract nouns (ade>ae|à|è, ude>ú/úe)
 
 B1: feltrin-belumat transformation, plural with transformation '[aeou][ln] > 'Vi (.>i|[èò][ln], a.>ài|a[ln], e.>éi|e[ln], o.>ói|o[ln], u.>úi|u[ln])
 B2: feltrin-belumat transformation, plural with transformation '[aeou][^-]+[aeou][ln] > 'V[^-]+Vi (l>i|[aeouàèéòóú]l, n>i|[aeouàèéòóú]n)
-A5/A6: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, neve > neu / '-[ai]vo > '-Vu ([aiò]vo>[àíò]u|[aeiò]vo, ve>u|neve)
-V3/V4/V7: venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
+B3: arsedexe transformation, singular with transformation -'[aiò]vo > -'Vu, neve > neu / '-[ai]vo > '-Vu ([aiò]vo>[àíò]u|[aeiò]vo, ve>u|neve)
+V0/V1/v1: venetian transformation (l>ƚ, j>ɉ, ŧ>s, đ>x)
 Vf/Vm/Vx: venetian transformation for femenine/masculine/neuter words (-l>-ƚe)
 Vp: prefix for venetian transformation (lV->ƚV-, jV->ɉV-, ŧV->sV-, đV->xV-)
 Bu: buran language transformation (a[lnr] > à, on > ó)
 Pd: paduan transformation: metaphonesis (-oxo>-uxi)
 Vs: prefix for vicentine transformation (re->ra-/ar-, se->sa-, per- > par-)
-Vr/VR: veronexe transformation (-ente > -ènte/M0FS, -en[pstŧ]o > -èn[pstŧ]o/M0FSPd, -en[dstŧ]a > -èn[dstŧ]a/F0, -osto > -òsto/M0FS, -ongo > -òngo/M0FS, -evo > -èvo/M0)
+Vr/VR: veronexe transformation (-ente > -ènte/M0A0, -en[pstŧ]o > -èn[pstŧ]o/M0A0Pd, -en[dstŧ]a > -èn[dstŧ]a/F2, -osto > -òsto/M0A0, -ongo > -òngo/M0A0, -evo > -èvo/M0)
 
 v0/v7: plants and crafts ((i)èr>ar(o/a/i/e), dor>(t)or(a/i/e)|[aeiou]dor, ol>i[oò]l(o/a/i/e)|[dđñrsŧx]ol, ol>òl(o/a/i/e)|[dđñrsŧx]ol, ...)
-m0/m7: deverbal nominals (-ment(o/i))
-z0/s0/s7: deverbal nominals (r>ŧion, r>sion)
 d0/d7: deverbal nominals ([ai]r>(d)ura, [ai]dur>ur, [ai]dur>ureto, [ai]dura>ura, [ai]dura>ureta)
 x0/x7: deaverbial nominals (a>ixm[oi]|[nr], a>ixm[oi])
 r0: denominal nominals (-[ae]ría)
 i0: denominal nominals (a>ist[aei]|l, [ae]>ist[aei], o>ist[aei]|[^i]o, o>st[aei]|io)
+i1: abstraction ([eo]>ía, ía|n)
 w0: adverbs (-mente)
-y0/y1: collective nouns (duro>ur[oi], ada>à[ae], ida>í[ae], uda>ú[ae])
-y2: collective nouns (duro>ur[oi], ada>a[ae], ida>i[ae], uda>u[ae])
+m0/m7: collectives (-ame)
+y0/y1: collective nouns (duro>ur[oi] / ada>à[ae], ida>í[ae], uda>ú[ae])
 Z0: ignore upper/lower case
 
 aT/a1: altered nouns (-ato/a, -ƚ-ato/a)
@@ -83,7 +72,7 @@ aZ/aS/aL: altered nouns (-aŧo/a, -aso/a, -ƚ-aso/a)
 eL/e7: altered nouns (-èl/èla, -èƚo/a)
 eT/e1: altered nouns (-eto/a, -ƚ-eto/a)
 eZ/eS: deajectival nominals (-eŧa/e, -esa/e)
-iN: altered nouns (-in/-ina)
+iN/aD: altered nouns (-in/-ina, -adina>-aina)
 iZ/iS: deajectival nominals (-iŧia/e, -isia/e)
 o0/o7: altered nouns (-on, -ƚ-on)
 o1: altered nouns (-ona)
@@ -91,15 +80,19 @@ o2/o3: altered nouns (-one masc., -one fem.)
 o4: altered nouns (-oni masc.)
 oT/oL: altered nouns (-òto/a, -ƚ-òto/a)
 uZ/uS/uL: altered nouns (-uŧo/a, -uso/a, -ƚ-uso/a)
+?: altered nouns (-oso)
+?: altered nouns (-eso)
+?: altered nouns (-[aeiòu]ko)
+?: altered nouns (-ur)
 
-p2/p3: prefix for bi-/tr[ie]-
-^0/^1/^2/^3/^4/^5/^6/^7/^8: prefix for altered nouns (anti-/tra-/pre-/kapo-/kontra-/kontro-/stra-/mal-/ben-)
+b2/b3: prefix for bi-/tr[ie]-
+^0/^1/^2/^3/^4/^5/^6/^7/^8/^9: prefix for altered nouns (anti-/tra-/pre-/kapo-/kontra-/kontro-/stra-/mal-/ben-/pro-)
 -0/-1: prefix for removal or lowering, and euphonic of de- (de-/de[sx]-)
 +0: prefix for deajectival verbs (i(n)-)
 *0: prefix for contrary or privative-pejorative action, removal, exit, separation ([sx]-)
 .0: prefix for repeated action (re-)
 @0: prefix for direction, approach, addition, intensive value (a-)
-@1: prefix for reinforcing (gives a superlative value) (ar[sŧ][iï]-)
+@1/@2: prefix for reinforcing (gives a superlative value) (arŧ[iï]-/ars[iï]-)
 :0: prefix for union, participation, connection (kon-)
 gv: prefix for initial lenition gu[ae]>v[ae]
 N1..N6/|1..|6: composite numerals
