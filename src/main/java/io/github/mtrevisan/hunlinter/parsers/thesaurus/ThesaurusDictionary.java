@@ -153,18 +153,23 @@ public class ThesaurusDictionary{
 		//remove all entries that have all the elements in one of `deleteSets`
 		dictionary.values()
 			.forEach(entry -> {
-				final Iterator<SynonymsEntry> itr = entry.getSynonyms().iterator();
-				while(itr.hasNext()){
-					final SynonymsEntry synonymsEntry = itr.next();
+				try{
+					final Iterator<SynonymsEntry> itr = entry.getSynonyms().iterator();
+					while(itr.hasNext()){
+						final SynonymsEntry synonymsEntry = itr.next();
 
-					final Set<String> currentSet = synonymsEntry.getSynonyms().stream()
-						.map(ThesaurusDictionary::removeSynonymUse)
-						.collect(Collectors.toSet());
-					currentSet.add(removeSynonymUse(entry.getDefinition()));
-					for(final Set<String> deleteSet : deleteSets){
-						if(currentSet.equals(deleteSet))
-							itr.remove();
+						final Set<String> currentSet = synonymsEntry.getSynonyms().stream()
+							.map(ThesaurusDictionary::removeSynonymUse)
+							.collect(Collectors.toSet());
+						currentSet.add(removeSynonymUse(entry.getDefinition()));
+						for(final Set<String> deleteSet : deleteSets){
+							if(currentSet.equals(deleteSet))
+								itr.remove();
+						}
 					}
+				}
+				catch(final Exception e){
+					throw new RuntimeException(e);
 				}
 			});
 		//remove all empty records
