@@ -35,12 +35,15 @@ import java.util.stream.IntStream;
  * A scalable in-memory implementation of the bloom filter.
  * Not suitable for persistence.
  *
- * @see <a href="https://github.com/rupeshmane/scalable-bloom-filter">Scalable Bloom Filtre</a>
+ * @see <a href="https://github.com/rupeshmane/scalable-bloom-filter">Scalable Bloom Filter</a>
  * @see <a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf">DBloom</a>
  *
  * @param <T> the type of object to be stored in the filter.
  */
 public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
+
+	private static final int MIN_CAPACITY = 8_000_000;
+
 
 	/** The default {@link Charset} is the platform encoding charset. */
 	private final Charset charset;
@@ -68,6 +71,12 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 		return currentFilter.add(value);
 	}
 
+
+	/**
+	 * Choose or create the current layer.
+	 * Create a new one if the current is full and the incoming value is not reported present (to avoid inserting into
+	 * a saturated layer).
+	 */
 	private BloomFilterInterface<T> chooseCurrentFilter(final T value){
 		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
 		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
@@ -79,13 +88,15 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	private BloomFilterInterface<T> fork(final int count){
-		final int minimumExpectedNumberOfElements = Math.min((int)Math.pow(100, count), 10_000_000);
-		final int expectedNumberOfElements = (int)Math.ceil(parameters.getExpectedNumberOfElements()
-			* Math.pow(parameters.getGrowthRateWhenFull(), count));
-		final double falsePositiveProbability = parameters.getFalsePositiveProbability() * Math.pow(parameters.getTighteningRatio(), count);
-		return new BloomFilter<>(charset, Math.max(expectedNumberOfElements, minimumExpectedNumberOfElements), falsePositiveProbability,
-			parameters.getBitArrayType(), null,
-			null);
+		//layer i capacity: n_i = max(n0 * growth^i, minCap)
+		final int base = parameters.getExpectedNumberOfElements();
+		final int expectedNumberOfElements = (int)Math.max(MIN_CAPACITY,
+			Math.ceil(base * Math.pow(parameters.getGrowthRateWhenFull(), count)));
+		//layer i FPP: p_i = p0 * tightening^i
+		final double falsePositiveProbability = parameters.getFalsePositiveProbability()
+			* Math.pow(parameters.getTighteningRatio(), count);
+		return new BloomFilter<>(charset, expectedNumberOfElements, falsePositiveProbability,
+			parameters.getBitArrayType(), null, null);
 	}
 
 	@Override
@@ -108,7 +119,7 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public final boolean isFull(){
 		final int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
-		return (addedElements >= parameters.getExpectedNumberOfElements() / 2);
+		return (addedElements >= parameters.getExpectedNumberOfElements() * 0.85);
 	}
 
 	@Override

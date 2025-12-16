@@ -213,17 +213,15 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 */
 	private synchronized boolean calculateIndexes(final byte[] bytes){
 		boolean bitsChanged = false;
-		final long hash = getLongHash64(bytes);
-		final int lowHash = (int)hash;
-		final int highHash = (int)(hash >>> 32);
-		final int size = bitArray.size();
+		final long[] hashes = getTwoLongHashes(bytes);
+		final long lowHash = hashes[0];
+		final long highHash = hashes[1];
+		final long m = Integer.toUnsignedLong(bitArray.size());
 		for(int i = 1; i <= hashFunctions; i ++){
-			int nextHash = lowHash + i * highHash;
-			//hashcode should be positive, flip all the bits if it's negative
-			if(nextHash < 0)
-				nextHash = ~nextHash;
-
-			final int index = nextHash % size;
+			final long nextHash = lowHash + i * highHash;
+			//ensure non-negative, then reduce modulo m
+			final long nonNegative = nextHash & Long.MAX_VALUE;
+			final int index = (int)(nonNegative % m);
 			bitsChanged |= bitArray.set(index);
 		}
 		return bitsChanged;
@@ -236,17 +234,15 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
 	public final synchronized boolean contains(final byte[] bytes){
-		final long hash = getLongHash64(bytes);
-		final int lowHash = (int)hash;
-		final int highHash = (int)(hash >>> 32);
-		final int size = bitArray.size();
+		final long[] hashes = getTwoLongHashes(bytes);
+		final long lowHash = hashes[0];
+		final long highHash = hashes[1];
+		final long m = Integer.toUnsignedLong(bitArray.size());
 		for(int i = 1; i <= hashFunctions; i ++){
-			int nextHash = lowHash + i * highHash;
-			//hashcode should be positive, flip all the bits if it's negative
-			if(nextHash < 0)
-				nextHash = ~nextHash;
-
-			final int index = nextHash % size;
+			final long nextHash = lowHash + i * highHash;
+			//ensure non-negative, then reduce modulo m
+			final long nonNegative = nextHash & Long.MAX_VALUE;
+			final int index = (int)(nonNegative % m);
 			if(!bitArray.get(index))
 				return false;
 		}
@@ -255,14 +251,34 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	//Helper functions for functionality within
 	/**
-	 * Compute one 64-bit hash from the given byte-array using the specified {@link HashFunction}.
+	 * Compute two 64-bit hashes from the given byte-array using the specified {@link HashFunction}.
 	 *
 	 * @param bytes	The byte-array to use for hash computation
 	 * @return the 64-bit hash
 	 * @throws NullPointerException	if the byte array is {@code null}
 	 */
-	private long getLongHash64(final byte[] bytes){
-		return (hasher.isSingleValued()? hasher.hash(bytes): hasher.hashMultiple(bytes)[0]);
+	private long[] getTwoLongHashes(final byte[] bytes){
+		if(!hasher.isSingleValued()){
+			final long[] hs = hasher.hashMultiple(bytes);
+			if(hs != null && hs.length >= 2)
+				return new long[]{hs[0], hs[1]};
+			if(hs != null && hs.length == 1)
+				return new long[]{hs[0], mix64(hs[0] ^ 0x9E37_79B9_7F4A_7C15L)};
+		}
+
+		//single-valued: promote to long and derive second via mixer
+		final long h1 = Integer.toUnsignedLong(hasher.hash(bytes));
+		final long h2 = mix64(h1 ^ 0x9E37_79B9_7F4A_7C15L);
+		return new long[]{h1, h2};
+	}
+
+	//64-bit mixing function (SplitMix64 finalizer) to decorrelate hashes.
+	private static long mix64(long z){
+		//golden ratio
+		z += 0x9E37_79B9_7F4A_7C15L;
+		z = (z ^ (z >>> 30)) * 0xBF58_476D_1CE4_E5B9L;
+		z = (z ^ (z >>> 27)) * 0x94D0_49BB_1331_11EBL;
+		return z ^ (z >>> 31);
 	}
 
 	/**
@@ -293,7 +309,11 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public final boolean contains(final T value){
-		return (value != null && contains(value.toString().getBytes(charset)));
+		try{
+			return (value != null && contains(decomposeValue(value)));
+		}
+		catch(final IOException ignored){}
+		return false;
 	}
 
 	@Override

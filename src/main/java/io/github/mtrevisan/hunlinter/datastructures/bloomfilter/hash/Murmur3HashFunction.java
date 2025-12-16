@@ -68,12 +68,12 @@ public class Murmur3HashFunction implements HashFunction{
 
 	@Override
 	public final int hash(final byte[] bytes){
-		return hash32(bytes, 0, SEED);
+		return hash32(bytes, bytes.length, SEED);
 	}
 
 	@Override
 	public final long[] hashMultiple(final byte[] bytes){
-		return hash128(bytes, 0, SEED);
+		return hash128(bytes, bytes.length, SEED);
 	}
 
 

@@ -72,7 +72,7 @@ public class MemoryMappedFileBitArray implements BitArray{
 		//we open in "rwd" mode, to save one i/o operation than in "rws" mode
 		this.backingFile = new RandomAccessFile(backingFile, "rwd");
 
-		numberOfBytes = (bits >> 3) + 1;
+		numberOfBytes = ((bits + Byte.SIZE - 1) >> 3);
 		extendFile(numberOfBytes);
 
 		//initialize the rest

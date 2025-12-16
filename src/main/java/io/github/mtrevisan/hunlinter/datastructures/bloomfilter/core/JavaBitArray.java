@@ -46,7 +46,7 @@ public class JavaBitArray implements BitArray{
 		if(bits <= 0)
 			throw new IllegalArgumentException(WRONG_NUMBER_OF_BITS);
 
-		data = new long[(int)(bits >>> 6) + 1];
+		data = new long[(int)((bits + Long.SIZE - 1) >>> 6)];
 	}
 
 	@Override
