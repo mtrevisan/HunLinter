@@ -68,6 +68,7 @@ public class WordCountWorker extends WorkerDictionary{
 
 		getWorkerData()
 			.withParallelProcessing()
+			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");

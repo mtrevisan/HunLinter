@@ -26,6 +26,7 @@ package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
+import io.github.mtrevisan.hunlinter.workers.dictionary.SmartFileSorter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -78,7 +79,7 @@ public final class ExternalSorter{
 
 		final List<File> files = new ArrayList<>((int)Math.ceil((double)dataLength / blockSize));
 		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), options.getCharset(), options.getZipBufferSize())){
-			final StringArrayList temporaryList = new StringArrayList(5_000_000);
+			final StringArrayList temporaryList = new StringArrayList(200_000_000, 2.f);
 			while(scanner.hasNextLine()){
 				//[B]
 				long currentBlockSize = 0l;

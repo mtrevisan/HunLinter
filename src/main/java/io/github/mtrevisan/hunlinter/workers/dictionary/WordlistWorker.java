@@ -46,6 +46,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -77,7 +79,7 @@ public class WordlistWorker extends WorkerDictionary{
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
-			.withParallelProcessing()
+//			.withParallelProcessing()
 			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
@@ -129,6 +131,17 @@ public class WordlistWorker extends WorkerDictionary{
 				closeWriter(writer);
 
 				resetProcessing("Sorting");
+
+				Path sortedFile = Path.of("C:\\Users\\MauroSimioni\\OneDrive - Targa Telematics S.p.A\\Documenti\\2.sorted.txt");
+				int parallelism = Runtime.getRuntime().availableProcessors();
+				int memoryMB = 1024;
+				Comparator<String> comparator = dicParser.getComparator();
+				try{
+					SmartFileSorter.sort(outputFile.toPath(), sortedFile, parallelism, memoryMB, comparator);
+				}
+				catch(Exception e){
+					throw new RuntimeException(e);
+				}
 
 				//sort file & remove duplicates
 				final ExternalSorterOptions options = ExternalSorterOptions.builder()
