@@ -247,11 +247,11 @@ public class FSASerializer implements FSASerializerInterface{
 
 		int offset = 0;
 
-		// Add dummy terminal state.
+		//add dummy terminal state
 		offset += emitNodeData(bb, os, nodeDataLength, 0);
 		offset += emitArc(bb, os, gtl, 0, (byte)0, 0);
 
-		// Add epsilon state.
+		//add epsilon state
 		offset += emitNodeData(bb, os, nodeDataLength, 0);
 		if(fsa.getRootNode() != 0)
 			offset += emitArc(bb, os, gtl, FSA.BIT_LAST_ARC | FSA.BIT_TARGET_NEXT, (byte)'^', 0);

@@ -177,10 +177,10 @@ public class FSA extends FSAAbstract{
 	 */
 	@Override
 	public final int getRootNode(){
-		// Skip dummy node marking terminating state.
+		//skip dummy node marking terminating state
 		final int epsilonNode = skipArc(getFirstArc(0));
 
-		// And follow the epsilon node's first (and only) arc.
+		//and follow the epsilon node's first (and only) arc
 		return getDestinationNodeOffset(getFirstArc(epsilonNode));
 	}
 

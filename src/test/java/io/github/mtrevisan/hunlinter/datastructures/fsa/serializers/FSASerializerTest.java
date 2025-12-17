@@ -165,10 +165,10 @@ class FSASerializerTest{
 
 		FSAAbstract fsa2 = FSAAbstract.read(new ByteArrayInputStream(fsaData));
 
-		// Ensure we have the NUMBERS flag set.
+		//ensure we have the NUMBERS flag set
 		Assertions.assertTrue(fsa2.getFlags().contains(FSAFlags.NUMBERS));
 
-		// Get all numbers from nodes.
+		//get all numbers from nodes
 		byte[] buffer = new byte[128];
 		ArrayList<String> result = new ArrayList<>();
 		FSATestUtils.walkNode(buffer, 0, fsa2, fsa2.getRootNode(), 0, result);

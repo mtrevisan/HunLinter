@@ -83,7 +83,7 @@ public class AhoCorasickReplacer{
 	private void buildFailureLinks(){
 		final Queue<Node> q = new ArrayDeque<>();
 		root.fail = root;
-		// Initialize depth-1 nodes
+		//initialize depth-1 nodes
 		for(final Node child : root.children.values()){
 			child.fail = root;
 			q.add(child);

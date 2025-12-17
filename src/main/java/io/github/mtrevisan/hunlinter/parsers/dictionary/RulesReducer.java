@@ -205,8 +205,10 @@ public class RulesReducer{
 
 		//process each group independently
 		for(final Map.Entry<List<LineEntry>, List<String>> group : groupByOwners.entrySet()){
-			final List<LineEntry> owners = group.getKey();     // indices of entries
-			final List<String> groupFrom = group.getValue(); // from-values in this group
+			//indices of entries
+			final List<LineEntry> owners = group.getKey();
+			//from-values in this group
+			final List<String> groupFrom = group.getValue();
 
 			if(groupFrom.isEmpty())
 				continue;
@@ -686,7 +688,7 @@ public class RulesReducer{
 			}
 		}
 
-		// If there were no valid elements, return empty.
+		//if there were no valid elements, return empty
 		if(membership.isEmpty())
 			return Collections.emptyList();
 

@@ -94,7 +94,7 @@ class BloomFilterTest{
 			String uuid = UUID.randomUUID().toString();
 			boolean present = filter.contains(uuid);
 			if(present){
-				// false positive
+				//false positive
 				Assertions.assertFalse(contained.contains(uuid));
 				fpp ++;
 			}
