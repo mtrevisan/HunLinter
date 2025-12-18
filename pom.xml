@@ -81,6 +81,8 @@
 		<maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
 		<exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
+		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-install-plugin -->
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 
@@ -96,6 +98,10 @@
 
 		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<github.vsonnier.hppcrt.version>0.7.5</github.vsonnier.hppcrt.version>
+
+		<!-- MapDB -->
+		<!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
+		<org.mapdb.version>3.1.0</org.mapdb.version>
 
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
@@ -484,6 +490,16 @@
 				</configuration>
 			</plugin>
 
+			<!-- Surefire -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<argLine>--enable-native-access=ALL-UNNAMED</argLine>
+				</configuration>
+			</plugin>
+
 			<!-- Install -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -562,6 +578,13 @@
 <!--			<version>1.0.0</version>-->
 <!--			<scope>runtime</scope>-->
 <!--		</dependency>-->
+
+		<!-- MapDB -->
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>${org.mapdb.version}</version>
+		</dependency>
 
 		<!-- JSON -->
 		<dependency>

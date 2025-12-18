@@ -132,30 +132,22 @@ public class WordlistWorker extends WorkerDictionary{
 
 				resetProcessing("Sorting");
 
-				Path sortedFile = Path.of("C:\\Users\\MauroSimioni\\OneDrive - Targa Telematics S.p.A\\Documenti\\2.sorted.txt");
-				int parallelism = Runtime.getRuntime().availableProcessors();
-				int memoryMB = 1024;
-				Comparator<String> comparator = dicParser.getComparator();
-				try{
-					SmartFileSorter.sort(outputFile.toPath(), sortedFile, parallelism, memoryMB, comparator);
-				}
-				catch(Exception e){
-					throw new RuntimeException(e);
-				}
-
 				//sort file & remove duplicates
 				final ExternalSorterOptions options = ExternalSorterOptions.builder()
 					.charset(charset)
-					.sortInParallel()
 					.comparator(dicParser.getComparator())
-					.useTemporaryAsZip()
 					.removeDuplicates()
+					.useTemporaryAsZip()
+					.zipBufferSize(256 * 1024)
+					.mappedMemory(1024)
+					.mappedWindow(512)
+					.osSortMemory(4096)
 					.build();
 				try{
-					ExternalSorter.sort(outputFile, options, outputFile);
+					ExternalSorter.sort(outputFile, outputFile, options);
 				}
-				catch(final IOException ioe){
-					throw new SorterException(ioe);
+				catch(final Exception e){
+					throw new SorterException(e);
 				}
 
 				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());

@@ -24,9 +24,10 @@
  */
 package io.github.mtrevisan.hunlinter.services.sorters.externalsorter;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.IOException;
 import java.util.Objects;
-import java.util.Scanner;
 
 
 /**
@@ -36,39 +37,43 @@ import java.util.Scanner;
  */
 class BinaryFileBuffer implements Closeable{
 
-	private final Scanner scanner;
+	private final BufferedReader reader;
 	private String cache;
 
 
-	BinaryFileBuffer(final Scanner scanner){
-		Objects.requireNonNull(scanner, "Scanner cannot be null");
+	BinaryFileBuffer(final BufferedReader reader) throws IOException{
+		Objects.requireNonNull(reader, "Scanner cannot be null");
 
-		this.scanner = scanner;
+		this.reader = reader;
 
 		readNextLine();
 	}
 
 	@Override
-	public final void close(){
-		scanner.close();
+	public final void close() throws IOException{
+		reader.close();
 	}
 
+	/** Returns true when no more lines are available. */
 	public final boolean isEmpty(){
 		return (cache == null);
 	}
 
+	/** Peek the current cached line without consuming it. */
 	public final String peek(){
 		return cache;
 	}
 
-	public final String pop(){
+	/** Pop the cached line and load the next one. */
+	public final String pop() throws IOException{
 		final String answer = peek();
 		readNextLine();
 		return answer;
 	}
 
-	private void readNextLine(){
-		cache = (scanner.hasNextLine()? scanner.nextLine(): null);
+	/** Load the next line into cache; sets cache to null at EOF. */
+	private void readNextLine() throws IOException{
+		cache = reader.readLine();
 	}
 
 }

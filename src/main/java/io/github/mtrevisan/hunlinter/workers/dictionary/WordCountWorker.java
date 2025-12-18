@@ -36,6 +36,9 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -55,6 +59,8 @@ public class WordCountWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Word count";
 
 	private final AtomicInteger totalInflections = new AtomicInteger(0);
+	private final DB onDiskDD;
+	private final Set<String> totalUniqueInflections;
 	private final BloomFilterInterface<String> dictionary;
 
 
@@ -67,7 +73,7 @@ public class WordCountWorker extends WorkerDictionary{
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
-			.withParallelProcessing()
+//			.withParallelProcessing()
 			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
@@ -77,15 +83,56 @@ public class WordCountWorker extends WorkerDictionary{
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
+		final Path dbFile = dicParser.getDicFile()
+			.toPath()
+			.resolveSibling("uniqueWords.db");
+		//build a fileDB with memory-mapped IO (if supported) and decent concurrency
+		onDiskDD = DBMaker
+			.fileDB(dbFile.toFile())
+			//use mmap for speed on 64-bit
+			.fileMmapEnableIfSupported()
+			//level of internal striping for concurrency
+			.concurrencyScale(64)
+			//preallocate 512 MB to reduce file growth overhead (tune)
+			.allocateStartSize(512l << 20)
+			//grow in 128 MB steps (tune)
+			.allocateIncrement(128l << 20)
+			//enable WAL (crash protection)
+			.transactionEnable()
+			.checksumHeaderBypass()
+			.closeOnJvmShutdown()
+			.make();
+
+		//create or open an HTreeSet<String> named `totalUniqueInflections`
+		totalUniqueInflections = onDiskDD
+			.hashSet("totalUniqueInflections", Serializer.STRING)
+			.counterEnable()
+			.createOrOpen();
+
+
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
 			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 			totalInflections.addAndGet(inflections.size());
-			for(int i = 0, length = inflections.size(); i < length; i ++)
-				dictionary.add(inflections.get(i).getWord());
+			for(int i = 0, length = inflections.size(); i < length; i ++){
+				final String word = inflections.get(i).getWord();
+
+				//bloom filter says it doesn't contain the word...
+				if(!dictionary.contains(word)){
+					//... so check also if it's present in the set...
+					if(totalUniqueInflections.add(word))
+						//... and if it's not, add it to the bloom filter
+						dictionary.add(word);
+				}
+				else
+					//bloom filter says it may contain the word, but it could be a false positive...
+					totalUniqueInflections.add(word);
+			}
 		};
 		final Consumer<Exception> cancelled = exc -> {
+			onDiskDD.commit();
+			onDiskDD.close();
 			dictionary.close();
 
 			if(onCancelled != null)
@@ -108,17 +155,16 @@ public class WordCountWorker extends WorkerDictionary{
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
+			onDiskDD.commit();
+			onDiskDD.close();
 			dictionary.close();
 
-			final int totalUniqueInflections = dictionary.getAddedElements();
-			final double falsePositiveProbability = dictionary.getTrueFalsePositiveProbability();
-			final int falsePositiveCount = (int)Math.ceil(totalUniqueInflections * falsePositiveProbability);
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}", DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {} ± {} ({}), {}",
+
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
+				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {}, {}",
 				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
-				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability),
-				falsePositiveCount,
-				DictionaryParser.SHORT_PERCENT_FORMATTER.format((double)totalUniqueInflections / totalInflections.get()));
+				DictionaryParser.SHORT_PERCENT_FORMATTER.format((double)totalUniqueInflections.size() / totalInflections.get()));
 
 			return null;
 		};

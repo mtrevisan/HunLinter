@@ -35,12 +35,12 @@ import java.util.Comparator;
  */
 public final class ExternalSorterOptions{
 
-	/** Default maximal number of temporary files allowed. */
-	public static final int MAX_TEMPORARY_FILES_DEFAULT = 1024;
-	/** Default maximal size of temporary file allowed [B]. */
-	public static final int MAX_TEMPORARY_FILE_SIZE_UNLIMITED = -1;
+	public static final long MINIMUM_MEMORY_TARGET = 64l * 1024l * 1024l;
+
 	/** Default ZIP buffer size [B]. */
-	public static final int ZIP_BUFFER_SIZE_DEFAULT = 2048;
+	public static final int ZIP_BUFFER_SIZE_DEFAULT = 256 * 1024;
+	/** Default Reader buffer size [B]. */
+	public static final int READER_BUFFER_SIZE_DEFAULT = 64 * 1024;
 
 	private static final String LINE_SEPARATOR_DEFAULT = System.lineSeparator();
 
@@ -48,37 +48,49 @@ public final class ExternalSorterOptions{
 	private final Charset charset;
 	/** String comparator. */
 	private final Comparator<String> comparator;
+	private final int parallelSortThreshold;
 	/** Whether the duplicate lines should be discarded. */
 	private final boolean removeDuplicates;
-	/** Whether to make a parallel sort. */
-	private final boolean sortInParallel;
-	/** Maximum number of temporary files allowed. */
-	private final int maxTemporaryFiles;
-	/** Maximum size of temporary file allowed [B]. */
-	private final long maxTemporaryFileSize;
 	/** Whether to use ZIP for temporary files. */
 	private final boolean useTemporaryAsZip;
 	/** Whether to use ZIP for output file. */
 	private final boolean writeOutputAsZip;
 	/** ZIP buffer size [B]. */
 	private final int zipBufferSize;
+	/** Reader buffer size [B]. */
+	private final int readerBufferSize;
 	/** Line separator for output file. */
 	private final String lineSeparator;
 
+	private final int parallelism;
+	/** RAM budget [MB] for mapped sorter (in-memory chunk sizing). */
+	private final int mappedMemory;
+	/** Memory-mapped window size [MB] for sliding reads. */
+	private final int mappedWindow;
+	/** OS sort memory [MB] passed to GNU sort (best-effort). */
+	private final int osSortMemory;
 
-	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator, final boolean removeDuplicates,
-			final boolean sortInParallel, final int maxTemporaryFiles, final long maxTemporaryFileSize,
-			final boolean useTemporaryAsZip, final boolean writeOutputAsZip, final int zipBufferSize, final String lineSeparator){
+
+	private ExternalSorterOptions(final Charset charset, final Comparator<String> comparator,
+			final boolean removeDuplicates, final boolean useTemporaryAsZip, final boolean writeOutputAsZip,
+			final int zipBufferSize, final int readerBufferSize, final String lineSeparator, final int parallelism,
+			final int mappedMemory, final int mappedWindow, final int osSortMemory){
 		this.charset = charset;
 		this.comparator = comparator;
+		parallelSortThreshold = 2 * 1024 * 1024;
+		//TODO move this under a menu `calibration`, store value until a new calibration is requested
+//		parallelSortThreshold = ParallelSortTuner.estimateThresholdForStrings(comparator);
 		this.removeDuplicates = removeDuplicates;
-		this.sortInParallel = sortInParallel;
-		this.maxTemporaryFiles = maxTemporaryFiles;
-		this.maxTemporaryFileSize = maxTemporaryFileSize;
 		this.useTemporaryAsZip = useTemporaryAsZip;
 		this.writeOutputAsZip = writeOutputAsZip;
 		this.zipBufferSize = zipBufferSize;
+		this.readerBufferSize = readerBufferSize;
 		this.lineSeparator = (lineSeparator != null? lineSeparator: LINE_SEPARATOR_DEFAULT);
+
+		this.parallelism = parallelism;
+		this.mappedMemory = mappedMemory;
+		this.mappedWindow = mappedWindow;
+		this.osSortMemory = osSortMemory;
 	}
 
 	public static ExternalSorterOptionsBuilder builder(){
@@ -88,18 +100,19 @@ public final class ExternalSorterOptions{
 	public static class ExternalSorterOptionsBuilder implements Builder<ExternalSorterOptions>{
 
 		private Charset charset;
-		private Comparator<String> comparator;
+		private Comparator<String> comparator = Comparator.naturalOrder();
 		private boolean removeDuplicates;
-		private boolean sortInParallel;
-		private int maxTemporaryFiles;
-		private boolean maxTemporaryFiles$set;
-		private long maxTemporaryFileSize;
-		private boolean maxTemporaryFileSize$set;
 		private boolean useTemporaryAsZip;
 		private boolean writeOutputAsZip;
 		private int zipBufferSize;
 		private boolean zipBufferSize$set;
+		private int readerBufferSize;
+		private boolean readerBufferSize$set;
 		private String lineSeparator;
+		private int parallelism = Runtime.getRuntime().availableProcessors();
+		private int mappedMemory;
+		private int mappedWindow;
+		private int osSortMemory;
 
 
 		ExternalSorterOptionsBuilder(){}
@@ -119,23 +132,6 @@ public final class ExternalSorterOptions{
 			return this;
 		}
 
-		public final ExternalSorterOptionsBuilder sortInParallel(){
-			sortInParallel = true;
-			return this;
-		}
-
-		public final ExternalSorterOptionsBuilder maxTemporaryFiles(final int maxTemporaryFiles){
-			this.maxTemporaryFiles = maxTemporaryFiles;
-			maxTemporaryFiles$set = true;
-			return this;
-		}
-
-		public final ExternalSorterOptionsBuilder maxTemporaryFileSize(final long maxTemporaryFileSize){
-			this.maxTemporaryFileSize = maxTemporaryFileSize;
-			maxTemporaryFileSize$set = true;
-			return this;
-		}
-
 		public final ExternalSorterOptionsBuilder useTemporaryAsZip(){
 			useTemporaryAsZip = true;
 			return this;
@@ -152,19 +148,45 @@ public final class ExternalSorterOptions{
 			return this;
 		}
 
+		public final ExternalSorterOptionsBuilder readerBufferSize(final int readerBufferSize){
+			this.readerBufferSize = readerBufferSize;
+			readerBufferSize$set = true;
+			return this;
+		}
+
 		public final ExternalSorterOptionsBuilder lineSeparator(final String lineSeparator){
 			this.lineSeparator = lineSeparator;
 			return this;
 		}
 
+		public final ExternalSorterOptionsBuilder parallelism(final int parallelism){
+			this.parallelism = parallelism;
+			return this;
+		}
+
+		public final ExternalSorterOptionsBuilder mappedMemory(final int mappedMemory){
+			this.mappedMemory = mappedMemory;
+			return this;
+		}
+
+		public final ExternalSorterOptionsBuilder mappedWindow(final int mappedWindow){
+			this.mappedWindow = mappedWindow;
+			return this;
+		}
+
+		public final ExternalSorterOptionsBuilder osSortMemory(final int osSortMemory){
+			this.osSortMemory = osSortMemory;
+			return this;
+		}
+
 		@Override
 		public final ExternalSorterOptions build(){
-			return new ExternalSorterOptions(charset, comparator, removeDuplicates, sortInParallel,
-				(maxTemporaryFiles$set? maxTemporaryFiles: MAX_TEMPORARY_FILES_DEFAULT),
-				(maxTemporaryFileSize$set? maxTemporaryFileSize: MAX_TEMPORARY_FILE_SIZE_UNLIMITED),
+			return new ExternalSorterOptions(charset, comparator, removeDuplicates,
 				useTemporaryAsZip, writeOutputAsZip,
 				(zipBufferSize$set? zipBufferSize: ZIP_BUFFER_SIZE_DEFAULT),
-				lineSeparator);
+				(readerBufferSize$set? readerBufferSize: READER_BUFFER_SIZE_DEFAULT),
+				lineSeparator,
+				parallelism, mappedMemory, mappedWindow, osSortMemory);
 		}
 
 	}
@@ -177,20 +199,12 @@ public final class ExternalSorterOptions{
 		return comparator;
 	}
 
+	public int getParallelSortThreshold(){
+		return parallelSortThreshold;
+	}
+
 	public boolean isRemoveDuplicates(){
 		return removeDuplicates;
-	}
-
-	public boolean isSortInParallel(){
-		return sortInParallel;
-	}
-
-	public int getMaxTemporaryFiles(){
-		return maxTemporaryFiles;
-	}
-
-	public long getMaxTemporaryFileSize(){
-		return maxTemporaryFileSize;
 	}
 
 	public boolean isUseTemporaryAsZip(){
@@ -205,8 +219,28 @@ public final class ExternalSorterOptions{
 		return zipBufferSize;
 	}
 
+	public int getReaderBufferSize(){
+		return readerBufferSize;
+	}
+
 	public String getLineSeparator(){
 		return lineSeparator;
+	}
+
+	public int getParallelism(){
+		return parallelism;
+	}
+
+	public int getMappedMemory(){
+		return mappedMemory;
+	}
+
+	public int getMappedWindow(){
+		return mappedWindow;
+	}
+
+	public int getOSSortMemory(){
+		return osSortMemory;
 	}
 
 }

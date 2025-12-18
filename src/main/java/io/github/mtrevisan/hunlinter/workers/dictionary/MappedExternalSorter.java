@@ -24,18 +24,18 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.PriorityQueue;
 
 
@@ -50,219 +50,180 @@ import java.util.PriorityQueue;
  * This sorter is extremely fast on SSD/NVMe and avoids excessive small reads.
  * All comments are in English as requested.
  */
-public class SmartFileSorter{
+public class MappedExternalSorter{
 
-	private SmartFileSorter(){}
+	private MappedExternalSorter(){}
 
 
 	/**
-	 * Sort the input file into the output file, choosing the fastest available method.
+	 * Sort a large UTF-8 text file using memory-mapped I/O.
 	 *
-	 * @param input	The input text file path.
-	 * @param output	The output text file path (will be overwritten).
-	 * @param parallelism	Suggested parallelism for OS sort (ignored by Windows cmd sort).
-	 * @param memoryMB	Suggested memory (MB) for OS sort (Linux/macOS) and for Java fallback chunking.
+	 * @param input	Path to input file (one line per record).
+	 * @param output	Path to output file (will be overwritten).
+	 * @param charset	Charset for decoding/encoding.
+	 * @param memory	In-memory chunk budget (for buffer sort).
+	 * @param window	Size of moving window for mmap reads.
+	 * @param comparator	Comparator for string lines.
 	 */
-	public static void sort(Path input, Path output, int parallelism, int memoryMB, Comparator<String> comparator)
-			throws IOException, InterruptedException{
-		Objects.requireNonNull(input, "input cannot be null");
-		Objects.requireNonNull(output, "output cannot be null");
+	public static void sort(final Path input, final Path output, final Charset charset, final int memory,
+			final int window, final Comparator<String> comparator) throws IOException{
+		//phase 1: produce sorted runs (temp files)
+		final List<Path> runs = buildSortedRuns(input, charset, memory, window, comparator);
 
-		//ensure output parent exists
-		final Path parent = output.toAbsolutePath()
-			.getParent();
-		if(parent != null)
-			Files.createDirectories(parent);
-
-		//try OS-native sort first
-		final String os = System.getProperty("os.name")
-			.toLowerCase(Locale.ROOT);
-
-		boolean success = false;
-		if(isWindows(os))
-			//Windows: use cmd sort
-			success = sortWindows(input, output);
-		else if(isUnixLike(os))
-			//Linux/macOS/Unix-like: use GNU/BSD sort
-			success = sortUnixLike(input, output, parallelism, memoryMB);
-
-		//fallback: pure Java external merge sort
-		if(!success)
-			sortExternalJava(input, output, memoryMB, comparator);
-	}
-
-	private static boolean isWindows(final String osName){
-		return osName.contains("win");
-	}
-
-	private static boolean isUnixLike(final String osName){
-		return osName.contains("nux")	//Linux
-			|| osName.contains("mac")	//macOS
-			|| osName.contains("nix")	//generic *nix
-			|| osName.contains("aix")	//IBM AIX
-			|| osName.contains("bsd")	//FreeBSD/OpenBSD/NetBSD
-			;
-	}
-
-	/**
-	 * Use Windows cmd.exe sort to sort the file.
-	 * Equivalent to: cmd /c "sort input > output"
-	 *
-	 * @return true if completed successfully, false otherwise
-	 */
-	private static boolean sortWindows(final Path input, final Path output){
-		try{
-			//delete target first to ensure redirection creates it cleanly
-			Files.deleteIfExists(output);
-
-			//use cmd redirection for fastest path:
-			//Note: Windows sort does not accept -o; redirection is required.
-			final String cmd = String.format("sort \"%s\" > \"%s\"", input.toAbsolutePath(), output.toAbsolutePath());
-
-			final ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", cmd);
-			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-			final Process p = pb.start();
-			final int code = p.waitFor();
-			return (code == 0 && Files.exists(output));
-		}
-		catch(final Exception ignored){
-			return false;
-		}
-	}
-
-	/**
-	 * Use Unix-like "sort" (GNU/BSD) with optional parallelism and memory.
-	 * On GNU sort: --parallel and -S are supported; on BSD sort they may be ignored.
-	 *
-	 * @return true if completed successfully, false otherwise
-	 */
-	private static boolean sortUnixLike(final Path input, final Path output, final int parallelism, final int memoryMB){
-		try{
-			//build command:
-			//prefer GNU syntax: sort --parallel=N -S 2048M input -o output
-			//if unsupported, BSD sort will ignore unknown flags or fail; we detect failure and fallback.
-			final List<String> cmd = new ArrayList<>();
-			cmd.add("sort");
-
-			//try to set memory and parallelism (best effort)
-			if(parallelism > 0)
-				//GNU sort only
-				cmd.add("--parallel=" + parallelism);
-			if(memoryMB > 0){
-				//GNU sort only
-				cmd.add("-S");
-				cmd.add(memoryMB + "M");
-			}
-
-			//input and output
-			cmd.add(input.toAbsolutePath().toString());
-			cmd.add("-o");
-			cmd.add(output.toAbsolutePath().toString());
-
-			final ProcessBuilder pb = new ProcessBuilder(cmd);
-			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-			final Process p = pb.start();
-			final int code = p.waitFor();
-			return (code == 0 && Files.exists(output));
-		}
-		catch(final Exception ignored){
-			return false;
-		}
-	}
-
-	/**
-	 * Pure Java external merge sort fallback, portable and robust.
-	 * Strategy:
-	 * - Read the input file in chunks (based on memoryMB).
-	 * - Sort each chunk in-memory and write a temp sorted run.
-	 * - Merge all runs with a k-way merge (PriorityQueue).
-	 */
-	private static void sortExternalJava(final Path input, final Path output, final int memoryMB,
-			final Comparator<String> comparator) throws IOException{
-		//choose chunk size in lines (heuristic)
-		final int avgLineBytes = 32;
-		final long bytesBudget = (long)(memoryMB * 0.2);
-		final int maxLinesInMemory = (int)Math.max(200_000, Math.min(Integer.MAX_VALUE, bytesBudget / avgLineBytes));
-
-		final List<Path> runs = new ArrayList<>();
-
-		//phase 1: make sorted runs
-		try(final BufferedReader reader = Files.newBufferedReader(input, StandardCharsets.UTF_8)){
-			final List<String> buffer = new ArrayList<>(maxLinesInMemory);
-			String line;
-			while((line = reader.readLine()) != null){
-				buffer.add(line);
-				if(buffer.size() >= maxLinesInMemory){
-					runs.add(writeSortedRun(buffer, comparator));
-					buffer.clear();
-				}
-			}
-			if(!buffer.isEmpty()){
-				runs.add(writeSortedRun(buffer, comparator));
-				buffer.clear();
-			}
-		}
-
-		//phase 2: k-way merge
-		mergeRuns(runs, output);
+		//phase 2: merge all runs
+		mergeRuns(runs, output, charset, comparator);
 
 		//cleanup
 		for(final Path p : runs){
 			try{
 				Files.deleteIfExists(p);
 			}
-			catch(final IOException ignored){}
+			catch(IOException ignored){
+			}
 		}
 	}
 
-	/** Sorts lines in-memory and writes a temporary sorted run file. */
-	private static Path writeSortedRun(final List<String> lines, final Comparator<String> comparator) throws IOException{
-		//sort in-place
+	private static List<Path> buildSortedRuns(final Path input, final Charset charset, final int memory,
+			final int window, final Comparator<String> comparator) throws IOException{
+		final long fileSize = Files.size(input);
+		final int windowBytes = Math.max(64, window) * 1024 * 1024;
+		final long bytesBudget = (long)memory * 1024L * 1024L;
+		//heuristic
+		final int avgLineBytes = 32;
+		final int maxLines = (int)Math.max(200_000,
+			Math.min(5_000_000, bytesBudget / avgLineBytes));
+
+		final List<Path> runs = new ArrayList<>();
+		final List<String> buffer = new ArrayList<>(maxLines);
+
+		try(final FileChannel ch = FileChannel.open(input, StandardOpenOption.READ)){
+			long pos = 0;
+			byte[] tailBytes = null;
+			while(pos < fileSize){
+				final long remaining = fileSize - pos;
+				final long mapSize = Math.min(remaining, windowBytes);
+
+				final ByteBuffer bb = ch.map(FileChannel.MapMode.READ_ONLY, pos, mapSize);
+
+				final int limit = bb.limit();
+				int start = 0;
+
+				if(tailBytes != null){
+					//prepend previous window’s partial line
+					final String partial = new String(tailBytes, charset);
+					buffer.add(partial);
+					tailBytes = null;
+				}
+
+				while(bb.hasRemaining()){
+					final byte b = bb.get();
+					if(b == '\n'){
+						final int end = bb.position();
+						final int len = end - start;
+						int sliceEnd = end;
+
+						if(len > 1){
+							//strip CR for CRLF
+							if(getByte(bb, end - 2) == '\r')
+								sliceEnd = end - 1;
+						}
+
+						final int bytesLen = sliceEnd - start;
+						if(bytesLen > 0){
+							final byte[] lineBytes = new byte[bytesLen];
+							bb.position(start);
+							bb.get(lineBytes);
+							bb.position(end);
+
+							buffer.add(new String(lineBytes, charset));
+							if(buffer.size() >= maxLines){
+								runs.add(writeRun(buffer, charset, comparator));
+								buffer.clear();
+							}
+						}
+						start = end;
+					}
+				}
+
+				final boolean endedOnNewline = (start == limit);
+
+				if(!endedOnNewline && limit > start){
+					final int len = limit - start;
+					final byte[] partial = new byte[len];
+					bb.position(start);
+					bb.get(partial);
+					tailBytes = partial;
+				}
+
+				pos += mapSize;
+
+				if(buffer.size() >= maxLines){
+					runs.add(writeRun(buffer, charset, comparator));
+					buffer.clear();
+				}
+			}
+
+			if(tailBytes != null)
+				buffer.add(new String(tailBytes, charset));
+
+			if(!buffer.isEmpty())
+				runs.add(writeRun(buffer, charset, comparator));
+		}
+
+		return runs;
+	}
+
+	private static byte getByte(final ByteBuffer bb, final int absolutePos){
+		final int old = bb.position();
+		bb.position(absolutePos);
+		final byte b = bb.get();
+		bb.position(old);
+		return b;
+	}
+
+	private static Path writeRun(final List<String> lines, final Charset charset, final Comparator<String> comparator)
+			throws IOException{
 		lines.sort(comparator);
 
-		final Path run = Files.createTempFile("sort-run-", ".txt");
-		try(final BufferedWriter w = Files.newBufferedWriter(run, StandardCharsets.UTF_8, StandardOpenOption.WRITE)){
-			for(int i = 0, length = lines.size(); i < length; i ++){
-				w.write(lines.get(i));
+		final Path run = Files.createTempFile("mapped-sort-run-", ".txt");
+		try(final BufferedWriter w = Files.newBufferedWriter(run, charset,
+			StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)){
+			for(final String s : lines){
+				w.write(s);
 				w.newLine();
 			}
 		}
 		return run;
 	}
 
-	/** Merge all sorted runs into the final output (k-way merge with PriorityQueue). */
-	private static void mergeRuns(final List<Path> runs, final Path output) throws IOException{
-		//open all readers
-		final List<BufferedReader> readers = new ArrayList<>(runs.size());
-		for(final Path run : runs)
-			readers.add(Files.newBufferedReader(run, StandardCharsets.UTF_8));
+	private static void mergeRuns(final List<Path> runs, final Path output, final Charset charset,
+			final Comparator<String> comparator) throws IOException{
+		final List<MappedRunReader> readers = new ArrayList<>(runs.size());
+		for(final Path p : runs)
+			//per-run window MB
+			readers.add(new MappedRunReader(p, charset, 128));
 
-		//min-heap by line content
-		final PriorityQueue<RunEntry> pq = new PriorityQueue<>(Comparator.comparing(e -> e.line));
-
-		//prime the heap
-		for(final BufferedReader reader : readers){
-			final String line = reader.readLine();
+		final PriorityQueue<RunEntry> pq = new PriorityQueue<>(Comparator.comparing(e -> e.line, comparator));
+		for(final MappedRunReader reader : readers){
+			final String line = reader.nextLine();
 			if(line != null)
 				pq.add(new RunEntry(line, reader));
 		}
 
-		//merge
-		try(final BufferedWriter w = Files.newBufferedWriter(output, StandardCharsets.UTF_8,
-				StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)){
+		try(final BufferedWriter w = Files.newBufferedWriter(output, charset, StandardOpenOption.CREATE,
+				StandardOpenOption.TRUNCATE_EXISTING)){
 			while(!pq.isEmpty()){
 				final RunEntry e = pq.poll();
 				w.write(e.line);
 				w.newLine();
 
-				final String next = e.reader.readLine();
-				if(next != null)
+				final String next = e.reader.nextLine();
+				if(next != null && !next.isEmpty())
 					pq.add(new RunEntry(next, e.reader));
 			}
 		}
 
-		//close readers
-		for(final BufferedReader reader : readers){
+		for(final MappedRunReader reader : readers){
 			try{
 				reader.close();
 			}
@@ -271,15 +232,105 @@ public class SmartFileSorter{
 		}
 	}
 
-	/** Entry used in the k-way merge heap. */
 	private static final class RunEntry{
 		final String line;
-		final BufferedReader reader;
+		final MappedRunReader reader;
 
-		RunEntry(final String line, final BufferedReader reader){
+		RunEntry(final String line, final MappedRunReader reader){
 			this.line = line;
 			this.reader = reader;
 		}
+
+	}
+
+	private static final class MappedRunReader implements Closeable{
+		private final Charset charset;
+		private final FileChannel ch;
+		private final long fileSize;
+		private final int windowBytes;
+
+		private long pos = 0l;
+		private ByteBuffer window;
+		private int base = 0;
+
+		MappedRunReader(final Path path, final Charset charset, final int windowMB) throws IOException{
+			this.charset = charset;
+			this.windowBytes = Math.max(64, windowMB) * 1024 * 1024;
+			this.ch = FileChannel.open(path, StandardOpenOption.READ);
+			this.fileSize = ch.size();
+			mapNextWindow();
+		}
+
+		String nextLine() throws IOException{
+			if(pos >= fileSize && (window == null || !window.hasRemaining()))
+				return null;
+
+			while(true){
+				if((window == null || !window.hasRemaining()) && !mapNextWindow())
+					return null;
+
+				while(window.hasRemaining()){
+					final byte b = window.get();
+					if(b == '\n'){
+						final int end = window.position();
+						final int len = end - base;
+						int sliceEnd = end;
+						if(len > 1 && getByte(window, end - 2) == '\r')
+							sliceEnd = end - 1;
+
+						final int bytesLen = sliceEnd - base;
+						if(bytesLen <= 0){
+							base = end;
+
+							continue;
+						}
+
+						final byte[] arr = new byte[bytesLen];
+						window.position(base);
+						window.get(arr);
+						window.position(end);
+
+						base = end;
+						return new String(arr, charset);
+					}
+				}
+
+				final int windowLimit = window.limit();
+				final int unread = windowLimit - base;
+				if(unread > 0){
+					final byte[] tail = new byte[unread];
+					window.position(base);
+					window.get(tail);
+					window.position(windowLimit);
+					base = windowLimit;
+					return new String(tail, charset);
+				}
+
+				if(!mapNextWindow())
+					return null;
+			}
+		}
+
+		private boolean mapNextWindow() throws IOException{
+			if(pos >= fileSize){
+				window = null;
+
+				return false;
+			}
+
+			final long remaining = fileSize - pos;
+			final long size = Math.min(remaining, windowBytes);
+			window = ch.map(FileChannel.MapMode.READ_ONLY, pos, size);
+			base = 0;
+			pos += size;
+			return true;
+		}
+
+		@Override
+		public void close() throws IOException{
+			ch.close();
+		}
+
 	}
 
 }
