@@ -86,7 +86,7 @@
 
 		<!-- Apache -->
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
-		<apache.commons-text.version>1.14.0</apache.commons-text.version>
+		<apache.commons-text.version>1.15.0</apache.commons-text.version>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<apache.commons-io.version>2.21.0</apache.commons-io.version>
 
@@ -103,7 +103,7 @@
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		<logback.logback-classic.version>1.5.21</logback.logback-classic.version>
+		<logback.logback-classic.version>1.5.22</logback.logback-classic.version>
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
