@@ -97,8 +97,8 @@ public class StringArrayList implements RandomAccess{
 	 * The list will be empty after this call returns.
 	 */
 	public final synchronized void clear(){
-		for(int i = 0; i < size; i ++)
-			data[i] = null;
+		Arrays.fill(data, null);
+		size = 0;
 	}
 
 	public final synchronized void sort(final Comparator<? super String> comparator){

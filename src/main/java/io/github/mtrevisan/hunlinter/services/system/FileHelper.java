@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.Desktop;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -46,7 +47,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PushbackInputStream;
 import java.io.RandomAccessFile;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,6 +66,8 @@ import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 public final class FileHelper{
@@ -217,6 +222,106 @@ public final class FileHelper{
 		final File file = createDeleteOnExitFile((filename != null? filename: "hunlinter-test"), extension);
 		Files.writeString(file.toPath(), content);
 		return file;
+	}
+
+
+	/**
+	 * Create a BufferedReader over a text file, auto-detecting compression (plain, .gz, .zip)
+	 * and stripping a possible Unicode BOM. GZIP buffer size is configurable.
+	 *
+	 * @param path	The input file path.
+	 * @param charset	The charset to decode bytes into characters.
+	 * @param zipBufferSize	Buffer size for (G)ZIP streams (in bytes). If <= 0, a sensible default is used.
+	 * @return	A new BufferedReader for the file content.
+	 * @throws IOException	On any I/O error.
+	 */
+	public static BufferedReader createBufferedReader(final Path path, final Charset charset, final int zipBufferSize,
+			final int readerBufferSize) throws IOException{
+		if(path == null)
+			throw new IllegalArgumentException("path cannot be null");
+		if(charset == null)
+			throw new IllegalArgumentException("charset cannot be null");
+
+		final String name = path.getFileName().toString()
+			.toLowerCase(Locale.ROOT);
+		final int gzBuffer = (zipBufferSize > 0? zipBufferSize: 256 * 1024);
+		final int rdrBuffer = Math.max((readerBufferSize > 0? readerBufferSize: (1 << 20)), 64 * 1024);
+
+		//open a base InputStream, wrap with buffering first (improves performance for all types)
+		InputStream in = new BufferedInputStream(Files.newInputStream(path), Math.max(gzBuffer, rdrBuffer));
+
+		if(name.endsWith(".gz")){
+			//GZIP: wrap with GZIPInputStream (configurable buffer)
+			in = new GZIPInputStream(in, gzBuffer);
+			//strip BOM if present and return reader
+			return new BufferedReader(new InputStreamReader(stripBOM(in), charset), rdrBuffer);
+		}
+		else if(name.endsWith(".zip")){
+			//ZIP: read the first non-directory entry
+			final ZipInputStream entryStream = new ZipInputStream(in);
+			ZipEntry entry;
+			while((entry = entryStream.getNextEntry()) != null){
+				if(!entry.isDirectory()){
+					//use the current ZIP entry stream (`entryStream`) directly
+					//Note: do not close `entryStream` here; the BufferedReader will close the chain.
+					return new BufferedReader(new InputStreamReader(stripBOM(entryStream), charset), rdrBuffer);
+				}
+			}
+			//no file entries found
+			entryStream.close();
+			throw new IOException("ZIP file has no file entries: " + path);
+		}
+		else
+			//plain text file
+			return new BufferedReader(new InputStreamReader(stripBOM(in), charset), rdrBuffer);
+	}
+
+	/**
+	 * Wrap the given InputStream in a PushbackInputStream to detect and strip common Unicode BOMs.
+	 * Supported BOMs: UTF-8, UTF-16 (BE/LE), UTF-32 (BE/LE).
+	 *
+	 * @param in The original InputStream.
+	 * @return An InputStream positioned after the BOM (if any), or at the beginning if none.
+	 * @throws IOException On I/O error.
+	 */
+	private static InputStream stripBOM(final InputStream in) throws IOException{
+		//we need to read up to 4 bytes to detect UTF-32 BOMs as well
+		final PushbackInputStream pb = new PushbackInputStream(in, 4);
+		final byte[] bom = new byte[4];
+		final int read = pb.read(bom, 0, bom.length);
+
+		int skip = 0;
+		if(read >= 3 && (bom[0] & 0xFF) == 0xEF && (bom[1] & 0xFF) == 0xBB && (bom[2] & 0xFF) == 0xBF)
+			//UTF-8 BOM
+			skip = 3;
+		else if(read >= 2){
+			final int b0 = bom[0] & 0xFF;
+			final int b1 = bom[1] & 0xFF;
+			if(b0 == 0xFE && b1 == 0xFF)
+				//UTF-16 BE
+				skip = 2;
+			else if(b0 == 0xFF && b1 == 0xFE){
+				if(read >= 4 && (bom[2] & 0xFF) == 0x00 && (bom[3] & 0xFF) == 0x00)
+					//UTF-32 LE
+					skip = 4;
+				else
+					//UTF-16 LE
+					skip = 2;
+			}
+			else if(read >= 4){
+				final int b2 = bom[2] & 0xFF;
+				final int b3 = bom[3] & 0xFF;
+				if(b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF)
+					//UTF-32 BE
+					skip = 4;
+			}
+		}
+
+		//push back everything after the BOM
+		if(read > 0 && read > skip)
+			pb.unread(bom, skip, read - skip);
+
+		return pb;
 	}
 
 
