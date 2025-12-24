@@ -36,17 +36,16 @@ import io.github.mtrevisan.hunlinter.parsers.vos.Inflection;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDataParser;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerDictionary;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,7 +58,6 @@ public class WordCountWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Word count";
 
 	private final AtomicInteger totalInflections = new AtomicInteger(0);
-	private final DB onDiskDD;
 	private final Set<String> totalUniqueInflections;
 	private final BloomFilterInterface<String> dictionary;
 
@@ -83,31 +81,8 @@ public class WordCountWorker extends WorkerDictionary{
 		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
 
-		final Path dbFile = dicParser.getDicFile()
-			.toPath()
-			.resolveSibling("uniqueWords.db");
-		//build a fileDB with memory-mapped IO (if supported) and decent concurrency
-		onDiskDD = DBMaker
-			.fileDB(dbFile.toFile())
-			//use mmap for speed on 64-bit
-			.fileMmapEnableIfSupported()
-			//level of internal striping for concurrency
-			.concurrencyScale(64)
-			//preallocate 512 MB to reduce file growth overhead (tune)
-			.allocateStartSize(512l << 20)
-			//grow in 128 MB steps (tune)
-			.allocateIncrement(128l << 20)
-			//enable WAL (crash protection)
-			.transactionEnable()
-			.checksumHeaderBypass()
-			.closeOnJvmShutdown()
-			.make();
-
-		//create or open an HTreeSet<String> named `totalUniqueInflections`
-		totalUniqueInflections = onDiskDD
-			.hashSet("totalUniqueInflections", Serializer.STRING)
-			.counterEnable()
-			.createOrOpen();
+		totalUniqueInflections = new HashSet<>(50_000_000);
+//		totalUniqueInflections = ConcurrentHashMap.newKeySet(50_000_000);
 
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
@@ -131,8 +106,6 @@ public class WordCountWorker extends WorkerDictionary{
 			}
 		};
 		final Consumer<Exception> cancelled = exc -> {
-			onDiskDD.commit();
-			onDiskDD.close();
 			dictionary.close();
 
 			if(onCancelled != null)
@@ -155,15 +128,13 @@ public class WordCountWorker extends WorkerDictionary{
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
-			onDiskDD.commit();
-			onDiskDD.close();
 			dictionary.close();
 
 
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
 				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {}, {}",
-				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections),
+				DictionaryParser.COUNTER_FORMATTER.format(totalUniqueInflections.size()),
 				DictionaryParser.SHORT_PERCENT_FORMATTER.format((double)totalUniqueInflections.size() / totalInflections.get()));
 
 			return null;

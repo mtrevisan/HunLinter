@@ -99,10 +99,6 @@
 		<!-- https://mvnrepository.com/artifact/com.github.vsonnier/hppcrt -->
 		<github.vsonnier.hppcrt.version>0.7.5</github.vsonnier.hppcrt.version>
 
-		<!-- MapDB -->
-		<!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
-		<org.mapdb.version>3.1.0</org.mapdb.version>
-
 		<!-- JSON -->
 		<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
 		<googlecode.json-simple.version>1.1.1</googlecode.json-simple.version>
@@ -578,13 +574,6 @@
 <!--			<version>1.0.0</version>-->
 <!--			<scope>runtime</scope>-->
 <!--		</dependency>-->
-
-		<!-- MapDB -->
-		<dependency>
-			<groupId>org.mapdb</groupId>
-			<artifactId>mapdb</artifactId>
-			<version>${org.mapdb.version}</version>
-		</dependency>
 
 		<!-- JSON -->
 		<dependency>
