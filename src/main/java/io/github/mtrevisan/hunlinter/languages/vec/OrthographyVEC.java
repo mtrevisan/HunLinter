@@ -67,6 +67,11 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 
+	private static final TrieReplacer TRIE_STRESS = new TrieReplacer(STRESS_CODES, TRUE_STRESS);
+	private static final TrieReplacer TRIE_EXTENDED = new TrieReplacer(EXTENDED_CHARS, TRUE_CHARS);
+	private static final TrieReplacer TRIE_NASAL = new TrieReplacer(MB_MP, NB_NP);
+
+
 	private OrthographyVEC(){}
 
 	@SuppressWarnings("MethodOverridesStaticMethodOfSuperclass")
@@ -83,19 +88,19 @@ public final class OrthographyVEC extends Orthography{
 	@Override
 	public String correctOrthography(final String word){
 		//correct stress
-		String correctedWord = replaceEach(word, STRESS_CODES, TRUE_STRESS);
+		String correctedWord = TRIE_STRESS.replaceEach(word);
 
 		correctedWord = WordVEC.markDefaultStress(correctedWord);
 
 		//correct h occurrences after d, j, l, n, t
-		correctedWord = replaceEach(correctedWord, EXTENDED_CHARS, TRUE_CHARS);
+		correctedWord = TRIE_EXTENDED.replaceEach(correctedWord);
 
 		//remove other occurrences of h not into fhV
 		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
 		//correct mb/mp occurrences into nb/np
-		correctedWord = replaceEach(correctedWord, MB_MP, NB_NP);
+		correctedWord = TRIE_NASAL.replaceEach(correctedWord);
 
 		//correct ïC/üC occurrences into iC/uC
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
@@ -119,21 +124,6 @@ public final class OrthographyVEC extends Orthography{
 		correctedWord = reduceGeminates(correctedWord);
 
 		return correctedWord;
-	}
-
-	/**
-	 * Replaces occurrences of strings from searchList in the given text with corresponding strings from replacementList.
-	 * After each replacement, the search continues from the position immediately after the replaced substring.
-	 *
-	 * @param text	The original text where replacements will occur.
-	 * @param searchList	An array of strings to search for in the text.
-	 * @param replacementList	An array of strings to replace the found strings with. Must have the same length as {@code searchList}.
-	 * @return	The modified text after performing all replacements.
-	 * @throws IllegalArgumentException	If {@code searchList} and {@code replacementList} have different lengths.
-	 */
-	private static String replaceEach(final String text, final String[] searchList, final String[] replacementList){
-		final TrieReplacer trie = new TrieReplacer(searchList, replacementList);
-		return trie.replaceEach(text);
 	}
 
 	/**
