@@ -46,20 +46,6 @@ public final class OrthographyVEC extends Orthography{
 	private static final String[] MB_MP = {"mb", "mp"};
 	private static final String[] NB_NP = {"nb", "np"};
 
-	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
-	private static final Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
-	private static final Pattern PATTERN_U_DIAERESIS_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])");
-	private static final Pattern PATTERN_V_I_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ï");
-	private static final Pattern PATTERN_V_U_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ü");
-
-	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)");
-
-	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])");
-	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
-	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])");
-	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))");
 	private static final String FALSE_S_INTO_X = "èsre";
 
 	private static class SingletonHelper{
@@ -85,6 +71,7 @@ public final class OrthographyVEC extends Orthography{
 	 * @param word	The word to be corrected.
 	 * @return	The corrected word.
 	 */
+	//FIXME starts with 31 s
 	@Override
 	public String correctOrthography(final String word){
 		//correct stress
@@ -97,28 +84,29 @@ public final class OrthographyVEC extends Orthography{
 
 		//remove other occurrences of h not into fhV
 		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
-			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
+			correctedWord = removeHFromNotFH(correctedWord);
 
 		//correct mb/mp occurrences into nb/np
 		correctedWord = TRIE_NASAL.replaceEach(correctedWord);
 
 		//correct ïC/üC occurrences into iC/uC
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_U_DIAERESIS_C, "u$1");
+		correctedWord = normalizeDiaeresisBeforeConsonant(correctedWord);
 		//correct Vï/Vü occurrences into Vi/Vu
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_I_DIAERESIS, "$1i");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_U_DIAERESIS, "$1u");
+		correctedWord = normalizeDiaeresisAfterVowel(correctedWord);
 
-		correctedWord = correctIJOccurrences(correctedWord);
+		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
+		//correcting also the converse
+		correctedWord = jIntoI(correctedWord);
+		correctedWord = iInitialIntoJ(correctedWord);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INSIDE_INTO_L, "$1l");
+		correctedWord = lhInitialIntoL(correctedWord);
+		correctedWord = lhInsideIntoL(correctedWord);
 		//correct x occurrences into s prior to c, f, k, p, s, t, ŧ
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, v, r, l
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
+		correctedWord = xIntoS(correctedWord);
 		if(!correctedWord.endsWith(FALSE_S_INTO_X))
-			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
+			correctedWord = sIntoX(correctedWord);
 
 		//eliminate consonant geminates
 		correctedWord = reduceGeminates(correctedWord);
@@ -126,18 +114,172 @@ public final class OrthographyVEC extends Orthography{
 		return correctedWord;
 	}
 
-	/**
-	 * Corrects occurrences of 'i' into 'j' at the beginning of a word followed by a vowel and between vowels, correcting also the converse.
-	 *
-	 * @param word	The word to be corrected.
-	 * @return	The corrected word.
-	 */
-	private static String correctIJOccurrences(String word){
-		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
-		//correcting also the converse
-		word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
-		word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.GRAPHEME_J);
+	//Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)")
+	private static String removeHFromNotFH(final String word){
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+			if(c == 'h'){
+				final char prev = (i > 0? word.charAt(i - 1): 0);
+				final char next = (i + 1 < length ? word.charAt(i + 1): 0);
+
+				//equivalent of (?<!f)h(?!vowel)
+				if(prev != 'f' && !WordVEC.isVowel(next))
+					//skip this h
+					continue;
+			}
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
+	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
+	//Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])")
+	//Pattern PATTERN_U_DIAERESIS_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])")
+	private static String normalizeDiaeresisBeforeConsonant(final String word){
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+
+			if((c == 'ï' || c == 'ü') && i + 1 < length){
+				final char next = word.charAt(i + 1);
+				if(!WordVEC.isVowel(next) && next != 'ʼ' && next != '–' && next != '-'){
+					//C is consonant → remove diaeresis
+					sb.append(c == 'ï'? 'i': 'u');
+					continue;
+				}
+			}
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
+	//Pattern PATTERN_V_I_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ï")
+	//Pattern PATTERN_V_U_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ü")
+	private static String normalizeDiaeresisAfterVowel(final String word){
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+
+			if((c == 'ï' || c == 'ü') && i > 0 && WordVEC.isVowel(word.charAt(i - 1))){
+				sb.append(c == 'ï'? 'i': 'u');
+				continue;
+			}
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
+	//Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])")
+	private static String jIntoI(final String word){
+		final int length = word.length();
+		if(length > 1 && word.charAt(0) == 'j'){
+			final char next = word.charAt(1);
+			if(!WordVEC.isVowel(next) && next != 'ï' && next != 'ü' && next != 'h')
+				return "i" + word.substring(1);
+		}
 		return word;
+	}
+
+	//Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])")
+	private static String iInitialIntoJ(final String word){
+		final int length = word.length();
+		return (length > 1 && word.charAt(0) == 'i' && WordVEC.isVowel(word.charAt(1))
+			? "j" + word.substring(1)
+			: word);
+	}
+
+	//Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])")
+	private static String lhInitialIntoL(final String word){
+		final int length = word.length();
+		if(length > 1 && word.charAt(0) == 'ƚ'){
+			final char next = word.charAt(1);
+			if(!WordVEC.isVowelOrJW(next))
+				return "l" + word.substring(1);
+		}
+		return word;
+	}
+
+	//Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])")
+	/**
+	 * Replace 'ƚ' with 'l' only in the two "inside" cases equivalent to:
+	 *  ([vowel])ƚ(?=[^vowel jw – -]) | ([^ ʼ vowel – -])ƚ(?=[vowel jw])
+	 *
+	 * Edge cases:
+	 * - If the word length is 1 and it's just 'ƚ', keep it as 'ƚ'.
+	 * - We require real neighbors for both cases; if prev or next does not exist, we do NOT replace.
+	 */
+	private static String lhInsideIntoL(final String word){
+		// If the word is just "ƚ", we must keep it as-is.
+		if(word.length() == 1)
+			return word;
+
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+
+			if(c == 'ƚ'){
+				//fetch neighbors; if they don't exist, mark as '\0'
+				final char prev = (i > 0 ? word.charAt(i - 1) : '\0');
+				final char next = (i + 1 < length ? word.charAt(i + 1) : '\0');
+
+				//we need real neighbors for the two cases to match the original regex intent
+				final boolean hasPrev = (prev != '\0');
+				final boolean hasNext = (next != '\0');
+
+				//case1: ([vowel])ƚ(?=[^vowel jw – -])
+				//	-> previous is vowel; next exists and is NOT vowel/j/w/–/-
+				final boolean case1 = (hasPrev && WordVEC.isVowel(prev) && hasNext && !WordVEC.isVowelOrJW(next)
+					&& next != '–' && next != '-');
+
+				//case2: ([^ ʼ vowel – -])ƚ(?=[vowel jw])
+				//	-> previous exists and is NOT space/apostrophe/vowel/–/-; next exists and IS vowel or j/w
+				final boolean case2 = (hasPrev && prev != ' ' && prev != 'ʼ' && !WordVEC.isVowel(prev)
+					&& prev != '–' && prev != '-' && hasNext && WordVEC.isVowelOrJW(next));
+
+				if(case1 || case2){
+					//replace 'ƚ' with plain 'l' only in these two internal contexts
+					sb.append('l');
+					continue;
+				}
+			}
+
+			sb.append(c);
+		}
+
+		return sb.toString();
+	}
+
+	//Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])")
+	private static String xIntoS(final String word){
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+
+			sb.append(c == 'x' && i + 1 < length && WordVEC.isConsonantForXtoS(word.charAt(i + 1))? 's': c);
+		}
+		return sb.toString();
+	}
+
+	//Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))")
+	private static String sIntoX(final String word){
+//		if(word.endsWith("sx"))
+//			return word;
+
+		final int length = word.length();
+		final StringBuilder sb = new StringBuilder(length);
+		for(int i = 0; i < length; i ++){
+			final char c = word.charAt(i);
+
+			sb.append(c == 's' && i + 1 < length && WordVEC.isConsonantForStoX(word.charAt(i + 1))? 'x': c);
+		}
+		return sb.toString();
 	}
 
 	/**

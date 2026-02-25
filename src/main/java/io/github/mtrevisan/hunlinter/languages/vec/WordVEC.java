@@ -58,6 +58,7 @@ public final class WordVEC{
 	private static final char[] VOWELS_STRESSED_ARRAY = VOWELS_STRESSED.toCharArray();
 	private static final char[] VOWELS_UNSTRESSED_ARRAY = VOWELS_UNSTRESSED.toCharArray();
 	private static final char[] VOWELS_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED).toCharArray();
+	private static final char[] VOWELS_OR_JW_EXTENDED_ARRAY = (VOWELS_PLAIN + VOWELS_STRESSED + "jJwW").toCharArray();
 	static final char[] VOWELS_ARRAY = "aAàÀeEéÉèÈiIíÍïÏoOóÓòÒuUúÚüÜ".toCharArray();
 	private static final char[] CONSONANTS_ARRAY = CONSONANTS.toCharArray();
 	static{
@@ -72,6 +73,7 @@ public final class WordVEC{
 		Arrays.sort(VOWELS_STRESSED_ARRAY);
 		Arrays.sort(VOWELS_UNSTRESSED_ARRAY);
 		Arrays.sort(VOWELS_EXTENDED_ARRAY);
+		Arrays.sort(VOWELS_OR_JW_EXTENDED_ARRAY);
 		Arrays.sort(VOWELS_ARRAY);
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
@@ -137,6 +139,16 @@ public final class WordVEC{
 	}
 
 	/**
+	 * Determines if a given character is a vowel or a /j/ or /w/.
+	 *
+	 * @param chr	The character to check.
+	 * @return	Whether the character is a vowel or a /j/ or /w/.
+	 */
+	public static boolean isVowelOrJW(final char chr){
+		return (Arrays.binarySearch(VOWELS_OR_JW_EXTENDED_ARRAY, chr) >= 0);
+	}
+
+	/**
 	 * Determines if a given character is a consonant.
 	 *
 	 * @param chr	The character to check.
@@ -144,6 +156,16 @@ public final class WordVEC{
 	 */
 	public static boolean isConsonant(final char chr){
 		return !isVowel(chr);
+	}
+
+	//characters that make X turn into S
+	public static boolean isConsonantForXtoS(char c) {
+		return ("cfkpstŧ".indexOf(c) >= 0);
+	}
+
+	//characters that make S turn into X
+	public static boolean isConsonantForStoX(char c) {
+		return ("mnñbdgɉvrl".indexOf(c) >= 0);
 	}
 
 	/**
