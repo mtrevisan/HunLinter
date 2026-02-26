@@ -80,19 +80,18 @@ public class TrieReplacer{
 	 * Efficient: avoids substring creation and checks via trie at the current position only.
 	 */
 	public String replaceEach(final String text){
-		final StringBuilder sb = new StringBuilder(text);
+		final int length = text.length();
+		final StringBuilder sb = new StringBuilder(length);
 		int position = 0;
-		while(position < sb.length()){
+		while(position < length){
 			Node node = root;
 			int j = position;
 			int matchedIndex = -1;
 
 			//traverse the trie along characters from the current position
-			while(j < sb.length()){
-				final char c = sb.charAt(j);
-				node = node.children.get(c);
+			while(j < length){
+				node = node.children.get(text.charAt(j));
 				if(node == null)
-					//no match starting at this position
 					break;
 
 				if(node.outIndex != -1){
@@ -101,23 +100,21 @@ public class TrieReplacer{
 					//earliest match at current position
 					break;
 				}
-
-				j++;
+				j ++;
 			}
 
 			if(matchedIndex != -1){
-				final String search = searchList[matchedIndex];
-				final String replacement = replacementList[matchedIndex];
-
-				//replace [position, position + search.length())
-				sb.replace(position, position + search.length(), replacement);
+				sb.append(replacementList[matchedIndex]);
 
 				//resume from after the replacement (in the mutated string)
-				position += replacement.length();
+				position += searchList[matchedIndex].length();
 			}
-			else
+			else{
+				sb.append(text.charAt(position));
+
 				//no match at current position: advance by one
 				position ++;
+			}
 		}
 
 		return sb.toString();
