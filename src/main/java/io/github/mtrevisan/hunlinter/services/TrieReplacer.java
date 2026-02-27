@@ -24,7 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.services;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +33,8 @@ import java.util.Map;
  * - at each current position, try to match any search pattern starting THERE;
  * - if matched, replace, then resume from AFTER the replacement in the MUTATED string;
  * - if not matched, advance by one character.
+ *
+ * https://github.com/hankcs/AhoCorasickDoubleArrayTrie/tree/master/src/main/java/com/hankcs/algorithm
  */
 public class TrieReplacer{
 
@@ -59,8 +60,8 @@ public class TrieReplacer{
 		if(length != replacementList.length)
 			throw new IllegalArgumentException("Search and replacement lists must have equal length.");
 
-		this.searchList = Arrays.copyOf(searchList, length);
-		this.replacementList = Arrays.copyOf(replacementList, replacementList.length);
+		this.searchList = searchList;
+		this.replacementList = replacementList;
 		for(int i = 0; i < length; i ++)
 			insert(searchList[i], i);
 	}
