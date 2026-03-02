@@ -37,14 +37,21 @@ import java.util.regex.Pattern;
 
 public final class OrthographyVEC extends Orthography{
 
-	private static final String[] STRESS_CODES = {"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:"};
-	private static final String[] TRUE_STRESS = {"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü"};
-
-	private static final String[] EXTENDED_CHARS = {"dh", "jh", "lh", "nh", "th"};
-	private static final String[] TRUE_CHARS = {"đ", "ɉ", "ƚ", "ñ", "ŧ"};
-
-	private static final String[] MB_MP = {"mb", "mp"};
-	private static final String[] NB_NP = {"nb", "np"};
+	private static final String[] STRESS_EXTENDED_NASALS = {
+		//stress
+		"a\\", "e\\", "o\\", "e/", "i/", "i\\", "ì", "i:", "o/", "u/", "u\\", "ù", "u:",
+		//extended
+		"dh", "jh", "lh", "nh", "th",
+		//nasals
+		"mb", "mp"
+		};
+	private static final String[] TRUE_STRESS_EXTENDED_NASALS = {
+		//stress
+		"à", "è", "ò", "é", "í", "í", "í", "ï", "ó", "ú", "ú", "ú", "ü",
+		//extended
+		"đ", "ɉ", "ƚ", "ñ", "ŧ",
+		//nasals
+		"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
 	private static final Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
@@ -67,9 +74,8 @@ public final class OrthographyVEC extends Orthography{
 	}
 
 
-	private static final TrieReplacer TRIE_STRESS = new TrieReplacer(STRESS_CODES, TRUE_STRESS);
-	private static final TrieReplacer TRIE_EXTENDED = new TrieReplacer(EXTENDED_CHARS, TRUE_CHARS);
-	private static final TrieReplacer TRIE_NASAL = new TrieReplacer(MB_MP, NB_NP);
+	private static final TrieReplacer TRIE_STRESS_EXTENDED_NASAL = new TrieReplacer(STRESS_EXTENDED_NASALS, TRUE_STRESS_EXTENDED_NASALS);
+//	private static final AhoCorasickReplacer TRIE_STRESS_EXTENDED_NASAL = new AhoCorasickReplacer(STRESS_EXTENDED_NASALS, TRUE_STRESS_EXTENDED_NASALS);
 
 
 	private OrthographyVEC(){}
@@ -88,19 +94,15 @@ public final class OrthographyVEC extends Orthography{
 	@Override
 	public String correctOrthography(final String word){
 		//correct stress
-		String correctedWord = TRIE_STRESS.replaceEach(word);
+		//correct h occurrences after d, j, l, n, t
+		//correct mb/mp occurrences into nb/np
+		String correctedWord = TRIE_STRESS_EXTENDED_NASAL.replaceEach(word);
 
 		correctedWord = WordVEC.markDefaultStress(correctedWord);
-
-		//correct h occurrences after d, j, l, n, t
-		correctedWord = TRIE_EXTENDED.replaceEach(correctedWord);
 
 		//remove other occurrences of h not into fhV
 		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
-
-		//correct mb/mp occurrences into nb/np
-		correctedWord = TRIE_NASAL.replaceEach(correctedWord);
 
 		//correct ïC/üC occurrences into iC/uC
 		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
