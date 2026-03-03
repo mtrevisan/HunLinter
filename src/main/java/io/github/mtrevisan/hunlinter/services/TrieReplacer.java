@@ -85,7 +85,8 @@ public final class TrieReplacer{
 	 *
 	 * @param searchList	Array of non-{@code null}, non-empty patterns to search for.
 	 * @param replacementList	Array of non-{@code null} replacement strings.
-	 * @throws IllegalArgumentException	If array lengths differ, or a pattern is {@code null}/empty, or a replacement is {@code null}.
+	 * @throws IllegalArgumentException	If array lengths differ, or a pattern is {@code null}/empty, or a replacement
+	 * is {@code null}.
 	 */
 	public TrieReplacer(final String[] searchList, final String[] replacementList){
 		if(searchList == null || replacementList == null)
