@@ -76,7 +76,7 @@
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
 		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
-<!--		<maven-shade-plugin.version>3.6.1</maven-shade-plugin.version>-->
+<!--		<maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>-->
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.8.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
