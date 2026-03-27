@@ -382,7 +382,7 @@ public class AffixEntry{
 			&& appending.equals(rhs.appending)
 //			&& Objects.equals(continuationFlags, rhs.continuationFlags)
 			&& condition.equals(rhs.condition)
-			&& morphologicalFields.equals(rhs.morphologicalFields));
+			&& Objects.equals(morphologicalFields, rhs.morphologicalFields));
 	}
 
 	@Override
