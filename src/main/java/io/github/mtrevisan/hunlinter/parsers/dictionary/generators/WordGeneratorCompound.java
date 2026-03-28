@@ -172,10 +172,10 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	}
 
 	private void applyOutputConversions(final Iterable<Inflection> inflections, final String forceCompoundUppercaseFlag){
-		final Function<String, String> applyOutputConversionTable = affixData::applyOutputConversionTable;
+//		final Function<String, String> applyOutputConversionTable = affixData::applyOutputConversionTable;
 		//convert using output table
 		for(final Inflection inflection : inflections){
-			inflection.applyOutputConversionTable(applyOutputConversionTable);
+//			inflection.applyOutputConversionTable(applyOutputConversionTable);
 			inflection.capitalizeIfContainsFlag(forceCompoundUppercaseFlag);
 			inflection.removeContinuationFlag(forceCompoundUppercaseFlag);
 		}
