@@ -262,12 +262,13 @@ public class AffixData{
 	}
 
 	public final boolean isAffixProductive(final String affix, final String word){
-		final String convertedWord = applyInputConversionTable(word);
+//		final String convertedWord = applyInputConversionTable(word);
 
 		final boolean productive;
 		final Object affixData = getData(affix);
 		if(affixData != null && RuleEntry.class.isAssignableFrom(affixData.getClass()))
-			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
+//			productive = ((RuleEntry)affixData).isProductiveFor(convertedWord);
+			productive = ((RuleEntry)affixData).isProductiveFor(word);
 		else
 			productive = isManagedByCompoundRule(affix);
 		return productive;

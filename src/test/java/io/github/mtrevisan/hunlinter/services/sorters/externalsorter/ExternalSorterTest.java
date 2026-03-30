@@ -59,7 +59,7 @@ class ExternalSorterTest{
 			.comparator(DEFAULT_COMPARATOR)
 			.build();
 
-		ExternalSorter.sort(in, options, outputFile);
+		ExternalSorter.sort(in, outputFile, options);
 
 		Assertions.assertEquals(0, outputFile.length());
 	}
@@ -71,7 +71,7 @@ class ExternalSorterTest{
 			.comparator(DEFAULT_COMPARATOR)
 			.build();
 
-		ExternalSorter.sort(inputFile, options, outputFile);
+		ExternalSorter.sort(inputFile, outputFile, options);
 
 		Assertions.assertEquals(27, outputFile.length());
 	}
@@ -83,7 +83,7 @@ class ExternalSorterTest{
 			.comparator(DEFAULT_COMPARATOR)
 			.build();
 
-		ExternalSorter.sort(inputFile, options, outputFile);
+		ExternalSorter.sort(inputFile, outputFile, options);
 
 		Assertions.assertEquals(27, outputFile.length());
 	}
@@ -96,7 +96,7 @@ class ExternalSorterTest{
 			.removeDuplicates()
 			.build();
 
-		ExternalSorter.sort(inputFile, options, outputFile);
+		ExternalSorter.sort(inputFile, outputFile, options);
 
 		Assertions.assertEquals(21, outputFile.length());
 		Assertions.assertEquals("a\r\nc\r\ne\r\ng\r\ni\r\nj\r\nk\r\n", Files.readString(outputFile.toPath()));

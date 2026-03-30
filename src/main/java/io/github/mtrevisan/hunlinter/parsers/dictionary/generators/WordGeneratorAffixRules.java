@@ -66,8 +66,9 @@ public class WordGeneratorAffixRules extends WordGeneratorBase{
 			enforceOnlyInCompound(inflections);
 
 		//convert using output table
-		for(int i = 0, length = inflections.size(); i < length; i ++)
-			inflections.get(i).applyOutputConversionTable(affixData::applyOutputConversionTable);
+//		for(int i = 0, length = inflections.size(); i < length; i ++)
+//			inflections.get(i)
+//				.applyOutputConversionTable(affixData::applyOutputConversionTable);
 
 		if(LOGGER.isTraceEnabled())
 			for(int i = 0, length = inflections.size(); i < length; i ++)

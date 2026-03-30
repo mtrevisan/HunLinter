@@ -91,9 +91,10 @@ public class DictionaryEntryFactory{
 		final List<String> continuationFlags = extractContinuationFlags(m.group(PARAM_FLAGS));
 		final List<String> morphologicalFields = extractMorphologicalFields(m.group(PARAM_MORPHOLOGICAL_FIELDS), addStemTag, word);
 
-		final String convertedWord = affixData.applyInputConversionTable(word);
+//		final String convertedWord = affixData.applyInputConversionTable(word);
 		final boolean combinable = true;
-		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
+//		return new DictionaryEntry(convertedWord, continuationFlags, morphologicalFields, combinable);
+		return new DictionaryEntry(word, continuationFlags, morphologicalFields, combinable);
 	}
 
 	private static String extractWord(final String word){
