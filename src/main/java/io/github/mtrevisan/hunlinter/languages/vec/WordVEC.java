@@ -77,7 +77,7 @@ public final class WordVEC{
 	}
 
 	//NOTE: any character that appears before the first `<` is considered an ignorable character
-	private static final String COLLATOR_RULE = "; '-' < ' '='\t' < \u00AD;‐;‑;‒;–;—;―;− < ʼ=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j,J < ɉ=jh,Ɉ=Jh < k,K < l,L < ƚ=lh,Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
+	private static final String COLLATOR_RULE = "; '-' < ' '='\t' < \u00AD;‐;‑;‒;–;—;―;− < ʼ=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j=ɉ=jh,J=Ɉ=Jh < k,K < l=ƚ=lh,L=Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh,gn=Gn < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private static Collator COLLATOR;
 	static{
