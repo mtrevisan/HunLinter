@@ -22,6 +22,9 @@ import java.util.*;
  *   <li>Anticipated pre-push suffix pruning.</li>
  *   <li>Suffix-mask lower-bound pruning (classic).</li>
  *   <li>Zero-contribution pruning (word adds no new letter).</li>
+ *   <li>Length lower-bound pruning: if current length + minimum possible
+ *       completion length exceeds {@code MAX_TOTAL_LEN}, the branch is cut
+ *       both at pop time and pre-push.</li>
  *   <li>Rarity-based word ordering (rarest letters first).</li>
  *   <li>O(|word|) mask building via a char-to-bit lookup table (no indexOf).</li>
  *   <li>Optional subset-word pruning at startup ({@code -Dprune.subsets=true}).</li>
@@ -29,11 +32,12 @@ import java.util.*;
  *   <li>Inline ancestor path stored per stack frame (no pointer aliasing).</li>
  * </ul>
  *
- * <b>Flat stack layout</b> — five parallel arrays indexed by {@code top}:
+ * <b>Flat stack layout</b> — six parallel arrays indexed by {@code top}:
  * <pre>
  *   sStart [top]                             first candidate word index
  *   sDepth [top]                             number of words chosen so far
  *   sMask  [top]                             bitmask of letters covered
+ *   sLen   [top]                             total character length so far
  *   sChoice[top]                             word chosen to arrive here (-1 = root)
  *   sPath  [top * K .. top * K + depth - 1]  word-index path from root to this node
  * </pre>
@@ -44,11 +48,12 @@ public class Main2{
 
 	// ===== CONFIGURATION =====
 	private static final int K = 5;
-	private static final long LOG_EVERY = 1_000_000_000l;
+	private static final long LOG_EVERY = 100_000_000l;
+	private static final long CHECKPOINT_EVERY = 100_000_000l;
 	private static final String WORDS_FILE = "words.txt";
 	private static final String CHECKPOINT_FILE = "checkpoint" + K + ".bin";
 	private static final String SOLUTIONS_FILE = "solutions" + K + ".txt";
-	private static final double THRESHOLD = 0.47;
+	private static final double THRESHOLD = 0.24;
 
 	// Fixed alphabet
 	private static final List<Character> ALPHABET = List.of(
@@ -80,6 +85,12 @@ public class Main2{
 	private static long[] wordMasks;
 	/** {@code suffixMasks[i] = wordMasks[i] | … | wordMasks[n-1];  suffixMasks[n] = 0} */
 	private static long[] suffixMasks;
+	/**
+	 * {@code minLenSum[k]} = sum of the {@code k} shortest word lengths in the
+	 * (post-pruning, pre-sort) dictionary.  Used as the tightest possible lower
+	 * bound on the total length of any k-word completion.
+	 */
+	private static int[] minLenSum;
 
 	private static long runs = 0L;
 	private static volatile boolean stopRequested = false;
@@ -89,6 +100,7 @@ public class Main2{
 	private static int[] sStart;
 	private static int[] sDepth;
 	private static long[] sMask;
+	private static int[] sLen;    // total character length accumulated so far
 	private static int[] sChoice;
 	/**
 	 * Inline path storage: {@code sPath[top*K .. top*K + depth - 1]} holds the word
@@ -97,28 +109,29 @@ public class Main2{
 	 */
 	private static int[] sPath;
 
-	/** minLenSum[k] = sum of the k shortest word lengths in the dictionary. */
-	private static int[] minLenSum;
-	// parallel stack array: total length so far
-	private static int[] sLen;
-
 
 	// ===== CHECKPOINT =====
 	private static final class Checkpoint implements Serializable{
+		@Serial
+		private static final long serialVersionUID = 4l;
+
 		final int top;
 		final int[] start;
 		final int[] depth;
 		final long[] mask;
+		final int[] len;
 		final int[] choice;
 		final int[] path;   // flat array, length = (top + 1) * K
 		final long runs;
 
 		Checkpoint(final int top, final int[] start, final int[] depth, final long[] mask,
-				final int[] choice, final int[] path, final long runs){
+			final int[] len, final int[] choice, final int[] path,
+			final long runs){
 			this.top = top;
 			this.start = Arrays.copyOf(start, top + 1);
 			this.depth = Arrays.copyOf(depth, top + 1);
 			this.mask = Arrays.copyOf(mask, top + 1);
+			this.len = Arrays.copyOf(len, top + 1);
 			this.choice = Arrays.copyOf(choice, top + 1);
 			this.path = Arrays.copyOf(path, (top + 1) * K);
 			this.runs = runs;
@@ -150,11 +163,13 @@ public class Main2{
 		final int[] lStart = sStart;
 		final int[] lDepth = sDepth;
 		final long[] lMask = sMask;
+		final int[] lLen = sLen;
 		final int[] lChoice = sChoice;
 		final int[] lPath = sPath;
 		final long[] lWordM = wordMasks;
 		final long[] lSuffix = suffixMasks;
-		final int nWords = words.size();  // cache: avoids virtual call per frame
+		final int nWords = words.size();
+		final int[] lMinLenSum = minLenSum;
 
 		// topPath mirrors top * K but is updated with +K/-K instead of a multiply.
 		int topPath = top * K;
@@ -165,6 +180,7 @@ public class Main2{
 			final int start = lStart[top];
 			final int depth = lDepth[top];
 			final long mask = lMask[top];
+			final int len = lLen[top];
 			final int choice = lChoice[top];
 			// Copy current path
 			System.arraycopy(lPath, topPath, pathBuf, 0, depth);
@@ -178,40 +194,30 @@ public class Main2{
 					(choice >= 0? words.get(choice): "ROOT"));
 
 			// ── Periodic checkpoint ───────────────────────────────────────────
-			if((runs & 0x1FFF_FFFFl) == 0){
+			if(runs % CHECKPOINT_EVERY == 0){
 				try{
 					saveCheckpoint(top + 1);
+//					System.out.println("Checkpoint saved");
 				}
 				catch(final Exception e){
 					e.printStackTrace();
 				}
 			}
 
-			// ── Pruning 4: length bound ───────────────────────────────────────
-			// currentLen + minimum possible cost for remaining slots ≥ maxTotalLen → prune
-			// We need to track currentLen in the stack — add sLen[] parallel array.
-			// aggiungi alias locale
-			final int[] lLen = sLen;
-			// nel pop, dopo le altre letture:
-			final int len = lLen[top];
-
-			// Pruning 4: length lower bound
-			// Even using the (remainingSlots) shortest possible words, total exceeds MAX_TOTAL_LEN
+			// ── Pruning 4: length lower bound ─────────────────────────────────
+			// current length + cheapest possible completion > MAX_TOTAL_LEN → prune.
 			final int remainingSlots = K - depth;
-			if(len + minLenSum[remainingSlots] > MAX_TOTAL_LEN)
+			if(len + lMinLenSum[remainingSlots] > MAX_TOTAL_LEN)
 				continue;
 
-
-			// ── Pruning 1: suffix lower bound ─────────────────────────────────
-			// Even unioning every remaining word cannot complete the alphabet.
+			// ── Pruning 1: suffix coverage ────────────────────────────────────
 			if((mask | lSuffix[start]) != FULL_MASK)
 				continue;
 
 			// ── Leaf: solution check ──────────────────────────────────────────
 			if(depth == K){
 				if(mask == FULL_MASK)
-					writeSolution(pathBuf, depth);
-
+					writeSolution(pathBuf, depth, len);
 				continue;
 			}
 
@@ -229,6 +235,13 @@ public class Main2{
 				if(newMask == mask)
 					continue;
 
+				final int newLen = len + words.get(i).length();
+
+				// Pruning 4b: anticipated length bound — pre-push
+				// newLen + cheapest (remainingSlots-1) words > MAX_TOTAL_LEN → skip
+				if(newLen + lMinLenSum[remainingSlots - 1] > MAX_TOTAL_LEN)
+					continue;
+
 				// Pruning 3: anticipated suffix check — pre-push
 				if((newMask | lSuffix[i + 1]) != FULL_MASK)
 					continue;
@@ -239,14 +252,12 @@ public class Main2{
 				lStart[top] = i + 1;
 				lDepth[top] = depth + 1;
 				lMask[top] = newMask;
+				lLen[top] = newLen;
 				lChoice[top] = i;
 
 				// Write inline path: parent's path[0..depth-1] + word i
 				System.arraycopy(pathBuf, 0, lPath, topPath, depth);
 				lPath[topPath + depth] = i;
-
-				// nel push, dopo gli altri array:
-				lLen[top] = len + words.get(i).length();
 			}
 		}
 
@@ -277,10 +288,9 @@ public class Main2{
 		sStart = new int[maxStack];
 		sDepth = new int[maxStack];
 		sMask = new long[maxStack];
+		sLen = new int[maxStack];
 		sChoice = new int[maxStack];
 		sPath = new int[maxStack * K];
-		// root frame: length = 0 (array already zeroed)
-		sLen = new int[maxStack];
 
 		final File cpFile = new File(CHECKPOINT_FILE);
 		if(!cpFile.exists() || cpFile.length() == 0){
@@ -288,8 +298,8 @@ public class Main2{
 			sStart[0] = 0;
 			sDepth[0] = 0;
 			sMask[0] = 0l;
+			sLen[0] = 0;
 			sChoice[0] = -1;
-			// sPath[0..K-1] is already zero; depth=0, so it is never read
 			return 0;
 		}
 
@@ -297,10 +307,11 @@ public class Main2{
 			final Checkpoint cp = (Checkpoint)in.readObject();
 			runs = cp.runs;
 			final int size = cp.top + 1;
-			System.out.printf("Checkpoint loaded: runs = %,d, stack entries = %,d%n", cp.runs, size);
+			System.out.printf("Checkpoint loaded: runs = %,d, stack entries = %,d%n", cp.runs / CHECKPOINT_EVERY, size);
 			System.arraycopy(cp.start, 0, sStart, 0, size);
 			System.arraycopy(cp.depth, 0, sDepth, 0, size);
 			System.arraycopy(cp.mask, 0, sMask, 0, size);
+			System.arraycopy(cp.len, 0, sLen, 0, size);
 			System.arraycopy(cp.choice, 0, sChoice, 0, size);
 			System.arraycopy(cp.path, 0, sPath, 0, size * K);
 			return cp.top;
@@ -312,7 +323,7 @@ public class Main2{
 		final Path tmp = Paths.get(CHECKPOINT_FILE + ".tmp");
 		try(final ObjectOutputStream out = new ObjectOutputStream(
 			Files.newOutputStream(tmp, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))){
-			out.writeObject(new Checkpoint(size - 1, sStart, sDepth, sMask, sChoice, sPath, runs));
+			out.writeObject(new Checkpoint(size - 1, sStart, sDepth, sMask, sLen, sChoice, sPath, runs));
 			out.flush();
 		}
 		try{
@@ -327,7 +338,7 @@ public class Main2{
 	// ===== WORD LOADING & PREPROCESSING =====
 
 	private static void loadWords() throws Exception{
-		final InputStream is = Main.class.getResourceAsStream("/" + WORDS_FILE);
+		final InputStream is = Main2.class.getResourceAsStream("/" + WORDS_FILE);
 		if(is == null)
 			throw new IllegalStateException(WORDS_FILE + " not found in classpath");
 
@@ -356,17 +367,25 @@ public class Main2{
 
 		System.out.printf("Pure combinations C(%,d, %d) = %,d%n", words.size(), K, countCombinations());
 
-		// ── Rarity sort: pack score into a long[], sort primitively ──────────
-		// Avoids Integer[] boxing and Double.compare() overhead.
-		// High 32 bits: inverted score as fixed-point (multiply by 1<<20, negate for desc order).
-		// Low 32 bits: original index.
+		// ── Precompute minLenSum ──────────────────────────────────────────────
+		// Must be done BEFORE the rarity sort so it reflects the actual word lengths
+		// available regardless of ordering.
+		final int[] sortedLens = new int[words.size()];
+		for(int i = 0; i < sortedLens.length; i ++)
+			sortedLens[i] = words.get(i).length();
+		Arrays.sort(sortedLens);
+		minLenSum = new int[K + 1];
+		for(int k = 1; k <= K; k ++)
+			minLenSum[k] = minLenSum[k - 1] + sortedLens[k - 1];
+		System.out.printf("MAX_TOTAL_LEN = %d, minLenSum[K] = %d, minLenSum: %s%n",
+			MAX_TOTAL_LEN, minLenSum[K], Arrays.toString(minLenSum));
+
+		// ── Rarity sort ───────────────────────────────────────────────────────
 		final int[] freq = new int[ALPHABET_SIZE];
-		for(int j = 0, wordMasksLength = wordMasks.length; j < wordMasksLength; j ++){
-			final long m = wordMasks[j];
+		for(final long m : wordMasks)
 			for(int i = 0; i < ALPHABET_SIZE; i ++)
 				if((m & (1l << i)) != 0)
 					freq[i] ++;
-		}
 
 		final long[] sortKeys = new long[words.size()];
 		for(int idx = 0; idx < words.size(); idx ++){
@@ -377,8 +396,8 @@ public class Main2{
 					s += 1. / freq[i];
 			// Negate score so that Arrays.sort (ascending) gives descending rarity order.
 			// Multiply by a large constant to preserve fixed-point precision.
-			final long scoreBits = (long)(-s * (1L << 30));
-			sortKeys[idx] = (scoreBits << 32) | (idx & 0xFFFFFFFFL);
+			final long scoreBits = (long)(-s * (1l << 30));
+			sortKeys[idx] = (scoreBits << 32) | (idx & 0xFFFFFFFFl);
 		}
 
 		Arrays.sort(sortKeys);
@@ -386,30 +405,20 @@ public class Main2{
 		final List<String> sortedWords = new ArrayList<>(words.size());
 		final long[] sortedMasks = new long[words.size()];
 		for(int rank = 0; rank < sortKeys.length; rank ++){
-			final int origIdx = (int)(sortKeys[rank] & 0xFFFFFFFFL);
+			final int origIdx = (int)(sortKeys[rank] & 0xFFFFFFFFl);
 			sortedWords.add(words.get(origIdx));
 			sortedMasks[rank] = wordMasks[origIdx];
 		}
 		words = sortedWords;
 		wordMasks = sortedMasks;
 
-		// Precompute minLenSum[k] = sum of k shortest word lengths
-		// Words are sorted by rarity, not by length, so we need a separate sort
-		final int[] sortedLens = new int[words.size()];
-		for(int i = 0; i < sortedLens.length; i ++)
-			sortedLens[i] = words.get(i).length();
-		Arrays.sort(sortedLens);
-		minLenSum = new int[K + 1];
-		for(int k = 1; k <= K; k ++)
-			minLenSum[k] = minLenSum[k - 1] + sortedLens[k - 1];
-
 		// Build suffix-OR masks
 		suffixMasks = new long[wordMasks.length + 1];
 		for(int i = wordMasks.length - 1; i >= 0; i --)
 			suffixMasks[i] = suffixMasks[i + 1] | wordMasks[i];
 
-		System.out.printf("Loaded %,d words, alphabet = %d bits, suffix[0] = %s%n",
-			words.size(), ALPHABET_SIZE,
+		System.out.printf("Loaded %,d words, alphabet = %d bits, MAX_TOTAL_LEN = %d, suffix[0] = %s%n",
+			words.size(), ALPHABET_SIZE,MAX_TOTAL_LEN,
 			(suffixMasks[0] == FULL_MASK
 				? "FULL (search possible)"
 				: "INCOMPLETE — no solution exists with this word list!"));
@@ -461,21 +470,7 @@ public class Main2{
 		for(final int idx : bestByMask.values())
 			keep[idx] = true;
 
-		int kept = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i])
-				kept ++;
-
-		final List<String> fw = new ArrayList<>(kept);
-		final long[] fm = new long[kept];
-		int out = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i]){
-				fw.add(words.get(i));
-				fm[out ++] = wordMasks[i];
-			}
-		words = fw;
-		wordMasks = fm;
+		rebuild(keep);
 	}
 
 	/**
@@ -503,23 +498,8 @@ public class Main2{
 				}
 			}
 		}
-
-		int kept = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i])
-				kept ++;
-
-		final List<String> fw = new ArrayList<>(kept);
-		final long[] fm = new long[kept];
-		int out = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i]){
-				fw.add(words.get(i));
-				fm[out++] = wordMasks[i];
-			}
-		words = fw;
-		wordMasks = fm;
-		System.out.printf("Subset pruning: %,d words retained (from %,d)%n", kept, n);
+		rebuild(keep);
+		System.out.printf("Subset pruning: %,d words retained%n", words.size());
 	}
 
 	/**
@@ -539,35 +519,21 @@ public class Main2{
 		for(int i = 0; i < n; i ++){
 			if(!keep[i]) continue;
 			final long mi = wordMasks[i];
-			final int len = words.get(i).length();
+			final int li = words.get(i).length();
 			for(int j = 0; j < n; j ++){
 				if(i == j || !keep[j])
 					continue;
 
 				final long mj = wordMasks[j];
+				final int lj = words.get(j).length();
 				// W2=j dominates W1=i: covers at least the same letters and is not longer
-				if((mi & mj) == mi && words.get(j).length() <= len && (mj != mi || words.get(j).length() < len)){
+				if((mi & mj) == mi && lj <= li && (mj != mi || lj < li)){
 					keep[i] = false;
 					break;
 				}
 			}
 		}
-
-		int kept = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i])
-				kept ++;
-
-		final List<String> fw = new ArrayList<>(kept);
-		final long[] fm = new long[kept];
-		int out = 0;
-		for(int i = 0; i < n; i ++)
-			if(keep[i]){
-				fw.add(words.get(i));
-				fm[out++] = wordMasks[i];
-			}
-		words = fw;
-		wordMasks = fm;
+		rebuild(keep);
 	}
 
 	/**
@@ -600,9 +566,7 @@ public class Main2{
 
 				for(int b = 0; b < g; b ++){
 					if(a == b) continue;
-					final int ib = group.get(b);
-					final String wb = words.get(ib);
-
+					final String wb = words.get(group.get(b));
 					// Find the single differing position
 					int diffPos = -1;
 					boolean valid = true;
@@ -616,8 +580,7 @@ public class Main2{
 						}
 					}
 					if(!valid || diffPos < 0)
-						// 0 or 2+ differences
-						continue;
+						continue;  // 0 or 2+ differences
 
 					// Check that the replaced char appears at least twice in wa
 					final char replaced = wa.charAt(diffPos);
@@ -633,17 +596,24 @@ public class Main2{
 			}
 		}
 
-		// Rebuild words and wordMasks keeping only non-redundant entries
-		int kept = 0;
+		final boolean[] keep = new boolean[n];
 		for(int i = 0; i < n; i ++)
-			if(!redundant[i])
+			keep[i] = !redundant[i];
+		rebuild(keep);
+	}
+
+	/** Shared helper: compacts words/wordMasks keeping only entries where keep[i]=true. */
+	private static void rebuild(final boolean[] keep){
+		int kept = 0;
+		for(final boolean k : keep)
+			if(k)
 				kept ++;
 
 		final List<String> fw = new ArrayList<>(kept);
 		final long[] fm = new long[kept];
 		int out = 0;
-		for(int i = 0; i < n; i ++)
-			if(!redundant[i]){
+		for(int i = 0; i < keep.length; i ++)
+			if(keep[i]){
 				fw.add(words.get(i));
 				fm[out++] = wordMasks[i];
 			}
@@ -683,18 +653,13 @@ public class Main2{
 	}
 
 	/**
-	 * Writes a valid solution to the solutions file if its duplicate ratio ≤ {@link #THRESHOLD}.
-	 *
-	 * @param path  word-index path, indices 0..depth-1
-	 * @param depth number of words in the combination (= K at a leaf)
+	 * Writes a solution to the solutions file.
+	 * The length check is now redundant (Pruning 4 already guarantees len ≤ MAX_TOTAL_LEN)
+	 * but kept as a safety net.
 	 */
-	private static void writeSolution(final int[] path, final int depth){
+	private static void writeSolution(final int[] path, final int depth, final int totalLen){
 		try{
-			int totalLength = 0;
-			for(int i = 0; i < depth; i ++)
-				totalLength += words.get(path[i]).length();
-
-			final double duplicateRatio = (double)totalLength / ALPHABET_SIZE - 1.;
+			final double duplicateRatio = (double)totalLen / ALPHABET_SIZE - 1.;
 			if(duplicateRatio > THRESHOLD)
 				return;
 
