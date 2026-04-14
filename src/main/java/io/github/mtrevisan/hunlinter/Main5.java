@@ -4,10 +4,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -36,6 +40,7 @@ public class Main5{
 	// ===== CONFIGURATION =====
 //	private static final String WORDS_FILE = "words.txt";
 	private static final String WORDS_FILE = "all.txt";
+	private static final String FILTERED_WORDS_FILE = "all.filtered.txt";
 	private static final String SOLUTIONS_FILE = "solutionsDLX-all.txt";
 
 	private static final int MIN_K = 4;
@@ -104,12 +109,19 @@ public class Main5{
 
 	public static void main(final String[] args) throws Exception{
 		// ===== LOAD & PREPROCESS =====
-		loadWords();
-		System.out.println("Loaded: " + words.size() + " words");
+		final boolean filteredFileLoaded = loadWords(FILTERED_WORDS_FILE);
+		if(!filteredFileLoaded){
+			loadWords(WORDS_FILE);
+			System.out.println("Loaded: " + words.size() + " words");
 
-		pruneIdenticalMasks();
-		pruneDominatedWords();
-		System.out.println("Used:   " + words.size() + " words");
+			pruneIdenticalMasks();
+			pruneDominatedWords();
+			System.out.println("Used:   " + words.size() + " words");
+
+			writeFilteredWords();
+		}
+		else
+			System.out.println("Loaded: " + words.size() + " words");
 
 		buildDLX();
 		checkAlphabetCoverageOrFail();
@@ -159,13 +171,14 @@ public class Main5{
 
 	// ===== LOAD & PREPROCESS =====
 
-	private static void loadWords() throws Exception{
-		final InputStream is = Main5.class.getResourceAsStream("/" + WORDS_FILE);
-		if(is == null)
-			throw new IllegalStateException("Missing file: " + WORDS_FILE);
+	private static boolean loadWords(final String filename) throws Exception{
+		File file = new File(filename);
+		if(!file.exists() || !file.isFile())
+			return false;
 
 		words = new ArrayList<>();
-		try(final BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))){
+		try(final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+				StandardCharsets.UTF_8))){
 			String line;
 			while((line = br.readLine()) != null)
 				if(!line.isBlank())
@@ -175,6 +188,8 @@ public class Main5{
 		wordMasks = new long[words.size()];
 		for(int i = 0, length = words.size(); i < length; i ++)
 			wordMasks[i] = buildMask(words.get(i));
+
+		return true;
 	}
 
 	/**
@@ -284,6 +299,17 @@ public class Main5{
 		}
 		arr = Arrays.copyOfRange(arr, 0, count);
 		wordMasks = arr;
+	}
+
+	private static void writeFilteredWords() throws IOException{
+		try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(FILTERED_WORDS_FILE),
+				StandardCharsets.UTF_8))){
+			for(int i = 0, length = words.size(); i < length; i ++){
+				bw.write(words.get(i));
+				bw.newLine();
+			}
+		}
+		System.out.println("Filtered dictionary written to " + FILTERED_WORDS_FILE);
 	}
 
 	// ===== DLX BUILD =====
