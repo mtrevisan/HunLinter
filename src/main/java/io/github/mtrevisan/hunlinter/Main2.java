@@ -1,6 +1,7 @@
 package io.github.mtrevisan.hunlinter;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -158,6 +159,8 @@ public class Main2{
 	// ===== SEARCH =====
 
 	private static void runIterativeSearch(int top){
+		final double k = 100. / countCombinations().doubleValue();
+
 		// Local aliases — keeps all hot arrays as local variables so the JIT
 		// can promote them to registers and skip null/bounds re-checks.
 		final int[] lStart = sStart;
@@ -189,8 +192,9 @@ public class Main2{
 
 			runs ++;
 			if(runs % LOG_EVERY == 0)
-				System.out.printf("Run %d: choice = %s%n",
+				System.out.printf("Run %d (%.9f%%): choice = %s%n",
 					runs / LOG_EVERY,
+					runs * k,
 					(choice >= 0? words.get(choice): "ROOT"));
 
 			// ── Periodic checkpoint ───────────────────────────────────────────
