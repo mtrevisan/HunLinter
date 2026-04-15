@@ -129,6 +129,7 @@ public class Main6{
 		else
 			System.out.println("Loaded: " + words.size() + " words");
 
+		analyzeAllWords();
 		buildDLX();
 		checkAlphabetCoverageOrFail();
 
@@ -340,6 +341,12 @@ public class Main6{
 
 	private static boolean isVowel(final char c){
 		return ("aeiouàèéíòóúïü".indexOf(Character.toLowerCase(c)) >= 0);
+	}
+
+	private static void analyzeAllWords(){
+		wordFeatures = new ArrayList<>(words.size());
+		for(String w : words)
+			wordFeatures.add(analyzeWord(w));
 	}
 
 	// ===== DLX BUILD =====
