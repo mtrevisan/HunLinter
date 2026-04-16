@@ -121,16 +121,15 @@ public class Main6{
 		final boolean filteredFileLoaded = loadWords(FILTERED_WORDS_FILE);
 		if(!filteredFileLoaded){
 			loadWords(WORDS_FILE);
-			System.out.println("Loaded: " + words.size() + " words");
+			System.out.printf(Locale.FRANCE, "Loaded: %,d words%n", words.size());
 
 			pruneIdenticalMasks();
 			pruneDominatedWords();
-			System.out.println("Used:   " + words.size() + " words");
-
 			writeFilteredWords();
+			System.out.printf(Locale.FRANCE, "Used:   %,d words%n", words.size());
 		}
 		else
-			System.out.println("Loaded: " + words.size() + " words");
+			System.out.printf(Locale.FRANCE, "Loaded: %,d words%n", words.size());
 
 		analyzeAllWords();
 		sortByDensity();
@@ -160,8 +159,6 @@ public class Main6{
 		for(int k = Math.max(1, MIN_K); k <= maxPossible; k ++){
 			System.out.println("Trying K = " + k);
 
-			foundAnyForCurrentK = false;
-
 			search(0, k, new int[k], new SolutionStats());
 
 			if(foundAnyForCurrentK){
@@ -179,7 +176,7 @@ public class Main6{
 	// ===== LOAD & PREPROCESS =====
 
 	private static boolean loadWords(final String filename) throws Exception{
-		File file = new File(filename);
+		final File file = new File(filename);
 		if(!file.exists() || !file.isFile())
 			return false;
 
@@ -192,8 +189,9 @@ public class Main6{
 					words.add(line.trim());
 		}
 
-		wordMasks = new long[words.size()];
-		for(int i = 0, length = words.size(); i < length; i ++)
+		final int length = words.size();
+		wordMasks = new long[length];
+		for(int i = 0; i < length; i ++)
 			wordMasks[i] = buildMask(words.get(i));
 
 		return true;
@@ -237,8 +235,7 @@ public class Main6{
 		// Map mask → index of the shortest word seen so far with that mask
 		final Map<Long, Integer> best = new HashMap<>();
 		for(int i = 0, length = words.size(); i < length; i ++)
-			best.merge(wordMasks[i], i, (a, b) ->
-				words.get(b).length() < words.get(a).length()? b: a);
+			best.merge(wordMasks[i], i, (a, b) -> words.get(b).length() < words.get(a).length()? b: a);
 
 		// Mark as kept only the winning index for each mask
 		final boolean[] keep = new boolean[words.size()];
@@ -351,17 +348,12 @@ public class Main6{
 				nw.add(words.get(i));
 				nm.add(wordMasks[i]);
 			}
-
 		words = nw;
-		long[] arr = new long[10];
-		int count = 0;
-		for(int i = 0, nmSize = nm.size(); i < nmSize; i ++){
-			if(arr.length == count)
-				arr = Arrays.copyOf(arr, count * 2);
-			arr[count ++] = nm.get(i);
-		}
-		arr = Arrays.copyOfRange(arr, 0, count);
-		wordMasks = arr;
+
+		final long[] newWordMasks = new long[nm.size()];
+		for(int i = 0; i < nm.size(); i ++)
+			newWordMasks[i] = nm.get(i);
+		wordMasks = newWordMasks;
 	}
 
 	private static void writeFilteredWords() throws IOException{
@@ -420,7 +412,8 @@ public class Main6{
 
 	private static void buildDLX(){
 		root = new Column("ROOT");
-		root.L = root.R = root;
+		root.L = root;
+		root.R = root;
 
 		columns = new Column[ALPHABET_SIZE];
 		Column prev = root;
@@ -482,6 +475,7 @@ public class Main6{
 		if(root.R == root){
 			if(stats.jTotal >= 2 && stats.lTotal >= 2 && stats.hasJFollowedByVowel && stats.hasLFollowedByVowel){
 				foundAnyForCurrentK = true;
+
 				writeSolution(depth, solution);
 			}
 			return;
@@ -584,7 +578,6 @@ public class Main6{
 
 	private static void reorder(final Integer[] idx){
 		final int n = idx.length;
-
 		final List<String> newWords = new ArrayList<>(n);
 		final long[] newMasks = new long[n];
 		final List<WordFeatures> newFeatures = new ArrayList<>(n);
