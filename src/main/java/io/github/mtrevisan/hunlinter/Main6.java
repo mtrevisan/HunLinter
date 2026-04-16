@@ -58,6 +58,15 @@ public class Main6{
 			IS_VOWEL[c] = true;
 	}
 
+	// Extra DLX columns for global constraints
+	private static final int COL_J1 = ALPHABET_SIZE + 0;
+	private static final int COL_J2 = ALPHABET_SIZE + 1;
+	private static final int COL_JV = ALPHABET_SIZE + 2;
+	private static final int COL_L1 = ALPHABET_SIZE + 3;
+	private static final int COL_L2 = ALPHABET_SIZE + 4;
+	private static final int COL_LV = ALPHABET_SIZE + 5;
+	private static final int TOTAL_COLUMNS = ALPHABET_SIZE + 6;
+
 	// ===== DLX STRUCTURES =====
 
 	private static class Node{
@@ -93,13 +102,6 @@ public class Main6{
 		int lCount;
 		boolean jFollowedByVowel;
 		boolean lFollowedByVowel;
-	}
-
-	private static class SolutionStats{
-		int jTotal;
-		int lTotal;
-		boolean hasJFollowedByVowel;
-		boolean hasLFollowedByVowel;
 	}
 
 	// ===== GLOBAL STATE =====
@@ -168,7 +170,7 @@ public class Main6{
 		for(int k = Math.max(1, MIN_K); k <= maxPossible; k ++){
 			System.out.println("Trying K = " + k);
 
-			search(0, k, new int[k], new SolutionStats());
+			search(0, k, new int[k]);
 
 			if(foundAnyForCurrentK){
 				System.out.println("Minimum K found: " + k);
@@ -417,50 +419,93 @@ public class Main6{
 		root.L = root;
 		root.R = root;
 
-		columns = new Column[ALPHABET_SIZE];
+		columns = new Column[TOTAL_COLUMNS];
 		Column prev = root;
+		// Alphabet columns
 		for(int i = 0; i < ALPHABET_SIZE; i ++){
 			final Column c = new Column(ALPHABET.get(i).toString());
 			columns[i] = c;
 
-			c.L = prev;
-			c.R = root;
-			prev.R = c;
-			root.L = c;
+			linkColumn(prev, c);
 			prev = c;
 		}
 
-		for(int w = 0, length = words.size(); w < length; w ++){
-			final long mask = wordMasks[w];
-			Node first = null;
-			Node prevNode = null;
-			for(int b = 0; b < ALPHABET_SIZE; b ++){
-				if((mask & (1l << b)) == 0)
-					continue;
+		// Global constraint columns
+		columns[COL_J1] = new Column("J1");
+		columns[COL_J2] = new Column("J2");
+		columns[COL_JV] = new Column("JV");
+		columns[COL_L1] = new Column("L1");
+		columns[COL_L2] = new Column("L2");
+		columns[COL_LV] = new Column("LV");
 
-				final Column c = columns[b];
-				final Node n = new Node(w);
-				n.C = c;
-
-				n.D = c;
-				n.U = c.U;
-				c.U.D = n;
-				c.U = n;
-				c.size ++;
-
-				if(first == null){
-					first = n;
-					n.L = n.R = n;
-				}
-				else{
-					n.L = prevNode;
-					n.R = first;
-					prevNode.R = n;
-					first.L = n;
-				}
-				prevNode = n;
-			}
+		for(int i = ALPHABET_SIZE; i < TOTAL_COLUMNS; i ++){
+			linkColumn(prev, columns[i]);
+			prev = columns[i];
 		}
+
+		root.L = prev;
+		prev.R = root;
+
+		// Add rows
+		for(int w = 0, length = words.size(); w < length; w ++){
+			Node first = null;
+			// Alphabet coverage
+			final long mask = wordMasks[w];
+			for(int b = 0; b < ALPHABET_SIZE; b ++){
+				if((mask & (1l << b)) != 0)
+					first = addNode(w, columns[b], first);
+			}
+
+			// Global constraints
+			WordFeatures f = wordFeatures.get(w);
+
+			if(f.jCount >= 1)
+				first = addNode(w, columns[COL_J1], first);
+			if(f.jCount >= 2)
+				first = addNode(w, columns[COL_J2], first);
+			if(f.jFollowedByVowel)
+				first = addNode(w, columns[COL_JV], first);
+
+			if(f.lCount >= 1)
+				first = addNode(w, columns[COL_L1], first);
+			if(f.lCount >= 2)
+				first = addNode(w, columns[COL_L2], first);
+			if(f.lFollowedByVowel)
+				first = addNode(w, columns[COL_LV], first);
+		}
+	}
+
+	private static void linkColumn(final Column left, final Column c){
+		c.L = left;
+		c.R = left.R;
+		left.R.L = c;
+		left.R = c;
+		c.U = c.D = c;
+	}
+
+	private static Node addNode(final int wordIndex, final Column c, Node first){
+		final Node n = new Node(wordIndex);
+		n.C = c;
+
+		// vertical link
+		n.D = c;
+		n.U = c.U;
+		c.U.D = n;
+		c.U = n;
+		c.size ++;
+
+		// horizontal link
+		if(first == null){
+			first = n;
+			n.L = n.R = n;
+		}
+		else{
+			n.L = first.L;
+			n.R = first;
+			first.L.R = n;
+			first.L = n;
+		}
+		return first;
 	}
 
 	private static void checkAlphabetCoverageOrFail(){
@@ -472,29 +517,18 @@ public class Main6{
 
 	// ===== DLX SEARCH WITH GLOBAL CONSTRAINTS =====
 
-	private static void search(final int depth, final int maxDepth, final int[] solution, final SolutionStats stats){
+	private static void search(final int depth, final int maxDepth, final int[] solution){
 		// If all columns are covered, we found a solution
 		if(root.R == root){
-			if(stats.jTotal >= 2 && stats.lTotal >= 2 && stats.hasJFollowedByVowel && stats.hasLFollowedByVowel){
-				foundAnyForCurrentK = true;
+			foundAnyForCurrentK = true;
 
-				writeSolution(depth, solution);
-			}
+			writeSolution(depth, solution);
+
 			return;
 		}
 
 		// Depth limit reached, but columns still uncovered → dead end
 		if(depth == maxDepth)
-			return;
-
-		//anticipated pruning:
-		// --- Hard upper bounds on J / L totals ---
-		// --- J followed by vowel must still be achievable ---
-		// --- L followed by vowel must still be achievable ---
-		if(stats.jTotal + maxRemainingJ[depth] < 2
-				|| stats.lTotal + maxRemainingL[depth] < 2
-				|| !stats.hasJFollowedByVowel && !canStillHaveJv[depth]
-				|| !stats.hasLFollowedByVowel && !canStillHaveLv[depth])
 			return;
 
 		final Column c = selectColumn();
@@ -504,45 +538,15 @@ public class Main6{
 		cover(c);
 
 		for(Node r = c.D; r != c; r = r.D){
-			final WordFeatures wf = wordFeatures.get(r.wordIndex);
-
-			final int oldJ = stats.jTotal;
-			final int oldL = stats.lTotal;
-			final boolean oldJv = stats.hasJFollowedByVowel;
-			final boolean oldLv = stats.hasLFollowedByVowel;
-
-			stats.jTotal += wf.jCount;
-			stats.lTotal += wf.lCount;
-			stats.hasJFollowedByVowel |= wf.jFollowedByVowel;
-			stats.hasLFollowedByVowel |= wf.lFollowedByVowel;
-
-			// Local feasibility check after taking this word
-			if(stats.jTotal + maxRemainingJ[depth] < 2
-					|| stats.lTotal + maxRemainingL[depth] < 2
-					|| (!stats.hasJFollowedByVowel && !canStillHaveJv[depth])
-					|| (!stats.hasLFollowedByVowel && !canStillHaveLv[depth])){
-				// rollback immediately
-				stats.jTotal = oldJ;
-				stats.lTotal = oldL;
-				stats.hasJFollowedByVowel = oldJv;
-				stats.hasLFollowedByVowel = oldLv;
-				continue;
-			}
-
 			solution[depth] = r.wordIndex;
 
 			for(Node j = r.R; j != r; j = j.R)
 				cover(j.C);
 
-			search(depth + 1, maxDepth, solution, stats);
+			search(depth + 1, maxDepth, solution);
 
 			for(Node j = r.L; j != r; j = j.L)
 				uncover(j.C);
-
-			stats.jTotal = oldJ;
-			stats.lTotal = oldL;
-			stats.hasJFollowedByVowel = oldJv;
-			stats.hasLFollowedByVowel = oldLv;
 		}
 
 		uncover(c);
