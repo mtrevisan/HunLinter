@@ -60,13 +60,14 @@ public class Main6{
 	}
 
 	// Extra DLX columns for global constraints
+	private static final boolean RELAX_J_L_CONSTRAINTS = true;
 	private static final int COL_J1 = ALPHABET_SIZE + 0;
 	private static final int COL_J2 = ALPHABET_SIZE + 1;
 	private static final int COL_JV = ALPHABET_SIZE + 2;
 	private static final int COL_L1 = ALPHABET_SIZE + 3;
 	private static final int COL_L2 = ALPHABET_SIZE + 4;
 	private static final int COL_LV = ALPHABET_SIZE + 5;
-	private static final int TOTAL_COLUMNS = ALPHABET_SIZE + 6;
+	private static final int TOTAL_COLUMNS = ALPHABET_SIZE + (RELAX_J_L_CONSTRAINTS? 0: 6);
 
 	// ===== DLX STRUCTURES =====
 
@@ -114,11 +115,6 @@ public class Main6{
 	private static List<WordFeatures> wordFeatures;
 
 	// ===== SOLUTIONS =====
-	private static int[] maxRemainingJ;
-	private static int[] maxRemainingL;
-	private static boolean[] canStillHaveJv;
-	private static boolean[] canStillHaveLv;
-
 
 	private static BufferedWriter solutionsWriter;
 	private static boolean foundAnyForCurrentK;
@@ -145,7 +141,6 @@ public class Main6{
 
 		analyzeAllWords();
 		sortByDensity();
-		precomputeGlobalUpperBounds();
 		buildDLX();
 		checkAlphabetCoverageOrFail();
 
@@ -421,17 +416,19 @@ public class Main6{
 			prev = c;
 		}
 
-		// Global constraint columns
-		columns[COL_J1] = new Column("J1");
-		columns[COL_J2] = new Column("J2");
-		columns[COL_JV] = new Column("JV");
-		columns[COL_L1] = new Column("L1");
-		columns[COL_L2] = new Column("L2");
-		columns[COL_LV] = new Column("LV");
+		if(!RELAX_J_L_CONSTRAINTS){
+			// Global constraint columns
+			columns[COL_J1] = new Column("J1");
+			columns[COL_J2] = new Column("J2");
+			columns[COL_JV] = new Column("JV");
+			columns[COL_L1] = new Column("L1");
+			columns[COL_L2] = new Column("L2");
+			columns[COL_LV] = new Column("LV");
 
-		for(int i = ALPHABET_SIZE; i < TOTAL_COLUMNS; i ++){
-			linkColumn(prev, columns[i]);
-			prev = columns[i];
+			for(int i = ALPHABET_SIZE; i < TOTAL_COLUMNS; i ++){
+				linkColumn(prev, columns[i]);
+				prev = columns[i];
+			}
 		}
 
 		root.L = prev;
@@ -442,27 +439,28 @@ public class Main6{
 			Node first = null;
 			// Alphabet coverage
 			final long mask = wordMasks[w];
-			for(int b = 0; b < ALPHABET_SIZE; b ++){
+			for(int b = 0; b < ALPHABET_SIZE; b ++)
 				if((mask & (1l << b)) != 0)
 					first = addNode(w, columns[b], first);
+
+			if(!RELAX_J_L_CONSTRAINTS){
+				// Global constraints
+				final WordFeatures f = wordFeatures.get(w);
+
+				if(f.jCount >= 1)
+					first = addNode(w, columns[COL_J1], first);
+				if(f.jCount >= 2)
+					first = addNode(w, columns[COL_J2], first);
+				if(f.jFollowedByVowel)
+					first = addNode(w, columns[COL_JV], first);
+
+				if(f.lCount >= 1)
+					first = addNode(w, columns[COL_L1], first);
+				if(f.lCount >= 2)
+					first = addNode(w, columns[COL_L2], first);
+				if(f.lFollowedByVowel)
+					first = addNode(w, columns[COL_LV], first);
 			}
-
-			// Global constraints
-			WordFeatures f = wordFeatures.get(w);
-
-			if(f.jCount >= 1)
-				first = addNode(w, columns[COL_J1], first);
-			if(f.jCount >= 2)
-				first = addNode(w, columns[COL_J2], first);
-			if(f.jFollowedByVowel)
-				first = addNode(w, columns[COL_JV], first);
-
-			if(f.lCount >= 1)
-				first = addNode(w, columns[COL_L1], first);
-			if(f.lCount >= 2)
-				first = addNode(w, columns[COL_L2], first);
-			if(f.lFollowedByVowel)
-				first = addNode(w, columns[COL_LV], first);
 		}
 	}
 
@@ -630,27 +628,6 @@ public class Main6{
 		});
 
 		reorder(idx);
-	}
-
-	/**
-	 * Precomputes suffix upper bounds for global constraints.
-	 * Used for aggressive early cutoff during search.
-	 */
-	private static void precomputeGlobalUpperBounds(){
-		final int n = words.size();
-		maxRemainingJ = new int[n + 1];
-		maxRemainingL = new int[n + 1];
-		canStillHaveJv = new boolean[n + 1];
-		canStillHaveLv = new boolean[n + 1];
-		for(int i = n - 1; i >= 0; i --){
-			final WordFeatures f = wordFeatures.get(i);
-
-			maxRemainingJ[i] = maxRemainingJ[i + 1] + f.jCount;
-			maxRemainingL[i] = maxRemainingL[i + 1] + f.lCount;
-
-			canStillHaveJv[i] = canStillHaveJv[i + 1] || f.jFollowedByVowel;
-			canStillHaveLv[i] = canStillHaveLv[i + 1] || f.lFollowedByVowel;
-		}
 	}
 
 	private static void reorder(final Integer[] idx){
