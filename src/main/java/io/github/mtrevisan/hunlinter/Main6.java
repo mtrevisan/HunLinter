@@ -15,6 +15,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -258,91 +259,80 @@ public class Main6{
 	}
 
 	/**
-	 * Removes words that are dominated by a single other word.
-	 * W1 is dominated if there exists W2 such that:
-	 * - mask(W2) ⊇ mask(W1)  (W2 covers all letters of W1, and possibly more)
-	 * - len(W2) ≤ len(W1)    (W2 is not longer, so it can only yield a better or equal duplicateRatio)
-	 * <p>
-	 * Note: this subsumes pruneSubsumedWords() entirely — if both are used,
-	 * pruneSubsumedWords() becomes redundant and can be removed.
+	 * Removes words dominated by another word.
+	 * A word W1 is dominated if there exists W2 such that:
+	 * - mask(W2) covers all bits of mask(W1)
+	 * - length(W2) <= length(W1)
+	 * - and W2 is strictly better (shorter or different mask)
 	 */
-	@Deprecated /* O(n²) */
-	private static void pruneDominatedWords2(){
-		final int n = words.size();
-		final boolean[] keep = new boolean[n];
-		Arrays.fill(keep, true);
-
-		for(int i = 0; i < n; i ++){
-			if(!keep[i])
-				continue;
-
-			final long mi = wordMasks[i];
-			final int li = words.get(i)
-				.length();
-			for(int j = 0; j < n; j ++){
-				if(i == j || !keep[j])
-					continue;
-
-				final long mj = wordMasks[j];
-				final int lj = words.get(j)
-					.length();
-				// W2=j dominates W1=i: covers at least the same letters and is not longer
-				if((mi & mj) == mi && lj <= li && (mi != mj || lj < li)){
-					keep[i] = false;
-					break;
-				}
-			}
-		}
-
-		rebuild(keep);
-	}
-
-	/* ≈ O(n·log(n)) */
 	private static void pruneDominatedWords(){
 		final int n = words.size();
+
+		// Precompute word lengths
+		final int[] wordLengths = new int[n];
+		for(int i = 0; i < n; i ++)
+			wordLengths[i] = words.get(i).length();
+
+		// keep[i] == false means the word is dominated and can be removed
 		final boolean[] keep = new boolean[n];
 		Arrays.fill(keep, true);
 
-		// Group word indices by number of bits set in their mask
-		final Map<Integer, List<Integer>> buckets = new HashMap<>();
-		for(int i = 0; i < n; i ++){
-			final int bc = Long.bitCount(wordMasks[i]);
-			buckets.computeIfAbsent(bc, k -> new ArrayList<>())
-				.add(i);
+		// Bucket word indices by bitcount using an array (faster than HashMap)
+		final List<Integer>[] buckets = new ArrayList[ALPHABET_SIZE + 1];
+		for(int i = 0; i <= ALPHABET_SIZE; i ++)
+			buckets[i] = new ArrayList<>();
+
+		for(int i = 0; i < n; i ++)
+			buckets[Long.bitCount(wordMasks[i])].add(i);
+
+		// Sort each bucket by increasing word length (shorter dominates sooner)
+		for(int bc = 0; bc <= ALPHABET_SIZE; bc ++){
+			final List<Integer> bucket = buckets[bc];
+			bucket.sort(Comparator.comparingInt(a -> wordLengths[a]));
 		}
 
-		// For each group of smaller/equal masks
+		// Process buckets from small to large bitcount
+		// For each bucket of smaller masks
 		for(int bc = 0; bc <= ALPHABET_SIZE; bc ++){
-			final List<Integer> smaller = buckets.get(bc);
-			if(smaller == null)
+			final List<Integer> smaller = buckets[bc];
+			if(smaller.isEmpty())
 				continue;
 
-			// Compare only against same or larger bit-count groups
-			for(int bc2 = bc; bc2 <= ALPHABET_SIZE; bc2 ++){
-				final List<Integer> larger = buckets.get(bc2);
-				if(larger == null)
+			for(int s = 0, ss = smaller.size(); s < ss; s ++){
+				final int i = smaller.get(s);
+				if(!keep[i])
 					continue;
 
-				for(int k = 0, smallerSize = smaller.size(); k < smallerSize; k ++){
-					final int i = smaller.get(k);
-					if(!keep[i])
+				final long mi = wordMasks[i];
+				final int li = wordLengths[i];
+
+				// Compare only against same or larger bitcounts
+				outer:
+				for(int bc2 = bc; bc2 <= ALPHABET_SIZE; bc2 ++){
+					final List<Integer> larger = buckets[bc2];
+					if(larger.isEmpty())
 						continue;
 
-					final long mi = wordMasks[i];
-					final int li = words.get(i).length();
-
-					for(int i1 = 0, largerSize = larger.size(); i1 < largerSize; i1 ++){
-						final int j = larger.get(i1);
+					for(int l = 0, ls = larger.size(); l < ls; l ++){
+						final int j = larger.get(l);
 						if(i == j || !keep[j])
 							continue;
 
-						final long mj = wordMasks[j];
-						final int lj = words.get(j).length();
-
-						// W2=j dominates W1=i: covers at least the same letters and is not longer
-						if((mi & mj) == mi && lj <= li && (mi != mj || lj < li)){
-							keep[i] = false;
+						// Bucket is length‑sorted → stop once too long
+						final int lj = wordLengths[j];
+						if(lj > li)
 							break;
+
+						final long mj = wordMasks[j];
+						// Skip identical masks with equal length
+						// (already handled by pruneIdenticalMasks)
+						if(mi == mj && lj == li)
+							continue;
+
+						// Dominating condition
+						if((mi & mj) == mi){
+							keep[i] = false;
+							break outer;
 						}
 					}
 				}
