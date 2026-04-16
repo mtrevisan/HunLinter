@@ -41,7 +41,7 @@ public class Main5{
 //	private static final String WORDS_FILE = "words.txt";
 	private static final String WORDS_FILE = "all.txt";
 	private static final String FILTERED_WORDS_FILE = "all.filtered.txt";
-	private static final String SOLUTIONS_FILE = "solutionsDLX-all.txt";
+	private static final String SOLUTIONS_FILE = "solutionsDLX-5.txt";
 
 	private static final int MIN_K = 4;
 

@@ -56,9 +56,12 @@ public class Main6{
 	// ===== DLX STRUCTURES =====
 
 	private static class Node{
-		Node L, R, U, D;
+		Node L;
+		Node R;
+		Node U;
+		Node D;
 		Column C;
-		int wordIndex;
+		final int wordIndex;
 
 		Node(final int wordIndex){
 			this.wordIndex = wordIndex;
@@ -103,13 +106,13 @@ public class Main6{
 	private static List<WordFeatures> wordFeatures;
 
 	// ===== SOLUTIONS =====
-
-	private static boolean foundAnyForCurrentK;
+	private static int maxJPerWord;
+	private static int maxLPerWord;
 
 	private static BufferedWriter solutionsWriter;
+	private static boolean foundAnyForCurrentK;
 
-	private static volatile boolean finishedNormally = false;
-
+	private static volatile boolean finishedNormally;
 
 	// ===== MAIN =====
 
@@ -130,6 +133,7 @@ public class Main6{
 			System.out.println("Loaded: " + words.size() + " words");
 
 		analyzeAllWords();
+		sortByDensity();
 		buildDLX();
 		checkAlphabetCoverageOrFail();
 
@@ -143,10 +147,8 @@ public class Main6{
 				System.err.println("\nShutdown requested.");
 
 			try{
-				if(solutionsWriter != null){
+				if(solutionsWriter != null)
 					solutionsWriter.close();
-					solutionsWriter = null;
-				}
 			}
 			catch(final IOException ioe){
 				ioe.printStackTrace();
@@ -160,9 +162,7 @@ public class Main6{
 
 			foundAnyForCurrentK = false;
 
-			final int[] solution = new int[k];
-
-			search(0, k, solution, new SolutionStats());
+			search(0, k, new int[k], new SolutionStats());
 
 			if(foundAnyForCurrentK){
 				System.out.println("Minimum K found: " + k);
@@ -185,7 +185,7 @@ public class Main6{
 
 		words = new ArrayList<>();
 		try(final BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-			StandardCharsets.UTF_8))){
+				StandardCharsets.UTF_8))){
 			String line;
 			while((line = br.readLine()) != null)
 				if(!line.isBlank())
@@ -257,7 +257,8 @@ public class Main6{
 	 * Note: this subsumes pruneSubsumedWords() entirely — if both are used,
 	 * pruneSubsumedWords() becomes redundant and can be removed.
 	 */
-	private static void pruneDominatedWords(){
+	@Deprecated /* O(n²) */
+	private static void pruneDominatedWords2(){
 		final int n = words.size();
 		final boolean[] keep = new boolean[n];
 		Arrays.fill(keep, true);
@@ -280,6 +281,61 @@ public class Main6{
 				if((mi & mj) == mi && lj <= li && (mi != mj || lj < li)){
 					keep[i] = false;
 					break;
+				}
+			}
+		}
+
+		rebuild(keep);
+	}
+
+	/* ≈ O(n·log(n)) */
+	private static void pruneDominatedWords(){
+		final int n = words.size();
+		final boolean[] keep = new boolean[n];
+		Arrays.fill(keep, true);
+
+		// Group word indices by number of bits set in their mask
+		final Map<Integer, List<Integer>> buckets = new HashMap<>();
+		for(int i = 0; i < n; i ++){
+			final int bc = Long.bitCount(wordMasks[i]);
+			buckets.computeIfAbsent(bc, k -> new ArrayList<>())
+				.add(i);
+		}
+
+		// For each group of smaller/equal masks
+		for(int bc = 0; bc <= ALPHABET_SIZE; bc ++){
+			final List<Integer> smaller = buckets.get(bc);
+			if(smaller == null)
+				continue;
+
+			// Compare only against same or larger bit-count groups
+			for(int bc2 = bc; bc2 <= ALPHABET_SIZE; bc2 ++){
+				final List<Integer> larger = buckets.get(bc2);
+				if(larger == null)
+					continue;
+
+				for(int k = 0, smallerSize = smaller.size(); k < smallerSize; k ++){
+					final int i = smaller.get(k);
+					if(!keep[i])
+						continue;
+
+					final long mi = wordMasks[i];
+					final int li = words.get(i).length();
+
+					for(int i1 = 0, largerSize = larger.size(); i1 < largerSize; i1 ++){
+						final int j = larger.get(i1);
+						if(i == j || !keep[j])
+							continue;
+
+						final long mj = wordMasks[j];
+						final int lj = words.get(j).length();
+
+						// W2=j dominates W1=i: covers at least the same letters and is not longer
+						if((mi & mj) == mi && lj <= li && (mi != mj || lj < li)){
+							keep[i] = false;
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -310,7 +366,7 @@ public class Main6{
 
 	private static void writeFilteredWords() throws IOException{
 		try(final BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(FILTERED_WORDS_FILE),
-			StandardCharsets.UTF_8))){
+				StandardCharsets.UTF_8))){
 			for(int i = 0, length = words.size(); i < length; i ++){
 				bw.write(words.get(i));
 				bw.newLine();
@@ -323,7 +379,7 @@ public class Main6{
 
 	private static WordFeatures analyzeWord(final String w){
 		final WordFeatures f = new WordFeatures();
-		for(int i = 0; i < w.length(); i ++){
+		for(int i = 0, length = w.length(); i < length; i ++){
 			final char c = Character.toLowerCase(w.charAt(i));
 			if(c == 'j'){
 				f.jCount ++;
@@ -345,8 +401,19 @@ public class Main6{
 
 	private static void analyzeAllWords(){
 		wordFeatures = new ArrayList<>(words.size());
-		for(String w : words)
-			wordFeatures.add(analyzeWord(w));
+
+		maxJPerWord = 0;
+		maxLPerWord = 0;
+		for(int i = 0, length = words.size(); i < length; i ++){
+			final String w = words.get(i);
+			final WordFeatures f = analyzeWord(w);
+			wordFeatures.add(f);
+
+			if(f.jCount > maxJPerWord)
+				maxJPerWord = f.jCount;
+			if(f.lCount > maxLPerWord)
+				maxLPerWord = f.lCount;
+		}
 	}
 
 	// ===== DLX BUILD =====
@@ -424,6 +491,12 @@ public class Main6{
 		if(depth == maxDepth)
 			return;
 
+		//anticipated pruning
+		final int remaining = maxDepth - depth;
+		if(stats.jTotal + remaining * maxJPerWord < 2
+				|| stats.lTotal + remaining * maxLPerWord < 2)
+			return;
+
 		final Column c = selectColumn();
 		if(c.size == 0)
 			return;
@@ -433,7 +506,8 @@ public class Main6{
 		for(Node r = c.D; r != c; r = r.D){
 			final WordFeatures wf = wordFeatures.get(r.wordIndex);
 
-			final int oldJ = stats.jTotal, oldL = stats.lTotal;
+			final int oldJ = stats.jTotal;
+			final int oldL = stats.lTotal;
 			final boolean oldJv = stats.hasJFollowedByVowel;
 			final boolean oldLv = stats.hasLFollowedByVowel;
 
@@ -496,6 +570,34 @@ public class Main6{
 			}
 		c.R.L = c;
 		c.L.R = c;
+	}
+
+	private static void sortByDensity(){
+		final Integer[] idx = new Integer[words.size()];
+		for(int i = 0, length = idx.length; i < length; i ++)
+			idx[i] = i;
+
+		Arrays.sort(idx, (a, b) -> Long.bitCount(wordMasks[b]) - Long.bitCount(wordMasks[a]));
+
+		reorder(idx);
+	}
+
+	private static void reorder(final Integer[] idx){
+		final int n = idx.length;
+
+		final List<String> newWords = new ArrayList<>(n);
+		final long[] newMasks = new long[n];
+		final List<WordFeatures> newFeatures = new ArrayList<>(n);
+		for(int i = 0; i < n; i ++){
+			final int oldIndex = idx[i];
+			newWords.add(words.get(oldIndex));
+			newMasks[i] = wordMasks[oldIndex];
+			newFeatures.add(wordFeatures.get(oldIndex));
+		}
+
+		words = newWords;
+		wordMasks = newMasks;
+		wordFeatures = newFeatures;
 	}
 
 	// ===== OUTPUT =====
