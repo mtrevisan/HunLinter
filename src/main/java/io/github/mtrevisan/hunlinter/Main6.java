@@ -52,6 +52,11 @@ public class Main6{
 		for(int i = 0; i < ALPHABET_SIZE; i ++)
 			CHAR_BIT[ALPHABET.get(i)] = i;
 	}
+	private static final boolean[] IS_VOWEL = new boolean[256];
+	static{
+		for(final char c : "aeiouàèéíòóúïü".toCharArray())
+			IS_VOWEL[c] = true;
+	}
 
 	// ===== DLX STRUCTURES =====
 
@@ -387,8 +392,8 @@ public class Main6{
 		return f;
 	}
 
-	private static boolean isVowel(final char c){
-		return ("aeiouàèéíòóúïü".indexOf(Character.toLowerCase(c)) >= 0);
+	private static boolean isVowel(final char chr){
+		return (chr < IS_VOWEL.length && IS_VOWEL[Character.toLowerCase(chr)]);
 	}
 
 	private static void analyzeAllWords(){
@@ -566,12 +571,54 @@ public class Main6{
 		c.L.R = c;
 	}
 
+	/**
+	 * Sorts words by descending heuristic score to reduce DLX branching.
+	 * <p>
+	 * The score favors words that:
+	 * - cover many alphabet letters (high bitCount)
+	 * - contribute strongly to global constraints (J/L counts and vowel-follow)
+	 * - are short (to minimize duplicate ratio)
+	 * <p>
+	 * Higher score = earlier in search.
+	 */
 	private static void sortByDensity(){
 		final Integer[] idx = new Integer[words.size()];
-		for(int i = 0, length = idx.length; i < length; i ++)
-			idx[i] = i;
+		Arrays.setAll(idx, i -> i);
 
-		Arrays.sort(idx, (a, b) -> Long.bitCount(wordMasks[b]) - Long.bitCount(wordMasks[a]));
+		Arrays.sort(idx, (a, b) -> {
+			final long ma = wordMasks[a];
+			final long mb = wordMasks[b];
+
+			final int bitsA = Long.bitCount(ma);
+			final int bitsB = Long.bitCount(mb);
+
+			final WordFeatures fa = wordFeatures.get(a);
+			final WordFeatures fb = wordFeatures.get(b);
+
+			final int lenA = words.get(a).length();
+			final int lenB = words.get(b).length();
+
+			/*
+			 * Heuristic scoring:
+			 * - bit coverage is the dominant factor
+			 * - J/L counts help satisfy global constraints early
+			 * - vowel-follow flags are bonuses
+			 * - shorter words are preferred
+			 */
+			final int scoreA = 10 * bitsA
+				+ 6 * (fa.jCount + fa.lCount)
+				+ 4 * (fa.jFollowedByVowel? 1: 0)
+				+ 4 * (fa.lFollowedByVowel? 1: 0)
+				- lenA;
+			final int scoreB = 10 * bitsB
+				+ 6 * (fb.jCount + fb.lCount)
+				+ 4 * (fb.jFollowedByVowel? 1: 0)
+				+ 4 * (fb.lFollowedByVowel? 1: 0)
+				- lenB;
+
+			// Descending order (highest score first)
+			return Integer.compare(scoreB, scoreA);
+		});
 
 		reorder(idx);
 	}
