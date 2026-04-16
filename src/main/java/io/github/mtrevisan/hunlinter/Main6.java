@@ -111,8 +111,11 @@ public class Main6{
 	private static List<WordFeatures> wordFeatures;
 
 	// ===== SOLUTIONS =====
-	private static int maxJPerWord;
-	private static int maxLPerWord;
+	private static int[] maxRemainingJ;
+	private static int[] maxRemainingL;
+	private static boolean[] canStillHaveJv;
+	private static boolean[] canStillHaveLv;
+
 
 	private static BufferedWriter solutionsWriter;
 	private static boolean foundAnyForCurrentK;
@@ -138,6 +141,7 @@ public class Main6{
 
 		analyzeAllWords();
 		sortByDensity();
+		precomputeGlobalUpperBounds();
 		buildDLX();
 		checkAlphabetCoverageOrFail();
 
@@ -399,17 +403,10 @@ public class Main6{
 	private static void analyzeAllWords(){
 		wordFeatures = new ArrayList<>(words.size());
 
-		maxJPerWord = 0;
-		maxLPerWord = 0;
 		for(int i = 0, length = words.size(); i < length; i ++){
 			final String w = words.get(i);
 			final WordFeatures f = analyzeWord(w);
 			wordFeatures.add(f);
-
-			if(f.jCount > maxJPerWord)
-				maxJPerWord = f.jCount;
-			if(f.lCount > maxLPerWord)
-				maxLPerWord = f.lCount;
 		}
 	}
 
@@ -490,10 +487,14 @@ public class Main6{
 		if(depth == maxDepth)
 			return;
 
-		//anticipated pruning
-		final int remaining = maxDepth - depth;
-		if(stats.jTotal + remaining * maxJPerWord < 2
-				|| stats.lTotal + remaining * maxLPerWord < 2)
+		//anticipated pruning:
+		// --- Hard upper bounds on J / L totals ---
+		// --- J followed by vowel must still be achievable ---
+		// --- L followed by vowel must still be achievable ---
+		if(stats.jTotal + maxRemainingJ[depth] < 2
+				|| stats.lTotal + maxRemainingL[depth] < 2
+				|| !stats.hasJFollowedByVowel && !canStillHaveJv[depth]
+				|| !stats.hasLFollowedByVowel && !canStillHaveLv[depth])
 			return;
 
 		final Column c = selectColumn();
@@ -514,6 +515,19 @@ public class Main6{
 			stats.lTotal += wf.lCount;
 			stats.hasJFollowedByVowel |= wf.jFollowedByVowel;
 			stats.hasLFollowedByVowel |= wf.lFollowedByVowel;
+
+			// Local feasibility check after taking this word
+			if(stats.jTotal + maxRemainingJ[depth] < 2
+					|| stats.lTotal + maxRemainingL[depth] < 2
+					|| (!stats.hasJFollowedByVowel && !canStillHaveJv[depth])
+					|| (!stats.hasLFollowedByVowel && !canStillHaveLv[depth])){
+				// rollback immediately
+				stats.jTotal = oldJ;
+				stats.lTotal = oldL;
+				stats.hasJFollowedByVowel = oldJv;
+				stats.hasLFollowedByVowel = oldLv;
+				continue;
+			}
 
 			solution[depth] = r.wordIndex;
 
@@ -621,6 +635,27 @@ public class Main6{
 		});
 
 		reorder(idx);
+	}
+
+	/**
+	 * Precomputes suffix upper bounds for global constraints.
+	 * Used for aggressive early cutoff during search.
+	 */
+	private static void precomputeGlobalUpperBounds(){
+		final int n = words.size();
+		maxRemainingJ = new int[n + 1];
+		maxRemainingL = new int[n + 1];
+		canStillHaveJv = new boolean[n + 1];
+		canStillHaveLv = new boolean[n + 1];
+		for(int i = n - 1; i >= 0; i --){
+			final WordFeatures f = wordFeatures.get(i);
+
+			maxRemainingJ[i] = maxRemainingJ[i + 1] + f.jCount;
+			maxRemainingL[i] = maxRemainingL[i + 1] + f.lCount;
+
+			canStillHaveJv[i] = canStillHaveJv[i + 1] || f.jFollowedByVowel;
+			canStillHaveLv[i] = canStillHaveLv[i + 1] || f.lFollowedByVowel;
+		}
 	}
 
 	private static void reorder(final Integer[] idx){
