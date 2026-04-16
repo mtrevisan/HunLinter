@@ -135,6 +135,7 @@ public class Main6{
 
 			pruneIdenticalMasks();
 			pruneDominatedWords();
+
 			writeFilteredWords();
 			System.out.printf(Locale.FRANCE, "Used:   %,d words%n", words.size());
 		}
