@@ -36,14 +36,19 @@ public class Main6{
 	// ===== CONFIGURATION =====
 	private static final String WORDS_FILE = "all.txt";
 	private static final String FILTERED_WORDS_FILE = "all.filtered.txt";
-	private static final String SOLUTIONS_FILE = "solutionsDLX-all.txt";
+	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 0.8-aeio.txt";
 
-	private static final int MIN_K = 4;
+	private static final int MIN_K = 5;
+	private static final double DUPLICATE_THRESHOLD = 0.33;
 
-	private static final List<Character> ALPHABET = List.of(
-		'C', 'Đ', 'Ñ', 'J', 'B', 'Ŧ', 'Ò', 'F', 'G', 'X', 'È',
-		'U', 'Ü', 'Ú', 'M', 'V', 'P', 'D', 'K', 'S', 'L',
-		'T', 'R', 'N', 'I', 'Ï', 'Í', 'O', 'Ó', 'A', 'À', 'E', 'É'
+	private static final boolean FULL_ALPHABET = false;
+	private static final List<Character> ALPHABET = (FULL_ALPHABET
+		? List.of('C', 'Đ', 'Ñ', 'J', 'B', 'Ŧ', 'Ò', 'F', 'G', 'X', 'È',
+			'U', 'Ü', 'Ú', 'M', 'V', 'P', 'D', 'K', 'S', 'L',
+			'T', 'R', 'N', 'I', 'Ï', 'Í', 'O', 'Ó', 'A', 'À', 'E', 'É')
+		: List.of('C', 'Đ', 'Ñ', 'J', 'B', 'Ŧ', 'Ò', 'F', 'G', 'X', 'È',
+			'U', 'M', 'V', 'P', 'D', 'K', 'S', 'L',
+			'T', 'R', 'N'/*, 'I', 'O', 'A', 'E'/**/)
 	);
 	private static final int ALPHABET_SIZE = ALPHABET.size();
 	// Fast char → bit lookup
@@ -167,7 +172,7 @@ public class Main6{
 		for(int k = Math.max(1, MIN_K); k <= maxPossible; k ++){
 			System.out.println("Trying K = " + k);
 
-			search(0, k, new int[k]);
+			search(0, k, new int[k], 0);
 
 			if(foundAnyForCurrentK){
 				System.out.println("Minimum K found: " + k);
@@ -217,14 +222,15 @@ public class Main6{
 		for(int i = 0, length = word.length(); i < length; i ++){
 			char c = Character.toLowerCase(word.charAt(i));
 			// Phonetic/orthographic normalization
-//			c = switch(c){
-//				case 'à' -> 'a';
-//				case 'é' -> 'e';
-//				case 'í', 'ï' -> 'i';
-//				case 'ó' -> 'o';
-//				case 'ú', 'ü' -> 'u';
-//				default -> c;
-//			};
+			if(!FULL_ALPHABET)
+				c = switch(c){
+					case 'à' -> 'a';
+					case 'é' -> 'e';
+					case 'í', 'ï' -> 'i';
+					case 'ó' -> 'o';
+					case 'ú', 'ü' -> 'u';
+					default -> c;
+				};
 
 			final int idx = CHAR_BIT[Character.toUpperCase(c)];
 			if(idx >= 0)
@@ -506,7 +512,10 @@ public class Main6{
 
 	// ===== DLX SEARCH WITH GLOBAL CONSTRAINTS =====
 
-	private static void search(final int depth, final int maxDepth, final int[] solution){
+	private static void search(final int depth, final int maxDepth, final int[] solution, final int totalLen){
+		if(totalLen / (double)ALPHABET_SIZE - 1. >= DUPLICATE_THRESHOLD)
+			return;
+
 		// If all columns are covered, we found a solution
 		if(root.R == root){
 			foundAnyForCurrentK = true;
@@ -532,7 +541,8 @@ public class Main6{
 			for(Node j = r.R; j != r; j = j.R)
 				cover(j.C);
 
-			search(depth + 1, maxDepth, solution);
+			final int newTotalLen = totalLen + words.get(r.wordIndex).length();
+			search(depth + 1, maxDepth, solution, newTotalLen);
 
 			for(Node j = r.L; j != r; j = j.L)
 				uncover(j.C);
@@ -613,14 +623,16 @@ public class Main6{
 			 * - shorter words are preferred
 			 */
 			final int scoreA = 10 * bitsA
+				+ (RELAX_J_L_CONSTRAINTS? 0:
 				+ 6 * (fa.jCount + fa.lCount)
 				+ 4 * (fa.jFollowedByVowel? 1: 0)
-				+ 4 * (fa.lFollowedByVowel? 1: 0)
+				+ 4 * (fa.lFollowedByVowel? 1: 0))
 				- lenA;
 			final int scoreB = 10 * bitsB
+				+ (RELAX_J_L_CONSTRAINTS? 0:
 				+ 6 * (fb.jCount + fb.lCount)
 				+ 4 * (fb.jFollowedByVowel? 1: 0)
-				+ 4 * (fb.lFollowedByVowel? 1: 0)
+				+ 4 * (fb.lFollowedByVowel? 1: 0))
 				- lenB;
 
 			// Descending order (highest score first)
@@ -665,12 +677,14 @@ public class Main6{
 				sj.add(words.get(solution[i]));
 
 			final double duplicateRatio = (double)totalLen / ALPHABET_SIZE - 1.;
-			final String line = String.format(Locale.ROOT, "%.2f", duplicateRatio) + ": " + sj;
-			solutionsWriter.write(line);
-			solutionsWriter.newLine();
-			solutionsWriter.flush();
+			if(duplicateRatio < DUPLICATE_THRESHOLD){
+				final String line = String.format(Locale.ROOT, "%.2f", duplicateRatio) + ": " + sj;
+				solutionsWriter.write(line);
+				solutionsWriter.newLine();
+				solutionsWriter.flush();
 
-			System.out.println(line);
+				System.out.println(line);
+			}
 		}
 		catch(final IOException ioe){
 			throw new UncheckedIOException(ioe);
