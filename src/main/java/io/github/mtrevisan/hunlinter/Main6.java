@@ -34,9 +34,9 @@ import java.util.StringJoiner;
 public class Main6{
 
 	// ===== CONFIGURATION =====
-	private static final String WORDS_FILE = "all.txt";
-	private static final String FILTERED_WORDS_FILE = "all.filtered.txt";
-	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 0.8-aeio.txt";
+	private static final String WORDS_FILE = "all - 0.9.txt";
+	private static final String FILTERED_WORDS_FILE = "all.filtered - 0.9.txt";
+	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 0.9-aeio.txt";
 
 	private static final int MIN_K = 5;
 	private static final double DUPLICATE_THRESHOLD = 0.33;
