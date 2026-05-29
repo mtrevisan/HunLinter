@@ -82,7 +82,9 @@ public final class FontHelper{
 
 			LOGGER.info("System fonts loaded");
 			final List<Font> allFonts = new ArrayList<>(familyNames.length);
-			for(final String familyName : familyNames){
+			for(int i = 0, length = familyNames.length; i < length; i ++){
+				final String familyName = familyNames[i];
+
 				final Font font = new Font(familyName, Font.PLAIN, 20);
 				//filter out non-plain fonts
 				//filter out those fonts which have `I` equals to `1` or `l`, and 'O' to '0'
@@ -92,6 +94,10 @@ public final class FontHelper{
 					allFonts.add(font);
 				else
 					LOGGER.debug("Font '{}' discarded because has some identical letters (l/I/1, or O/0)", font.getName());
+
+
+				if(i % 10 == 0)
+					Thread.yield();
 			}
 			LOGGER.info("System fonts filtered");
 
