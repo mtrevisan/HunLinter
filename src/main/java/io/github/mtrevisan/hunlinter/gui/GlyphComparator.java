@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2022 Mauro Trevisan
+ * Copyright (c) 2019-2026 Mauro Trevisan
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,12 +24,12 @@
  */
 package io.github.mtrevisan.hunlinter.gui;
 
-import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
+import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 
 public final class GlyphComparator{
@@ -45,46 +45,52 @@ public final class GlyphComparator{
 	 * @param chrs	Characters to be checked for equality.
 	 * @return	Whether some given characters are identical in their glyph representation.
 	 */
-	public static boolean haveIdenticalGlyphs(final Font font, final float maxDifferenceThreshold, final char... chrs){
-		final BufferedImage[] glyphs = new BufferedImage[chrs.length];
-		glyphs[0] = renderImage(font, chrs[0]);
-		for(int i = 0; i < chrs.length - 1; i ++)
-			for(int j = i + 1; j < chrs.length; j ++){
-				if(glyphs[j] == null)
-					glyphs[j] = renderImage(font, chrs[j]);
-
-				if(visualSimilarity(glyphs[i], glyphs[j]) < maxDifferenceThreshold)
-					return true;
-			}
+	public static boolean haveIdenticalGlyphs(Font font, float maxDifferenceThreshold, char... chrs){
+		final FontRenderContext frc = new FontRenderContext(null, true, true);
+		final boolean[][] base = rasterizeGlyph(font, frc, chrs[0]);
+		for(int i = 1; i < chrs.length; i ++){
+			final boolean[][] other = rasterizeGlyph(font, frc, chrs[i]);
+			if(visualSimilarity(base, other, maxDifferenceThreshold))
+				return true;
+		}
 		return false;
 	}
 
-	/**
-	 * Render a BufferedImage containing the given character.
-	 *
-	 * @param font	The font to render the character in
-	 * @param chr	Character to render
-	 * @return	The image of the given character
-	 */
-	private static BufferedImage renderImage(final Font font, final char chr){
-		final BufferedImage img = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-		final Graphics g = img.createGraphics();
-		g.setColor(Color.BLACK);
-		g.setFont(font);
-		final int baseline = g.getFontMetrics().getMaxAscent() + 1;
-		g.drawString(Character.toString(chr), 1, baseline);
-		g.dispose();
-		return img;
+	// Converts a glyph into a small normalized bitmap (boolean grid)
+	private static boolean[][] rasterizeGlyph(final Font font, final FontRenderContext frc, final char chr){
+		final int size = 32;
+		final boolean[][] grid = new boolean[size][size];
+		final GlyphVector gv = font.createGlyphVector(frc, new char[]{chr});
+		final Shape shape = gv.getOutline();
+		final Rectangle2D bounds = shape.getBounds2D();
+		if(bounds.isEmpty())
+			return grid;
+
+		final double scaleX = size / bounds.getWidth();
+		final double scaleY = size / bounds.getHeight();
+		final AffineTransform at = new AffineTransform();
+		at.translate(-bounds.getX(), -bounds.getY());
+		at.scale(scaleX, scaleY);
+		final Shape normalized = at.createTransformedShape(shape);
+
+		for(int y = 0; y < size; y ++)
+			for(int x = 0; x < size; x ++)
+				if(normalized.contains(x, y))
+					grid[y][x] = true;
+		return grid;
 	}
 
-	private static float visualSimilarity(final RenderedImage img1, final RenderedImage img2){
-		final DataBuffer data1 = img1.getData().getDataBuffer();
-		final DataBuffer data2 = img2.getData().getDataBuffer();
-		final int size = data1.getSize();
-		int difference = 0;
-		for(int i = 0; i < size; i ++)
-			difference += (data1.getElem(i) != data2.getElem(i)? 1: 0);
-		return (float)difference / size;
+	private static boolean visualSimilarity(final boolean[][] a, final boolean[][] b, final float threshold){
+		int diff = 0;
+		int total = a.length * a[0].length;
+		for(int y = 0; y < a.length; y ++)
+			for(int x = 0; x < a[y].length; x ++)
+				if(a[y][x] != b[y][x]){
+					diff ++;
+					if((float)diff / total > threshold)
+						return false;
+				}
+		return (float)diff / total < threshold;
 	}
 
 }

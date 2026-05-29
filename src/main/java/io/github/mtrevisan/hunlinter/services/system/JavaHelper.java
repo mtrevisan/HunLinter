@@ -51,7 +51,7 @@ public final class JavaHelper{
 
 	private static final char QUOTATION_MARK = '"';
 
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(2);
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.min(4, Runtime.getRuntime().availableProcessors() - 1));
 
 
 	private JavaHelper(){}
