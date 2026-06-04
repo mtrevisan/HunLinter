@@ -39,7 +39,7 @@ public class Main6{
 	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 0.9-aeio.txt";
 
 	private static final int MIN_K = 5;
-	private static final double DUPLICATE_THRESHOLD = 0.33;
+	private static final double DUPLICATE_THRESHOLD = 0.28;
 
 	private static final boolean FULL_ALPHABET = false;
 	private static final List<Character> ALPHABET = (FULL_ALPHABET
@@ -199,7 +199,7 @@ public class Main6{
 			String line;
 			while((line = br.readLine()) != null)
 				if(!line.isBlank())
-					words.add(line.trim());
+					words.add(line);
 		}
 
 		final int length = words.size();
@@ -249,7 +249,8 @@ public class Main6{
 		// Map mask → index of the shortest word seen so far with that mask
 		final Map<Long, Integer> best = new HashMap<>();
 		for(int i = 0, length = words.size(); i < length; i ++)
-			best.merge(wordMasks[i], i, (a, b) -> words.get(b).length() < words.get(a).length()? b: a);
+			best.merge(wordMasks[i], i,
+				(a, b) -> words.get(b).replace("-", StringUtils.EMPTY).length() < words.get(a).replace("-", StringUtils.EMPTY).length()? b: a);
 
 		// Mark as kept only the winning index for each mask
 		final boolean[] keep = new boolean[words.size()];
@@ -272,7 +273,9 @@ public class Main6{
 		// Precompute word lengths
 		final int[] wordLengths = new int[n];
 		for(int i = 0; i < n; i ++)
-			wordLengths[i] = words.get(i).length();
+			wordLengths[i] = words.get(i)
+				.replace("-", StringUtils.EMPTY)
+				.length();
 
 		// keep[i] == false means the word is dominated and can be removed
 		final boolean[] keep = new boolean[n];
@@ -541,7 +544,9 @@ public class Main6{
 			for(Node j = r.R; j != r; j = j.R)
 				cover(j.C);
 
-			final int newTotalLen = totalLen + words.get(r.wordIndex).length();
+			final int newTotalLen = totalLen + words.get(r.wordIndex)
+				.replace("-", StringUtils.EMPTY)
+				.length();
 			search(depth + 1, maxDepth, solution, newTotalLen);
 
 			for(Node j = r.L; j != r; j = j.L)
@@ -612,8 +617,12 @@ public class Main6{
 			final WordFeatures fa = wordFeatures.get(a);
 			final WordFeatures fb = wordFeatures.get(b);
 
-			final int lenA = words.get(a).length();
-			final int lenB = words.get(b).length();
+			final int lenA = words.get(a)
+				.replace("-", StringUtils.EMPTY)
+				.length();
+			final int lenB = words.get(b)
+				.replace("-", StringUtils.EMPTY)
+				.length();
 
 			/*
 			 * Heuristic scoring:
@@ -670,6 +679,7 @@ public class Main6{
 			int totalLen = 0;
 			for(int i = 0; i < depth; i ++)
 				totalLen += words.get(solution[i])
+					.replace("-", StringUtils.EMPTY)
 					.length();
 
 			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
