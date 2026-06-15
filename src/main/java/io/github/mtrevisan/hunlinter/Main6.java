@@ -34,12 +34,14 @@ import java.util.StringJoiner;
 public class Main6{
 
 	// ===== CONFIGURATION =====
-	private static final String WORDS_FILE = "all - 0.9.txt";
-	private static final String FILTERED_WORDS_FILE = "all.filtered - 0.9.txt";
-	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 0.9-aeio.txt";
+	private static final String WORDS_FILE = "all - 1.0.txt";
+	private static final String FILTERED_WORDS_FILE = "all.filtered - 1.0.txt";
+	private static final String SOLUTIONS_FILE = "solutionsDLX-all - 4.txt";
 
-	private static final int MIN_K = 5;
-	private static final double DUPLICATE_THRESHOLD = 0.28;
+//	private static final int MIN_K = 5;
+//	private static final double DUPLICATE_THRESHOLD = 0.28;
+	private static final int MIN_K = 4;
+	private static final double DUPLICATE_THRESHOLD = 0.33;
 
 	private static final boolean FULL_ALPHABET = false;
 	private static final List<Character> ALPHABET = (FULL_ALPHABET
@@ -92,11 +94,13 @@ public class Main6{
 	private static class Column extends Node{
 		int size;
 		final String name;
+		final int colIndex;
 
-		Column(final String name){
+		Column(final String name, final int colIndex){
 			super(-1);
 
 			this.name = name;
+			this.colIndex = colIndex;
 			this.C = this;
 			L = R = U = D = this;
 		}
@@ -118,6 +122,15 @@ public class Main6{
 	private static List<String> words;
 	private static long[] wordMasks;
 	private static List<WordFeatures> wordFeatures;
+
+	// Cache word lengths and threshold to avoid string manipulation and float division in recursion
+	private static int[] wordLengths;
+	private static int maxAllowedLength;
+
+	// Heuristic Pruning
+	private static int remainingAlphabetColumns;
+	private static int maxBitsPerWord;
+	private static int minWordLength;
 
 	// ===== SOLUTIONS =====
 
@@ -146,6 +159,20 @@ public class Main6{
 
 		analyzeAllWords();
 		sortByDensity();
+
+		// Precompute final word lengths and strict integer bounds after sorting
+		wordLengths = new int[words.size()];
+		int maxBits = 0;
+		int minLen = Integer.MAX_VALUE;
+		for(int i = 0; i < words.size(); i ++){
+			wordLengths[i] = words.get(i).replace("-", StringUtils.EMPTY).length();
+			maxBits = Math.max(maxBits, Long.bitCount(wordMasks[i]));
+			minLen = Math.min(minLen, wordLengths[i]);
+		}
+		maxAllowedLength = (int) Math.ceil((DUPLICATE_THRESHOLD + 1.0) * ALPHABET_SIZE);
+		maxBitsPerWord = maxBits;
+		minWordLength = minLen;
+
 		buildDLX();
 		checkAlphabetCoverageOrFail();
 
@@ -171,6 +198,9 @@ public class Main6{
 		final int maxPossible = words.size();
 		for(int k = Math.max(1, MIN_K); k <= maxPossible; k ++){
 			System.out.println("Trying K = " + k);
+
+			// Reset the dynamic counter of discovered alphabet letters
+			remainingAlphabetColumns = ALPHABET_SIZE;
 
 			search(0, k, new int[k], 0);
 
@@ -290,10 +320,8 @@ public class Main6{
 			buckets[Long.bitCount(wordMasks[i])].add(i);
 
 		// Sort each bucket by increasing word length (shorter dominates sooner)
-		for(int bc = 0; bc <= ALPHABET_SIZE; bc ++){
-			final List<Integer> bucket = buckets[bc];
-			bucket.sort(Comparator.comparingInt(a -> wordLengths[a]));
-		}
+		for(int bc = 0; bc <= ALPHABET_SIZE; bc ++)
+			buckets[bc].sort(Comparator.comparingInt(a -> wordLengths[a]));
 
 		// Process buckets from small to large bitcount
 		// For each bucket of smaller masks
@@ -410,7 +438,7 @@ public class Main6{
 	// ===== DLX BUILD =====
 
 	private static void buildDLX(){
-		root = new Column("ROOT");
+		root = new Column("ROOT", -1);
 		root.L = root;
 		root.R = root;
 
@@ -418,7 +446,7 @@ public class Main6{
 		Column prev = root;
 		// Alphabet columns
 		for(int i = 0; i < ALPHABET_SIZE; i ++){
-			final Column c = new Column(ALPHABET.get(i).toString());
+			final Column c = new Column(ALPHABET.get(i).toString(), i);
 			columns[i] = c;
 
 			linkColumn(prev, c);
@@ -427,12 +455,12 @@ public class Main6{
 
 		if(!RELAX_J_L_CONSTRAINTS){
 			// Global constraint columns
-			columns[COL_J1] = new Column("J1");
-			columns[COL_J2] = new Column("J2");
-			columns[COL_JV] = new Column("JV");
-			columns[COL_L1] = new Column("L1");
-			columns[COL_L2] = new Column("L2");
-			columns[COL_LV] = new Column("LV");
+			columns[COL_J1] = new Column("J1", COL_J1);
+			columns[COL_J2] = new Column("J2", COL_J2);
+			columns[COL_JV] = new Column("JV", COL_JV);
+			columns[COL_L1] = new Column("L1", COL_L1);
+			columns[COL_L2] = new Column("L2", COL_L2);
+			columns[COL_LV] = new Column("LV", COL_LV);
 
 			for(int i = ALPHABET_SIZE; i < TOTAL_COLUMNS; i ++){
 				linkColumn(prev, columns[i]);
@@ -516,7 +544,14 @@ public class Main6{
 	// ===== DLX SEARCH WITH GLOBAL CONSTRAINTS =====
 
 	private static void search(final int depth, final int maxDepth, final int[] solution, final int totalLen){
-		if(totalLen / (double)ALPHABET_SIZE - 1. >= DUPLICATE_THRESHOLD)
+//		if(totalLen / (double)ALPHABET_SIZE - 1. >= DUPLICATE_THRESHOLD)
+//			return;
+		final int remWords = maxDepth - depth;
+		// Letter mismatch pruning (There are not enough words to cover the remaining letters)
+		if(remainingAlphabetColumns > remWords * maxBitsPerWord)
+			return;
+		// Length-bound pruning (Even using the shortest possible words we would exceed the threshold)
+		if(totalLen + remWords * minWordLength >= maxAllowedLength)
 			return;
 
 		// If all columns are covered, we found a solution
@@ -539,14 +574,18 @@ public class Main6{
 		cover(c);
 
 		for(Node r = c.D; r != c; r = r.D){
-			solution[depth] = r.wordIndex;
+			final int wIdx = r.wordIndex;
+			// Pruning Fail-Fast. If we exceed the threshold, we skip the entire branch without making unnecessary
+			// changes and covers on sibling nodes.
+			final int newTotalLen = totalLen + wordLengths[wIdx];
+			if(newTotalLen >= maxAllowedLength)
+				continue;
+
+			solution[depth] = wIdx;
 
 			for(Node j = r.R; j != r; j = j.R)
 				cover(j.C);
 
-			final int newTotalLen = totalLen + words.get(r.wordIndex)
-				.replace("-", StringUtils.EMPTY)
-				.length();
 			search(depth + 1, maxDepth, solution, newTotalLen);
 
 			for(Node j = r.L; j != r; j = j.L)
@@ -564,7 +603,8 @@ public class Main6{
 			if(c.size < min){
 				min = c.size;
 				best = c;
-				if(min == 1)
+				// If we find an unavoidable column (0 or 1), there is no point in looking further
+				if(min <= 1)
 					break;
 			}
 		}
@@ -574,6 +614,11 @@ public class Main6{
 	private static void cover(final Column c){
 		c.R.L = c.L;
 		c.L.R = c.R;
+
+		// Subtract from the counter if we are covering a letter of the alphabet
+		if(c.colIndex >= 0 && c.colIndex < ALPHABET_SIZE)
+			remainingAlphabetColumns --;
+
 		for(Node i = c.D; i != c; i = i.D)
 			for(Node j = i.R; j != i; j = j.R){
 				j.D.U = j.U;
@@ -589,6 +634,11 @@ public class Main6{
 				j.D.U = j;
 				j.U.D = j;
 			}
+
+		// Reset the counter
+		if(c.colIndex >= 0 && c.colIndex < ALPHABET_SIZE)
+			remainingAlphabetColumns ++;
+
 		c.R.L = c;
 		c.L.R = c;
 	}
@@ -678,9 +728,7 @@ public class Main6{
 		try{
 			int totalLen = 0;
 			for(int i = 0; i < depth; i ++)
-				totalLen += words.get(solution[i])
-					.replace("-", StringUtils.EMPTY)
-					.length();
+				totalLen += wordLengths[solution[i]];
 
 			final StringJoiner sj = new StringJoiner(StringUtils.SPACE);
 			for(int i = 0; i < depth; i ++)
