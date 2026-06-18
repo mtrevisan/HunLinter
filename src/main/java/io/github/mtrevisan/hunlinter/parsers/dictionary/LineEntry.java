@@ -79,9 +79,6 @@ public class LineEntry implements Serializable{
 
 	public static LineEntry createFromWithWords(final LineEntry entry, final String condition,
 			final Collection<String> words){
-//FIXME
-if(entry.removal.length() > condition.length())
-	System.err.println("WARNING: removal length is greater than condition length");
 		return new LineEntry(entry.removal, entry.addition, condition, words);
 	}
 

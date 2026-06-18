@@ -217,21 +217,26 @@ public class RulesReducer{
 			final Set<String> groupSet = new HashSet<>(groupFrom);
 			final List<String> nonTargetsUnion = new ArrayList<>();
 			for(final LineEntry e : owners)
-				for(final String u : e.from){
+				for(final String u : e.from)
 					if(!groupSet.contains(u))
 						nonTargetsUnion.add(u);
-				}
 
 
-			//FIXME problem: length of `condition` less than length of `removal`
 			//partition groupFrom into maximal clean subsets using a reverse trie
 			final List<SubsetBySuffix> subsets = partitionByCleanSuffixes(groupFrom, nonTargetsUnion);
 
 			//emit clones: for each subset, produce one rule per owner with the same 'from' set
 			for(final SubsetBySuffix ss : subsets){
 				final String suffix = ss.suffix;
-				for(final LineEntry ownerEntry : owners)
-					result.add(LineEntry.createFrom(ownerEntry, suffix));
+				for(final LineEntry ownerEntry : owners){
+					final LineEntry entry = LineEntry.createFrom(ownerEntry, suffix);
+					//FIXME problem: length of `condition` less than length of `removal`... fixed? what if `removal`
+					// contains a group?
+					if(entry.condition.isEmpty())
+						entry.condition = entry.removal;
+
+					result.add(entry);
+				}
 			}
 		}
 
@@ -252,13 +257,13 @@ public class RulesReducer{
 	}
 
 	/**
-	 * Partition 'groupFrom' into maximal subsets, each identified by a suffix 's' such that:
-	 * - s length >= minLen,
-	 * - no 'nonTarget' ends with s,
-	 * - the subset is exactly the set of 'groupFrom' strings that end with s,
-	 * - and no ancestor suffix of s satisfies the same property (maximality by depth).
+	 * Partition `groupFrom` into maximal subsets, each identified by a suffix `s` such that:
+	 * - `s` length >= minLen,
+	 * - no `nonTarget` ends with `s`,
+	 * - the subset is exactly the set of `groupFrom` strings that end with `s`,
+	 * - and no ancestor suffix of `s` satisfies the same property (maximality by depth).
 	 * <p>
-	 * We use a reverse trie over 'groupFrom' to discover deepest clean suffixes.
+	 * We use a reverse trie over `groupFrom` to discover the deepest clean suffixes.
 	 */
 	private static List<SubsetBySuffix> partitionByCleanSuffixes(final List<String> groupFrom,
 			final List<String> nonTargetsUnion){
@@ -298,12 +303,12 @@ public class RulesReducer{
 
 	/**
 	 * Depth-first traversal: at each node, we know the suffix represented by the path.
-	 * Because we traverse from last character to first, we build the human-readable suffix
-	 * by prepending the current character to 'suffixSoFar'.
+	 * Because we traverse from the last character to the first, we build the human-readable suffix
+	 * by prepending the current character to `suffixSoFar`.
 	 * <p>
 	 * If the suffix is "clean" (length >= minLen and no non-target ends with it), we emit
 	 * a subset for all strings under this node and DO NOT descend further (maximality).
-	 * Otherwise we keep descending.
+	 * Otherwise, we keep descending.
 	 */
 	private static void dfsCollect(final TrieNode node, final String suffixSoFar, final List<String> groupFrom,
 			final List<String> nonTargetsUnion, final List<SubsetBySuffix> out){
@@ -476,7 +481,7 @@ public class RulesReducer{
 	}
 
 	/**
-	 * Compacts a collection of {@code LineEntry}s by grouping and merging the entries based on their  corresponding
+	 * Compacts a collection of {@code LineEntry}s by grouping and merging the entries based on their corresponding
 	 * keys built from conditions, removals, and sorted/hashed additions. Entries with the same key are merged,
 	 * consolidating their `from` fields.
 	 *
@@ -738,7 +743,25 @@ public class RulesReducer{
 			if(genericOnlyToken.isEmpty() && specificOnlyToken.isEmpty()){
 				//if the conditions of only the generic token and only the specific token are both empty
 				// (S1 = ∅ ∧ S2 = ∅), add a token to the head of the generic condition...
-				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				final Set<Character> otherTokens = new HashSet<>();
+				for(final LineEntry entry : entries){
+					if(entry == generic)
+						continue;
+
+					if(entry.condition.endsWith(generic.condition)){
+						final String[] entryCond = RegexSequencer.splitSequence(entry.condition);
+						if(entryCond.length > genericConditionLength){
+							final Set<Character> token = entry.extractGroup(genericConditionLength);
+							otherTokens.addAll(token);
+						}
+					}
+				}
+
+				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size());
+				final String newGenericCondition = (chooseRatifyingOverNegated
+						? RegexHelper.makeGroup(genericToken, comparator)
+						: RegexHelper.makeNotGroup(otherTokens, comparator))
+					+ generic.condition;
 				final LineEntry newGeneric = LineEntry.createFrom(generic, newGenericCondition);
 				entries.remove(generic);
 				if(!entries.contains(newGeneric))
@@ -800,8 +823,25 @@ public class RulesReducer{
 				}
 			}
 			else{
-				//specialize the generic rule by adding a token at the head of the condition
-				final String newGenericCondition = RegexHelper.makeGroup(genericToken, comparator) + generic.condition;
+				final Set<Character> otherTokens = new HashSet<>();
+				for(final LineEntry entry : entries){
+					if(entry == generic)
+						continue;
+
+					if(entry.condition.endsWith(generic.condition)){
+						final String[] entryCond = RegexSequencer.splitSequence(entry.condition);
+						if(entryCond.length > genericConditionLength){
+							final Set<Character> token = entry.extractGroup(genericConditionLength);
+							otherTokens.addAll(token);
+						}
+					}
+				}
+
+				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size());
+				final String newGenericCondition = (chooseRatifyingOverNegated
+						? RegexHelper.makeGroup(genericToken, comparator)
+						: RegexHelper.makeNotGroup(otherTokens, comparator))
+					+ generic.condition;
 				final LineEntry newGeneric = LineEntry.createFrom(generic, newGenericCondition);
 				entries.remove(generic);
 				if(!entries.contains(newGeneric))
