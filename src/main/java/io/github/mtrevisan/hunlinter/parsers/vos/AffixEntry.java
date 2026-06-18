@@ -380,7 +380,7 @@ public class AffixEntry{
 		return (Objects.equals(parent, rhs.parent)
 			&& removing.equals(rhs.removing)
 			&& appending.equals(rhs.appending)
-//			&& Objects.equals(continuationFlags, rhs.continuationFlags)
+			&& Objects.equals(continuationFlags, rhs.continuationFlags)
 			&& condition.equals(rhs.condition)
 			&& Objects.equals(morphologicalFields, rhs.morphologicalFields));
 	}
@@ -390,7 +390,7 @@ public class AffixEntry{
 		int result = (parent == null? 0: parent.hashCode());
 		result = 31 * result + (removing == null? 0: removing.hashCode());
 		result = 31 * result + (appending == null? 0: appending.hashCode());
-//		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
+		result = 31 * result + (continuationFlags == null? 0: continuationFlags.hashCode());
 		result = 31 * result + (condition == null? 0: condition.hashCode());
 		result = 31 * result + (morphologicalFields == null? 0: morphologicalFields.hashCode());
 		return result;
