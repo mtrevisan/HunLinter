@@ -255,11 +255,11 @@ class RulesReducerSuffixTest{
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "ato", "[nr]", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
+			new LineEntry("", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor", "sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),
 			new LineEntry("èl", "elato", "èl", Arrays.asList("vedèl", "kanèl", "kapèl")),
 			new LineEntry("", "ta", "[^bklns]a", Arrays.asList("kalandra", "kora", "maca", "savia", "aria", "inkuixitora", "marenda", "kuadra", "inspetora", "toxa", "grada", "merenda", "kara", "fatora")),
 			new LineEntry("", "ato", "[^è]l", Arrays.asList("rusiñol", "ruxiñol", "rosiñol", "mol", "đeneral", "roxiñol", "xel")),
-			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧoko", "porko", "ŧedro", "bosko", "manđo", "soko", "sorgo", "visio", "muso", "borso", "manxo", "kuadro", "sporko")),
+			new LineEntry("o", "ato", "[^bkmv]o", Arrays.asList("verdo", "mando", "viŧio", "savio", "speso", "kalandro", "vexo", "konto", "granfo", "solfro", "libro", "đilio", "ŧedro", "manđo", "sorgo", "visio", "muso", "borso", "manxo", "kuadro")),
 			new LineEntry("òba", "obata", "òba", Arrays.asList("gòba", "ròba")),
 			new LineEntry("òka", "okata", "òka", Arrays.asList("òka", "pòka")),
 			new LineEntry("èla", "elata", "èla", Arrays.asList("kapèla", "vedèla")),

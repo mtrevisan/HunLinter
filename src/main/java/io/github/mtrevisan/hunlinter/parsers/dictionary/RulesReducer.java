@@ -757,7 +757,7 @@ public class RulesReducer{
 					}
 				}
 
-				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size());
+				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size() + 1);
 				final String newGenericCondition = (chooseRatifyingOverNegated
 						? RegexHelper.makeGroup(genericToken, comparator)
 						: RegexHelper.makeNotGroup(otherTokens, comparator))
@@ -770,38 +770,49 @@ public class RulesReducer{
 			else{
 				//... otherwise, replace both rules with three rules, each with the condition of only the first (S1), only
 				// the second (S2), and the intersection (I), redistribute the words in "from" appropriately
-				if(!genericOnlyToken.isEmpty()){
-					entries.remove(generic);
-					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(genericOnlyToken, comparator));
-					for(int i = (genericCondition.length > 1? 1: 0), length = genericCondition.length - genericConditionLength + 1; i < length; i ++)
-						sb.append(genericCondition[i]);
-					final String genericOnlyCondition = sb.toString();
-					final LineEntry newGenericOnly = LineEntry.createFrom(generic, genericOnlyCondition);
-					if(!entries.contains(newGenericOnly))
-						entries.add(newGenericOnly);
-				}
-				if(!specificOnlyToken.isEmpty()){
-					entries.remove(specific);
 
-					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(specificOnlyToken, comparator));
-					for(int i = (specificCondition.length > 1? 1: 0), length = specificCondition.length - genericConditionLength + 1; i < length; i ++)
-						sb.append(specificCondition[i]);
-					final String specificOnlyCondition = sb.toString();
-					final LineEntry newSpecificOnly = LineEntry.createFrom(specific, specificOnlyCondition);
-					if(!entries.contains(newSpecificOnly))
-						entries.add(newSpecificOnly);
-				}
-				if(!intersectionToken.isEmpty()){
-					final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(intersectionToken, comparator));
-					for(int i = (genericCondition.length > 1? 1: 0), length = genericCondition.length - genericConditionLength + 1; i < length; i ++)
-						sb.append(genericCondition[i]);
-					final String intersectionCondition = sb.toString();
-					final LineEntry newIntersectionFromGeneric = LineEntry.createFrom(generic, intersectionCondition);
-					final LineEntry newIntersectionFromSpecific = LineEntry.createFrom(specific, intersectionCondition);
-					if(!entries.contains(newIntersectionFromGeneric))
-						entries.add(newIntersectionFromGeneric);
-					if(!entries.contains(newIntersectionFromSpecific))
-						entries.add(newIntersectionFromSpecific);
+				final boolean applyExclusionLadder = applyExclusionLadder(generic, genericCondition,
+					specificCondition,
+					entries, comparator,
+					genericConditionLength);
+
+				// If they share the same condition length or already contain character classes (e.g., "[ab]o"),
+				// it makes sense to split into 3 parts to cleanly isolate the intersection.
+				int specificConditionLength = specificCondition.length;
+				if(genericConditionLength == specificConditionLength || !applyExclusionLadder){
+					if(!genericOnlyToken.isEmpty()){
+						entries.remove(generic);
+						final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(genericOnlyToken, comparator));
+						for(int i = (genericConditionLength > 1? 1: 0), length = 1; i < length; i ++)
+							sb.append(genericCondition[i]);
+						final String genericOnlyCondition = sb.toString();
+						final LineEntry newGenericOnly = LineEntry.createFrom(generic, genericOnlyCondition);
+						if(!entries.contains(newGenericOnly))
+							entries.add(newGenericOnly);
+					}
+					if(!specificOnlyToken.isEmpty()){
+						entries.remove(specific);
+
+						final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(specificOnlyToken, comparator));
+						for(int i = (specificConditionLength > 1? 1: 0), length = 1; i < length; i ++)
+							sb.append(specificCondition[i]);
+						final String specificOnlyCondition = sb.toString();
+						final LineEntry newSpecificOnly = LineEntry.createFrom(specific, specificOnlyCondition);
+						if(!entries.contains(newSpecificOnly))
+							entries.add(newSpecificOnly);
+					}
+					if(!intersectionToken.isEmpty()){
+						final StringBuilder sb = new StringBuilder(RegexHelper.makeGroup(intersectionToken, comparator));
+						for(int i = (genericConditionLength > 1? 1: 0), length = 1; i < length; i ++)
+							sb.append(genericCondition[i]);
+						final String intersectionCondition = sb.toString();
+						final LineEntry newIntersectionFromGeneric = LineEntry.createFrom(generic, intersectionCondition);
+						final LineEntry newIntersectionFromSpecific = LineEntry.createFrom(specific, intersectionCondition);
+						if(!entries.contains(newIntersectionFromGeneric))
+							entries.add(newIntersectionFromGeneric);
+						if(!entries.contains(newIntersectionFromSpecific))
+							entries.add(newIntersectionFromSpecific);
+					}
 				}
 			}
 		}
@@ -837,7 +848,7 @@ public class RulesReducer{
 					}
 				}
 
-				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size());
+				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size() + 1);
 				final String newGenericCondition = (chooseRatifyingOverNegated
 						? RegexHelper.makeGroup(genericToken, comparator)
 						: RegexHelper.makeNotGroup(otherTokens, comparator))
@@ -867,6 +878,60 @@ public class RulesReducer{
 //			assert (refined != null && !refined.equals(generic.condition));
 //			generic.condition = refined;
 //		}
+	}
+
+	private static boolean applyExclusionLadder(LineEntry generic, String[] genericCondition, String[] specificCondition, List<LineEntry> entries, Comparator<String> comparator, int genericConditionLength){
+		boolean applyExclusionLadder = false;
+		// If the generic rule has a shorter condition length than the specific one (e.g., "o" vs "èƚo"),
+		// we are dealing with a vertical inclusion hierarchy: apply a negative character class progression.
+		int specificConditionLength = specificCondition.length;
+		if(genericConditionLength < specificConditionLength){
+			// Check if both conditions consist exclusively of single-character tokens (e.g. "a", not "[ab]")
+			boolean allSingleCharacters = true;
+			for(int i = 0; i < genericConditionLength; i ++){
+				final String token = genericCondition[i];
+				if(token.length() != 1){
+					allSingleCharacters = false;
+					break;
+				}
+			}
+			if(allSingleCharacters)
+				for(int i = 0; i < specificConditionLength; i ++){
+					final String token = specificCondition[i];
+					if(token.length() != 1){
+						allSingleCharacters = false;
+						break;
+					}
+				}
+
+			if(allSingleCharacters){
+				applyExclusionLadder = true;
+
+				entries.remove(generic);
+
+				// 1. Strip the matching context part to find exactly which characters are left over
+				int extraCharsCount = specificConditionLength - genericConditionLength;
+
+				// 2. Iterate backwards through the remaining specific path to build the progressive exclusions
+				for(int i = extraCharsCount - 1; i >= 0; i --){
+					final StringBuilder sb = new StringBuilder();
+
+					// Add the current character as a negative group
+					final char targetChar = specificCondition[i].charAt(0);
+					final Set<Character> toExclude = Collections.singleton(targetChar);
+					sb.append(RegexHelper.makeNotGroup(toExclude, comparator));
+
+					// Append the remaining characters of the specific condition that follow this index, up to the end
+					for(int j = i + 1; j < specificConditionLength; j ++)
+						sb.append(specificCondition[j]);
+
+					final LineEntry newProgressiveEntry = LineEntry.createFrom(generic, sb.toString());
+					if(!entries.contains(newProgressiveEntry))
+						entries.add(newProgressiveEntry);
+				}
+			}
+		}
+		return applyExclusionLadder;
 	}
 
 	private static List<LineEntry> compactRulesButConditionAndFrom(final List<LineEntry> plainRules,
@@ -1374,7 +1439,8 @@ public class RulesReducer{
 	//TODO if parent group has a non-empty intersection with one of its children, then parent.from must contain child.from (for child with condition as parent.condition?)
 	private static void disjoinSameConditionLength(final List<LineEntry> branch, final Comparator<String> comparator){
 		final Map<LineEntry, Set<Character>> branchGroup = new HashMap<>(branch.size());
-		final int conditionLength = branch.get(0).condition.length();
+		final int conditionLength = branch.getFirst()
+			.condition.length();
 		for(int i = 0, length = branch.size(); i < length; i ++){
 			final LineEntry rule = branch.get(i);
 			branchGroup.put(rule, rule.extractGroup(conditionLength));
