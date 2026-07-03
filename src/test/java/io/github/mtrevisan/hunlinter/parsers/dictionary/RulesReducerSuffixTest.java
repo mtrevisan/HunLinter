@@ -25,6 +25,8 @@
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
 import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
+import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
@@ -39,7 +41,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @SuppressWarnings("ALL")
@@ -94,6 +95,11 @@ class RulesReducerSuffixTest{
 			.flatMap(List::stream)
 			.toList();
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+AffixParser affParser = new AffixParser();
+affParser.parse(affFile, language);
+AffixData affixData = affParser.getAffixData();
+List<LineEntry> compactedRules2 = new RulesReducer3(affixData)
+	.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("r", "‘", "r", "par"),
@@ -167,6 +173,11 @@ class RulesReducerSuffixTest{
 			.flatMap(List::stream)
 			.toList();
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+AffixParser affParser = new AffixParser();
+affParser.parse(affFile, language);
+AffixData affixData = affParser.getAffixData();
+List<LineEntry> compactedRules2 = new RulesReducer3(affixData)
+	.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("", "ta", "[^ƚ]a", "kaƚandra"),
