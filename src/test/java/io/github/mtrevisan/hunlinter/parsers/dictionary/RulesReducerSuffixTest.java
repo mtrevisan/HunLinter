@@ -264,6 +264,11 @@ List<LineEntry> compactedRules2 = new RulesReducer3(affixData)
 			.flatMap(List::stream)
 			.toList();
 		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
+AffixParser affParser = new AffixParser();
+affParser.parse(affFile, language);
+AffixData affixData = affParser.getAffixData();
+List<LineEntry> compactedRules2 = new RulesReducer3(affixData)
+	.reduceRules(originalRules);
 
 		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
 			new LineEntry("", "ato", "[nr]", Arrays.asList("bon", "dixnar", "veŧin", "bar", "far", "tabar", "paron", "koɉon", "ŧinŧin", "inkuixitor", "sen", "baron", "vexin", "patron", "peŧenin", "vesin", "pecenin", "xbir", "kojon", "rexon", "inspetor", "fator", "sinsin", "padron", "pesenin", "fakin")),

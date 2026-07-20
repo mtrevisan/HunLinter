@@ -123,40 +123,53 @@ public class RulesReducer{
 		return reduceRules(plainRules, null);
 	}
 
+	/**
+	 * Reduces the initial full set of plain rules into the minimal set of Hunspell sub-rules
+	 * by minimizing conditions, merging identical transformations, and resolving condition overlaps.
+	 *
+	 * @param plainRules	The initial list of fully expanded dictionary line entries.
+	 * @param progressCallback	Optional callback to track the status percentage of the execution.
+	 * @return	A minimized list of {@code LineEntry} objects representing the exact minimal rule set.
+	 */
 	public final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules,
 			final ProgressCallback progressCallback){
+		// 1. First reduction pass: group and merge identical conditions, removals, and additions
+		// to consolidate their 'from' source words.
 		final List<LineEntry> compactedRulesFrom = compactRulesFrom(plainRules, comparator);
-
 		if(progressCallback != null)
 			progressCallback.accept(14);
 
+		// 2. Second reduction pass: group identical conditions, removals, and source sets
+		// to consolidate their 'addition' fields.
 		final List<LineEntry> compactedRulesAddition = compactRulesAddition(compactedRulesFrom, comparator);
-
 		if(progressCallback != null)
 			progressCallback.accept(29);
 
+		// 3. Third reduction pass: check elements with the exact same 'from' word set,
+		// extracting the maximum common removal suffix and shifting the remaining characters into the additions.
 		final List<LineEntry> compactedRulesSameFrom = compactRulesByFrom(compactedRulesAddition);
-
 		if(progressCallback != null)
 			progressCallback.accept(43);
 
+		// 4. Disjoin originating word sets: use a reverse trie to partition overlapping word sets
+		// into maximal clean subsets based on their ending letters.
 		final List<LineEntry> disjoinFromsRules = disjoinFroms(compactedRulesSameFrom);
-
 		if(progressCallback != null)
 			progressCallback.accept(57);
 
+		// 5. Vertical exclusion ladder and collision solver: detect overlaps where a generic rule
+		// improperly triggers on words reserved for a more specific rule, applying negative groups
+		// (e.g., [^è]ƚo) or generating intersection subsets.
 		final List<LineEntry> nonCollidingRules = resolveCollisions(disjoinFromsRules, comparator);
 //		final List<LineEntry> nonCollidingRules = LineEntry.eliminateCollisions(compactedRulesSameFrom, comparator);
-
 		//reshuffle the originating list to place the correct inflections in the correct rule
 //		compactedRules = makeAdditionsDisjoint(compactedRules);
-
 		if(progressCallback != null)
 			progressCallback.accept(71);
 
 		//FIXME
 //		final List<LineEntry> compactedRules = compactRulesFrom(nonCollidingRules, comparator);
-		final List<LineEntry> compactedRules = nonCollidingRules;
+//		final List<LineEntry> compactedRules = nonCollidingRules;
 
 //		compactedRules = disjoinConditions(compactedRules);
 
@@ -167,11 +180,13 @@ public class RulesReducer{
 
 //		final List<LineEntry> res = LineEntry.eliminateCollisions(compactedRules, comparator);
 
-		final List<LineEntry> redistributedRules = flattenRulesByAddition(compactedRules, comparator);
-
+		// 6. Flatten rules: unfold additions back into unified rules to allow final conditional grouping.
+		final List<LineEntry> redistributedRules = flattenRulesByAddition(nonCollidingRules, comparator);
 		if(progressCallback != null)
 			progressCallback.accept(86);
 
+		// 7. Final condition compactor: merge lines that share identical removals, additions,
+		// and trailing contexts, blending their leading characters into a compressed character group (e.g., [nr]).
 		//TODO same removal, same add, then add condition, add from
 		final List<LineEntry> lazyCompactedRules = compactRulesCondition(redistributedRules, comparator);
 //		final List<LineEntry> lazyCompactedRules = compactRulesButConditionAndFrom(redistributedRules, comparator);
@@ -571,6 +586,19 @@ public class RulesReducer{
 		return result;
 	}
 
+	private static List<LineEntry> flattenRulesByAddition(final Collection<LineEntry> entries,
+		final Comparator<String> comparator){
+		final List<LineEntry> flattened = new ArrayList<>();
+		for(final LineEntry entry : entries){
+			for(final String add : entry.addition){
+				final Set<String> singleAdd = new LinkedHashSet<>();
+				singleAdd.add(add);
+				flattened.add(new LineEntry(entry.removal, singleAdd, entry.condition, new HashSet<>(entry.from)));
+			}
+		}
+		return flattened;
+	}
+
 	/**
 	 * Resolves potential collisions in a list of {@code LineEntry} objects by refining entries so that more specific
 	 * conditions do not conflict with generic ones. It adjusts the conditions of entries to eliminate overlaps between
@@ -718,7 +746,17 @@ public class RulesReducer{
 		return new ArrayList<>(atoms.values());
 	}
 
-	/** Attempt to refine a generic condition by analyzing its `from` words */
+	/**
+	 * Refines colliding rule conditions by extracting character intersections and
+	 * partitioning word sets to avoid over-generalized negation groups.
+	 *
+	 * @param generic            The generic rule entry to refine.
+	 * @param genericCondition   The split condition sequence of the generic rule.
+	 * @param specific           The specific rule entry causing the collision.
+	 * @param specificCondition  The split condition sequence of the specific rule.
+	 * @param entries            The total list of line entries being processed.
+	 * @param comparator         The character ordering comparator.
+	 */
 	private static void refineCondition(final LineEntry generic, final String[] genericCondition,
 			final LineEntry specific, final String[] specificCondition,
 			final List<LineEntry> entries, final Comparator<String> comparator){
@@ -757,7 +795,7 @@ public class RulesReducer{
 					}
 				}
 
-				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size() + 1);
+				final boolean chooseRatifyingOverNegated = (genericToken.size() + 1 <= otherTokens.size());
 				final String newGenericCondition = (chooseRatifyingOverNegated
 						? RegexHelper.makeGroup(genericToken, comparator)
 						: RegexHelper.makeNotGroup(otherTokens, comparator))
@@ -848,7 +886,7 @@ public class RulesReducer{
 					}
 				}
 
-				final boolean chooseRatifyingOverNegated = (genericToken.size() < otherTokens.size() + 1);
+				final boolean chooseRatifyingOverNegated = (genericToken.size() + 1 <= otherTokens.size());
 				final String newGenericCondition = (chooseRatifyingOverNegated
 						? RegexHelper.makeGroup(genericToken, comparator)
 						: RegexHelper.makeNotGroup(otherTokens, comparator))
