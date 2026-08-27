@@ -105,11 +105,11 @@
 
 		<!-- Logging -->
 		<!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
-		<logback.logback-classic.version>1.5.37</logback.logback-classic.version>
+		<logback.logback-classic.version>1.6.3</logback.logback-classic.version>
 
 		<!-- JUnit -->
 		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-		<junit.junit-jupiter-engine.version>6.1.1</junit.junit-jupiter-engine.version>
+		<junit.junit-jupiter-engine.version>6.1.3</junit.junit-jupiter-engine.version>
 	</properties>
 
 	<profiles>

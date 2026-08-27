@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.TrieReplacer;
+import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public final class OrthographyVEC extends Orthography{
 	private static final Pattern PATTERN_REMOVE_H_FROM_NOT_FH = RegexHelper.pattern("(?<!f)h(?!aeiouàèéíòóú)");
 
 	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])");
-	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàèéíïòóúü])");
+	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàéíïòóúü])");
 	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])");
