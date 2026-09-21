@@ -77,7 +77,7 @@ public final class WordVEC{
 	}
 
 	//NOTE: any character that appears before the first `<` is considered an ignorable character
-	private static final String COLLATOR_RULE = "; '-' < ' '='\t' < \u00AD;‐;‑;‒;–;—;―;− < ʼ=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j=ɉ=jh,J=Ɉ=Jh < k,K < l=ƚ=lh,L=Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh,gn=Gn < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
+	private static final String COLLATOR_RULE = "; '-' < ' '='\t' < \u00AD;‐;‑;‒;–;—;―;− < ’=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j=ɉ=jh,J=Ɉ=Jh < k,K < l=ƚ=lh,L=Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh,gn=Gn < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
 	private static Collator COLLATOR;
 	static{
@@ -147,7 +147,7 @@ public final class WordVEC{
 	}
 
 	/**
-	 * Determines if a given word starts with a vowel (e.g. /^[ʼ']?[aeiouàèéíòóú]/).
+	 * Determines if a given word starts with a vowel (e.g. /^[’']?[aeiouàèéíòóú]/).
 	 *
 	 * @param word	The word to check.
 	 * @return	Whether the word starts with a vowel.
@@ -160,7 +160,7 @@ public final class WordVEC{
 	}
 
 	/**
-	 * Determines if a given word ends with a vowel (e.g. /[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*ʼ?$/).
+	 * Determines if a given word ends with a vowel (e.g. /[aeiouàèéíòóú][^aàbcdđeéèfghiíjɉklƚmnñoóòprsʃtŧuúvxʒ]*’?$/).
 	 *
 	 * @param word	The word to check.
 	 * @return	Whether the word ends with a vowel.
@@ -389,7 +389,7 @@ public final class WordVEC{
 		final int length = word.length();
 		final char[] chars = word.toCharArray();
 
-		int higherIndex = StringUtils.lastIndexOf(word, 'ʼ') - 1;
+		int higherIndex = StringUtils.lastIndexOf(word, '’') - 1;
 		if(higherIndex < 0)
 			higherIndex = length - 1;
 

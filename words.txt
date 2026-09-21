@@ -8684,7 +8684,7 @@ daŧio
 daŧiàbil
 daŧièr
 daŧièra
-daʼ
+da’
 dea
 deada
 deal
@@ -9795,7 +9795,7 @@ deŧènio
 deŧèso
 deŧévol
 deŧíder
-deʼ
+de’
 dia
 diabete
 diabòlego
@@ -32762,7 +32762,7 @@ niŧisitade
 niŧiòl
 niŧol
 niŧòl
-niʼ
+ni’
 noa
 noador
 noadora
@@ -33025,7 +33025,7 @@ noŧentin
 noŧenŧa
 noŧion
 noŧivo
-ntʼ
+nt’
 nudar
 nude
 nudo
@@ -35706,7 +35706,7 @@ paŧiéntis
 paŧo
 paŧífege
 paŧífego
-paʼ
+pa’
 pea
 peada
 pearar
@@ -36664,7 +36664,7 @@ peŧàtis
 peŧòl
 peŧòla
 peŧòto
-peʼ
+pe’
 pia
 piada
 piadejar
@@ -52926,7 +52926,7 @@ suño
 suòldo
 suònio
 suòr
-suòʼ
+suò’
 suđago
 suđarir
 suđeridor

@@ -55,8 +55,8 @@ public final class OrthographyVEC extends Orthography{
 		"nb", "np"};
 
 	//here `ï` and `ü` are really consonants, but are treated as vowels, in order for `argüio` to be valid
-	private static final Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúüʼ–-])");
-	private static final Pattern PATTERN_U_DIAERESIS_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúüʼ–-])");
+	private static final Pattern PATTERN_I_DIAERESIS_C = RegexHelper.pattern("ï([^aeiouàèéíïòóúü’–-])");
+	private static final Pattern PATTERN_U_DIAERESIS_C = RegexHelper.pattern("ü([^aeiouàèéíïòóúü’–-])");
 	private static final Pattern PATTERN_V_I_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ï");
 	private static final Pattern PATTERN_V_U_DIAERESIS = RegexHelper.pattern("([aeiouàèéíòóú])ü");
 
@@ -64,8 +64,8 @@ public final class OrthographyVEC extends Orthography{
 
 	private static final Pattern PATTERN_J_INTO_I = RegexHelper.pattern("^j(?=[^aeiouàèéíïòóúüh])");
 	private static final Pattern PATTERN_I_INITIAL_INTO_J = RegexHelper.pattern("^i(?=[aeiouàéíïòóúü])");
-	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^ʼaeiouàèéíïòóúüjw])");
-	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ʼaeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INITIAL_INTO_L = RegexHelper.pattern("^ƚ(?=[^’aeiouàèéíïòóúüjw])");
+	private static final Pattern PATTERN_LH_INSIDE_INTO_L = RegexHelper.pattern("([aeiouàèéíïòóúü])ƚ(?=[^aeiouàèéíïòóúüjw–-])|([^ ’aeiouàèéíïòóúü–-])ƚ(?=[aeiouàèéíïòóúüjw])");
 	private static final Pattern PATTERN_X_INTO_S = RegexHelper.pattern(GraphemeVEC.GRAPHEME_X + "(?=[cfkpstŧ])");
 	private static final Pattern PATTERN_S_INTO_X = RegexHelper.pattern(GraphemeVEC.GRAPHEME_S + "(?=([mnñbdgɉvrl]))");
 	private static final String FALSE_S_INTO_X = "èsre";

@@ -35,9 +35,9 @@ class WordVECTest{
 		Assertions.assertEquals("pi", WordVEC.markDefaultStress("pi"));
 		Assertions.assertEquals("pí", WordVEC.markDefaultStress("pí"));
 
-		Assertions.assertEquals("ʼecóʼ", WordVEC.markDefaultStress("ʼecóʼ"));
+		Assertions.assertEquals("’ecó’", WordVEC.markDefaultStress("’ecó’"));
 
-		Assertions.assertEquals("betolíʼ", WordVEC.markDefaultStress("betolíʼ"));
+		Assertions.assertEquals("betolí’", WordVEC.markDefaultStress("betolí’"));
 	}
 
 	@Test
