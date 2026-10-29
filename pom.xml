@@ -305,6 +305,8 @@
 					</archive>
 					<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>
 					<appendAssemblyId>false</appendAssemblyId>
+					<!-- do not replace the main artifact: maven-jar-plugin attaches it afterwards -->
+					<attach>false</attach>
 				</configuration>
 			</plugin>
 			<!-- Jlink -->
@@ -362,8 +364,6 @@
 							<executable>${java.home}/bin/jlink.exe</executable>
 							<arguments>
 								<argument>--strip-debug</argument>
-								<argument>--compress</argument>
-									<argument>2</argument>
 								<argument>--no-header-files</argument>
 								<argument>--no-man-pages</argument>
 								<argument>--include-locales=${jvm.locales}</argument>
