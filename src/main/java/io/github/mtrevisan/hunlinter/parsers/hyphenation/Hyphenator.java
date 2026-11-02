@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.parsers.hyphenation;
 
 import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.AhoCorasickTrie;
-import io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie.dtos.SearchResult;
 import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;

@@ -27,8 +27,8 @@ package io.github.mtrevisan.hunlinter.parsers.dictionary;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.AffixEntry;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
@@ -45,9 +45,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -194,7 +194,7 @@ public class RulesReducer{
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(),
+		prettyPrintRules.addFirst(LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(),
 			prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
