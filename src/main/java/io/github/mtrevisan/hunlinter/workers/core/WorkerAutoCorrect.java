@@ -52,20 +52,6 @@ public class WorkerAutoCorrect extends WorkerAbstract<WorkerDataParser<AutoCorre
 			? entries.parallelStream()
 			: entries.stream());
 		processAutoCorrect(stream, entries.size(), dataProcessor);
-
-		CorrectionEntry data = null;
-		try{
-			final AutoCorrectParser acoParser = workerData.getParser();
-			final List<CorrectionEntry> dictionary = acoParser.getCorrectionsDictionary();
-			for(int i = 0, length = dictionary.size(); i < length; i ++){
-				data = dictionary.get(i);
-				dataProcessor.accept(data);
-			}
-		}
-		catch(final RuntimeException re){
-			manageException(new LinterException(re)
-				.withData(data));
-		}
 	}
 
 	private List<CorrectionEntry> loadAutoCorrect(){

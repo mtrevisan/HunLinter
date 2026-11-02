@@ -168,7 +168,7 @@ public class Inflection extends DictionaryEntry{
 
 	public final void capitalizeIfContainsFlag(final String forceCompoundUppercaseFlag){
 		if(compoundEntries != null && !compoundEntries.isEmpty()
-				&& compoundEntries.get(compoundEntries.size() - 1).hasContinuationFlag(forceCompoundUppercaseFlag))
+				&& compoundEntries.getLast().hasContinuationFlag(forceCompoundUppercaseFlag))
 			word = StringUtils.capitalize(word);
 	}
 

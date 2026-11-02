@@ -44,6 +44,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 
@@ -74,7 +76,17 @@ public final class FontHelper{
 
 	private FontHelper(){}
 
+	/** Starts loading the system fonts in background, without any notification. */
 	public static void loadAllFonts(){
+		loadAllFonts(null);
+	}
+
+	/**
+	 * Starts loading the system fonts in background.
+	 *
+	 * @param onLoaded	Called on the event dispatch thread when all the fonts have been loaded successfully (can be <code>null</code>).
+	 */
+	public static void loadAllFonts(final Runnable onLoaded){
 		futureAllFonts = JavaHelper.executeFuture(() -> {
 			LOGGER.info("Load system fonts");
 			final String[] familyNames = GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -102,15 +114,53 @@ public final class FontHelper{
 			LOGGER.info("System fonts filtered");
 
 			return allFonts;
+		}, future -> {
+			try{
+				future.get();
+
+				if(onLoaded != null)
+					JavaHelper.executeOnEventDispatchThread(onLoaded);
+			}
+			catch(final InterruptedException ie){
+				Thread.currentThread().interrupt();
+			}
+			catch(final ExecutionException | CancellationException e){
+				LOGGER.error("Cannot load system fonts", e);
+			}
 		});
 	}
 
+	/** @return	Whether all the system fonts have been successfully loaded (this never blocks). */
+	public static boolean areAllFontsLoaded(){
+		final Future<List<Font>> future = futureAllFonts;
+		if(future == null || !future.isDone() || future.isCancelled())
+			return false;
+
+		try{
+			return (future.get() != null);
+		}
+		catch(final InterruptedException ie){
+			Thread.currentThread().interrupt();
+			return false;
+		}
+		catch(final ExecutionException ee){
+			return false;
+		}
+	}
+
 	public static Font chooseBestFont(final String languageSample){
+		final Font defaultFont = FontChooserDialog.getDefaultFont();
+		if(!areAllFontsLoaded()){
+			//do not wait for the fonts (this is usually called on the event dispatch thread, a wait would freeze the UI)
+			LOGGER.info("System fonts not loaded yet, using the default font");
+
+			return defaultFont;
+		}
+
 		extractFonts(languageSample);
 
 		final List<Font> fonts = (FAMILY_NAMES_MONOSPACED.isEmpty()? FAMILY_NAMES_ALL: FAMILY_NAMES_MONOSPACED);
-		final Font defaultFont = FontChooserDialog.getDefaultFont();
-		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.get(0).deriveFont(15.f));
+		Font bestFont = (fonts.isEmpty()? defaultFont: fonts.getFirst().deriveFont(15.f));
 		if(!bestFont.equals(defaultFont))
 			for(final Font f : fonts){
 				final String defaultFontName = defaultFont.getName();
@@ -133,6 +183,9 @@ public final class FontHelper{
 			FontHelper.languageSample = languageSample;
 
 			final List<Font> allFonts = JavaHelper.waitForFuture(futureAllFonts);
+			if(allFonts == null)
+				return;
+
 			if(FAMILY_NAMES_ALL.isEmpty()){
 				FAMILY_NAMES_ALL.ensureCapacity(allFonts.size());
 				FAMILY_NAMES_MONOSPACED.ensureCapacity(allFonts.size());

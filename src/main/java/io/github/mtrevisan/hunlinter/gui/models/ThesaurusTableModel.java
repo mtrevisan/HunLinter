@@ -26,7 +26,6 @@ package io.github.mtrevisan.hunlinter.gui.models;
 
 import io.github.mtrevisan.hunlinter.parsers.thesaurus.ThesaurusEntry;
 import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 
 import javax.swing.table.AbstractTableModel;

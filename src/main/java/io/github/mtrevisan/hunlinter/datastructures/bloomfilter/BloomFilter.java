@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -88,7 +89,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	private final int bitsRequired;
 
 	/** Number of elements actually added to the Bloom filter. */
-	private volatile int addedElements;
+	private final AtomicInteger addedElements = new AtomicInteger();
 
 
 	/**
@@ -154,8 +155,6 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 
 		this.decomposer = decomposer;
 		this.hasher = ObjectUtils.getIfNull(hasher, HASHER_DEFAULT);
-
-		addedElements = 0;
 	}
 
 	@Override
@@ -164,8 +163,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public final synchronized int getAddedElements(){
-		return addedElements;
+	public final int getAddedElements(){
+		return addedElements.get();
 	}
 
 	//Default bloom filter functions follow
@@ -198,10 +197,20 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @param bytes	The bytes to be added to bloom filter.
 	 * @return {@code true} if any bit was modified when adding the value, {@code false} otherwise.
 	 */
-	public final synchronized boolean add(final byte[] bytes){
+	public final boolean add(final byte[] bytes){
+		//a thread-safe bit array doesn't need any lock, so many threads can add in parallel
+		if(bitArray.isThreadSafe())
+			return addInternal(bytes);
+
+		synchronized(this){
+			return addInternal(bytes);
+		}
+	}
+
+	private boolean addInternal(final byte[] bytes){
 		final boolean bitsChanged = calculateIndexes(bytes);
 		if(bitsChanged)
-			addedElements ++;
+			addedElements.incrementAndGet();
 		return bitsChanged;
 	}
 
@@ -211,7 +220,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	private synchronized boolean calculateIndexes(final byte[] bytes){
+	private boolean calculateIndexes(final byte[] bytes){
 		boolean bitsChanged = false;
 		final long[] hashes = getTwoLongHashes(bytes);
 		final long lowHash = hashes[0];
@@ -233,7 +242,16 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 *		asymptotic false positive probability'.
 	 *		Let's split up 64-bit hashcode into two 32-bit hashcodes and employ the technique mentioned in the above paper
 	 */
-	public final synchronized boolean contains(final byte[] bytes){
+	public final boolean contains(final byte[] bytes){
+		if(bitArray.isThreadSafe())
+			return containsInternal(bytes);
+
+		synchronized(this){
+			return containsInternal(bytes);
+		}
+	}
+
+	private boolean containsInternal(final byte[] bytes){
 		final long[] hashes = getTwoLongHashes(bytes);
 		final long lowHash = hashes[0];
 		final long highHash = hashes[1];
@@ -291,6 +309,10 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	 * @return the decomposed byte array
 	 */
 	private byte[] decomposeValue(final T value) throws IOException{
+		//fast path: this is exactly what the default decomposer does, without the intermediate streams
+		if(decomposer == null)
+			return value.toString().getBytes(charset);
+
 		final ByteSink sink = new ByteSink();
 		Objects.requireNonNullElse(decomposer, decomposerDefault)
 			.decompose(value, sink, charset);
@@ -317,8 +339,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public final synchronized boolean isFull(){
-		return (addedElements >= expectedElements);
+	public final boolean isFull(){
+		return (addedElements.get() >= expectedElements);
 	}
 
 	@Override
@@ -327,8 +349,8 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	}
 
 	@Override
-	public final synchronized double getTrueFalsePositiveProbability(){
-		return getTrueFalsePositiveProbability(addedElements);
+	public final double getTrueFalsePositiveProbability(){
+		return getTrueFalsePositiveProbability(addedElements.get());
 	}
 
 	@Override
@@ -341,7 +363,7 @@ public class BloomFilter<T> implements BloomFilterInterface<T>{
 	@Override
 	public final synchronized void clear(){
 		bitArray.clearAll();
-		addedElements = 0;
+		addedElements.set(0);
 	}
 
 	@Override

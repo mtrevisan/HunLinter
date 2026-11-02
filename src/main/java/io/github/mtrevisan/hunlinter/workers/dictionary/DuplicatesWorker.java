@@ -283,7 +283,7 @@ public class DuplicatesWorker extends WorkerDictionary{
 						//already inserted line, skip
 						continue;
 
-					final Inflection prod = entries.iterator().next().getInflection();
+					final Inflection prod = entries.getFirst().getInflection();
 					origin.setLength(0);
 					origin.append(prod.getWord());
 					final List<String> partOfSpeechOrInflectionalAffix = prod.getMorphologicalFieldPartOfSpeechOrInflectionalAffix();

@@ -76,7 +76,6 @@ public class StatisticsWorker extends WorkerDictionary{
 
 		getWorkerData()
 			.withParallelProcessing()
-			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(affParser, "Affix parser cannot be null");

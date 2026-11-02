@@ -82,7 +82,7 @@ public class WordMuncher{
 
 	public final List<DictionaryEntry> inferAffixRules(final DictionaryEntry dicEntry){
 		final List<DictionaryEntry> originators = extractAllAffixes(dicEntry);
-		originators.add(0, dicEntry);
+		originators.addFirst(dicEntry);
 
 		originators.removeIf(originator -> !dicInclusionTestWorker.isInDictionary(originator.getWord()));
 
@@ -119,7 +119,7 @@ public class WordMuncher{
 					if(inflections.size() != 1)
 						continue;
 
-					final List<String> baseInflectionPartOfSpeech = inflections.get(0).getMorphologicalFieldPartOfSpeech();
+					final List<String> baseInflectionPartOfSpeech = inflections.getFirst().getMorphologicalFieldPartOfSpeech();
 					if(baseInflectionPartOfSpeech.isEmpty() && partOfSpeech.isEmpty() || baseInflectionPartOfSpeech.equals(partOfSpeech))
 						originators.add(originatorEntry);
 				}

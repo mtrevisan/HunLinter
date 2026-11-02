@@ -29,6 +29,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.LineEntry;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.RulesReducer;
+import io.github.mtrevisan.hunlinter.parsers.dictionary.RulesReducer4;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
@@ -62,7 +63,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Rules reducer";
 
 
-	private final RulesReducer rulesReducer;
+	private final RulesReducer4 rulesReducer;
 
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
@@ -78,7 +79,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
-		rulesReducer = new RulesReducer(affixData, wordGenerator);
+		rulesReducer = new RulesReducer4(affixData, wordGenerator);
 		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);

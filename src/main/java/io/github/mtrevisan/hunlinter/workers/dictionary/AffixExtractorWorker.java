@@ -36,7 +36,14 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -61,7 +68,6 @@ public class AffixExtractorWorker extends WorkerDictionary{
 
 		getWorkerData()
 			.withDataCompletedCallback(onCompleted)
-			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 

@@ -48,7 +48,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 
 abstract class WordGeneratorCompound extends WordGeneratorBase{
@@ -290,9 +289,9 @@ abstract class WordGeneratorCompound extends WordGeneratorBase{
 	/** @return	A list of prefixes from first entry, suffixes from last entry, and terminals from both. */
 	private List<List<String>> extractCompoundFlagsByComponent(final List<DictionaryEntry> compoundEntries,
 			final String compoundFlag){
-		final List<List<String>> prefixes = compoundEntries.get(0)
+		final List<List<String>> prefixes = compoundEntries.getFirst()
 			.extractAllAffixes(affixData, false);
-		final List<List<String>> suffixes = compoundEntries.get(compoundEntries.size() - 1)
+		final List<List<String>> suffixes = compoundEntries.getLast()
 			.extractAllAffixes(affixData, false);
 		final Set<String> terminals = new TreeSet<>();
 		terminals.addAll(prefixes.get(Affixes.INDEX_TERMINALS));

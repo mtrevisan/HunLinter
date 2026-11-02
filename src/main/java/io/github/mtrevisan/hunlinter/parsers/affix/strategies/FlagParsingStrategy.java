@@ -73,7 +73,7 @@ public abstract class FlagParsingStrategy{
 		for(int i = 0; i < size; i ++)
 			validate(flags.get(i));
 
-		final StringBuilder sb = new StringBuilder(flags.get(0).length() * size);
+		final StringBuilder sb = new StringBuilder(flags.getFirst().length() * size);
 		for(int i = 0; i < size; i ++)
 			sb.append(flags.get(i));
 		return sb.toString();

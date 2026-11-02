@@ -24,11 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.autocorrect;
 
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.AutoCorrectParser;
 import io.github.mtrevisan.hunlinter.parsers.autocorrect.CorrectionEntry;
@@ -48,8 +44,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,7 +64,12 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 	private static final String CORRECT_WORD_NOT_IN_DICTIONARY = "Dictionary doesn't contain correct entry {} (from entry {})";
 
 
-	private final BloomFilterInterface<String> bloomFilter;
+	/**
+	 * The words of the (correct forms of the) corrections that have been found into the dictionary.
+	 * NOTE: it's enough to look for those few words while the inflections are generated, there's no need to store all of them (an exact
+	 * set is also way faster, and smaller, than a bloom filter with as many hash functions as needed for the required precision).
+	 */
+	private final Set<String> foundWords = ConcurrentHashMap.newKeySet();
 
 
 	public AutoCorrectLinterWorker(final AutoCorrectParser acoParser, final String language, final DictionaryParser dicParser,
@@ -79,37 +84,21 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
-		final Charset charset = dicParser.getCharset();
-		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
-
 		final Consumer<CorrectionEntry> dataProcessor = data -> {
 			final String correctForm = data.getCorrectForm();
 
-			boolean correctWordContainsSpecialChars = false;
-			final int bound = correctForm.length();
-			for(int i = 0; i < bound; i ++){
-				final char chr = correctForm.charAt(i);
-				if(!Character.isLetter(chr) && !Character.isWhitespace(chr)){
-					correctWordContainsSpecialChars = true;
-					break;
-				}
-			}
-
-			if(!correctWordContainsSpecialChars){
-				//check if the (correct) word is present in the dictionary
-				final String[] words = StringUtils.split(correctForm, " –");
-				for(int i = 0; i < words.length; i ++)
-					if(!bloomFilter.contains(words[i]))
-						LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(CORRECT_WORD_NOT_IN_DICTIONARY, words[i], correctForm));
-			}
+			//check if the (correct) word is present in the dictionary
+			final String[] words = extractWords(correctForm);
+			for(int i = 0; i < words.length; i ++)
+				if(!foundWords.contains(words[i]))
+					LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(CORRECT_WORD_NOT_IN_DICTIONARY, words[i], correctForm));
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
 			resetProcessing("Reading dictionary file (step 1/2)");
 
-			collectWords(dicParser, wordGenerator);
+			collectWords(dicParser, wordGenerator, extractSearchedWords(acoParser));
 
 			return null;
 		};
@@ -125,7 +114,28 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 		setProcessor(step1.andThen(step2));
 	}
 
-	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	/** @return	The words of the given correct form, nothing if the correct form contains some special characters. */
+	private static String[] extractWords(final String correctForm){
+		final int bound = correctForm.length();
+		for(int i = 0; i < bound; i ++){
+			final char chr = correctForm.charAt(i);
+			if(!Character.isLetter(chr) && !Character.isWhitespace(chr))
+				return new String[0];
+		}
+
+		return StringUtils.split(correctForm, " –");
+	}
+
+	/** @return	The words the (correct forms of the) corrections are made of. */
+	private static Set<String> extractSearchedWords(final AutoCorrectParser acoParser){
+		final Set<String> searchedWords = new HashSet<>();
+		final List<CorrectionEntry> entries = acoParser.getCorrectionsDictionary();
+		for(int i = 0, length = entries.size(); i < length; i ++)
+			Collections.addAll(searchedWords, extractWords(entries.get(i).getCorrectForm()));
+		return searchedWords;
+	}
+
+	private void collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator, final Set<String> searchedWords){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
@@ -136,7 +146,8 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final String str = inflections.get(i).getWord();
-					bloomFilter.add(str);
+					if(searchedWords.contains(str))
+						foundWords.add(str);
 				}
 			}
 			catch(final LinterException e){
@@ -148,11 +159,9 @@ public class AutoCorrectLinterWorker extends WorkerAutoCorrect{
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
+		//the inflections are generated in parallel (the bloom filter is thread-safe)
+		ParserHelper.forEachDictionaryLineParallel(dicFile, charset, fun, progressCallback);
 
-		bloomFilter.close();
-
-		return bloomFilter;
 	}
 
 }

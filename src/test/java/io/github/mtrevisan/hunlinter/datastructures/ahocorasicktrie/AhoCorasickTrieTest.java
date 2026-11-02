@@ -85,7 +85,7 @@ class AhoCorasickTrieTest{
 
 		List<SearchResult<Integer>> results = trie.searchInText("resting in the test");
 		Assertions.assertEquals(2, results.size());
-		SearchResult<Integer> search = results.get(0);
+		SearchResult<Integer> search = results.getFirst();
 		Assertions.assertEquals(0, search.getIndexBegin());
 		Assertions.assertEquals(4, search.getValue().intValue());
 		search = results.get(1);

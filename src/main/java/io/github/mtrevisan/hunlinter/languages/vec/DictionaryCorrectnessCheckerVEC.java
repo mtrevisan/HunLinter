@@ -39,8 +39,6 @@ import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterWarning;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -188,22 +186,20 @@ public class DictionaryCorrectnessCheckerVEC extends DictionaryCorrectnessChecke
 		for(int i = 0; i < WORD_SEPARATORS.length(); i ++)
 			derivedWord = StringUtils.remove(derivedWord, WORD_SEPARATORS.charAt(i));
 
-		final Collection<LanguageVariant> variants = EnumSet.noneOf(LanguageVariant.class);
-		if(derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE)){
+		//NOTE: an error is raised only if the word belongs to both variants (the venetian one requires a `ƚ`), so all the checks
+		//for the northern variant can be skipped (they have no side effects) for the words without a `ƚ`
+		final boolean venetian = derivedWord.contains(GraphemeVEC.GRAPHEME_L_STROKE);
+		if(venetian){
 			if(RegexHelper.find(derivedWord, patternNonVanishingEl))
 				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_NON_VAN_EL, inflection.getWord());
 			if(inflection.hasContinuationFlag(northernPluralRule))
 				throw new LinterException(WORD_WITH_VAN_EL_CANNOT_CONTAIN_RULE, northernPluralRule, northernPluralStressedRule, inflection.getWord());
 			if(RegexHelper.find(derivedWord, patternVanishingElNextToConsonant))
 				throw new LinterException(WORD_WITH_VAN_EL_NEAR_CONSONANT, inflection.getWord());
-
-			variants.add(LanguageVariant.VENETIAN);
 		}
-		if(RegexHelper.find(derivedWord, patternNonVanishingElNotAtEnd)
-				|| derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE))
-			variants.add(LanguageVariant.NORTHERN);
 
-		if(variants.size() > 1)
+		if(venetian && (RegexHelper.find(derivedWord, patternNonVanishingElNotAtEnd)
+				|| derivedWord.contains(GraphemeVEC.GRAPHEME_D_STROKE) || derivedWord.contains(GraphemeVEC.GRAPHEME_T_STROKE)))
 			throw new LinterException(WORD_WITH_MIXED_VARIANTS, inflection.getWord());
 	}
 

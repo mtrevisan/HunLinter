@@ -81,6 +81,27 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 		addComponent(TEXT_PANES, textPane, markers);
 	}
 
+	/** Stop appending log messages to the given label, to be called when the owning window is disposed in order to avoid leaks. */
+	public static void removeLabel(final JLabel label){
+		removeComponent(LABELS, label);
+	}
+
+	/** Stop appending log messages to the given text area, to be called when the owning window is disposed in order to avoid leaks. */
+	public static void removeTextArea(final JTextArea textArea){
+		removeComponent(TEXT_AREAS, textArea);
+	}
+
+	/** Stop appending log messages to the given text pane, to be called when the owning window is disposed in order to avoid leaks. */
+	public static void removeTextPane(final JTextPane textPane){
+		removeComponent(TEXT_PANES, textPane);
+	}
+
+	private static <T> void removeComponent(final Map<Marker, List<T>> map, final T component){
+		if(component != null)
+			for(final List<T> components : map.values())
+				components.remove(component);
+	}
+
 	private static <T> void addComponent(final Map<Marker, List<T>> map, final T component, final Marker... markers){
 		Objects.requireNonNull(component, "Component cannot be null");
 
@@ -105,7 +126,7 @@ public class ApplicationLogAppender extends AppenderBase<ILoggingEvent>{
 			final String message = new String(encoded, StandardCharsets.UTF_8);
 
 			final List<Marker> markerList = eventObject.getMarkerList();
-			final Marker marker = (!markerList.isEmpty()? markerList.get(0): null);
+			final Marker marker = (!markerList.isEmpty()? markerList.getFirst(): null);
 			JavaHelper.executeOnEventDispatchThread(() -> {
 				final List<JTextArea> textAreas = TEXT_AREAS.get(marker);
 				if(textAreas != null)

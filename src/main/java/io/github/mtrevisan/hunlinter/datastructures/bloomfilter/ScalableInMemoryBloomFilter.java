@@ -25,9 +25,9 @@
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter;
 
 import java.nio.charset.Charset;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.IntStream;
 
 
@@ -49,7 +49,9 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	private final Charset charset;
 	private final BloomFilterParameters parameters;
 
-	private final Deque<BloomFilterInterface<T>> filters = new ArrayDeque<>();
+	/** Thread-safe, the most recent layer is the first one. */
+	private final Deque<BloomFilterInterface<T>> filters = new ConcurrentLinkedDeque<>();
+	private final Object forkLock = new Object();
 
 
 	public ScalableInMemoryBloomFilter(final Charset charset, final BloomFilterParameters parameters){
@@ -78,11 +80,18 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 	 * a saturated layer).
 	 */
 	private BloomFilterInterface<T> chooseCurrentFilter(final T value){
-		BloomFilterInterface<T> currentFilter = (!filters.isEmpty()? filters.peek(): null);
-		if(currentFilter == null || !currentFilter.contains(value) && currentFilter.isFull()){
-			currentFilter = fork(filters.size());
+		BloomFilterInterface<T> currentFilter = filters.peekFirst();
+		//NOTE: the cheap `isFull` check goes first, `contains` has to compute the hashes of the value
+		if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
+			//many threads could have reached this point, only the first one has to create the new layer
+			synchronized(forkLock){
+				currentFilter = filters.peekFirst();
+				if(currentFilter == null || currentFilter.isFull() && !currentFilter.contains(value)){
+					currentFilter = fork(filters.size());
 
-			filters.push(currentFilter);
+					filters.addFirst(currentFilter);
+				}
+			}
 		}
 		return currentFilter;
 	}
@@ -118,7 +127,8 @@ public class ScalableInMemoryBloomFilter<T> implements BloomFilterInterface<T>{
 
 	@Override
 	public final boolean isFull(){
-		final int addedElements = (!filters.isEmpty()? filters.peek().getAddedElements(): 0);
+		final BloomFilterInterface<T> first = filters.peekFirst();
+		final int addedElements = (first != null? first.getAddedElements(): 0);
 		return (addedElements >= parameters.getExpectedNumberOfElements() * 0.85);
 	}
 

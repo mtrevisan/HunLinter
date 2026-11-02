@@ -130,12 +130,19 @@ public class LineEntry implements Serializable{
 		final Collection<String> reversedFrom = new HashSet<>(from.size());
 		final StringBuilder sb = new StringBuilder();
 		for(final String add : addition){
-			final String[] additions = RegexHelper.split(add, SPLITTER_ADDITION);
+			//only the surface (before the continuation flags and the morphological fields) is reversed, even if empty
+			int surfaceEnd = add.length();
+			for(int i = 0; i < add.length(); i ++){
+				final char chr = add.charAt(i);
+				if(chr == '/' || chr == '\t'){
+					surfaceEnd = i;
+					break;
+				}
+			}
 			sb.setLength(0);
-			sb.append(additions[0]);
+			sb.append(add, 0, surfaceEnd);
 			sb.reverse();
-			for(int i = 1; i < additions.length; i ++)
-				sb.append(additions[i]);
+			sb.append(add, surfaceEnd, add.length());
 
 			reversedAddition.add(sb.toString());
 		}
@@ -592,7 +599,8 @@ public class LineEntry implements Serializable{
 		final String line = type.getOption().getCode() + StringUtils.SPACE
 			+ flag + StringUtils.SPACE
 			+ (removal.isEmpty()? ZERO: removal) + StringUtils.SPACE
-			+ firstAddition + StringUtils.SPACE
+			+ (firstAddition.isEmpty() || firstAddition.charAt(0) == '/'? ZERO + firstAddition: firstAddition)
+			+ StringUtils.SPACE
 			+ (condition.isEmpty()? DOT: condition);
 		return (idx >= 0? line + morphologicalRules: line);
 	}

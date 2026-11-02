@@ -1313,7 +1313,7 @@ public class RulesReducer{
 				if(properChildrenSize > 1 && properChildrenSize <= branchSize){
 					//must separate each element of the `properChildren` list
 					properChildren.clear();
-					final LineEntry parent = branch.get(0);
+					final LineEntry parent = branch.getFirst();
 					properChildren.add(parent);
 					for(int j = 1; j < branchSize; j ++){
 						final LineEntry child = branch.get(j);
@@ -1451,7 +1451,7 @@ public class RulesReducer{
 	 * @return	The list of branches. The first element being the limb.
 	 */
 	private static List<LineEntry> extractBranch(final List<LineEntry> rules){
-		final LineEntry parent = rules.get(0);
+		final LineEntry parent = rules.getFirst();
 		final List<LineEntry> branch = new ArrayList<>(rules.size());
 		final Iterator<LineEntry> itr = rules.iterator();
 		while(itr.hasNext()){
@@ -1465,7 +1465,7 @@ public class RulesReducer{
 	}
 
 	private static int extractSameConditionLength(final List<LineEntry> branch){
-		final int conditionLength = branch.get(0).condition.length();
+		final int conditionLength = branch.getFirst().condition.length();
 		for(int i = 0, length = branch.size(); i < length; i ++){
 			final LineEntry entry = branch.get(i);
 			if(conditionLength != entry.condition.length())
@@ -1514,7 +1514,7 @@ public class RulesReducer{
 		//if parent contains into one if its children (that have child.condition.length > parent.length),
 		//then the parent is a final rule
 		final List<LineEntry> properChildren = new ArrayList<>(branch.size());
-		final LineEntry parent = branch.get(0);
+		final LineEntry parent = branch.getFirst();
 		properChildren.add(parent);
 		for(int i = 1, length = branch.size(); i < length; i ++){
 			final LineEntry child = branch.get(i);
@@ -1527,7 +1527,7 @@ public class RulesReducer{
 	private static List<LineEntry> disjoinDifferentConditionLength(final List<List<LineEntry>> branches,
 			final int branchIndex, final Comparator<String> comparator){
 		final List<LineEntry> branch = branches.get(branchIndex);
-		final LineEntry parent = branch.get(0);
+		final LineEntry parent = branch.getFirst();
 
 		final Set<Character> childrenGroup = new HashSet<>(0);
 		final StringBuilder condition = new StringBuilder();
@@ -1614,7 +1614,7 @@ public class RulesReducer{
 			condition.append(augment)
 				.append(parent.condition);
 			final LineEntry newParent = LineEntry.createFrom(parent, condition.toString());
-			branch.remove(0);
+			branch.removeFirst();
 
 			for(final Character chr : intersectionGroup){
 				final LineEntry newRule = LineEntry.createFrom(parent, chr + parent.condition);
@@ -1644,7 +1644,7 @@ public class RulesReducer{
 		final StringBuilder condition = new StringBuilder();
 		for(final List<LineEntry> similarities : similarityBucket.values())
 			if(similarities.size() > 1){
-				final LineEntry anEntry = similarities.get(0);
+				final LineEntry anEntry = similarities.getFirst();
 				final String[] aCondition = RegexSequencer.splitSequence(anEntry.condition);
 				final String[] commonPreCondition = RegexSequencer.subSequence(aCondition, 0, 1);
 				final String[] commonPostCondition = RegexSequencer.subSequence(aCondition, 2);
@@ -1687,7 +1687,7 @@ public class RulesReducer{
 
 		final AffixType type = ruleToBeReduced.getType();
 		final List<String> prettyPrintRules = convertEntriesToRules(flag, type, keepLongestCommonAffix, compactedRules);
-		prettyPrintRules.add(0, LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(),
+		prettyPrintRules.addFirst(LineEntry.toHunspellHeader(type, flag, ruleToBeReduced.combinableChar(),
 			prettyPrintRules.size()));
 		return prettyPrintRules;
 	}
@@ -1818,11 +1818,11 @@ public class RulesReducer{
 			return maxConditionEntry;
 		}
 		else
-			return (!rules.isEmpty()? rules.get(0): null);
+			return (!rules.isEmpty()? rules.getFirst(): null);
 	}
 
 	private static void expandAddition(final List<LineEntry> rules, final LineEntry compactedRule){
-		final String from = rules.get(0).from.iterator().next();
+		final String from = rules.getFirst().from.iterator().next();
 		final int longestConditionLength = compactedRule.condition.length();
 		for(int i = 0, length = rules.size(); i < length; i ++){
 			final LineEntry rule = rules.get(i);

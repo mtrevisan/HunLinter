@@ -24,22 +24,17 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.SetHelper;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @SuppressWarnings("ALL")
@@ -63,8 +58,8 @@ class RulesReducerPrefixTest{
 			"PFX '0 l ‘ l",
 			"PFX '0 v ‘ v"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
 		AffixType affixType = AffixType.PREFIX;
@@ -78,37 +73,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("g", "‘", "[^a]g", Arrays.asList("aseifnog", "aŧeifnog", "oifnog")),
-			new LineEntry("ag", "‘", "ag", "atevag"),
-			new LineEntry("l", "‘", "l", "exeràl"),
-			new LineEntry("a", "‘", "a", Arrays.asList("arokna", "na", "la", "aroƚa", "arola")),
-			new LineEntry("i", "‘", "i", Arrays.asList("oírdni", "otnatni", "atserpni", "‘tni", "étni")),
-			new LineEntry("ni", "‘", "tni", Arrays.asList("otnatni", "‘tni", "étni")),
-			new LineEntry("v", "‘", "v", Arrays.asList("ortsòv", "raduv", "oduv", "oƚov", "raƚov", "arav", "otakov", "agèlov", "atlòv", "ogedàƚov", "adatlov", "utòv", "reƚov", "ut-òv", "adusov", "ageƚòv", "ratlov", "otlov", "agèƚov", "oxov", "raxov", "eolóv", "ut-uv", "agelòv", "olov", "ralov", "eoxóv", "adaxov", "aduslov", "utuv", "relov", "oƚòv", "ovlòv", "noxov", "alodív", "arèitnelov", "eotlòv", "iuv", "arèitnilov", "eoƚóv", "olòv", "avlòv", "eoràv", "oduslov", "arèitniƚov", "arèitneƚov", "eodràv", "orav", "rarav", "ogedàlov", "aŧaxov", "eodúv", "exov", "anidatlov", "odusov", "otlòv", "odrav", "radrav")),
-			new LineEntry("d", "‘", "d", "otid"),
-			new LineEntry("òk", "‘", "òk", "asòk")
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX '0 Y 9",
-			"PFX '0 a ‘ a",
-			"PFX '0 d ‘ d",
-			"PFX '0 i ‘ i",
-			"PFX '0 l ‘ l",
-			"PFX '0 v ‘ v",
-			"PFX '0 ga ‘ ga",
-			"PFX '0 kò ‘ kò",
-			"PFX '0 g ‘ g[^a]",
-			"PFX '0 in ‘ int"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -140,8 +105,8 @@ class RulesReducerPrefixTest{
 			"PFX vs té tà té",
 			"PFX vs ve va ver"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "vs";
 		AffixType affixType = AffixType.PREFIX;
@@ -155,49 +120,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("es", "as", "es", Arrays.asList("ratàbes", "atares", "aítserges", "oterges", "otnopares", "odarges", "oiŧivres", "otabes", "oɉares", "lavares", "ojares", "oisivres", "natserges", "iđrèvares", "rabres", "ixrèvares", "etnexres", "otnemarges", "adaneres", "ogeràvles", "òretabes", "aíreterges", "eotàbes", "adares", "retàbes", "idrèvares", "òratabes", "oiraterges")),
-			new LineEntry("eb", "ab", "eb", Arrays.asList("oɉasreb", "ojasreb", "lèvotreb", "eoníkereb", "alèotreb", "atereb", "arèoreb", "eoɉàsreb", "eojàsreb", "nitereb", "alèvotreb", "raɉasreb", "ranikereb", "rajasreb", "nikereb", "rèoreb", "lèotreb", "onikereb", "alokòkireb")),
-			new LineEntry("ès", "às", "ès", Arrays.asList("idrèv–arès", "eobrès", "ixrèv–arès", "iđrèv–arès")),
-			new LineEntry("er", "ar", "er", Arrays.asList("noteper", "anier", "eognémer", "eosàger", "alotsèɉer", "raƚetser", "aŧager", "rèjoƚer", "raisefer", "arèletser", "onoxer", "rèɉoƚer", "alotsèjer", "arèjoƚer", "adasager", "oñeter", "ripser", "eonóɉer", "ratoɉer", "ragnemer", "ranojer", "raer", "oderfer", "notloer", "lètser", "aŧiatlaber", "odeŧer", "ognemer", "lèxeder", "eođéŧer", "rakserfer", "otnexer", "raxeser", "eotnéxer", "radufer", "logídnever", "osofer", "alèraper", "oƚètser", "lètojer", "lèdnemer", "eodúfer", "ratlaber", "arèɉoƚer", "eolètser", "eorúkner", "nifuber", "obnober", "eoƚètser", "oxeser", "oŧager", "odufer", "nojer", "nolotlover", "emaŧager", "eonójer", "lètoɉer", "abober", "eotòjer", "rabràber", "noxer", "arèiletser", "onojer", "ragner", "asager", "olètser", "ogner", "úvedner", "eotòɉer", "raŧager", "eoŧàger", "lèđeder", "adaƚetser", "otanemer", "atseuker", "lager", "eoxéser", "radeŧer", "eotlàber", "alotséɉer", "otòɉer", "oɉòler", "rarukner", "adaletser", "ocer", "anixnamer", "racer", "arèɉoler", "ranoxer", "ratnexer", "orukner", "lèdeder", "alotséjer", "raletser", "eoiséfer", "rèjoler", "emasager", "arèƚetser", "ratojer", "rèɉoler", "érter", "okserfer", "otlaber", "ranoɉer", "rađeŧer", "lèdnamer", "osager", "eoksérfer", "arèiƚetser", "alogídnever", "notlover", "oisefer", "etneŧer", "atlaber", "ojauker", "otlòker", "eodéŧer", "adaŧager", "logéber", "eonóxer", "ojòler", "aletlaber", "ođeŧer", "onoɉer", "otòjer", "rasager", "arèjoler", "etneser")),
-			new LineEntry("ét", "àt", "ét", "eotét"),
-			new LineEntry("èp", "àp", "èp", Arrays.asList("orteprèp", "otumrèp", "eotumrèp", "eorteprèp")),
-			new LineEntry("ef", "af", "ef", Arrays.asList("adarosref", "laref", "eorósref", "orosref", "ralaref", "olaref", "ramref", "arosref", "nixàref", "eolàref", "otnemref", "rarosref", "nirosref", "oƚaref", "okubanref", "raƚaref", "ratnemref", "omref", "eotnémref", "eoƚàref", "eƚaref")),
-			new LineEntry("ép", "àp", "ép", Arrays.asList("lorép", "eororép", "ororép")),
-			new LineEntry("ep", "ap", "ep", Arrays.asList("odnetnirep", "eogúsrep", "lokírep", "òrep", "riñivrep", "eotiugèsrep", "rarteprep", "otirep", "ougèsrep", "oxilanosrep", "anednòŧrep", "eotémrep", "otiugèsrep", "exinrep", "eodúmrep", "osrokrep", "otusrep", "ratumrep", "rartsulrep", "oxausrep", "eoxíƚanosrep", "otarteprep", "eodoírep", "eoñétrep", "anednòsrep", "raxilanosrep", "rinimrep", "otartsulrep", "eoutèprep", "nikurep", "odausrep", "ramufrep", "ripesrep", "oƚokírep", "aloŧúrep", "otòkrep", "otnatrep", "nisrep", "otrèvrep", "omufrep", "oñèvrep", "òŧrep", "outèprep", "osemrep", "atelosurep", "ripeŧrep", "riñevrep", "eoƚókrep", "ateloŧurep", "odumrep", "oradúmrep", "eodnétnirep", "riugesrep", "raradumrep", "oxarfírep", "arodarukrep", "rodukesrep", "oxolokirep", "ralokrep", "ogusrep", "eotòkrep", "eoñévrep", "oxanosrep", "rotukesrep", "oñètrep", "onamrep", "onifrep", "ortsulrep", "lobnésrep", "renamrep", "anosrep", "eougèsrep", "rarofrep", "lomésrep", "rèkurep", "eorókrep", "axinrep", "eoradúmrep", "rauteprep", "raƚokirep", "oxiƚanosrep", "noixausrep", "oxoƚamrep", "eoƚokírep", "oxamrep", "eolókrep", "ranesrep", "eoñètrep", "riñetrep", "omòrep", "eolokírep", "akurep", "orokrep", "osrèvrep", "raxiƚanosrep", "eoxílanosrep", "eotírep", "eoxarfírep", "alosúrep", "ratirep", "ratonrep", "nokurep", "raƚokrep", "ralokirep", "arèkurep", "eodàusrep", "rodarukrep", "ratiugesrep", "òsrep", "oñetrep", "eotònrep", "otemrep", "oròfrep", "anifrep", "emokrep", "ékrep", "oxolamrep", "ragusrep", "odoírep", "òcrep", "eoñèvrep", "oƚokrep", "eomúfrep", "otòxinrep", "eoròfrep", "otònrep", "radumrep", "rosrep", "ojanosrep", "eotrèvrep", "raxarfirep", "olokrep", "oxetnirep", "rasrep", "oxoƚokirep", "oñevrep", "eortsúlrep", "rarorep", "oiŧipeŧrep", "olokírep", "radoirep", "ratokrep")),
-			new LineEntry("ev", "av", "ev", Arrays.asList("orusrev", "eoƚòrev", "ralorev", "olòrev", "ragefirev", "eonérev", "ogefírev", "eorúsrev", "alogírev", "raƚorev", "oxigrev", "lòirev", "rarusrev", "eolòrev", "rosrev", "oƚòrev", "eoxígrev", "ranerev", "onerev", "raxigrev", "eogefírev")),
-			new LineEntry("éf", "àf", "éf", "eomréf"),
-			new LineEntry("èr", "àr", "èr", "eoèr"),
-			new LineEntry("et", "at", "et", Arrays.asList("aniret", "eojànet", "raloraŧret", "eolòiraŧret", "aɉanet", "oƚòrasret", "raloirasret", "raŧaret", "eoɉànet", "olòirasret", "anixaret", "raƚoirasret", "aiŧiret", "rasaret", "ajanet", "raneiparet", "olòrasret", "eoŧàret", "olòiraŧret", "arèitset", "ojanet", "eonéiparet", "oɉanet", "raloiraŧret", "otet", "ratet", "adatset", "oŧaret", "ralorasret", "eolòirasret", "eoƚòirasret", "osaret", "oneiparet", "raƚorasret", "olòraŧret", "oƚòirasret", "eosàret", "nixet", "eolòrasret", "eolòraŧret", "rajanet", "raɉanet", "eoƚòrasret")),
-			new LineEntry("ér", "àr", "ér", Arrays.asList("eocér", "eognér")),
-			new LineEntry("eS", "aS", "eS", Arrays.asList("lavareS", "eƚavareS"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX vs Y 15",
-			"PFX vs be ba be",
-			"PFX vs fe fa fe",
-			"PFX vs pe pa pe",
-			"PFX vs re ra re",
-			"PFX vs se sa se",
-			"PFX vs Se Sa Se",
-			"PFX vs te ta te",
-			"PFX vs ve va ve",
-			"PFX vs fé fà fé",
-			"PFX vs pé pà pé",
-			"PFX vs ré rà ré",
-			"PFX vs té tà té",
-			"PFX vs pè pà pè",
-			"PFX vs rè rà rè",
-			"PFX vs sè sà sè"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -210,8 +133,8 @@ class RulesReducerPrefixTest{
 			"PFX ^0 Y 1",
 			"PFX ^0 0 anti ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "^0";
 		AffixType affixType = AffixType.PREFIX;
@@ -225,21 +148,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "itna", StringUtils.EMPTY, Arrays.asList("otap", "laiŧos", "laisos", "ailidiv", "aramàk", "amam", "ailiđiv", "aremàk", "otèp", "ailixiv", "otsap", "omxius"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX ^0 Y 1",
-			"PFX ^0 0 anti ."
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -254,8 +163,8 @@ class RulesReducerPrefixTest{
 			"PFX .0 0 ra [^a]",
 			"PFX .0 0 ar [^ƚ]"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = ".0";
 		AffixType affixType = AffixType.PREFIX;
@@ -269,25 +178,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "ar", "[^a]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "odro", "eodév", "aneiparts", "raxilag", "reloit", "rañèc", "risu", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("", "er", ".", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("", "ra", "[^ƚ]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "oisnun", "olòs", "olòt", "òresan", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "olov", "eoŧnók", "ragen", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "eoisnón", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osan", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "oisnon", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "eoisnún", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "otirf", "rinu", "rino", "eodnàmod", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "resàn", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "òrasan", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "eosàn", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "ogèn", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "rasàn", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "aŧnats", "òrarok", "òrexok", "eodúf", "otan", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "eoiŧnún", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raiŧnon", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raiŧnun", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "ovòn", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "eovòn", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "ravon", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "òrađuf", "oiŧnun", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "raisnon", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "eoiŧnón", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oiŧnon", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "raisnun", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "eogèn", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX .0 Y 3",
-			"PFX .0 0 re .",
-			"PFX .0 0 ra [^a]",
-			"PFX .0 0 ar [^ƚ]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -301,8 +192,8 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in [^n]",
 			"PFX +0 0 i n"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
 		AffixType affixType = AffixType.PREFIX;
@@ -316,23 +207,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "ni", "[^n]", Arrays.asList("eorgetní", "ovlas", "ođèle", "oratí", "eojémos", "rexàrt", "otart", "òradart", "ratàb", "raf", "eonód", "raxèl", "axeps", "eođílag", "eonóp", "odirf", "orgetní", "òredrevok", "odneiba", "òređnerts", "òređele", "òredel", "osonok", "òrexeƚe", "otòƚab", "reñét", "osemorp", "reñév", "ragap", "rasnok", "resónok", "onop", "eotnàip", "rañiŧ", "oƚoit", "rakip", "oñirg", "eoɉémos", "òredev", "ređèl", "oxèƚe", "radèle", "rasnop", "reñéc", "oipòk", "olob", "oloc", "omits", "rexrèvok", "òraxlov", "òrañev", "rakif", "aduƚos", "rijob", "reñèt", "reñèv", "eovràs", "olòv", "rađop", "eolíf", "nilets", "òrađel", "otnivnok", "eođròt", "erdnelps", "eođnét", "reñèc", "òrañec", "oipod", "olòs", "olòt", "oklak", "òrañet", "ralets", "okreŧ", "ojip", "eokràm", "odrav", "olòc", "odrat", "òravlos", "oxerk", "eoxnéps", "redúf", "odaf", "rexnérts", "oxerp", "rea", "eotnémadnof", "oloit", "utòv", "oŧnivnok", "eotràp", "otnom", "oduƚos", "rađúf", "òrañevos", "akreŧ", "eotnéved", "rargetni", "oipud", "adaƚof", "rađup", "eoxúƚ", "olov", "eoŧnók", "eoƚotípak", "olot", "ratoƚab", "eoñévos", "òraxart", "redàrt", "enemròc", "òradrom", "eognàv", "rirapnok", "raƚag", "ratneved", "oxeps", "ragel", "neip-arts", "rañuk", "oƚokèb", "eolèv", "rađrèvok", "erdrèvok", "onoixiv", "ojob", "eobórp", "òraduf", "eoxnérts", "raƚets", "ravak", "eonrót", "eolév", "eoirtàp", "eotúb", "eoŧlàbx", "omenà", "òreŧnivnok", "ofif", "otemorp", "rađitab", "rid", "atòb", "ut-òv", "odijob", "otlòit", "eotlàs", "rednéps", "otlov", "otlot", "emodnéibag", "oderk", "eođrèvok", "eorók", "enemodnéibag", "eoɉób", "osap", "òređnet", "òraderk", "riñivbus", "odèl", "eoxrèvok", "eosé", "osab", "ridla", "rajemos", "eotà", "òraxrot", "rageip", "osal", "olokèb", "rarips", "eolokèb", "eosú", "oxnet", "raƚev", "ranoixiv", "aŧnasoñok", "otlòc", "ranrot", "rexírf", "eodàrt", "enemròt", "eokrés", "eojàt", "oxrèvok", "oñesa", "osès", "erdnerts", "eovrès", "rednérp", "otneps", "òrenop", "omrof", "olòŧ", "eotíŧ", "òradnet", "erdirf", "otloc", "eoném", "òradnev", "odnam", "òređrot", "otlòk", "raxíd", "odev", "rakot", "amits", "eoŧlà", "odutab", "otlòv", "ogèip", "otlòs", "ravel", "ođrèvok", "otlòt", "òredlos", "ratak", "ravort", "òredlov", "oxròs", "oxròt", "otnaip", "oidèm", "eoxú", "eoxúl", "eoxúp", "eolotípak", "erdev", "oxart", "reas", "osrav", "òrejob", "raŧeps", "retàb", "rageƚ", "raditab", "reñèvos", "raƚopop", "rexèl", "ređnéps", "osev", "ròc", "risne", "ređlòv", "oirtap", "riñet", "obòrp", "riñev", "raŧep", "ròt", "ovlòs", "utuv", "òretemorp", "osem", "ovlòv", "osep", "raŧerd", "eonópnok", "raxop", "akres", "òreserk", "ranópnok", "òraxros", "oxilag", "riñevos", "eotèŧ", "eolàg", "òrađirf", "eopàŧ", "emròt", "raƚif", "ridof", "raɉat", "eolàs", "raxòk", "erdèl", "adaƚif", "odnev", "emodnà", "odnet", "ravív", "ratep", "rarap", "rates", "odavel", "raɉemos", "odnem", "eorím", "ratex", "eorít", "òrednof", "òređart", "rađròt", "raxèƚ", "òrexlov", "odròm", "rateg", "odròt", "raborp", "eoxúg", "redírf", "eoxúf", "raŧlak", "eoxàrt", "eoxúd", "eoxúk", "òraxnet", "ratém", "enemodnéiba", "ragnav", "eomàc", "rileb", "ognav", "rađnéps", "osaƚ", "rasaƚ", "otirf", "rinu", "rino", "eodnàmod", "òrexuƚ", "òrajob", "osulf", "eodnàmok", "redrèvok", "eođítab", "òrev", "òretelf", "otulos", "òrexrevok", "òrevirks", "eođírf", "oŧnok", "relov", "otnexerp", "raŧnok", "ođart", "otrèf", "arudatab", "riɉob", "eoxèle", "oŧlabx", "raxàrt", "eosàƚ", "odop", "oñèv", "relot", "eoléts", "otrap", "osèŧ", "oñèt", "adaksak", "reloc", "rednérts", "eotémorp", "òresnivnok", "reƚoit", "òraxeƚe", "òrerok", "òreɉob", "oxelps", "odòp", "oèrk", "oñèc", "osla", "adijob", "rilas", "oborp", "ređrèvok", "eoñévbus", "odna", "rexèƚe", "rareti", "odakeb", "rexnét", "eotnéxerp", "òrađnerts", "eoƚopòp", "redév", "ravras", "okram", "ovras", "rasof", "rafub", "raibnak", "eoŧéps", "rakram", "eosès", "adutab", "redèl", "ritsev", "osòd", "ovirks", "òradel", "eoŧérd", "nokeb", "oñev", "oñet", "ređnérts", "òrađneps", "asnats", "osòm", "otloit", "osòf", "osne", "rađèl", "ođèl", "otsèni", "raseŧ", "eosép", "omac", "ramac", "aíredlab", "eosév", "oñec", "rañév", "ralotipak", "oisarg", "otèƚe", "rañét", "òradev", "rexròs", "rexròt", "eoŧlàk", "radop", "rañèv", "rañéc", "rejób", "eofíf", "rañèt", "ratnemadnof", "noiŧa", "odro", "eodév", "aneiparts", "osirapa", "raxilag", "reloit", "rañèc", "risu", "rasla", "eođàrt", "òradrevok", "eolòŧ", "òreart", "ređèle", "redérk", "rise", "otòlab", "radna", "radàrt", "radnélps", "eròt", "raƚovop", "raxírf", "rađnérts", "odup", "radup", "eoríps", "okres", "oretí", "odiɉob", "oterk", "ravírks", "eojób", "ravres", "eoƚovòp", "onopnok", "rakres", "radnamod", "eoslàbx", "orapa", "òrexul", "adafub", "òrexuk", "òrexud", "rednév", "eordàuk", "ralopop", "rednét", "òrexuf", "eròc", "oñis", "rañis", "eoredísnok", "redròm", "eodèl", "òradlos", "noixuf", "resnívnok", "eovórt", "òraxrevok", "ratlas", "ratnet", "oxile", "okeb", "rañévos", "eodílag", "avlòv", "rednélps", "oƚovòp", "eoiŧàrg", "ovrès", "òrevom", "radro", "òresoñok", "riñevbus", "eovírks", "eotàrt", "riurtsok", "odusov", "eolòs", "oxirf", "eodèle", "raƚotipak", "rarati", "ojemos", "eosàb", "eosnóp", "eolób", "raƚotlov", "òraserk", "ratirem", "eosàl", "ratipak", "eoradísnok", "eosàp", "ratrop", "radilag", "eodlàks", "adaf", "òradnof", "eosnók", "osrapa", "radírf", "eoñívbus", "okes", "rakes", "rilop", "redròt", "otnes", "oxnerts", "otnet", "eoƚéts", "otlas", "okif", "rakeb", "osrapnok", "ođop", "ramits", "ođneps", "ròit", "adakeb", "eojíp", "otrèvok", "raipok", "radnamok", "revlòs", "òranop", "òređirf", "ramena", "rakreŧ", "raklak", "erduf", "òređneps", "aŧnesoñok", "olotípak", "radúf", "ođòp", "ođlòv", "lub", "otròp", "raipod", "radrav", "otròs", "otròt", "radrat", "ravlas", "eođóp", "rađèle", "ođirf", "oñivbus", "eoƚàs", "rilibats", "enemodnà", "ratart", "eovlòs", "resérk", "eortnóks", "odnerts", "eròit", "adatnom", "nitart", "oxèl", "eokíf", "osirapnok", "eobòrp", "ratnexerp", "odèle", "rexlòv", "eoñíŧ", "eokíp", "eonemés", "reva", "eoidèm", "òređrevok", "eotipàk", "rañirg", "ogap", "raxèƚe", "òreviv", "osnok", "oàf", "eoksàk", "òredele", "oñiŧ", "okip", "oàg", "osnop", "raslabx", "òretem", "ranod", "oàs", "oƚas", "eodnérp", "otirks", "ranóp", "adiɉob", "oƚag", "ratisus", "oñuk", "eovàk", "osoñok", "eotsèv", "riƚeb", "eođòp", "rexúk", "oƚets", "rexúl", "eoibnàk", "ovak", "oàrt", "eobnób", "rexúf", "oƚòit", "ogèl", "oxet", "retèlf", "eoƚàg", "òreñevos", "òredirf", "eotòlab", "òratelf", "rexúd", "eosrèv", "resè", "odusiv", "aŧnasonok", "riref", "eodnéps", "odrèvok", "eogàp", "ratnom", "òraxuƚ", "adusov", "eokéb", "ovèl", "eodrèvok", "eokés", "ođup", "ođitab", "oterts", "ralos", "raipud", "òrexele", "reɉób", "redlòv", "redlòs", "radérk", "ralof", "rixof", "rerók", "erdnof", "odilag", "oƚev", "ralob", "eodnév", "oƚopòp", "raxnét", "eosné", "riƚibats", "raiŧarg", "eoxílag", "rednóf", "eodròm", "eodròt", "eođnéps", "oƚèv", "òrexeƚ", "aŧnats", "òrarok", "òrexok", "eodúf", "eoŧnívnok", "olets", "rata", "radnam", "raxitab", "olòit", "oxid", "otab", "eodúp", "òraɉob", "okot", "òraxnerts", "òrednerts", "rajip", "eoñésa", "rardauk", "riraf", "eodrò", "òrexirf", "ramrof", "eodnét", "otak", "raxròt", "eodném", "resóñok", "raxròs", "otaf", "rafif", "otèx", "otès", "eolopòp", "rixuf", "rixuk", "oibnak", "eoksép", "odnelps", "ratlok", "eoñèvos", "riƚop", "otèp", "ratlov", "ratnaip", "otèl", "olotlòv", "eolotlòv", "emodnéiba", "eodnóf", "rasap", "eoñís", "eodnóm", "oƚotípak", "olopòp", "otirèm", "radèl", "òrexel", "odulos", "rasab", "rexúƚ", "aduslov", "orips", "rasal", "òradnelps", "ođnet", "rodednev", "rasnívnok", "oradísnok", "odneibag", "oƚif", "eodlòv", "oxòp", "eodnérts", "oɉat", "oxòk", "eodlòs", "raxu", "raradisnok", "rajób", "oviv", "ritrap", "otep", "òraxeƚ", "orap", "otes", "otsòpnok", "eofúb", "radnév", "ođròt", "oñevos", "radnét", "radnem", "eodnà", "oxèƚ", "ralotlov", "oteg", "ređírf", "radròm", "otem", "òraxok", "erdèle", "eoslà", "oŧlak", "eoisàrg", "eotsèni", "eoñèc", "eosèŧ", "eoñèv", "oŧeps", "eodóp", "eosérk", "rasrav", "eoñèt", "raƚokeb", "ralovop", "eosnívnok", "òrasonok", "eoàf", "eosérd", "rasev", "òraxuf", "raidem", "raŧlabx", "òraxuk", "òrexid", "eoñéc", "rases", "òraxul", "ortnoks", "otipàk", "eotirèm", "osèlf", "eoséps", "eođèl", "òraxud", "eodítab", "ravlòs", "adasap", "eoñév", "noisaveƚ", "ređàrt", "oŧep", "eotèlf", "eoñét", "òretab", "rasep", "rartnoks", "revírks", "ositrap", "oxop", "eosòf", "ogèƚ", "ranemes", "radrèvok", "oŧerd", "raloŧ", "radnérts", "reŧnívnok", "rabnob", "oƚòc", "òraxneps", "rasónok", "rexèle", "renóp", "eoxlòv", "oredísnok", "adusiv", "rinrof", "ovòm", "onrot", "rañesa", "reñévos", "eoslàk", "opas", "rasrev", "ovèƚ", "eoàv", "òređuf", "eoèrk", "otid", "radév", "òrednelps", "ovort", "òravom", "otis", "eodòp", "òraŧnivnok", "eodírf", "emròit", "eovòm", "òradnerp", "eotòƚab", "oƚot", "òrexnerts", "otèle", "otèlf", "oƚov", "ratèlf", "rarid", "rexíd", "oxuk", "oxud", "eoxíƚag", "oxuf", "oxug", "raxug", "òrađele", "otèŧ", "ređúf", "rexnéps", "raisarg", "onemés", "raƚos", "òrasnivnok", "raƚof", "eoñírg", "adalif", "utà", "odart", "eovóm", "oƚob", "raƚob", "erdnev", "oƚoc", "òradirf", "ut-uv", "erdnet", "rasérk", "riduf", "ovom", "erdròt", "oƚòs", "oƚòt", "ravóm", "eoƚòs", "oƚòv", "eoƚób", "emròc", "oidis", "erdròm", "òraxid", "òratab", "riñiv", "òradnerts", "utàv", "obnob", "eoipód", "eokréŧ", "otartnoks", "raveƚ", "òrađuf", "osrèv", "òredart", "otod", "raksak", "oà", "eodnélps", "ravòm", "òreduf", "oduslov", "òravirks", "adulos", "otòb", "revas", "otèƚ", "òrednerp", "rapas", "òrexneps", "erderk", "òradele", "otòk", "eoipòk", "otsèv", "raxlòv", "osnivnok", "oxup", "eotís", "orim", "oxul", "renópnok", "reàrt", "redèle", "orit", "oŧla", "ratis", "eovèƚ", "revag", "radnóf", "eosónok", "eoƚokèb", "eoxèƚ", "eoxòk", "otsiv", "òraviv", "oɉemos", "radnérp", "eoƚíf", "eoxòp", "raseps", "odnerp", "oseps", "radnom", "odnof", "odnom", "radnof", "oserd", "eoŧép", "raserd", "eoxóp", "oserk", "ođilag", "eogèƚ", "òratem", "raerk", "eoxírf", "eoretí", "òraxirf", "odaksak", "ratémorp", "òradneps", "ratolab", "raredisnok", "oƚotlòv", "eotròp", "raŧnívnok", "orok", "òrevlos", "oksak", "radnéps", "adalof", "eotèp", "eoxítab", "olovòp", "raksep", "eotès", "eotèx", "eođlòv", "eopàs", "òratemorp", "eovlàs", "oƚub", "raxúf", "eotnés", "òrexart", "eotnét", "eomíts", "rarix", "raslak", "raxúd", "eodràt", "eodràv", "eotég", "eotém", "etneđ", "raxúk", "raxúl", "arodednev", "eođnérts", "raxup", "eoklàk", "òredrot", "eotép", "radlaks", "oxlòv", "rateŧ", "opaŧ", "rarim", "onem", "eovív", "radlòs", "otiŧ", "eotés", "olag", "rarit", "raŧla", "olas", "òredrom", "òraxele", "oditab", "òređlov", "ose", "rairtap", "otub", "ratub", "odaveƚ", "òrednev", "raxnérts", "adanem", "lasnops", "ređnét", "eodérk", "odnamod", "rađilag", "osu", "eoƚév", "osròm", "eoipúd", "ota", "erdnerp", "olèv", "ređròt", "ralokeb", "otnemadnof", "enemròit", "raxrèvok", "òresonok", "rañèvos", "aŧnesonok", "raɉób", "utag", "òrednet", "otisús", "oɉob", "osrok", "aneip-arts", "raxiƚag", "otsòp", "riñivos", "òranopnok", "òrađrot", "eoxròs", "eotlòv", "eomróf", "eoxròt", "oksep", "oñèvos", "rarók", "òrenopnok", "eovèl", "eogèip", "eođúf", "etnex", "eođúp", "otsopnok", "oxuƚ", "oxneps", "eoràp", "aŧlab", "rariđ", "oslak", "eokót", "rexèƚ", "erdart", "eoƚotlòv", "eoxnét", "eoxíd", "rexòk", "riđof", "odlòv", "òrexrot", "rapaŧ", "odlòs", "retém", "ranem", "eosràv", "òrederk", "odnamok", "ratiŧ", "òrexros", "eotlòk", "ralag", "eoƚèv", "eoɉàt", "eonóixiv", "revív", "olev", "ojat", "rađàrt", "rađírf", "raxèle", "eolovòp", "eogèl", "nimak", "eoxèƚe", "olif", "ralif", "oxèle", "rirapa", "reƚov", "neiparts", "reƚot", "ratseni", "oxiƚag", "oslabx", "reƚoc", "òredneps", "òrađrevok", "oxu", "eođèle", "riđuf", "òraxel", "eoratí", "ertsè", "òrexnet", "otneved", "etned", "eoñúk", "raxúƚ", "eotisús", "oiŧarg", "onod", "oxitab", "otuƚos", "riƚas", "revóm", "eotàb", "eoxèl", "eotnóm", "òrađart", "eotàk", "oñevbus", "ritnes", "retémorp", "eomenà", "otsop", "òređel", "eodnàm", "òreñec", "revòm", "ordauk", "odlaks", "òreñev", "odanem", "ođnerts", "òreñet", "ralev", "rajat", "raxnéps", "eoàrt", "oxiƚe")),
-			new LineEntry("", "i", "n", Arrays.asList("eogèn", "raisnun", "rasàn", "eoisnón", "eovòn", "oiŧnun", "eosàn", "ovòn", "raiŧnon", "resàn", "raisnon", "raiŧnun", "osan", "otan", "oisnun", "eoiŧnón", "ogèn", "eoiŧnún", "òresan", "ravon", "eoisnún", "oisnon", "ragen", "oiŧnon", "òrasan"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX +0 Y 2",
-			"PFX +0 0 i n",
-			"PFX +0 0 in [^n]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -347,8 +222,8 @@ class RulesReducerPrefixTest{
 			"PFX $1 0 h/Z0 .",
 			"PFX $1 0 da/Z0 ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "$1";
 		AffixType affixType = AffixType.PREFIX;
@@ -362,22 +237,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", SetHelper.setOf("ad/Z0", "h/Z0"), StringUtils.EMPTY, Arrays.asList("rs", "A", "aD", "C", "Å", "F", "H", "J", "lom", "K", "gHmm", "N", "zH", "Ve", "aP", "rab", "S", "T", "V", "W", "vS", "pN", "tak", "ml", "lP", "g", "Ω", "l", "m", "yG", "rroT", "qB", "s", "xl", "u", "bW"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX $1 Y 2",
-			"PFX $1 0 h/Z0 .",
-			"PFX $1 0 da/Z0 ."
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -392,8 +252,8 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in– n",
 			"PFX +0 0 i [lƚmnñrs]"
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
 		AffixType affixType = AffixType.PREFIX;
@@ -407,25 +267,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "ni", "[^n]", Arrays.asList("odamam", "adamam")),
-			new LineEntry("", "–ni", "n", Arrays.asList("etneŧon", "etneson", "nitneson")),
-			new LineEntry("", "i", "[^k]", Arrays.asList("odamam", "etneŧon", "etneson", "nitneson", "adamam"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX +0 Y 3",
-			"PFX +0 0 in– n",
-			"PFX +0 0 i [^k]",
-			"PFX +0 0 in [^n]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 	@Test
@@ -440,8 +282,8 @@ class RulesReducerPrefixTest{
 			"PFX p3 0 trï [aeiouàèéíòóú]",
 			"PFX p3 0 tre ."
 		);
-		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer reducer = pair.getLeft();
+		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer4 reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "p3";
 		AffixType affixType = AffixType.PREFIX;
@@ -455,25 +297,7 @@ class RulesReducerPrefixTest{
 			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, affixType))
 			.flatMap(Collection::stream)
 			.toList();
-		List<LineEntry> compactedRules = reducer.reduceRules(originalRules);
-
-		Set<LineEntry> expectedCompactedRules = SetHelper.setOf(
-			new LineEntry("", "ïrt", "à", Arrays.asList("lognà", "lugnà", "oƚognà", "oƚugnà")),
-			new LineEntry("", "irt", "[^à]", Arrays.asList("éip", "ogeŧílx", "èp", "abalís", "èip", "abaƚís", "ogesílx")),
-			new LineEntry("", "ert", ".", Arrays.asList("éip", "lognà", "ogeŧílx", "èp", "lugnà", "oƚognà", "abalís", "èip", "oƚugnà", "abaƚís", "ogesílx"))
-		);
-		Assertions.assertEquals(expectedCompactedRules, new HashSet<>(compactedRules));
-
-		List<String> rules = reducer.convertFormat(flag, false, compactedRules);
-		List<String> expectedRules = Arrays.asList(
-			"PFX p3 Y 3",
-			"PFX p3 0 trï à",
-			"PFX p3 0 tre .",
-			"PFX p3 0 tri [^à]"
-		);
-		Assertions.assertEquals(expectedRules, rules);
-
-		RulesReducerUtils.checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
+		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
 	}
 
 }

@@ -24,11 +24,7 @@
  */
 package io.github.mtrevisan.hunlinter.workers.thesaurus;
 
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -50,9 +46,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -68,7 +68,12 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 	private static final String ENTRY_NOT_IN_DICTIONARY = "Dictionary doesn't contain definition {} (from entry {})";
 
 
-	private final BloomFilterInterface<String> bloomFilter;
+	/**
+	 * The words of the thesaurus' definitions that have been found into the dictionary.
+	 * NOTE: it's enough to look for those few words while the inflections are generated, there's no need to store all of them (an exact
+	 * set is also way faster, and smaller, than a bloom filter with as many hash functions as needed for the required precision).
+	 */
+	private final Set<String> foundWords = ConcurrentHashMap.newKeySet();
 
 
 	public ThesaurusLinterWorker(final ThesaurusParser theParser, final String language, final DictionaryParser dicParser,
@@ -82,10 +87,6 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 		Objects.requireNonNull(dicParser, "Dictionary parser cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
-
-		final Charset charset = dicParser.getCharset();
-		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
 
 		final Consumer<ThesaurusEntry> dataProcessor = data -> {
 			final String originalDefinition = data.getDefinition();
@@ -109,9 +110,9 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			final String originalDefinition = data.getDefinition();
 
 			//check if the word is present in the dictionary
-			final String[] words = StringUtils.split(originalDefinition.toLowerCase(Locale.ROOT), " –");
+			final String[] words = extractWords(originalDefinition);
 			for(int i = 0; i < words.length; i ++)
-				if(!bloomFilter.contains(words[i]))
+				if(!foundWords.contains(words[i]))
 					LOGGER.warn(ParserManager.MARKER_APPLICATION, JavaHelper.textFormat(ENTRY_NOT_IN_DICTIONARY, words[i], originalDefinition));
 		};
 
@@ -125,7 +126,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		final Function<Void, Void> step2 = ignored -> {
 			resetProcessing("Reading dictionary file (step 2/3)");
 
-			collectWords(dicParser, wordGenerator);
+			collectWords(dicParser, wordGenerator, extractSearchedWords(theParser));
 
 			return null;
 		};
@@ -141,7 +142,20 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		setProcessor(step1.andThen(step2).andThen(step3));
 	}
 
-	private BloomFilterInterface<String> collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator){
+	private static String[] extractWords(final String definition){
+		return StringUtils.split(definition.toLowerCase(Locale.ROOT), " –");
+	}
+
+	/** @return	The words (in lowercase) the thesaurus' definitions are made of. */
+	private static Set<String> extractSearchedWords(final ThesaurusParser theParser){
+		final Set<String> searchedWords = new HashSet<>();
+		final List<ThesaurusEntry> entries = theParser.getSynonymsDictionary();
+		for(int i = 0, length = entries.size(); i < length; i ++)
+			Collections.addAll(searchedWords, extractWords(entries.get(i).getDefinition()));
+		return searchedWords;
+	}
+
+	private void collectWords(final DictionaryParser dicParser, final WordGenerator wordGenerator, final Set<String> searchedWords){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
@@ -153,7 +167,8 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 				for(int i = 0, length = inflections.size(); i < length; i ++){
 					final String str = inflections.get(i).getWord()
 						.toLowerCase(Locale.ROOT);
-					bloomFilter.add(str);
+					if(searchedWords.contains(str))
+						foundWords.add(str);
 				}
 			}
 			catch(final LinterException e){
@@ -165,11 +180,9 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
+		//the inflections are generated in parallel (the bloom filter is thread-safe)
+		ParserHelper.forEachDictionaryLineParallel(dicFile, charset, fun, progressCallback);
 
-		bloomFilter.close();
-
-		return bloomFilter;
 	}
 
 }

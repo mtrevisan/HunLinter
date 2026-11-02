@@ -100,7 +100,7 @@ public final class Digraph<T>{
 		while(v >= adjacency.size())
 			adjacency.add(new ArrayList<>(0));
 		adjacency.get(v)
-			.add(0, IndexDataPair.of(w, value));
+			.addFirst(IndexDataPair.of(w, value));
 	}
 
 	/**

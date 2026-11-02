@@ -492,7 +492,34 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
-					<argLine>--enable-native-access=ALL-UNNAMED</argLine>
+					<!-- The tests are loaded by reflection and use JUnit from within the module: the IDE runs them on the module
+						path, so the module has to read JUnit and open the packages that contain the tests to it. -->
+					<argLine>
+						--enable-native-access=ALL-UNNAMED
+						--add-reads io.github.mtrevisan.hunlinter=org.junit.jupiter.api
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.ahocorasicktrie=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.bloomfilter=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.fsa=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.fsa.builders=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.fsa.lookup=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.fsa.serializers=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.datastructures.fsa.stemming=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.languages=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.languages.vec=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.affix=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.dictionary=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.dictionary.generators=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.hyphenation=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.vos=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.services=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.services.regexgenerator=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.services.semanticversioning=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.services.sorters=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.services.sorters.externalsorter=org.junit.platform.commons
+					</argLine>
+
 				</configuration>
 			</plugin>
 

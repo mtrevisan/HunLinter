@@ -28,6 +28,7 @@ import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.core.IndexDataPair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +43,10 @@ public class HyphenationBreak{
 			final int wordLength);
 	}
 
-	private static final Map<String, NoHyphenationManageFunction> NO_HYPHENATION_MANAGE_METHODS = Map.of(
-		"  ", HyphenationBreak::manageInside,
-		"^ ", HyphenationBreak::manageStartsWith,
-		" $", HyphenationBreak::manageEndsWith,
-		"^$", HyphenationBreak::manageWhole
-	);
+	private static final NoHyphenationManageFunction MANAGE_INSIDE = HyphenationBreak::manageInside;
+	private static final NoHyphenationManageFunction MANAGE_STARTS_WITH = HyphenationBreak::manageStartsWith;
+	private static final NoHyphenationManageFunction MANAGE_ENDS_WITH = HyphenationBreak::manageEndsWith;
+	private static final NoHyphenationManageFunction MANAGE_WHOLE = HyphenationBreak::manageWhole;
 
 	static final IndexDataPair<String> EMPTY_PAIR = IndexDataPair.of(0, null);
 
@@ -64,6 +63,24 @@ public class HyphenationBreak{
 
 	public final boolean isBreakpoint(final int index){
 		return (indexesAndRules.getOrDefault(index, EMPTY_PAIR).getIndex() % 2 != 0);
+	}
+
+	/**
+	 * @param wordLength	The length of the word.
+	 * @return	The indexes (in increasing order) of the break points inside the word, that is the ones in the range [0, wordLength[
+	 *			with an odd value.
+	 */
+	public final int[] getBreakpoints(final int wordLength){
+		int[] breakpoints = new int[indexesAndRules.size()];
+		int count = 0;
+		for(final Map.Entry<Integer, IndexDataPair<String>> entry : indexesAndRules.entrySet()){
+			final int index = entry.getKey();
+			if(index >= 0 && index < wordLength && entry.getValue().getIndex() % 2 != 0)
+				breakpoints[count ++] = index;
+		}
+		breakpoints = Arrays.copyOf(breakpoints, count);
+		Arrays.sort(breakpoints);
+		return breakpoints;
 	}
 
 	public final String getRule(final int index){
@@ -85,8 +102,7 @@ public class HyphenationBreak{
 			for(int i = 0, length = syllabes.size(); i < length; i ++)
 				wordLength += syllabes.get(i).length();
 			for(final String nohyp : noHyphen){
-				final String reducedKey = reduceKey(nohyp);
-				final NoHyphenationManageFunction fun = NO_HYPHENATION_MANAGE_METHODS.get(reducedKey);
+				final NoHyphenationManageFunction fun = getManageFunction(nohyp);
 				fun.manage(indexesAndRules, syllabes, nohyp, wordLength);
 				if(syllabes.size() <= 1)
 					break;
@@ -126,7 +142,7 @@ public class HyphenationBreak{
 
 	private static void manageStartsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			final String nohyp, final int wordLength){
-		if(syllabes.get(0).equals(nohyp.substring(1))){
+		if(syllabes.getFirst().equals(nohyp.substring(1))){
 			indexesAndRules.remove(1);
 			indexesAndRules.remove(nohyp.length());
 
@@ -138,7 +154,7 @@ public class HyphenationBreak{
 	private static void manageEndsWith(final Map<Integer, IndexDataPair<String>> indexesAndRules, final List<String> syllabes,
 			final String nohyp, final int wordLength){
 		final int nohypLength = nohyp.length();
-		if(syllabes.get(syllabes.size() - 1).equals(nohyp.substring(0, nohypLength - 1))){
+		if(syllabes.getLast().equals(nohyp.substring(0, nohypLength - 1))){
 			indexesAndRules.remove(wordLength - nohypLength - 1);
 			indexesAndRules.remove(wordLength - 1);
 
@@ -169,8 +185,13 @@ public class HyphenationBreak{
 		array.remove(index);
 	}
 
-	private static String reduceKey(final CharSequence key){
-		return (isStarting(key)? "^": " ") + (isEnding(key)? "$": " ");
+	/** Selects the function without building (and looking up) a key string for each no-hyphen of each word. */
+	private static NoHyphenationManageFunction getManageFunction(final CharSequence nohyp){
+		final boolean starting = isStarting(nohyp);
+		final boolean ending = isEnding(nohyp);
+		if(starting)
+			return (ending? MANAGE_WHOLE: MANAGE_STARTS_WITH);
+		return (ending? MANAGE_ENDS_WITH: MANAGE_INSIDE);
 	}
 
 	private static boolean isStarting(final CharSequence key){

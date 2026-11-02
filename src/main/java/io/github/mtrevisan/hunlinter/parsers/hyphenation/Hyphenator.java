@@ -58,8 +58,6 @@ public class Hyphenator implements HyphenatorInterface{
 	private static final Pattern PATTERN_AUGMENTED_RULE = RegexHelper.pattern("^(?<rule>[^/]+)/(?<addBefore>[^=_]*?)(?:=|(?<hyphen>.)_)(?<addAfter>[^,]*)(?:,(?<start>\\d+),(?<cut>\\d+))?$");
 	private static final Pattern PATTERN_WORD_INITIAL = RegexHelper.pattern("^" + Pattern.quote(WORD_BOUNDARY));
 
-	private static final Pattern PATTERN_WORD_BOUNDARIES = RegexHelper.pattern(Pattern.quote(WORD_BOUNDARY));
-
 	private final HyphenationParser hypParser;
 	private final String breakCharacter;
 
@@ -154,7 +152,9 @@ public class Hyphenator implements HyphenatorInterface{
 	private HyphenationBreak hyphenate(String word, final Map<HyphenationParser.Level, AhoCorasickTrie<String>> patterns,
 			final HyphenationParser.Level level, final HyphenationOptions options){
 		//clear already present word boundaries' characters
-		word = RegexHelper.clear(word, PATTERN_WORD_BOUNDARIES);
+		//NOTE: the boundary is a literal, no regex needed (and most of the words don't contain it)
+		if(word.indexOf(WORD_BOUNDARY) >= 0)
+			word = word.replace(WORD_BOUNDARY, StringUtils.EMPTY);
 		final int wordSize = word.length();
 
 		final String customHyphenation = hypParser.getCustomHyphenations().get(level).get(word);
@@ -191,22 +191,22 @@ public class Hyphenator implements HyphenatorInterface{
 			final int rightMin = options.getRightMin();
 
 			final int normalizedWordSize = getNormalizedLength(word);
-			final List<SearchResult<String>> itr = patterns.searchInText(w);
-			for(int i = 0, length = itr.size(); i < length; i ++){
-				final SearchResult<String> r = itr.get(i);
-				final String rule = r.getValue();
-
-				final int startingIndex = r.getIndexBegin();
+			//NOTE: the hits are processed one by one (in the same order), this avoids to build the list of results
+			patterns.searchInText(w, (indexBegin, indexEnd, rule) -> {
 				//cycle the pattern's characters searching for numbers
 				//start from -1 since the initial dot has to be skipped
 				int j = -1;
-				final String reducedRule = HyphenationParser.removeNonStandardPart(rule);
-				for(final char chr : reducedRule.toCharArray()){
+				//the non-standard part of the rule (the one after the first `/`) has to be ignored
+				for(int k = 0, ruleLength = rule.length(); k < ruleLength; k ++){
+					final char chr = rule.charAt(k);
+					if(chr == '/')
+						break;
+
 					if(!Character.isDigit(chr))
 						j ++;
 					else{
 						//check if a break point should be skipped based on left and right min options
-						final int idx = startingIndex + j;
+						final int idx = indexBegin + j;
 						final int normalizedIdx = (idx > 0 && normalizedWordSize != wordSize? getNormalizedLength(word, idx): idx);
 						if(leftMin <= normalizedIdx && normalizedIdx <= normalizedWordSize - rightMin){
 							final int dd = Character.digit(chr, 10);
@@ -216,7 +216,9 @@ public class Hyphenator implements HyphenatorInterface{
 						}
 					}
 				}
-			}
+
+				return true;
+			});
 		}
 
 		return new HyphenationBreak(indexesAndRules);
@@ -266,13 +268,13 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private static void manageNoHyphenAtStart(final List<String> response, final String nohyp){
-		if(response.get(0).equals(nohyp.substring(1)))
-			response.remove(0);
+		if(response.getFirst().equals(nohyp.substring(1)))
+			response.removeFirst();
 	}
 
 	private static void manageNoHyphenAtEnd(final List<String> response, final String nohyp){
-		if(response.get(response.size() - 1).equals(nohyp.substring(0, nohyp.length() - 1)))
-			response.remove(response.size() - 1);
+		if(response.getLast().equals(nohyp.substring(0, nohyp.length() - 1)))
+			response.removeLast();
 	}
 
 	private static void manageNoHyphenAtMiddle(final Iterable<String> response, final String nohyp){
@@ -297,10 +299,11 @@ public class Hyphenator implements HyphenatorInterface{
 		String addAfter = null;
 		final int size = word.length();
 		final List<String> result = new ArrayList<>(0);
-		final Matcher m = RegexHelper.matcher(StringUtils.EMPTY, PATTERN_AUGMENTED_RULE);
+		//created lazily, only the words with augmented rules need it
+		Matcher m = null;
 		final StringBuilder sb = new StringBuilder();
-		for(int endIndex = 0; endIndex < size; endIndex ++)
-			if(hyphBreak.isBreakpoint(endIndex)){
+		//only the break points are visited (in increasing order), no need to look up each position
+		for(final int endIndex : hyphBreak.getBreakpoints(size)){
 //				final String subword = word.substring(startIndex, endIndex);
 				sb.setLength(0);
 //				sb.append(subword);
@@ -320,6 +323,8 @@ public class Hyphenator implements HyphenatorInterface{
 					final int index = HyphenationParser.getIndexOfBreakpoint(RegexHelper.clear(augmentedPatternData,
 						PATTERN_WORD_INITIAL));
 
+					if(m == null)
+						m = RegexHelper.matcher(StringUtils.EMPTY, PATTERN_AUGMENTED_RULE);
 					m.reset(augmentedPatternData);
 					if(m.find()){
 						final String addBefore = m.group(PARAM_ADD_BEFORE);
@@ -367,6 +372,13 @@ public class Hyphenator implements HyphenatorInterface{
 	}
 
 	private static int getNormalizedLength(final CharSequence word){
+		//fast path: ASCII characters are not changed by the normalization
+		boolean ascii = true;
+		for(int i = 0, length = word.length(); ascii && i < length; i ++)
+			ascii = (word.charAt(i) < 0x80);
+		if(ascii)
+			return word.length();
+
 		return Normalizer.normalize(word, Normalizer.Form.NFKC).length();
 	}
 

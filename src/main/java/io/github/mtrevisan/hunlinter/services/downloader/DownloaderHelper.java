@@ -47,7 +47,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import org.json.simple.parser.JSONParser;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;

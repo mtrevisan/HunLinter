@@ -248,7 +248,25 @@ public final class FileHelper{
 		final int rdrBuffer = Math.max((readerBufferSize > 0? readerBufferSize: (1 << 20)), 64 * 1024);
 
 		//open a base InputStream, wrap with buffering first (improves performance for all types)
-		InputStream in = new BufferedInputStream(Files.newInputStream(path), Math.max(gzBuffer, rdrBuffer));
+		final InputStream raw = new BufferedInputStream(Files.newInputStream(path), Math.max(gzBuffer, rdrBuffer));
+		try{
+			return wrapReader(raw, name, charset, gzBuffer, rdrBuffer, path);
+		}
+		catch(final IOException | RuntimeException e){
+			//do not leak the file handle if the wrapping fails
+			try{
+				raw.close();
+			}
+			catch(final IOException suppressed){
+				e.addSuppressed(suppressed);
+			}
+			throw e;
+		}
+	}
+
+	private static BufferedReader wrapReader(final InputStream raw, final String name, final Charset charset, final int gzBuffer,
+			final int rdrBuffer, final Path path) throws IOException{
+		InputStream in = raw;
 
 		if(name.endsWith(".gz")){
 			//GZIP: wrap with GZIPInputStream (configurable buffer)
@@ -332,9 +350,21 @@ public final class FileHelper{
 	public static Scanner createScanner(final Path path, final Charset charset, final int inputBufferSize)
 			throws IOException{
 		InputStream is = Files.newInputStream(path);
-		if(isGZipped(path.toFile()))
-			is = new GZIPInputStream(is, inputBufferSize);
-		return createScanner(is, charset);
+		try{
+			if(isGZipped(path.toFile()))
+				is = new GZIPInputStream(is, inputBufferSize);
+			return createScanner(is, charset);
+		}
+		catch(final IOException | RuntimeException e){
+			//do not leak the file handle if the wrapping fails
+			try{
+				is.close();
+			}
+			catch(final IOException suppressed){
+				e.addSuppressed(suppressed);
+			}
+			throw e;
+		}
 	}
 
 	private static Scanner createScanner(final InputStream is, final Charset charset) throws IOException{
@@ -391,9 +421,10 @@ public final class FileHelper{
 		final List<String> lines;
 		if(isGZipped(path.toFile())){
 			lines = new ArrayList<>(0);
-			final Scanner scanner = createScanner(path, charset, inputBufferSize);
-			while(scanner.hasNextLine())
-				lines.add(scanner.nextLine());
+			try(final Scanner scanner = createScanner(path, charset, inputBufferSize)){
+				while(scanner.hasNextLine())
+					lines.add(scanner.nextLine());
+			}
 		}
 		else
 			lines = Files.readAllLines(path, charset);

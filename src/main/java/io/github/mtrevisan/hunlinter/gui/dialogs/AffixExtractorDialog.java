@@ -37,16 +37,26 @@ import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.workers.core.WorkerAbstract;
 import io.github.mtrevisan.hunlinter.workers.dictionary.AffixExtractorWorker;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
+import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.util.List;
+import java.util.Objects;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
@@ -102,6 +112,15 @@ public class AffixExtractorDialog extends JDialog implements ActionListener, Pro
 
 		ApplicationLogAppender.addLabel(statusLabel, ParserManager.MARKER_AFFIX_EXTRACTOR_STATUS);
 		ApplicationLogAppender.addTextArea(affixesTextArea, ParserManager.MARKER_AFFIX_EXTRACTOR);
+	}
+
+	@Override
+	public void dispose(){
+		//avoid retaining this dialog's components inside the (static) log appender
+		ApplicationLogAppender.removeLabel(statusLabel);
+		ApplicationLogAppender.removeTextArea(affixesTextArea);
+
+		super.dispose();
 	}
 
 	private void initComponents(){

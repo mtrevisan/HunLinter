@@ -119,6 +119,12 @@ public class FileListenerManager implements FileListener, Runnable{
 			}
 			catch(final IOException ignored){}
 			watcher = createWatcher();
+
+			//the keys belong to the closed watcher, so they must be discarded and the watched folders registered again on the new watcher
+			watchKeyToDirPath.clear();
+			if(watcher != null)
+				for(final Path dir : dirPathToListeners.keySet())
+					addWatchKeyToDir(dir);
 		}
 	}
 
@@ -147,11 +153,13 @@ public class FileListenerManager implements FileListener, Runnable{
 
 	@Override
 	public final void unregisterAll(){
+		//clear first, so that `stop` doesn't register again the folders on the new watcher
+		dirPathToListeners.clear();
+		listenerToFilePatterns.clear();
+
 		stop();
 
 		watchKeyToDirPath.clear();
-		dirPathToListeners.clear();
-		listenerToFilePatterns.clear();
 	}
 
 	private void addWatchKeyToDir(final Path dir){

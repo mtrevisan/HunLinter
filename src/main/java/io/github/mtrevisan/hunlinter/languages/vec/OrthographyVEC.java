@@ -28,10 +28,8 @@ import io.github.mtrevisan.hunlinter.languages.Orthography;
 import io.github.mtrevisan.hunlinter.parsers.hyphenation.HyphenationParser;
 import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.TrieReplacer;
-import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -105,22 +103,32 @@ public final class OrthographyVEC extends Orthography{
 		if(correctedWord.length() > 1 && correctedWord.contains(GraphemeVEC.GRAPHEME_H))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_REMOVE_H_FROM_NOT_FH, StringUtils.EMPTY);
 
+		//NOTE: each regex below can match only if a given character is present (or, for the anchored ones, at a given position), so the
+		//cheap test avoids running the regex engine on the vast majority of words
 		//correct ïC/üC occurrences into iC/uC
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_U_DIAERESIS_C, "u$1");
+		if(correctedWord.indexOf('ï') >= 0)
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_I_DIAERESIS_C, "i$1");
+		if(correctedWord.indexOf('ü') >= 0)
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_U_DIAERESIS_C, "u$1");
 		//correct Vï/Vü occurrences into Vi/Vu
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_I_DIAERESIS, "$1i");
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_U_DIAERESIS, "$1u");
+		if(correctedWord.indexOf('ï') >= 0)
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_I_DIAERESIS, "$1i");
+		if(correctedWord.indexOf('ü') >= 0)
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_V_U_DIAERESIS, "$1u");
 
 		correctedWord = correctIJOccurrences(correctedWord);
 
 		//correct lh occurrences into l not at the beginning of a word and not between vowels
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INSIDE_INTO_L, "$1l");
+		if(correctedWord.indexOf('ƚ') >= 0){
+			if(correctedWord.charAt(0) == 'ƚ')
+				correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INITIAL_INTO_L, GraphemeVEC.GRAPHEME_L);
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_LH_INSIDE_INTO_L, "$1l");
+		}
 		//correct x occurrences into s prior to c, f, k, p, s, t, ŧ
 		//correct s occurrences into x prior to m, n, ñ, b, d, g, j, ɉ, v, r, l
-		correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
-		if(!correctedWord.endsWith(FALSE_S_INTO_X))
+		if(correctedWord.contains(GraphemeVEC.GRAPHEME_X))
+			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_X_INTO_S, GraphemeVEC.GRAPHEME_S);
+		if(correctedWord.contains(GraphemeVEC.GRAPHEME_S) && !correctedWord.endsWith(FALSE_S_INTO_X))
 			correctedWord = RegexHelper.replaceAll(correctedWord, PATTERN_S_INTO_X, GraphemeVEC.GRAPHEME_X);
 
 		//eliminate consonant geminates
@@ -138,8 +146,10 @@ public final class OrthographyVEC extends Orthography{
 	private static String correctIJOccurrences(String word){
 		//correct i occurrences into j at the beginning of a word followed by a vowel and between vowels,
 		//correcting also the converse
-		word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
-		word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.GRAPHEME_J);
+		if(!word.isEmpty() && word.charAt(0) == 'j')
+			word = RegexHelper.replaceAll(word, PATTERN_J_INTO_I, GraphemeVEC.GRAPHEME_I);
+		if(!word.isEmpty() && word.charAt(0) == 'i')
+			word = RegexHelper.replaceAll(word, PATTERN_I_INITIAL_INTO_J, GraphemeVEC.GRAPHEME_J);
 		return word;
 	}
 
@@ -151,10 +161,17 @@ public final class OrthographyVEC extends Orthography{
 	 */
 	//FIXME speed up
 	private static String reduceGeminates(final CharSequence word){
+		//fast path: nothing to reduce if there are no two equal adjacent characters
+		boolean hasAdjacentEqualChars = false;
+		for(int i = 1, length = word.length(); !hasAdjacentEqualChars && i < length; i ++)
+			hasAdjacentEqualChars = (word.charAt(i) == word.charAt(i - 1));
+		if(!hasAdjacentEqualChars)
+			return word.toString();
+
 		final StringBuilder sb = new StringBuilder(word);
 		for(int i = 1; i < sb.length(); i ++){
 			char chr = sb.charAt(i);
-			if(chr == sb.charAt(i - 1) && Arrays.binarySearch(WordVEC.VOWELS_ARRAY, chr) < 0){
+			if(chr == sb.charAt(i - 1) && !WordVEC.isAnyVowel(chr)){
 				final boolean starting1With = (i == 2 && ((chr = word.charAt(0)) == 'i' || chr == 'e'));
 				final boolean starting2With = (i == 3 && word.charAt(0) == 'd' && ((chr = word.charAt(1)) == 'e' || chr == 'i'));
 				final boolean endingWith = (i == sb.length() - 2 && ((chr = word.charAt(word.length() - 4)) == 'o' || chr == 'e')

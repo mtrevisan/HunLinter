@@ -112,6 +112,15 @@ public class RulesReducerDialog extends JDialog implements ActionListener, Prope
 		ApplicationLogAppender.addTextArea(reducedSetTextArea, ParserManager.MARKER_RULE_REDUCER);
 	}
 
+	@Override
+	public void dispose(){
+		//avoid retaining this dialog's components inside the (static) log appender
+		ApplicationLogAppender.removeLabel(statusLabel);
+		ApplicationLogAppender.removeTextArea(reducedSetTextArea);
+
+		super.dispose();
+	}
+
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 

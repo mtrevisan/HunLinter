@@ -85,7 +85,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		downloadButton.setEnabled(true);
 
 		final List<Pair<Version, String>> newerVersions = DownloaderHelper.extractNewerVersions();
-		remoteObject = DownloaderHelper.extractVersionData(newerVersions.get(0).getKey());
+		remoteObject = DownloaderHelper.extractVersionData(newerVersions.getFirst().getKey());
 
 		//copy to default download folder
 		localPath = System.getProperty("user.home") + "/Downloads/" + remoteObject.name;

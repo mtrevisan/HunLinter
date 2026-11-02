@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 
 public final class JavaHelper{
@@ -51,7 +52,7 @@ public final class JavaHelper{
 
 	private static final char QUOTATION_MARK = '"';
 
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.min(4, Runtime.getRuntime().availableProcessors() - 1));
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors() - 1)));
 
 
 	private JavaHelper(){}
@@ -75,26 +76,58 @@ public final class JavaHelper{
 		return future;
 	}
 
-	public static <T> T waitForFuture(final Future<T> future){
-		while(true){
-			try{
-				if(future.isDone())
-					return future.get();
+	/**
+	 * Executes the callable on the shared executor, calling the given callback (on the executor thread) as soon as the computation ends,
+	 * whether it completes normally, fails or is cancelled.
+	 *
+	 * @param callable	The computation.
+	 * @param onDone	The callback, it receives the (already done) future.
+	 * @return	The future of the computation.
+	 */
+	public static <T> Future<T> executeFuture(final Callable<T> callable, final Consumer<Future<T>> onDone){
+		final FutureTask<T> future = new FutureTask<>(callable){
+			@Override
+			protected void done(){
+				if(onDone != null)
+					onDone.accept(this);
 			}
-			catch(final InterruptedException | ExecutionException ignored){}
+		};
+		EXECUTOR_SERVICE.execute(future);
+		return future;
+	}
+
+	public static <T> T waitForFuture(final Future<T> future){
+		boolean interrupted = false;
+		try{
+			while(true){
+				try{
+					//blocks (no busy-wait) until the computation is complete
+					return future.get();
+				}
+				catch(final InterruptedException ie){
+					//keep waiting, the interruption is restored on exit
+					interrupted = true;
+				}
+				catch(final ExecutionException ee){
+					return null;
+				}
+			}
+		}
+		finally{
+			if(interrupted)
+				Thread.currentThread().interrupt();
 		}
 	}
 
 	/**
-	 * This method calls the garbage collector and then returns the free memory.
-	 * This avoids problems with applications where the GC hasn't reclaimed memory and reports no available memory.
+	 * This method returns an estimate of the memory available to the application (maximum heap minus the memory currently allocated,
+	 * garbage included, so it is a conservative estimate).
+	 * <p>NOTE: it deliberately doesn't call {@link System#gc()}, a full collection on each call is far more expensive than the
+	 * (small) inaccuracy it would remove.</p>
 	 *
 	 * @return estimated available memory
 	 */
-	@SuppressWarnings("CallToSystemGC")
 	public static long estimateAvailableMemory(){
-		System.gc();
-
 		//http://stackoverflow.com/questions/12807797/java-get-available-memory
 		final Runtime r = Runtime.getRuntime();
 		final long allocatedMemory = r.totalMemory() - r.freeMemory();

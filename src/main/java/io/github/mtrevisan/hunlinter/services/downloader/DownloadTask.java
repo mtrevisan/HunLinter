@@ -64,8 +64,9 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 			final URL url = new URI(remoteObject.downloadUrl)
 				.toURL();
-			final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this);
-			fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+			try(final ReadableByteChannel rbc = new RBCWrapper(Channels.newChannel(url.openStream()), contentLength(url), this)){
+				fileChannel.transferFrom(rbc, 0, Long.MAX_VALUE);
+			}
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final URISyntaxException | IOException e){
 			listener.failed(e);
@@ -77,15 +78,20 @@ public class DownloadTask extends SwingWorker<Void, Void> implements RBCWrapperD
 
 	private static int contentLength(final URL url){
 		int contentLength = -1;
+		HttpURLConnection connection = null;
 		try{
 			HttpURLConnection.setFollowRedirects(false);
 
-			final HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+			connection = (HttpURLConnection)url.openConnection();
 			connection.setRequestMethod("HEAD");
 
 			contentLength = connection.getContentLength();
 		}
 		catch(@SuppressWarnings("OverlyBroadCatchBlock") final IOException ignored){}
+		finally{
+			if(connection != null)
+				connection.disconnect();
+		}
 		return contentLength;
 	}
 

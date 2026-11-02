@@ -45,7 +45,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -72,7 +71,6 @@ public class WordCountWorker extends WorkerDictionary{
 
 		getWorkerData()
 //			.withParallelProcessing()
-			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");

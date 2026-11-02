@@ -25,7 +25,6 @@
 package io.github.mtrevisan.hunlinter.services;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,11 +129,11 @@ public final class ZipManager{
 						throw new IOException("Failed to create directory " + parent);
 
 					//write file content
-					final FileOutputStream fos = new FileOutputStream(newFile);
-					int len;
-					while((len = zis.read(buffer)) > 0)
-						fos.write(buffer, 0, len);
-					fos.close();
+					try(final FileOutputStream fos = new FileOutputStream(newFile)){
+						int len;
+						while((len = zis.read(buffer)) > 0)
+							fos.write(buffer, 0, len);
+					}
 				}
 				zipEntry = zis.getNextEntry();
 			}

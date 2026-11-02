@@ -24,12 +24,38 @@
  */
 package io.github.mtrevisan.hunlinter;
 
-import io.github.mtrevisan.hunlinter.actions.*;
+import io.github.mtrevisan.hunlinter.actions.AboutAction;
+import io.github.mtrevisan.hunlinter.actions.AffixExtractionAction;
+import io.github.mtrevisan.hunlinter.actions.AffixRulesReducerAction;
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterAction;
+import io.github.mtrevisan.hunlinter.actions.AutoCorrectLinterFSAAction;
+import io.github.mtrevisan.hunlinter.actions.CheckUpdateOnStartupAction;
+import io.github.mtrevisan.hunlinter.actions.CreatePackageAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryExtractDuplicatesAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryExtractMinimalPairsAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryExtractPoSFSAAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryExtractWordlistFSAAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryHyphenationStatisticsAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryLinterAction;
+import io.github.mtrevisan.hunlinter.actions.DictionarySorterAction;
+import io.github.mtrevisan.hunlinter.actions.DictionaryWordCountAction;
+import io.github.mtrevisan.hunlinter.actions.ExitAction;
+import io.github.mtrevisan.hunlinter.actions.HyphenationLinterAction;
+import io.github.mtrevisan.hunlinter.actions.IssueReporterAction;
+import io.github.mtrevisan.hunlinter.actions.OnlineHelpAction;
+import io.github.mtrevisan.hunlinter.actions.ProjectLoaderAction;
+import io.github.mtrevisan.hunlinter.actions.ReportWarningsAction;
+import io.github.mtrevisan.hunlinter.actions.SelectFontAction;
+import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterAction;
+import io.github.mtrevisan.hunlinter.actions.ThesaurusLinterFSAAction;
+import io.github.mtrevisan.hunlinter.actions.UpdateAction;
 import io.github.mtrevisan.hunlinter.gui.FontHelper;
 import io.github.mtrevisan.hunlinter.gui.GUIHelper;
 import io.github.mtrevisan.hunlinter.gui.MultiProgressBarUI;
 import io.github.mtrevisan.hunlinter.gui.ProjectFolderFilter;
 import io.github.mtrevisan.hunlinter.gui.components.RecentFilesMenu;
+import io.github.mtrevisan.hunlinter.gui.components.WorkersProgressPopup;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FileDownloaderDialog;
 import io.github.mtrevisan.hunlinter.gui.dialogs.FontChooserDialog;
 import io.github.mtrevisan.hunlinter.gui.events.LoadProjectEvent;
@@ -173,6 +199,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 
 	private final WorkerManager workerManager;
 
+	private WorkersProgressPopup workersProgress;
+
 
 	public MainFrame(){
 		Runtime.getRuntime().addShutdownHook(new Thread(JavaHelper::shutdownExecutor));
@@ -233,6 +261,8 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
       mainProgressBar = new javax.swing.JProgressBar();
 		mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
 		mainProgressBar.setUI(new MultiProgressBarUI());
+		workersProgress = new WorkersProgressPopup(mainProgressBar,
+			worker -> GUIHelper.askUserToAbort((WorkerAbstract<?>)worker, this, null, null));
       mainTabbedPane = new javax.swing.JTabbedPane();
       dicLayeredPane = new DictionaryLayeredPane(packager, parserManager);
 		EventBusService.subscribe(dicLayeredPane);
@@ -513,6 +543,9 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 		setFontMenuItem.setAction(new SelectFontAction(packager, parserManager, preferences));
 		setFontMenuItem.setMnemonic('f');
 		setFontMenuItem.setText("Select font…");
+		//enabled only when all the system fonts have been loaded (in background)
+		setFontMenuItem.setEnabled(false);
+		setFontMenuItem.setToolTipText("Loading system fonts…");
 		setMenu.add(setFontMenuItem);
 
       setReportWarningsCheckBoxMenuItem.setAction(new ReportWarningsAction(preferences));
@@ -938,15 +971,21 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 	public final void propertyChange(final PropertyChangeEvent evt){
 		switch(evt.getPropertyName()){
 			case PROPERTY_NAME_PROGRESS -> {
-				final int progress = (Integer)evt.getNewValue();
-				mainProgressBar.setValue(progress);
+				//the main progress bar shows the overall progress of all the running workers
+				//NOTE: a late event of an already terminated worker must not register it again
+				if(evt.getSource() instanceof final WorkerAbstract<?> worker && !worker.isDone())
+					workersProgress.update(worker, worker.getWorkerName(), (Integer)evt.getNewValue());
 			}
 			case PROPERTY_NAME_STATE -> {
 				final SwingWorker.StateValue stateValue = (SwingWorker.StateValue)evt.getNewValue();
 				mainProgressBar.setForeground(MultiProgressBarUI.MAIN_COLOR);
-				if(stateValue == SwingWorker.StateValue.DONE){
-					final String workerName = ((WorkerAbstract<?>)evt.getSource()).getWorkerName();
-					WorkerManager.callOnEnd(workerName);
+				if(evt.getSource() instanceof final WorkerAbstract<?> worker){
+					if(stateValue == SwingWorker.StateValue.STARTED)
+						workersProgress.update(worker, worker.getWorkerName(), worker.getProgress());
+					else if(stateValue == SwingWorker.StateValue.DONE){
+						workersProgress.finish(worker);
+						WorkerManager.callOnEnd(worker.getWorkerName());
+					}
 				}
 			}
 			case WorkerAbstract.PROPERTY_WORKER_CANCELLED -> mainProgressBar.setForeground(MultiProgressBarUI.ERROR_COLOR);
@@ -998,7 +1037,10 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 			EventBusService.subscribe(mainFrame);
 			mainFrame.setVisible(true);
 
-			FontHelper.loadAllFonts();
+			FontHelper.loadAllFonts(() -> {
+				mainFrame.setFontMenuItem.setEnabled(true);
+				mainFrame.setFontMenuItem.setToolTipText(null);
+			});
 		});
 	}
 

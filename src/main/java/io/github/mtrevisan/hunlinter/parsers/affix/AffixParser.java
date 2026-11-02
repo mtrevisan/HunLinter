@@ -42,14 +42,15 @@ import io.github.mtrevisan.hunlinter.services.RegexHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -81,7 +82,6 @@ public class AffixParser{
 	private static final Logger LOGGER = LoggerFactory.getLogger(AffixParser.class);
 
 
-	private static final String BAD_FIRST_LINE = "The first non-comment line in the affix file must be a 'SET charset', was: `{}`";
 	private static final String GLOBAL_ERROR_MESSAGE = "{}, line {}";
 
 	private static final String NO_LANGUAGE = "xxx";
@@ -191,22 +191,19 @@ public class AffixParser{
 		clear();
 
 		int index = 0;
-		boolean encodingRead = false;
 		final Path affPath = affFile.toPath();
-		final Charset charset = FileHelper.determineCharset(affPath, -1);
+		//NOTE: `SET` is optional, the default charset is ISO8859-1
+		final Charset charset = (hasCharsetDeclaration(affPath)
+			? FileHelper.determineCharset(affPath, -1)
+			: StandardCharsets.ISO_8859_1);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "The charset of the affix file is {}", charset.name());
 		try(final Scanner scanner = FileHelper.createScanner(affPath, charset)){
 			final ParsingContext context = new ParsingContext();
-			final String prefix = AffixOption.CHARACTER_SET.getCode() + StringUtils.SPACE;
 			while(scanner.hasNextLine()){
 				final String line = scanner.nextLine();
 				index ++;
 				if(ParserHelper.isDictionaryComment(line))
 					continue;
-
-				if(!encodingRead && !line.startsWith(prefix))
-					throw new LinterException(BAD_FIRST_LINE, line);
-				encodingRead = true;
 
 				context.update(line, index, scanner);
 				final AffixOption ruleType = AffixOption.createFromCode(context.getRuleType());
@@ -248,7 +245,25 @@ public class AffixParser{
 	private void postProcessCharset(){
 		//apply default charset
 		if(!data.containsData(AffixOption.CHARACTER_SET))
-			data.addData(AffixOption.CHARACTER_SET, StandardCharsets.ISO_8859_1);
+			data.addData(AffixOption.CHARACTER_SET, StandardCharsets.ISO_8859_1.name());
+	}
+
+	/** Whether the affix file contains a `SET` directive (read as ISO8859-1 in order to be charset agnostic). */
+	private static boolean hasCharsetDeclaration(final Path affPath) throws IOException{
+		final String prefix = AffixOption.CHARACTER_SET.getCode();
+		try(final BufferedReader reader = Files.newBufferedReader(affPath, StandardCharsets.ISO_8859_1)){
+			String line;
+			while((line = reader.readLine()) != null){
+				String cleaned = line.stripLeading();
+				//skip a possible UTF-8 BOM (seen as ISO8859-1)
+				if(cleaned.startsWith("ï»¿"))
+					cleaned = cleaned.substring(3);
+				if(cleaned.startsWith(prefix) && cleaned.length() > prefix.length()
+						&& Character.isWhitespace(cleaned.charAt(prefix.length())))
+					return true;
+			}
+		}
+		return false;
 	}
 
 	private void postProcessKey(){

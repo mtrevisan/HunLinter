@@ -37,7 +37,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
 
 
 public final class ParserHelper{
@@ -76,6 +78,51 @@ public final class ParserHelper{
 		return false;
 	}
 
+	/**
+	 * Same as {@link #forEachDictionaryLine(File, Charset, BiConsumer, ProgressCallback)}, but the lines are processed in parallel, so
+	 * the consumer and the progress callback MUST be thread-safe and the order of the calls is NOT guaranteed.
+	 * The whole file is loaded in memory.
+	 */
+	public static void forEachDictionaryLineParallel(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
+			final ProgressCallback progressCallback){
+		try{
+			final List<String> lines = FileHelper.readAllLines(file.toPath(), charset);
+			//skip a possible BOM (Unicode byte order mark)
+			if(!lines.isEmpty() && lines.getFirst().startsWith("\uFEFF"))
+				lines.set(0, lines.getFirst().substring(1));
+			assertLinesCount(lines);
+
+			final int totalLines = lines.size() - 1;
+			final int progressStep = Math.max(1, (int)Math.ceil(totalLines / 100.f));
+			final AtomicInteger processed = new AtomicInteger();
+			final AtomicInteger reported = new AtomicInteger();
+			IntStream.range(1, lines.size())
+				.parallel()
+				.forEach(index -> {
+					final String line = lines.get(index);
+
+					if(!isDictionaryComment(line))
+						fun.accept(index - 1, line);
+
+					if(progressCallback != null){
+						final int done = processed.incrementAndGet();
+						if(done % progressStep == 0){
+							final int percent = Math.min(done / progressStep, 100);
+							//report only increasing values
+							if(reported.getAndUpdate(previous -> Math.max(previous, percent)) < percent)
+								progressCallback.accept(percent);
+						}
+					}
+				});
+
+			if(progressCallback != null)
+				progressCallback.accept(100);
+		}
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
+		}
+	}
+
 	public static void assertNotEOF(final Scanner scanner) throws EOFException{
 		if(!scanner.hasNextLine())
 			throw new EOFException("Unexpected EOF while reading file");
@@ -111,7 +158,7 @@ public final class ParserHelper{
 	public static void assertLinesCount(final List<String> lines) throws EOFException{
 		if(lines.isEmpty())
 			throw new EOFException("Unexpected EOF while reading file");
-		final String line = lines.get(0);
+		final String line = lines.getFirst();
 		if(!NumberUtils.isCreatable(line))
 			throw new LinterException(WRONG_FILE_FORMAT, line);
 	}

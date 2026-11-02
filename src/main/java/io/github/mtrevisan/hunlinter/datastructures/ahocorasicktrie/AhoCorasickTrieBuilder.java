@@ -220,7 +220,7 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 	private int insert(final List<IndexDataPair<RadixTrieNode>> siblings){
 		int begin = 0;
 		if(!siblings.isEmpty()){
-			int checkPos = Math.max(siblings.get(0).getIndex() + 1, nextCheckPos) - 1;
+			int checkPos = Math.max(siblings.getFirst().getIndex() + 1, nextCheckPos) - 1;
 			int nonZeroNum = 0;
 			int first = 0;
 
@@ -246,8 +246,8 @@ public class AhoCorasickTrieBuilder<V extends Serializable>{
 				}
 
 				//the distance of the current position from the first sibling node
-				begin = checkPos - siblings.get(0).getIndex();
-				if(allocSize <= (begin + siblings.get(siblings.size() - 1).getIndex())){
+				begin = checkPos - siblings.getFirst().getIndex();
+				if(allocSize <= (begin + siblings.getLast().getIndex())){
 					//prevent progress from generating zero divide errors
 					final double l = Math.max(1.05, (double)keySize / (memoryGrowthRate + 1));
 					resize((int)(allocSize * l));

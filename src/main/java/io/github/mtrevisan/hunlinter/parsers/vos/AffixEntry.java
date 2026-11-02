@@ -40,12 +40,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -87,6 +86,7 @@ public class AffixEntry{
 	final List<String> continuationFlags;
 	/** condition that must be met before the affix can be applied. */
 	private final String condition;
+	private final ConditionMatcher conditionMatcher;
 	final List<String> morphologicalFields;
 
 
@@ -113,6 +113,7 @@ public class AffixEntry{
 		final String addition = Strings.CS.replace(m.group(PARAM_CONDITION), SLASH_ESCAPED, SLASH);
 		final String continuationClasses = m.group(PARAM_CONTINUATION_CLASSES);
 		condition = (lineParts.length > 4? Strings.CS.replace(lineParts[4], SLASH_ESCAPED, SLASH): DOT);
+		conditionMatcher = new ConditionMatcher(condition);
 		morphologicalFields = (lineParts.length > 5
 			? new ArrayList<>(Arrays.asList(StringUtils.split(expandAliases(lineParts[5], aliasesMorphologicalField))))
 			: null);
@@ -176,7 +177,8 @@ public class AffixEntry{
 	}
 
 	public final List<String> combineContinuationFlags(final Collection<String> otherContinuationFlags){
-		final Set<String> flags = new HashSet<>();
+		//NOTE: sorted, so that the result does not depend on the hash ordering (reproducible outputs)
+		final Set<String> flags = new TreeSet<>();
 		if(otherContinuationFlags != null && !otherContinuationFlags.isEmpty())
 			flags.addAll(otherContinuationFlags);
 		if(continuationFlags != null)
@@ -249,71 +251,78 @@ public class AffixEntry{
 	}
 
 	public final boolean canApplyTo(final String word){
-		if(condition.length() == 1 && condition.charAt(0) == '.')
-			return true;
-
-		return (parent.getType() == AffixType.PREFIX
-			? canApplyToPrefix(word)
-			: canApplyToSuffix(word));
+		return conditionMatcher.matches(word, parent.getType() == AffixType.SUFFIX);
 	}
 
-	@SuppressWarnings("IfStatementMissingBreakInLoop")
-	private boolean canApplyToPrefix(final String word){
-		if(word.startsWith(condition))
-			return true;
+	/**
+	 * Pre-compiled form of an affix condition (`.` matches any character, `[abc]` any of the listed characters, `[^abc]` any but the
+	 * listed characters, everything else matches itself), so that matching against a word doesn't allocate nor re-parse the condition.
+	 */
+	private static final class ConditionMatcher{
 
-		final char[] wrd = word.toCharArray();
-		final char[] cond = condition.toCharArray();
-		int i, j;
-		for(i = 0, j = 0; i < wrd.length && j < cond.length; i ++, j ++){
-			if(cond[j] == '['){
-				//search inside group
-				final boolean neg = (cond[j + 1] == '^');
-				boolean in = false;
-				do{
-					j ++;
-					if(!in && wrd[i] == cond[j])
-						in = true;
-				}while(j < cond.length - 1 && cond[j] != ']');
-				//cope with negation inside group
-				if(neg == in || j == cond.length - 1 && cond[j] != ']')
-					break;
+		/** `null` means 'any character'. */
+		private final char[][] sets;
+		private final boolean[] negated;
+		private final boolean matchAll;
+
+
+		private ConditionMatcher(final String condition){
+			final List<char[]> setList = new ArrayList<>(condition.length());
+			final List<Boolean> negatedList = new ArrayList<>(condition.length());
+			int i = 0;
+			while(i < condition.length()){
+				final char chr = condition.charAt(i);
+				if(chr == '['){
+					final int end = condition.indexOf(']', i + 1);
+					if(end >= 0){
+						final boolean neg = (i + 1 < end && condition.charAt(i + 1) == '^');
+						setList.add(condition.substring(i + 1 + (neg? 1: 0), end).toCharArray());
+						negatedList.add(neg);
+						i = end + 1;
+						continue;
+					}
+				}
+
+				//a `.` is a wildcard, anything else is a literal character
+				setList.add(chr == '.'? null: new char[]{chr});
+				negatedList.add(Boolean.FALSE);
+				i ++;
 			}
-			else if(cond[j] != wrd[i])
-				break;
-		}
-		return (j >= cond.length);
-	}
 
-	@SuppressWarnings("IfStatementMissingBreakInLoop")
-	private boolean canApplyToSuffix(final String word){
-		if(word.endsWith(condition))
+			sets = setList.toArray(new char[0][]);
+			negated = new boolean[sets.length];
+			for(int j = 0; j < negated.length; j ++)
+				negated[j] = negatedList.get(j);
+			matchAll = (condition.length() == 1 && condition.charAt(0) == '.');
+		}
+
+		private boolean matches(final String word, final boolean suffix){
+			if(matchAll)
+				return true;
+
+			final int length = sets.length;
+			final int wordLength = word.length();
+			if(wordLength < length)
+				return false;
+
+			final int offset = (suffix? wordLength - length: 0);
+			for(int i = 0; i < length; i ++)
+				if(!matches(i, word.charAt(offset + i)))
+					return false;
 			return true;
-
-		final char[] wrd = word.toCharArray();
-		final char[] cond = condition.toCharArray();
-		int i, j;
-		for(i = wrd.length - 1, j = cond.length - 1; i >= 0 && j >= 0; i --, j --){
-			if(cond[j] == ']'){
-				//search inside group
-				boolean in = false;
-				do{
-					j --;
-					if(!in && wrd[i] == cond[j])
-						in = true;
-				}while(j > 0 && cond[j] != '[');
-				if(j == 0 && cond[j] != '[')
-					break;
-
-				//cope with negation inside group
-				final boolean neg = (cond[j + 1] == '^');
-				if(neg == in)
-					break;
-			}
-			else if(cond[j] != wrd[i])
-				break;
 		}
-		return (j < 0);
+
+		private boolean matches(final int index, final char chr){
+			final char[] set = sets[index];
+			if(set == null)
+				return true;
+
+			boolean in = false;
+			for(int i = 0; !in && i < set.length; i ++)
+				in = (set[i] == chr);
+			return (in != negated[index]);
+		}
+
 	}
 
 	public final boolean canInverseApplyTo(final String word){

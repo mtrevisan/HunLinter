@@ -24,11 +24,16 @@
  */
 package io.github.mtrevisan.hunlinter.datastructures.bloomfilter.core;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
+
 
 /**
  * A fast bit-set implementation that allows direct access to data property so that it can be easily serialized.
  */
 public class JavaBitArray implements BitArray{
+
+	private static final VarHandle DATA_HANDLE = MethodHandles.arrayElementVarHandle(long[].class);
 
 	private static final String WRONG_NUMBER_OF_BITS = "Number of bits must be strictly positive";
 
@@ -51,23 +56,25 @@ public class JavaBitArray implements BitArray{
 
 	@Override
 	public final boolean get(final int index){
-		return ((data[index >> 6] & (1l << index)) != 0l);
+		return (((long)DATA_HANDLE.getVolatile(data, index >> 6) & (1l << index)) != 0l);
 	}
 
 	/** Returns true if the bit changed value. */
 	@Override
 	public final boolean set(final int index){
-		if(!get(index)){
-			data[index >> 6] |= (1l << index);
-			return true;
-		}
-		return false;
+		final long mask = (1l << index);
+		final int word = (index >> 6);
+		//fast path: the bit is already set
+		if(((long)DATA_HANDLE.getVolatile(data, word) & mask) != 0l)
+			return false;
+
+		//atomic, so the bit array can be shared by many threads
+		return (((long)DATA_HANDLE.getAndBitwiseOr(data, word, mask) & mask) == 0l);
 	}
 
 	@Override
 	public final void clear(final int index){
-		if(get(index))
-			data[index >> 6] &= ~(1l << index);
+		DATA_HANDLE.getAndBitwiseAnd(data, index >> 6, ~(1l << index));
 	}
 
 	@Override
@@ -75,6 +82,11 @@ public class JavaBitArray implements BitArray{
 		int size = data.length;
 		while(size > 0)
 			data[-- size] = 0l;
+	}
+
+	@Override
+	public final boolean isThreadSafe(){
+		return true;
 	}
 
 	/**

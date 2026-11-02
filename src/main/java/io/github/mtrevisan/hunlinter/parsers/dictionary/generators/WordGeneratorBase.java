@@ -280,7 +280,7 @@ class WordGeneratorBase{
 				//extract current rule
 				RuleEntry rule = affixData.getData(affix);
 				//override with the given rule
-				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
+				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().getFirst().getFlag()))
 					rule = overriddenRule;
 
 				List<String> currentPostponedAffixes = postponedAffixes;
@@ -305,7 +305,7 @@ class WordGeneratorBase{
 
 		RuleEntry rule = affixData.getData(affix);
 		//override with the given rule
-		if(overriddenRule != null && affix.equals(overriddenRule.getEntries().get(0).getFlag()))
+		if(overriddenRule != null && affix.equals(overriddenRule.getEntries().getFirst().getFlag()))
 			rule = overriddenRule;
 		if(rule == null){
 			if(affixData.isManagedByCompoundRule(affix))

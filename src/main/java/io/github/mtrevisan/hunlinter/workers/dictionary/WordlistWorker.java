@@ -46,8 +46,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -67,6 +65,8 @@ public class WordlistWorker extends WorkerDictionary{
 
 
 	private volatile boolean writerClosed;
+	/** Opened lazily (when the processing starts) and always closed, even if the worker is cancelled or fails. */
+	private volatile BufferedWriter writer;
 
 
 	public WordlistWorker(final ParserManager parserManager, final WorkerType type, final Consumer<Exception> onCancelled,
@@ -80,7 +80,6 @@ public class WordlistWorker extends WorkerDictionary{
 
 		getWorkerData()
 //			.withParallelProcessing()
-			.withDataCancelledCallback(onCancelled)
 			.withCancelOnException();
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
@@ -89,79 +88,102 @@ public class WordlistWorker extends WorkerDictionary{
 
 		final Charset charset = dicParser.getCharset();
 
-		try{
-			final BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath(), charset);
-			final Function<Inflection, String> toString = (type == WorkerType.COMPLETE || type == WorkerType.FULLSTRIP_WORDS
-				? Inflection::toString
-				: Inflection::getWord);
-			final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
-				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
-				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
+		final Function<Inflection, String> toString = (type == WorkerType.COMPLETE || type == WorkerType.FULLSTRIP_WORDS
+			? Inflection::toString
+			: Inflection::getWord);
+		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
+			final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(indexData.getData());
+			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
-				final int size = inflections.size();
-				if(type != WorkerType.FULLSTRIP_WORDS)
-					for(int i = 0; !writerClosed && i < size; i ++)
-						writeLine(writer, toString.apply(inflections.get(i)), NEW_LINE);
-				else
-					for(int i = 0; !writerClosed && i < size; i ++){
-						final Inflection inflection = inflections.get(i);
-						if(inflection.isFullstrip()){
-							final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
-							final String originatingWord = lastAppliedRule.undoRule(inflection.getWord());
-							writeLine(writer, originatingWord + SLASH + lastAppliedRule.getFlag(), NEW_LINE);
-						}
+			final int size = inflections.size();
+			if(type != WorkerType.FULLSTRIP_WORDS)
+				for(int i = 0; !writerClosed && i < size; i ++)
+					writeLine(writer, toString.apply(inflections.get(i)), NEW_LINE);
+			else
+				for(int i = 0; !writerClosed && i < size; i ++){
+					final Inflection inflection = inflections.get(i);
+					if(inflection.isFullstrip()){
+						final AffixEntry lastAppliedRule = inflection.getLastAppliedRule();
+						final String originatingWord = lastAppliedRule.undoRule(inflection.getWord());
+						writeLine(writer, originatingWord + SLASH + lastAppliedRule.getFlag(), NEW_LINE);
 					}
-			};
+				}
+		};
 
-			getWorkerData()
-				.withDataCancelledCallback(e -> {
-					closeWriter(writer);
-					writerClosed = true;
-				});
+		getWorkerData()
+			//the cancelled callback is registered only once (a further registration would replace this one)
+			.withDataCancelledCallback(e -> {
+				closeWriterQuietly();
 
-			final Function<Void, File> step1 = ignored -> {
-				prepareProcessing("Execute " + workerData.getWorkerName());
+				if(onCancelled != null)
+					onCancelled.accept(e);
+			});
+
+		final Function<Void, File> step1 = ignored -> {
+			prepareProcessing("Execute " + workerData.getWorkerName());
+
+			try{
+				writer = Files.newBufferedWriter(outputFile.toPath(), charset);
 
 				final File dicFile = dicParser.getDicFile();
 				processLines(dicFile.toPath(), charset, lineProcessor);
+			}
+			catch(final IOException ioe){
+				closeWriterQuietly();
 
-				return outputFile;
-			};
-			final Function<File, File> step2 = file -> {
-				closeWriter(writer);
+				throw new ParserException(ioe);
+			}
+			catch(final RuntimeException re){
+				//do not leak the file handle if the processing fails
+				closeWriterQuietly();
 
-				resetProcessing("Sorting");
+				throw re;
+			}
 
-				//sort file & remove duplicates
-				final ExternalSorterOptions options = ExternalSorterOptions.builder()
-					.charset(charset)
-					.comparator(dicParser.getComparator())
-					.removeDuplicates()
-					.useTemporaryAsZip()
-					.zipBufferSize(256 * 1024)
-					.mappedMemory(1024)
-					.mappedWindow(512)
-					.osSortMemory(4096)
-					.build();
-				try{
-					ExternalSorter.sort(outputFile, outputFile, options);
-				}
-				catch(final Exception e){
-					throw new SorterException(e);
-				}
+			return outputFile;
+		};
+		final Function<File, File> step2 = file -> {
+			closeWriter(writer);
 
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
+			resetProcessing("Sorting");
 
-				finalizeProcessing("Wordlist extracted successfully");
+			//sort file & remove duplicates
+			final ExternalSorterOptions options = ExternalSorterOptions.builder()
+				.charset(charset)
+				.comparator(dicParser.getComparator())
+				.removeDuplicates()
+				.useTemporaryAsZip()
+				.zipBufferSize(256 * 1024)
+				.mappedMemory(1024)
+				.mappedWindow(512)
+				.osSortMemory(4096)
+				.build();
+			try{
+				ExternalSorter.sort(outputFile, outputFile, options);
+			}
+			catch(final Exception e){
+				throw new SorterException(e);
+			}
 
-				return file;
-			};
-			final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
-			setProcessor(step1.andThen(step2).andThen(step3));
-		}
-		catch(final IOException ioe){
-			throw new ParserException(ioe);
-		}
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", file.getAbsolutePath());
+
+			finalizeProcessing("Wordlist extracted successfully");
+
+			return file;
+		};
+		final Function<File, Void> step3 = WorkerManager.openFileStep(LOGGER);
+		setProcessor(step1.andThen(step2).andThen(step3));
+	}
+
+	private void closeWriterQuietly(){
+		writerClosed = true;
+
+		final BufferedWriter w = writer;
+		if(w != null)
+			try{
+				w.close();
+			}
+			catch(final IOException ignored){}
 	}
 
 }

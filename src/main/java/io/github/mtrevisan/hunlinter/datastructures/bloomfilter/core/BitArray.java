@@ -69,6 +69,16 @@ public interface BitArray extends Closeable{
 	 */
 	int size();
 
+	/**
+	 * Whether {@link #get(int)} and {@link #set(int)} can be safely called by many threads at the same time without any external
+	 * synchronization.
+	 *
+	 * @return	{@code true} if this implementation is thread-safe.
+	 */
+	default boolean isThreadSafe(){
+		return false;
+	}
+
 	@Override
 	default void close() throws IOException{}
 

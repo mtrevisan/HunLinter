@@ -35,7 +35,6 @@ import java.text.RuleBasedCollator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
-import java.util.StringJoiner;
 
 
 public final class WordVEC{
@@ -76,6 +75,18 @@ public final class WordVEC{
 		Arrays.sort(CONSONANTS_ARRAY);
 	}
 
+	//lookup tables (indexed by character), much faster than a binary search on the arrays above
+	private static final boolean[] VOWELS_PLAIN_TABLE = toTable(VOWELS_PLAIN_ARRAY);
+	private static final boolean[] VOWELS_UNNECESSARY_STRESS_TABLE = toTable(VOWELS_UNNECESSARY_STRESS);
+	private static final boolean[] SURE_VOWELS_GRAVE_STRESSED_TABLE = toTable(SURE_VOWELS_GRAVE_STRESSED);
+	private static final boolean[] VOWELS_NOT_DIAERESIS_TABLE = toTable(VOWELS_NOT_DIAERESIS_ARRAY);
+	private static final boolean[] VOWELS_IU_TABLE = toTable(VOWELS_IU_ARRAY);
+	private static final boolean[] VOWELS_DIAERESIS_TABLE = toTable(VOWELS_DIAERESIS_ARRAY);
+	private static final boolean[] VOWELS_STRESSED_TABLE = toTable(VOWELS_STRESSED_ARRAY);
+	private static final boolean[] VOWELS_EXTENDED_TABLE = toTable(VOWELS_EXTENDED_ARRAY);
+	private static final boolean[] VOWELS_TABLE = toTable(VOWELS_ARRAY);
+	private static final boolean[] CONSONANTS_TABLE = toTable(CONSONANTS_ARRAY);
+
 	//NOTE: any character that appears before the first `<` is considered an ignorable character
 	private static final String COLLATOR_RULE = "; '-' < ' '='\t' < \u00AD;‐;‑;‒;–;—;―;− < ’=''' < '/' < 0 < 1 < 2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < a,A < à,À < b,B < c,C < d,D < đ=dh,Đ=Dh < e,E < é,É < è,È < f,F < g,G < h,H < i,I < ï,Ï < í,Í < j=ɉ=jh,J=Ɉ=Jh < k,K < l=ƚ=lh,L=Ƚ=Lh < m,M < n,N < ñ=nh,Ñ=Nh,gn=Gn < o,O < ó,Ó < ò,Ò < p,P < r,R < s,S < t,T < ŧ=th,Ŧ=Th < u,U < ü,Ü < ú,Ú < v,V < x,X";
 	@SuppressWarnings("NonConstantFieldWithUpperCaseName")
@@ -100,6 +111,27 @@ public final class WordVEC{
 
 	private WordVEC(){}
 
+	private static boolean[] toTable(final char[] chars){
+		char max = 0;
+		for(final char chr : chars)
+			if(chr > max)
+				max = chr;
+
+		final boolean[] table = new boolean[max + 1];
+		for(final char chr : chars)
+			table[chr] = true;
+		return table;
+	}
+
+	private static boolean contains(final boolean[] table, final char chr){
+		return (chr < table.length && table[chr]);
+	}
+
+	/** Whether the character is a vowel (either lower or upper case, plain, stressed or with diaeresis). */
+	static boolean isAnyVowel(final char chr){
+		return contains(VOWELS_TABLE, chr);
+	}
+
 	/**
 	 * Counts the number of graphemes in a given word.
 	 *
@@ -110,7 +142,7 @@ public final class WordVEC{
 		int count = 0;
 		for(int i = 0; i < word.length(); i ++){
 			final char chr = word.charAt(i);
-			if(Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0 || Arrays.binarySearch(CONSONANTS_ARRAY, chr) >= 0)
+			if(contains(VOWELS_EXTENDED_TABLE, chr) || contains(CONSONANTS_TABLE, chr))
 				count ++;
 		}
 		return count;
@@ -133,7 +165,7 @@ public final class WordVEC{
 	 * @return	Whether the character is a vowel.
 	 */
 	public static boolean isVowel(final char chr){
-		return (Arrays.binarySearch(VOWELS_EXTENDED_ARRAY, chr) >= 0);
+		return contains(VOWELS_EXTENDED_TABLE, chr);
 	}
 
 	/**
@@ -183,12 +215,12 @@ public final class WordVEC{
 	private static int getLastUnstressedVowelIndex(final CharSequence word, int lastLetterIndex){
 		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
 			final char chr = word.charAt(lastLetterIndex);
-			if(Arrays.binarySearch(VOWELS_PLAIN_ARRAY, chr) >= 0){
+			if(contains(VOWELS_PLAIN_TABLE, chr)){
 				if(chr != 'i' && chr != 'u')
 					break;
 
 				final int idx = (word.charAt(lastLetterIndex - 1) == '-'? lastLetterIndex - 2: lastLetterIndex - 1);
-				if(idx < 0 || Arrays.binarySearch(VOWELS_DIAERESIS_ARRAY, word.charAt(idx)) < 0)
+				if(idx < 0 || !contains(VOWELS_DIAERESIS_TABLE, word.charAt(idx)))
 					break;
 			}
 		}
@@ -205,7 +237,7 @@ public final class WordVEC{
 	private static int getLastUnstressedVowelIndex1(final CharSequence word, int lastLetterIndex){
 		for(lastLetterIndex --; lastLetterIndex >= 0; lastLetterIndex --){
 			final char chr = word.charAt(lastLetterIndex);
-			if(Arrays.binarySearch(VOWELS_UNNECESSARY_STRESS, chr) >= 0)
+			if(contains(VOWELS_UNNECESSARY_STRESS_TABLE, chr))
 				break;
 		}
 		return lastLetterIndex;
@@ -230,9 +262,8 @@ public final class WordVEC{
 	 */
 	public static int countStresses(final String word){
 		int count = 0;
-		final char[] chars = word.toCharArray();
-		for(int i = 0; i < chars.length; i ++)
-			if(Arrays.binarySearch(VOWELS_STRESSED_ARRAY, chars[i]) >= 0)
+		for(int i = 0, length = word.length(); i < length; i ++)
+			if(contains(VOWELS_STRESSED_TABLE, word.charAt(i)))
 				count ++;
 		return count;
 	}
@@ -244,6 +275,10 @@ public final class WordVEC{
 	 * @return	The word with stress suppressed.
 	 */
 	private static String suppressStress(final String word){
+		//fast path: nothing to suppress if there are no stressed vowels
+		if(getIndexOfStress(word) < 0)
+			return word;
+
 		final StringBuilder sb = new StringBuilder(word);
 		final char[] chars = word.toCharArray();
 		for(int i = 0; i < chars.length; i ++){
@@ -395,8 +430,7 @@ public final class WordVEC{
 
 		final int stressIndex = getIndexOfStress(word);
 		//if the last character is stressed, or the stress has to be present, then it's ok
-		if(higherIndex == stressIndex || stressIndex >= 0 && Arrays.binarySearch(SURE_VOWELS_GRAVE_STRESSED,
-				chars[stressIndex]) >= 0)
+		if(higherIndex == stressIndex || stressIndex >= 0 && contains(SURE_VOWELS_GRAVE_STRESSED_TABLE, chars[stressIndex]))
 			return word;
 
 		final boolean closedLastSyllable = isConsonant(chars[higherIndex]);
@@ -404,7 +438,7 @@ public final class WordVEC{
 		for(; vowelCount > 0 && higherIndex >= 0; higherIndex --){
 			final char currentChar = chars[higherIndex];
 			boolean vowel = isVowel(currentChar);
-			if(vowel && Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0)
+			if(vowel && contains(VOWELS_IU_TABLE, currentChar))
 				vowel = isVenetanVowel(word, higherIndex, length, currentChar);
 			if(vowel)
 				vowelCount --;
@@ -424,13 +458,13 @@ public final class WordVEC{
 			if(!isVowel(currentChar))
 				continue;
 
-			if(Arrays.binarySearch(VOWELS_IU_ARRAY, currentChar) >= 0 && !isVenetanVowel(word, i, length, currentChar))
+			if(contains(VOWELS_IU_TABLE, currentChar) && !isVenetanVowel(word, i, length, currentChar))
 				continue;
 
 			final boolean stressOnPenultimateSyllabe = (higherIndex == length - 2
 				&& isConsonant(chars[higherIndex - 1])
 				&& isVowel(chars[higherIndex + 1]));
-			if(stressOnPenultimateSyllabe && Arrays.binarySearch(VOWELS_IU_ARRAY, chars[higherIndex]) >= 0)
+			if(stressOnPenultimateSyllabe && contains(VOWELS_IU_TABLE, chars[higherIndex]))
 				return setAcuteStressAtIndex(word, higherIndex);
 
 			break;
@@ -454,7 +488,7 @@ public final class WordVEC{
 		if(insideWord){
 			final char previousChar = word.charAt(index - 1);
 			final char nextChar = word.charAt(index + 1);
-			final boolean maybeConsonant = (Arrays.binarySearch(VOWELS_NOT_DIAERESIS_ARRAY, currentChar) >= 0);
+			final boolean maybeConsonant = contains(VOWELS_NOT_DIAERESIS_TABLE, currentChar);
 			vowel = !(isConsonant(previousChar) && maybeConsonant && isVowel(nextChar));
 		}
 		return vowel;
@@ -467,7 +501,10 @@ public final class WordVEC{
 	 * @return	The index of the stressed grapheme, or {@code -1} if no stressed grapheme is found.
 	 */
 	static int getIndexOfStress(final CharSequence word){
-		return StringUtils.indexOfAny(word, VOWELS_STRESSED_ARRAY);
+		for(int i = 0, length = word.length(); i < length; i ++)
+			if(contains(VOWELS_STRESSED_TABLE, word.charAt(i)))
+				return i;
+		return -1;
 	}
 
 	/**

@@ -57,6 +57,9 @@ public enum MorphologicalTag{
 	FLAG("fl:");
 
 
+	private static final MorphologicalTag[] VALUES = values();
+
+
 	private final String code;
 	private final int hash;
 
@@ -68,7 +71,8 @@ public enum MorphologicalTag{
 
 	public static MorphologicalTag createFromCode(final String code){
 		final int hash = partialHash(code);
-		for(final MorphologicalTag tag : values())
+		//NOTE: `values()` clones the array at each call
+		for(final MorphologicalTag tag : VALUES)
 			if(tag.hash == hash)
 				return tag;
 		return null;

@@ -259,9 +259,13 @@ public class RulesLoader{
 	}
 
 	public final void letterToFlagIncompatibilityCheck(final Inflection inflection){
+		//NOTE: the entries throw only if the inflection has continuation flags
+		if(inflection.getContinuationFlags().isEmpty())
+			return;
+
 		final String word = inflection.getWord();
 		for(int i = 0; i < letterAndRulesNotCombinableKeys.length; i ++)
-			if(StringUtils.containsAny(word, letterAndRulesNotCombinableKeys[i])){
+			if(word.indexOf(letterAndRulesNotCombinableKeys[i]) >= 0){
 				final LetterMatcherEntry[] letterMatcherEntries = letterAndRulesNotCombinable.get(letterAndRulesNotCombinableKeys[i]);
 				for(int j = 0; j < letterMatcherEntries.length; j ++)
 					letterMatcherEntries[j].match(inflection);
@@ -269,6 +273,10 @@ public class RulesLoader{
 	}
 
 	public final void flagToFlagIncompatibilityCheck(final Inflection inflection){
+		//NOTE: no flag can be found if the inflection has no continuation flags
+		if(inflection.getContinuationFlags().isEmpty())
+			return;
+
 		for(int i = 0; i < ruleAndRulesNotCombinableKeys.length; i ++)
 			if(inflection.hasContinuationFlag(ruleAndRulesNotCombinableKeys[i])){
 				final RuleMatcherEntry[] ruleMatcherEntries = ruleAndRulesNotCombinable.get(ruleAndRulesNotCombinableKeys[i]);
@@ -278,9 +286,13 @@ public class RulesLoader{
 	}
 
 	public final void letterToFlagCompatibilityCheck(final Inflection inflection){
+		//NOTE: the entries throw only if the inflection has continuation flags
+		if(inflection.getContinuationFlags().isEmpty())
+			return;
+
 		final String word = inflection.getWord();
 		for(int i = 0; i < letterAndRulesCombinableKeys.length; i ++)
-			if(!StringUtils.containsAny(word, letterAndRulesCombinableKeys[i])){
+			if(word.indexOf(letterAndRulesCombinableKeys[i]) < 0){
 				final LetterMatcherEntry[] letterMatcherEntries = letterAndRulesCombinable.get(letterAndRulesCombinableKeys[i]);
 				for(int j = 0; j < letterMatcherEntries.length; j ++)
 					letterMatcherEntries[j].match(inflection);

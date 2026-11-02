@@ -111,7 +111,7 @@ public class DictionaryEntryFactory{
 		final String[] split = StringUtils.split(expandAliases(dicMorphologicalFields, aliasesMorphologicalField));
 		final List<String> mfs = (split != null? new ArrayList<>(Arrays.asList(split)): new ArrayList<>(0));
 		if(addStemTag && !containsStem(mfs))
-			mfs.add(0, MorphologicalTag.STEM.attachValue(word));
+			mfs.addFirst(MorphologicalTag.STEM.attachValue(word));
 		return mfs;
 	}
 

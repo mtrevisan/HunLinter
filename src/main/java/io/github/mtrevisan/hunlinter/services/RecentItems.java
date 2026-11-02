@@ -67,10 +67,10 @@ public class RecentItems{
 
 	public final void push(final String item){
 		items.remove(item);
-		items.add(0, item);
+		items.addFirst(item);
 
 		if(items.size() > maxItems)
-			items.remove(items.size() - 1);
+			items.removeLast();
 
 		update();
 	}

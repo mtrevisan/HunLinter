@@ -161,6 +161,32 @@ class AffixEntryTest{
 	}
 
 	@Test
+	void matchDotWildcardSuffix(){
+		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
+		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "T", 'N');
+		AffixEntry entry = createAffixEntry("SFX T y ies .[^aeiou]y", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
+
+		Assertions.assertTrue(entry.canApplyTo("try"));
+		Assertions.assertFalse(entry.canApplyTo("play"));
+		Assertions.assertFalse(entry.canApplyTo("ty"));
+		Assertions.assertFalse(entry.canApplyTo("^y"));
+	}
+
+	@Test
+	void matchDotWildcardPrefix(){
+		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
+		RuleEntry parent = new RuleEntry(AffixType.PREFIX, "P", 'N');
+		AffixEntry entry = createAffixEntry("PFX P 0 re a.[bc]", parent, strategy);
+		parent.setEntries(Arrays.asList(entry));
+
+		Assertions.assertTrue(entry.canApplyTo("axbz"));
+		Assertions.assertTrue(entry.canApplyTo("aac"));
+		Assertions.assertFalse(entry.canApplyTo("axdz"));
+		Assertions.assertFalse(entry.canApplyTo("ab"));
+	}
+
+	@Test
 	void applyRuleSuffix(){
 		FlagParsingStrategy strategy = ParsingStrategyFactory.createASCIIParsingStrategy();
 		RuleEntry parent = new RuleEntry(AffixType.SUFFIX, "M", 'N');
