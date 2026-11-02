@@ -4,6 +4,7 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.vos.RuleEntry;
+import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +20,7 @@ import java.util.Set;
 
 class RulesReducerUtils{
 
-	static Pair<RulesReducer4, WordGenerator> createReducer(File affFile, String language) throws IOException{
+	static Pair<RulesReducer, WordGenerator> createReducer(File affFile, String language) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
 		AffixData affixData = affParser.getAffixData();
@@ -26,11 +28,11 @@ class RulesReducerUtils{
 			"0");
 		DictionaryParser dicParser = new DictionaryParser(dicFile, affixData.getLanguage(), affixData.getCharset());
 		WordGenerator wordGenerator = new WordGenerator(affixData, dicParser, null);
-		RulesReducer4 reducer = new RulesReducer4(affixData, wordGenerator);
+		RulesReducer reducer = new RulesReducer(affixData, wordGenerator);
 		return Pair.of(reducer, wordGenerator);
 	}
 
-	static void checkReductionCorrectness(final RulesReducer4 reducer, final String flag, final List<String> reducedRules,
+	static void checkReductionCorrectness(final RulesReducer reducer, final String flag, final List<String> reducedRules,
 			final Set<String> originalLines){
 		reducer.checkReductionCorrectness(flag, reducedRules, originalLines, null);
 	}
@@ -44,7 +46,7 @@ class RulesReducerUtils{
 	 * 	<li>the reduced rules produce exactly the same inflections of the original ones, for each dictionary line.</li>
 	 * </ul>
 	 */
-	static void assertReduction(final RulesReducer4 reducer, final File affFile, final String language, final String flag,
+	static void assertReduction(final RulesReducer reducer, final File affFile, final String language, final String flag,
 			final List<LineEntry> originalRules, final List<String> originalLines) throws IOException{
 		AffixParser affParser = new AffixParser();
 		affParser.parse(affFile, language);
@@ -65,6 +67,24 @@ class RulesReducerUtils{
 		//the first line is the header
 		Assertions.assertTrue(rules.size() - 1 <= originalLength,
 			"Reduced rules (" + (rules.size() - 1) + ") are longer than the original ones (" + originalLength + "): " + rules);
+
+		//the rules go from the shortest added part to the longest one, then they are sorted by the collator of the language
+		Comparator<String> comparator = BaseBuilder.getComparator(language);
+		String previousAddition = null;
+		for(int i = 1; i < rules.size(); i ++){
+			String addition = rules.get(i).split("\\s+")[3];
+			int slash = addition.indexOf('/');
+			addition = (slash >= 0? addition.substring(0, slash): addition);
+			addition = (addition.equals("0")? "": addition);
+			if(previousAddition != null){
+				Assertions.assertTrue(addition.length() >= previousAddition.length(),
+					"Rules are not sorted by length of the added part: " + rules);
+				if(addition.length() == previousAddition.length())
+					Assertions.assertTrue(comparator.compare(previousAddition, addition) <= 0,
+						"Rules are not sorted by collator: " + rules);
+			}
+			previousAddition = addition;
+		}
 
 		checkReductionCorrectness(reducer, flag, rules, new HashSet<>(originalLines));
 	}

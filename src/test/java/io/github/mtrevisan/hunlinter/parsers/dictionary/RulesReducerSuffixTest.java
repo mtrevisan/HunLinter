@@ -24,8 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.parsers.dictionary;
 
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
-import io.github.mtrevisan.hunlinter.parsers.affix.AffixParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
@@ -74,8 +72,8 @@ class RulesReducerSuffixTest{
 			"SFX '0 o ‘ [^d]o",
 			"SFX '0 ove ó‘ ove"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -113,8 +111,8 @@ class RulesReducerSuffixTest{
 			"SFX &1 èƚo eƚato èƚo",
 			"SFX &1 o ato [^è]ƚo"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "&1";
 		AffixType affixType = AffixType.SUFFIX;
@@ -177,8 +175,8 @@ class RulesReducerSuffixTest{
 			"SFX &0 o ato [^ò]ko",
 			"SFX &0 0 ta [^ò][kns]a"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "&0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -228,8 +226,8 @@ class RulesReducerSuffixTest{
 			"SFX v1 òda odista òda",
 			"SFX v1 ònia onista ònia"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v1";
 		AffixType affixType = AffixType.SUFFIX;
@@ -346,8 +344,8 @@ class RulesReducerSuffixTest{
 			"SFX v0 ería aría ería",
 			"SFX v0 ería arieta ería"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "v0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -376,8 +374,8 @@ class RulesReducerSuffixTest{
 			"SFX s1 ía ixmo ía",
 			"SFX s1 òmo omixmo òmo"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s1";
 		AffixType affixType = AffixType.SUFFIX;
@@ -409,8 +407,8 @@ class RulesReducerSuffixTest{
 			"SFX s0 òmo omixmo òmo",
 			"SFX s0 òto otixmo òto"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "s0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -448,8 +446,8 @@ class RulesReducerSuffixTest{
 			"SFX r8 r doreto r",
 			"SFX r8 r toreto r"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r8";
 		AffixType affixType = AffixType.SUFFIX;
@@ -509,8 +507,8 @@ class RulesReducerSuffixTest{
 			"SFX r7 dora oreta dora",
 			"SFX r7 dora toreta dora"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r7";
 		AffixType affixType = AffixType.SUFFIX;
@@ -544,8 +542,8 @@ class RulesReducerSuffixTest{
 			"SFX r6 dura ura dura",
 			"SFX r6 dura ureta dura"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r6";
 		AffixType affixType = AffixType.SUFFIX;
@@ -583,8 +581,8 @@ class RulesReducerSuffixTest{
 			"SFX r5 dura ura dura",
 			"SFX r5 dura ureta dura"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r5";
 		AffixType affixType = AffixType.SUFFIX;
@@ -614,8 +612,8 @@ class RulesReducerSuffixTest{
 			"SFX r4 lderò ƚusion lderò",
 			"SFX r4 lverò ƚusion lverò"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r4";
 		AffixType affixType = AffixType.SUFFIX;
@@ -671,8 +669,8 @@ class RulesReducerSuffixTest{
 			"SFX r3 xerò sion [^r]xerò",
 			"SFX r3 orxerò uresion orxerò"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r3";
 		AffixType affixType = AffixType.SUFFIX;
@@ -716,8 +714,8 @@ class RulesReducerSuffixTest{
 			"SFX r2 xerò ŧion [^r]xerò",
 			"SFX r2 orxerò ureŧion orxerò"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r2";
 		AffixType affixType = AffixType.SUFFIX;
@@ -745,8 +743,8 @@ class RulesReducerSuffixTest{
 			"SFX r1 r mento r",
 			"SFX r1 rò mento arò"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r1";
 		AffixType affixType = AffixType.SUFFIX;
@@ -779,8 +777,8 @@ class RulesReducerSuffixTest{
 			"SFX r0 rò mento arò",
 			"SFX r0 erò imento erò"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "r0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -819,8 +817,8 @@ class RulesReducerSuffixTest{
 			"SFX q1 o esa [^è]ƚo",
 			"SFX q1 èƚo eƚesa èƚo"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "q1";
 		AffixType affixType = AffixType.SUFFIX;
@@ -908,8 +906,8 @@ class RulesReducerSuffixTest{
 			"SFX mf obrioxo ubriuxi obrioxo",
 			"SFX mf ordioxo urdiuxi ordioxo"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "mf";
 		AffixType affixType = AffixType.SUFFIX;
@@ -949,8 +947,8 @@ class RulesReducerSuffixTest{
 			"SFX V0 èr iereto [^aeoucijɉñ]èr",
 			"SFX V0 èr iareto [^aeoucijɉñ]èr"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "V0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -986,8 +984,8 @@ class RulesReducerSuffixTest{
 			"SFX U0 ul úi ul",
 			"SFX U0 un úi un"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "U0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -1018,8 +1016,8 @@ class RulesReducerSuffixTest{
 			"SFX %0 ète eteneta/F0 ète	ds:eto",
 			"SFX %0 ète etèna/F0 ète"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "%0";
 		AffixType affixType = AffixType.SUFFIX;
@@ -1055,8 +1053,8 @@ class RulesReducerSuffixTest{
 			"SFX %2 0 ix [xlcdm]",
 			"SFX %2 0 x i"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "%2";
 		AffixType affixType = AffixType.SUFFIX;
@@ -1102,8 +1100,8 @@ class RulesReducerSuffixTest{
 			"SFX '9 o ’ [^dkt]o",
 			"SFX '9 ove ó’ ove"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'9";
 		AffixType affixType = AffixType.SUFFIX;

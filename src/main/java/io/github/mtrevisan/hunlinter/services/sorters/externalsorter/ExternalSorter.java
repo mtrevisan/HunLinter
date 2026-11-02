@@ -115,9 +115,19 @@ public final class ExternalSorter{
 				Files.deleteIfExists(output);
 
 			//use cmd redirection for fastest path:
-			final String uniqueParam = (options.isRemoveDuplicates()? "/unique": StringUtils.EMPTY);
-			final Process p = new ProcessBuilder("cmd.exe", "/c",
-					"sort", uniqueParam, "/o", output.toString(), input.toString())
+			//NOTE: an empty argument must not be passed, otherwise `sort` takes it as another input file and fails
+			//NOTE: use the Windows `sort` explicitly, because another `sort` (ie. the GNU one that comes with Git) could be found
+			// first in the PATH
+			final String systemRoot = System.getenv("SystemRoot");
+			final Path windowsSort = (systemRoot != null? Path.of(systemRoot, "System32", "sort.exe"): null);
+			final String sortCommand = (windowsSort != null && Files.exists(windowsSort)? windowsSort.toString(): "sort");
+			final List<String> command = new ArrayList<>(List.of("cmd.exe", "/c", sortCommand));
+			if(options.isRemoveDuplicates())
+				command.add("/unique");
+			command.add("/o");
+			command.add(output.toString());
+			command.add(input.toString());
+			final Process p = new ProcessBuilder(command)
 				.redirectError(ProcessBuilder.Redirect.INHERIT)
 				.start();
 			final int code = p.waitFor();
@@ -358,7 +368,8 @@ public final class ExternalSorter{
 			final ExternalSorterOptions options) throws IOException{
 		//min-heap by line content
 		final Comparator<String> comparator = options.getComparator();
-		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(files.size(),
+		//NOTE: the initial capacity must be positive, even if there is nothing to merge (empty input)
+		final Queue<BinaryFileBuffer> queue = new PriorityQueue<>(Math.max(1, files.size()),
 			(i, j) -> comparator.compare(i.peek(), j.peek()));
 
 		final int runReadBuffer = Math.max(1 << 20, options.getZipBufferSize());

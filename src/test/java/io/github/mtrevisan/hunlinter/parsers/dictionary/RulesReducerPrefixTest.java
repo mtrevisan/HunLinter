@@ -58,8 +58,8 @@ class RulesReducerPrefixTest{
 			"PFX '0 l ‘ l",
 			"PFX '0 v ‘ v"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "'0";
 		AffixType affixType = AffixType.PREFIX;
@@ -105,8 +105,8 @@ class RulesReducerPrefixTest{
 			"PFX vs té tà té",
 			"PFX vs ve va ver"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "vs";
 		AffixType affixType = AffixType.PREFIX;
@@ -133,8 +133,8 @@ class RulesReducerPrefixTest{
 			"PFX ^0 Y 1",
 			"PFX ^0 0 anti ."
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "^0";
 		AffixType affixType = AffixType.PREFIX;
@@ -163,8 +163,8 @@ class RulesReducerPrefixTest{
 			"PFX .0 0 ra [^a]",
 			"PFX .0 0 ar [^ƚ]"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = ".0";
 		AffixType affixType = AffixType.PREFIX;
@@ -192,8 +192,8 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in [^n]",
 			"PFX +0 0 i n"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
 		AffixType affixType = AffixType.PREFIX;
@@ -222,8 +222,8 @@ class RulesReducerPrefixTest{
 			"PFX $1 0 h/Z0 .",
 			"PFX $1 0 da/Z0 ."
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "$1";
 		AffixType affixType = AffixType.PREFIX;
@@ -252,8 +252,8 @@ class RulesReducerPrefixTest{
 			"PFX +0 0 in– n",
 			"PFX +0 0 i [lƚmnñrs]"
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "+0";
 		AffixType affixType = AffixType.PREFIX;
@@ -282,8 +282,8 @@ class RulesReducerPrefixTest{
 			"PFX p3 0 trï [aeiouàèéíòóú]",
 			"PFX p3 0 tre ."
 		);
-		Pair<RulesReducer4, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
-		RulesReducer4 reducer = pair.getLeft();
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
 		WordGenerator wordGenerator = pair.getRight();
 		String flag = "p3";
 		AffixType affixType = AffixType.PREFIX;

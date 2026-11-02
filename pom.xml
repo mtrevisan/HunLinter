@@ -509,6 +509,7 @@
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.languages=org.junit.platform.commons
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.languages.vec=org.junit.platform.commons
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.affix=org.junit.platform.commons
+						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.strategies=org.junit.platform.commons
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.dictionary=org.junit.platform.commons
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.dictionary.generators=org.junit.platform.commons
 						--add-opens io.github.mtrevisan.hunlinter/io.github.mtrevisan.hunlinter.parsers.hyphenation=org.junit.platform.commons

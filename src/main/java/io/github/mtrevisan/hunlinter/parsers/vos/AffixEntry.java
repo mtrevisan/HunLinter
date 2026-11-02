@@ -160,6 +160,10 @@ public class AffixEntry{
 		}
 	}
 
+	public final String getRemoving(){
+		return removing;
+	}
+
 	public final String getAppending(){
 		return appending;
 	}

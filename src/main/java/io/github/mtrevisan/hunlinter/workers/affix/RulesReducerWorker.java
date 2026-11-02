@@ -29,7 +29,6 @@ import io.github.mtrevisan.hunlinter.parsers.affix.AffixData;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.LineEntry;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.RulesReducer;
-import io.github.mtrevisan.hunlinter.parsers.dictionary.RulesReducer4;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.parsers.vos.DictionaryEntry;
@@ -45,8 +44,9 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -63,7 +63,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 	public static final String WORKER_NAME = "Rules reducer";
 
 
-	private final RulesReducer4 rulesReducer;
+	private final RulesReducer rulesReducer;
 
 
 	public RulesReducerWorker(final String flag, final boolean keepLongestCommonAffix, final AffixData affixData,
@@ -79,7 +79,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 		Objects.requireNonNull(affixData, "Affix data cannot be null");
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
-		rulesReducer = new RulesReducer4(affixData, wordGenerator);
+		rulesReducer = new RulesReducer(affixData, wordGenerator);
 		final DictionaryEntryFactory dictionaryEntryFactory = new DictionaryEntryFactory(affixData);
 
 		final RuleEntry ruleToBeReduced = affixData.getData(flag);
@@ -88,14 +88,23 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		final AffixType type = ruleToBeReduced.getType();
 
-		final Set<String> originalLines = new HashSet<>(0);
-		final List<LineEntry> originalRules = new ArrayList<>(0);
+		//the lines are processed in parallel
+		final Set<String> originalLines = ConcurrentHashMap.newKeySet();
+		final Collection<LineEntry> originalRules = new ConcurrentLinkedQueue<>();
+		//the lemmas that carry the flag but undergo no transformation: no reduced condition can select them
+		final Set<String> inertWords = ConcurrentHashMap.newKeySet();
+		//only the lines that carry a flag that can lead to the given one can be inflected by it
+		final Set<String> leadingFlags = rulesReducer.collectFlagsLeadingTo(flag);
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
 			final String data = indexData.getData();
 			final DictionaryEntry dicEntry = dictionaryEntryFactory.createFromDictionaryLine(data);
+			if(!RulesReducer.hasAnyFlag(dicEntry, leadingFlags))
+				return;
+
 			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 			final List<LineEntry> rules = rulesReducer.collectInflectionsByFlag(inflections, flag, type);
+			inertWords.addAll(rulesReducer.collectInertWords(inflections, flag, type, rules));
 			if(rules != null && !rules.isEmpty()){
 				originalLines.add(data);
 				originalRules.addAll(rules);
@@ -123,7 +132,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			try{
-				return rulesReducer.reduceRules(originalRules, percent -> {
+				return rulesReducer.reduceRules(originalRules, inertWords, percent -> {
 					setWorkerProgress(percent);
 
 					sleepOnPause();
