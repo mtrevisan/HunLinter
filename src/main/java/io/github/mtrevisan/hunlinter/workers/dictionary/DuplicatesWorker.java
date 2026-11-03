@@ -52,17 +52,19 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -73,39 +75,16 @@ public class DuplicatesWorker extends WorkerDictionary{
 	private static final Logger LOGGER = LoggerFactory.getLogger(DuplicatesWorker.class);
 
 
-	private static class DuplicatesDictionaryBaseData extends BloomFilterParameters{
-
-		private static class SingletonHelper{
-			private static final DuplicatesDictionaryBaseData INSTANCE = new DuplicatesDictionaryBaseData();
-		}
-
-
-		public static DuplicatesDictionaryBaseData getInstance(){
-			return SingletonHelper.INSTANCE;
-		}
-
-		protected DuplicatesDictionaryBaseData(){}
-
-		@Override
-		public final int getExpectedNumberOfElements(){
-			return (int)(MAX_DUPLICATES * 1.5);
-		}
-
-		@Override
-		public final double getFalsePositiveProbability(){
-			return 0.1 / MAX_DUPLICATES;
-		}
-
-		@Override
-		public final double getGrowthRateWhenFull(){
-			return 1.3;
-		}
-
-	}
-
 	public static final String WORKER_NAME = "Duplicates extraction";
 
-	private static final int MAX_DUPLICATES = 1_000;
+	/**
+	 * If `true`, write to file ONLY the entries (lemmas) that can be removed without losing any inflection (same word, same
+	 * morphological fields), and nothing else; if `false`, write all the duplicates with the removal analysis.
+	 */
+	private static final boolean WRITE_ONLY_SAFELY_REMOVABLE_ENTRIES = true;
+
+	/** Text of the analysis of an entry that can be safely removed (see {@link RemovalAnalyzer#analyzeEntry(int, String, Collection)}). */
+	private static final String ENTRY_SAFELY_REMOVABLE_MARKER = "is safely removable (all its inflections";
 
 
 	private final DictionaryParser dicParser;
@@ -137,12 +116,12 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 		dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
 
-		final Function<Void, BloomFilterInterface<String>> step1 = ignored -> {
+		final Function<Void, Set<String>> step1 = ignored -> {
 			prepareProcessing("Reading dictionary file (step 1/3)");
 
 			return collectDuplicates();
 		};
-		final Function<BloomFilterInterface<String>, Collection<List<Duplicate>>> step2 = this::extractDuplicates;
+		final Function<Set<String>, Collection<List<Duplicate>>> step2 = this::extractDuplicates;
 		final Function<Collection<List<Duplicate>>, File> step3 = duplicates -> {
 			writeDuplicates(outputFile, duplicates);
 
@@ -154,34 +133,28 @@ public class DuplicatesWorker extends WorkerDictionary{
 		setProcessor(step1.andThen(step2).andThen(step3).andThen(step4));
 	}
 
-	private BloomFilterInterface<String> collectDuplicates(){
+	private Set<String> collectDuplicates(){
 		final File dicFile = dicParser.getDicFile();
 		final Charset charset = dicParser.getCharset();
 
 		final BloomFilterInterface<String> bloomFilter = new ScalableInMemoryBloomFilter<>(charset, dictionaryBaseData);
-		final BloomFilterInterface<String> duplicatesBloomFilter = new ScalableInMemoryBloomFilter<>(charset,
-			DuplicatesDictionaryBaseData.getInstance());
+		//exact set of the texts seen more than once, NOT capped: every lemma of the dictionary has to be checked, not only the first ones
+		final Set<String> duplicateTexts = ConcurrentHashMap.newKeySet();
 
+		//NOTE: the bloom filter (thread-safe bit array) and the set are shared among the threads
 		final BiConsumer<Integer, String> fun = (lineIndex, line) -> {
 			try{
-				if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
-					return;
-
 				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
 				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 				for(int i = 0, length = inflections.size(); i < length; i ++){
-					final String str = inflections.get(i).toStringWithPartOfSpeech();
-					if(!bloomFilter.add(str)){
-						duplicatesBloomFilter.add(str);
-
-						if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES)
-							break;
-					}
+					final String str = inflections.get(i).toStringWithAllMorphologicalFields();
+					if(!bloomFilter.add(str))
+						duplicateTexts.add(str);
 				}
 			}
 			catch(final LinterException e){
-				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
+				LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), fileLine(lineIndex), line);
 			}
 		};
 		final ProgressCallback progressCallback = lineIndex -> {
@@ -189,34 +162,26 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 			sleepOnPause();
 		};
-		ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
+		ParserHelper.forEachDictionaryLineParallel(dicFile, charset, fun, progressCallback);
 
 		bloomFilter.close();
 		final int totalInflections = bloomFilter.getAddedElements();
 		final double falsePositiveProbability = bloomFilter.getTrueFalsePositiveProbability();
 		bloomFilter.clear();
 
-		duplicatesBloomFilter.close();
-
 		final int falsePositiveCount = (int)Math.ceil(totalInflections * falsePositiveProbability);
-		if(duplicatesBloomFilter.getAddedElements() == MAX_DUPLICATES){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Maximum duplications reached");
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections processed: {}",
-				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
-		}
-		else
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
-				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
+			DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
 			DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), falsePositiveCount);
 
-		return duplicatesBloomFilter;
+		return duplicateTexts;
 	}
 
-	private Collection<List<Duplicate>> extractDuplicates(final BloomFilterInterface<String> duplicatesBloomFilter){
-		final Map<String, List<Duplicate>> result = new HashMap<>(0);
+	private Collection<List<Duplicate>> extractDuplicates(final Set<String> duplicateTexts){
+		final Map<String, List<Duplicate>> result = new ConcurrentHashMap<>(0);
 
-		if(duplicatesBloomFilter.getAddedElements() > 0){
+		if(!duplicateTexts.isEmpty()){
 			resetProcessing("Extracting duplicates (step 2/3)");
 
 			final Charset charset = dicParser.getCharset();
@@ -230,15 +195,17 @@ public class DuplicatesWorker extends WorkerDictionary{
 						final String word = inflections.get(WordGenerator.BASE_INFLECTION_INDEX).getWord();
 						for(int i = 0, length = inflections.size(); i < length; i ++){
 							final Inflection inflection = inflections.get(i);
-							final String text = inflection.toStringWithPartOfSpeech();
-							if(duplicatesBloomFilter.contains(text))
-								result.computeIfAbsent(text, k -> new ArrayList<>(1))
-									.add(new Duplicate(inflection, word, dicEntry.getContinuationFlags(), lineIndex));
+							final String text = inflection.toStringWithAllMorphologicalFields();
+							if(duplicateTexts.contains(text)){
+								final Duplicate duplicate = new Duplicate(inflection, word, dicEntry.getContinuationFlags(), lineIndex);
+								result.computeIfAbsent(text, k -> Collections.synchronizedList(new ArrayList<>(2)))
+									.add(duplicate);
+							}
 						}
 					}
 				}
 				catch(final LinterException e){
-					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), lineIndex + 1, line);
+					LOGGER.info(ParserManager.MARKER_APPLICATION, "{}, line {}: {}", e.getMessage(), fileLine(lineIndex), line);
 				}
 			};
 			final ProgressCallback progressCallback = lineIndex -> {
@@ -246,15 +213,14 @@ public class DuplicatesWorker extends WorkerDictionary{
 
 				sleepOnPause();
 			};
-			ParserHelper.forEachDictionaryLine(dicFile, charset, fun, progressCallback);
+			ParserHelper.forEachDictionaryLineParallel(dicFile, charset, fun, progressCallback);
 
-			final int totalDuplicates = duplicatesBloomFilter.getAddedElements();
-			final double falsePositiveProbability = duplicatesBloomFilter.getTrueFalsePositiveProbability();
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(totalDuplicates));
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "False positive probability is {} (overall duplicates ≲ {})",
-				DictionaryParser.PERCENT_FORMATTER.format(falsePositiveProbability), (int)Math.ceil(totalDuplicates * falsePositiveProbability));
+			//a text seen only once is a bloom filter false positive, not a duplicate
+			result.values().removeIf(group -> group.size() < 2);
 
-			duplicatesBloomFilter.clear();
+			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total duplicates: {}", DictionaryParser.COUNTER_FORMATTER.format(result.size()));
+
+			duplicateTexts.clear();
 		}
 		else
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "No duplicates found, skip remaining steps");
@@ -262,123 +228,316 @@ public class DuplicatesWorker extends WorkerDictionary{
 		return result.values();
 	}
 
+	/**
+	 * Write ALL the real duplicates (groups of at least two entries producing the same inflection), one group per line, ordered by
+	 * the first line of the dictionary involved; each group is annotated with the removal hints.
+	 * The output file is always created (empty if there are no duplicates).
+	 */
 	private void writeDuplicates(final File duplicatesFile, final Collection<List<Duplicate>> duplicates){
-		final int totalSize = duplicates.size();
-		if(totalSize > 0){
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "Write results to file (step 3/3)");
 
-			final Set<String> processedLines = new HashSet<>(totalSize);
+		//sort inside each group, then sort the groups, so that the output is deterministic
+		//(the line index is the tie-breaker because the entries are collected by many threads, in no particular order)
+		final Comparator<Duplicate> byAppliedRules = Comparator.<Duplicate>comparingInt(o -> o.getInflection().getAppliedRules().length)
+			.thenComparingInt(Duplicate::getLineIndex);
+		final List<List<Duplicate>> groups = new ArrayList<>(duplicates.size());
+		for(final List<Duplicate> group : duplicates){
+			final List<Duplicate> sortedGroup = new ArrayList<>(group);
+			sortedGroup.sort(byAppliedRules);
+			groups.add(sortedGroup);
+		}
+		groups.sort(Comparator.comparingInt(DuplicatesWorker::getFirstLineIndex));
 
-			int writtenSoFar = 0;
-			try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
-				final StringBuilder origin = new StringBuilder();
-				final Comparator<Duplicate> comparator = Comparator.comparingInt(o -> o.getInflection().getAppliedRules().length);
-				for(final List<Duplicate> entries : duplicates){
-					entries.sort(comparator);
+		//load only the lines of the entries involved, they are needed to really generate their inflections
+		final Set<Integer> involvedLineIndexes = new HashSet<>(0);
+		for(final List<Duplicate> group : groups)
+			for(final Duplicate duplicate : group)
+				involvedLineIndexes.add(duplicate.getLineIndex());
+		final RemovalAnalyzer analyzer = new RemovalAnalyzer(
+			ParserHelper.loadDictionaryLines(dicParser.getDicFile(), dicParser.getCharset(), involvedLineIndexes));
 
-					final StringJoiner lines = new StringJoiner(", ");
-					for(final Duplicate duplicate : entries)
-						lines.add(Integer.toString(duplicate.getLineIndex()));
-					if(!processedLines.add(lines.toString()))
-						//already inserted line, skip
-						continue;
-
-					final Inflection prod = entries.getFirst().getInflection();
-					origin.setLength(0);
-					origin.append(prod.getWord());
-					final List<String> partOfSpeechOrInflectionalAffix = prod.getMorphologicalFieldPartOfSpeechOrInflectionalAffix();
-					if(!partOfSpeechOrInflectionalAffix.isEmpty())
-						origin.append("(")
-							.append(String.join(" ", partOfSpeechOrInflectionalAffix))
-							.append(")");
-					origin.append(": ");
-					final StringJoiner sj = new StringJoiner(", ");
-					for(final Duplicate duplicate : entries){
-						final String info = StringUtils.join(Arrays.asList(duplicate.getWord(), " (", Integer.toString(duplicate.getLineIndex()),
-							(duplicate.getInflection().hasInflectionRules()?
-							" via " + duplicate.getInflection().getRulesSequence(): StringUtils.EMPTY), ")"), StringUtils.EMPTY);
-						sj.add(info);
-					}
-
-					final Iterator<Duplicate> itr = entries.iterator();
-					final Duplicate firstDuplicate = itr.next();
-					final Inflection firstDuplicateInflection = firstDuplicate.getInflection();
-					final String firstDuplicateRulesSequence = firstDuplicateInflection.getRulesSequence();
-					final Set<String> firstDuplicateContinuationFlags = new HashSet<>(firstDuplicateInflection.getContinuationFlags());
-					boolean isCandidate = false;
-					while(itr.hasNext()){
-						final Duplicate nextDuplicate = itr.next();
-						final Inflection nextDuplicateInflection = nextDuplicate.getInflection();
-						final String nextDuplicateRulesSequence = nextDuplicateInflection.getRulesSequence();
-						final Set<String> nextDuplicateContinuationFlags = new HashSet<>(nextDuplicateInflection.getContinuationFlags());
-
-						Duplicate candidate = firstDuplicate;
-						String candidateRulesSequence = firstDuplicateRulesSequence;
-						Set<String> candidateContinuationFlags = firstDuplicateContinuationFlags;
-						Duplicate other = nextDuplicate;
-						String otherRulesSequence = nextDuplicateRulesSequence;
-						if(firstDuplicateRulesSequence.length() > nextDuplicateRulesSequence.length()){
-							candidate = nextDuplicate;
-							other = firstDuplicate;
-							candidateRulesSequence = nextDuplicateRulesSequence;
-							otherRulesSequence = firstDuplicateRulesSequence;
-							candidateContinuationFlags = nextDuplicateContinuationFlags;
-						}
-
-						final boolean containmentCondition = (firstDuplicateContinuationFlags.isEmpty()
-							|| candidateContinuationFlags.containsAll(firstDuplicateContinuationFlags));
-						final String testEnd = Inflection.LEADS_TO + candidateRulesSequence;
-						final String testStart = candidateRulesSequence + Inflection.LEADS_TO;
-						final boolean equalProduction = (candidateRulesSequence.equals(otherRulesSequence)
-							&& candidate.getWord().equals(other.getWord()));
-						if(candidateRulesSequence.isEmpty()
-								|| containmentCondition && (equalProduction
-									|| otherRulesSequence.startsWith(testStart) || otherRulesSequence.endsWith(testEnd))){
-							final Set<String> candidateAppliedRules = new HashSet<>(candidate.getContinuationFlags());
-							for(final AffixEntry candidateAppliedRule : candidate.getInflection().getAppliedRules())
-								candidateAppliedRules.remove(candidateAppliedRule.getFlag());
-
-							final Set<String> otherAppliedRules = new HashSet<>(other.getContinuationFlags());
-							for(final AffixEntry otherAppliedRule : other.getInflection().getAppliedRules())
-								otherAppliedRules.remove(otherAppliedRule.getFlag());
-
-							final Set<String> intersectionAppliedRules = new HashSet<>(candidateAppliedRules);
-							intersectionAppliedRules.retainAll(otherAppliedRules);
-							candidateAppliedRules.removeAll(intersectionAppliedRules);
-							otherAppliedRules.removeAll(intersectionAppliedRules);
-							if(candidateAppliedRules.isEmpty()){
-								final String info = candidate.getWord()
-									+ (equalProduction && ! other.getWord().equals(candidate.getWord())? " (or " + other.getWord() + ")": "")
-									+ " is a candidate for removal";
-								if(!sj.toString().endsWith(info))
-									sj.add(info);
-							}
-							else
-								sj.add(candidate.getWord() + " cannot be safely removed due to candidate having flags "
-									+ candidateAppliedRules
-									+ (!otherAppliedRules.isEmpty()? " and other having flags " + otherAppliedRules: ""));
-
-							isCandidate = true;
-						}
-					}
-
-					if(isCandidate){
-						writer.write(origin.toString());
-						writer.write(sj.toString());
+		final int totalSize = groups.size();
+		final Set<String> processedGroups = new HashSet<>(totalSize);
+		int writtenSoFar = 0;
+		int writtenGroups = 0;
+		try(final BufferedWriter writer = Files.newBufferedWriter(duplicatesFile.toPath(), dicParser.getCharset())){
+			final StringBuilder sb = new StringBuilder();
+			for(final List<Duplicate> group : groups){
+				//skip groups made of the very same lines AND rules (they would give the very same advices)
+				if(processedGroups.add(getGroupKey(group, sb))){
+					if(describeGroup(group, analyzer, sb)){
+						writer.write(sb.toString());
 						writer.newLine();
+						writtenGroups ++;
 					}
+				}
 
-					setWorkerProgress(++ writtenSoFar, totalSize);
+				setWorkerProgress(++ writtenSoFar, totalSize);
 
-					sleepOnPause();
+				sleepOnPause();
+			}
+		}
+		catch(final IOException ioe){
+			throw new WriterException(ioe);
+		}
+
+		LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {} ({} duplicates)", duplicatesFile.getAbsolutePath(),
+			writtenGroups);
+	}
+
+	private static int getFirstLineIndex(final List<Duplicate> group){
+		int min = Integer.MAX_VALUE;
+		for(int i = 0, length = group.size(); i < length; i ++)
+			min = Math.min(min, group.get(i).getLineIndex());
+		return min;
+	}
+
+	private static String getGroupKey(final List<Duplicate> group, final StringBuilder sb){
+		sb.setLength(0);
+		for(int i = 0, length = group.size(); i < length; i ++){
+			if(i > 0)
+				sb.append(", ");
+			final Duplicate duplicate = group.get(i);
+			sb.append(duplicate.getLineIndex())
+				.append(':')
+				.append(duplicate.getInflection().getRulesSequence());
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * Exact removal analysis: instead of guessing from the flags, the inflections of the entries involved are really generated
+	 * and compared, so that a removal is reported as safe only if NO inflection (word + morphological fields) is lost.
+	 */
+	private final class RemovalAnalyzer{
+
+		private static final int MAX_LOST_SAMPLES = 3;
+
+		private final Map<Integer, String> lines;
+		private final Map<Integer, Set<String>> inflectionsByLine = new HashMap<>(0);
+		private final Map<String, Set<String>> inflectionsByLineWithoutFlag = new HashMap<>(0);
+
+
+		private RemovalAnalyzer(final Map<Integer, String> lines){
+			this.lines = lines;
+		}
+
+		/** @return	The inflections of the entry, or `null` if they cannot be generated. */
+		private Set<String> inflections(final int lineIndex){
+			if(inflectionsByLine.containsKey(lineIndex))
+				return inflectionsByLine.get(lineIndex);
+
+			final Set<String> inflections = generate(lineIndex, null);
+			inflectionsByLine.put(lineIndex, inflections);
+			return inflections;
+		}
+
+		/** @return	The inflections of the entry once the flag has been removed from it, or `null` if they cannot be generated. */
+		private Set<String> inflections(final int lineIndex, final String flagToRemove){
+			final String key = lineIndex + "|" + flagToRemove;
+			if(inflectionsByLineWithoutFlag.containsKey(key))
+				return inflectionsByLineWithoutFlag.get(key);
+
+			final Set<String> inflections = generate(lineIndex, flagToRemove);
+			inflectionsByLineWithoutFlag.put(key, inflections);
+			return inflections;
+		}
+
+		private Set<String> generate(final int lineIndex, final String flagToRemove){
+			final String line = lines.get(lineIndex);
+			if(line == null)
+				return null;
+
+			try{
+				final DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine(line);
+				if(flagToRemove != null)
+					dicEntry.removeContinuationFlag(flagToRemove);
+				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
+
+				final Set<String> keys = new HashSet<>(inflections.size() * 2);
+				for(int i = 0, length = inflections.size(); i < length; i ++)
+					keys.add(inflections.get(i).toStringWithAllMorphologicalFields());
+				return keys;
+			}
+			catch(final RuntimeException ignored){
+				return null;
+			}
+		}
+
+		/** @return	The elements of `inflections` that are NOT in `covering`, as a readable string (empty if there are none). */
+		private String lost(final Set<String> inflections, final Collection<String> covering){
+			final List<String> lost = new ArrayList<>(0);
+			int count = 0;
+			for(final String inflection : inflections)
+				if(!covering.contains(inflection)){
+					count ++;
+					if(lost.size() < MAX_LOST_SAMPLES)
+						lost.add(inflection);
+				}
+			if(count == 0)
+				return StringUtils.EMPTY;
+
+			Collections.sort(lost);
+			return count + " inflection" + (count > 1? "s": StringUtils.EMPTY);
+		}
+
+		/** Is the flag removable from the entry without losing any inflection? */
+		private String analyzeFlag(final int lineIndex, final String flag){
+			final Set<String> full = inflections(lineIndex);
+			final Set<String> reduced = inflections(lineIndex, flag);
+			final String where = "flag " + flag + " of line " + fileLine(lineIndex);
+			if(full == null || reduced == null)
+				return where + " cannot be verified";
+
+			final String lost = lost(full, reduced);
+			return (lost.isEmpty()
+				? where + " is safely removable (no inflection lost)"
+				: where + " is NOT removable, it would lose " + lost);
+		}
+
+		/** Is the whole entry removable, being all its inflections generated by the other entries? */
+		private String analyzeEntry(final int lineIndex, final String lemma, final Collection<Integer> otherLineIndexes,
+				final Map<Integer, String> lemmas){
+			final Set<String> full = inflections(lineIndex);
+			final String where = "entry " + lemma + " (line " + fileLine(lineIndex) + ")";
+			if(full == null || full.isEmpty())
+				//nothing to compare with (a vacuous truth would wrongly say it's removable)
+				return where + " cannot be verified";
+
+			final Set<String> covering = new HashSet<>(0);
+			final StringJoiner coveringEntries = new StringJoiner(", ");
+			for(final Integer otherLineIndex : otherLineIndexes){
+				final Set<String> other = inflections(otherLineIndex);
+				if(other == null)
+					return where + " cannot be verified";
+
+				covering.addAll(other);
+
+				//the entries that really contribute to cover this one
+				int covered = 0;
+				for(final String inflection : full)
+					if(other.contains(inflection))
+						covered ++;
+				if(covered > 0)
+					coveringEntries.add(lemmas.get(otherLineIndex) + " (line " + fileLine(otherLineIndex) + ", " + covered + "/"
+						+ full.size() + ")");
+			}
+
+			final String lost = lost(full, covering);
+			return (lost.isEmpty()
+				? where + " " + ENTRY_SAFELY_REMOVABLE_MARKER + " are generated by the other entries: " + coveringEntries + ")"
+				: where + " is NOT removable, it would lose " + lost);
+		}
+
+	}
+
+	/**
+	 * Build the line to be written for the given group (sorted by applied rules count) into `sb`.
+	 *
+	 * @return	Whether the line has to be written (always, unless {@link #WRITE_ONLY_SAFELY_REMOVABLE_ENTRIES} is set and the group
+	 * 	has no entry that can be safely removed).
+	 */
+	private static boolean describeGroup(final List<Duplicate> group, final RemovalAnalyzer analyzer, final StringBuilder sb){
+		final Inflection prod = group.getFirst().getInflection();
+		sb.setLength(0);
+		sb.append(prod.getWord());
+		//all the morphological fields, since they are what makes two inflections true duplicates
+		final List<String> morphologicalFields = prod.getMorphologicalFieldsAsList();
+		if(morphologicalFields != null && !morphologicalFields.isEmpty())
+			sb.append('(')
+				.append(String.join(" ", morphologicalFields))
+				.append(')');
+		sb.append(": ");
+
+		final StringJoiner details = new StringJoiner(", ");
+		//removal units: an entry (line) with the dictionary flag that generates the duplicate
+		final Map<String, Duplicate> units = new LinkedHashMap<>(0);
+		final Set<Integer> lineIndexes = new LinkedHashSet<>(0);
+		final Map<Integer, String> lemmas = new HashMap<>(0);
+		for(final Duplicate duplicate : group){
+			final Inflection inflection = duplicate.getInflection();
+			details.add(duplicate.getWord() + " (" + fileLine(duplicate.getLineIndex())
+				+ (inflection.hasInflectionRules()? " via " + inflection.getRulesSequence(): StringUtils.EMPTY) + ")");
+
+			units.putIfAbsent(duplicate.getLineIndex() + "|" + getRootFlag(inflection), duplicate);
+			lineIndexes.add(duplicate.getLineIndex());
+			lemmas.putIfAbsent(duplicate.getLineIndex(), duplicate.getWord());
+		}
+
+		final Set<String> advices = new LinkedHashSet<>(0);
+		final List<String> removableEntries = new ArrayList<>(0);
+		if(units.size() == 1){
+			//all the duplicates come from the very same flag of the very same entry: some rules of the flag overlap
+			final Duplicate unit = units.values().iterator().next();
+			final Set<String> ruleChains = new LinkedHashSet<>(0);
+			for(final Duplicate duplicate : group)
+				ruleChains.add(getRuleChain(duplicate.getInflection()));
+			advices.add("redundant rules inside flag " + getRootFlag(unit.getInflection()) + " of line " + fileLine(unit.getLineIndex())
+				+ ": " + String.join(" | ", ruleChains));
+		}
+		else{
+			for(final Duplicate unit : units.values()){
+				final String rootFlag = getRootFlag(unit.getInflection());
+				if(!rootFlag.isEmpty())
+					advices.add(analyzer.analyzeFlag(unit.getLineIndex(), rootFlag));
+			}
+
+			if(lineIndexes.size() > 1){
+				//NOTE: two entries could cover each other (ie. identical entries): removing both would lose everything, so the
+				//entries are examined one at a time (the last first) against the ones that would still remain, and an entry reported
+				//as removable is considered removed for the following ones
+				final List<Integer> remaining = new ArrayList<>(lineIndexes);
+				final List<Integer> examinationOrder = new ArrayList<>(lineIndexes);
+				examinationOrder.sort(Comparator.reverseOrder());
+				for(final Integer lineIndex : examinationOrder){
+					final List<Integer> others = new ArrayList<>(remaining);
+					others.remove(lineIndex);
+					final String advice = analyzer.analyzeEntry(lineIndex, lemmas.get(lineIndex), others, lemmas);
+					advices.add(advice);
+					if(advice.contains(ENTRY_SAFELY_REMOVABLE_MARKER)){
+						remaining.remove(lineIndex);
+						removableEntries.add(advice);
+					}
 				}
 			}
-			catch(final IOException ioe){
-				throw new WriterException(ioe);
-			}
-
-			LOGGER.info(ParserManager.MARKER_APPLICATION, "File written: {}", duplicatesFile.getAbsolutePath());
 		}
+
+		if(WRITE_ONLY_SAFELY_REMOVABLE_ENTRIES){
+			//only the entries that can be removed without losing any inflection
+			if(removableEntries.isEmpty())
+				return false;
+
+			sb.append(String.join(", ", removableEntries));
+			return true;
+		}
+
+		for(final String advice : advices)
+			details.add(advice);
+		sb.append(details);
+		return true;
+	}
+
+	/**
+	 * @param lineIndex	The index used internally (zero-based, header excluded).
+	 * @return	The line number as seen in a text editor (one-based, header included).
+	 */
+	private static int fileLine(final int lineIndex){
+		return lineIndex + 2;
+	}
+
+	/** @return	The flag, in the dictionary entry, that generates the inflection (empty if the inflection is the entry itself). */
+	private static String getRootFlag(final Inflection inflection){
+		final AffixEntry[] appliedRules = inflection.getAppliedRules();
+		return (appliedRules != null && appliedRules.length > 0? appliedRules[0].getFlag(): StringUtils.EMPTY);
+	}
+
+	private static String getRuleChain(final Inflection inflection){
+		final AffixEntry[] appliedRules = inflection.getAppliedRules();
+		final StringJoiner sj = new StringJoiner(Inflection.LEADS_TO);
+		if(appliedRules != null)
+			for(final AffixEntry appliedRule : appliedRules)
+				sj.add("[" + appliedRule + "]");
+		return sj.toString();
 	}
 
 }

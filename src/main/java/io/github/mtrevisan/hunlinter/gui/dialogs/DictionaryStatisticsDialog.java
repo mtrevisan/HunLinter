@@ -60,6 +60,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedWriter;
@@ -361,7 +362,7 @@ public class DictionaryStatisticsDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void exportButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+   private void exportButtonActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 		final JFileChooser saveTextFileFileChooser = JavaHelper.waitForFuture(futureSaveTextFileFileChooser);
 		final int fileChosen = saveTextFileFileChooser.showSaveDialog(this);
 		if(fileChosen == JFileChooser.APPROVE_OPTION){

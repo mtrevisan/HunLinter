@@ -45,6 +45,9 @@ import javax.swing.JOptionPane;
 import javax.xml.transform.TransformerException;
 import java.awt.Font;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -119,8 +122,8 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
 
 		textField.setFont(currentFont);
       textField.setToolTipText("hit `enter` to add");
-      textField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(final java.awt.event.KeyEvent evt) {
+      textField.addKeyListener(new KeyAdapter(){
+         public void keyReleased(final KeyEvent evt){
             textFieldKeyReleased(evt);
          }
       });
@@ -194,7 +197,7 @@ public class WordExceptionsLayeredPane extends JLayeredPane{
       debouncer.call(this);
    }//GEN-LAST:event_textFieldKeyReleased
 
-   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
          final String exception = textField.getText().trim();
          if(!parserManager.getWexParser().contains(exception)){

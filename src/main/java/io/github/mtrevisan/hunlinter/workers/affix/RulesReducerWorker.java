@@ -44,12 +44,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -90,7 +88,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 
 		//the lines are processed in parallel
 		final Set<String> originalLines = ConcurrentHashMap.newKeySet();
-		final Collection<LineEntry> originalRules = new ConcurrentLinkedQueue<>();
+		final RulesReducer.FactCollector originalRules = new RulesReducer.FactCollector();
 		//the lemmas that carry the flag but undergo no transformation: no reduced condition can select them
 		final Set<String> inertWords = ConcurrentHashMap.newKeySet();
 		//only the lines that carry a flag that can lead to the given one can be inflected by it
@@ -107,7 +105,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			inertWords.addAll(rulesReducer.collectInertWords(inflections, flag, type, rules));
 			if(rules != null && !rules.isEmpty()){
 				originalLines.add(data);
-				originalRules.addAll(rules);
+				originalRules.add(rules);
 			}
 		};
 
@@ -132,7 +130,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			try{
-				return rulesReducer.reduceRules(originalRules, inertWords, percent -> {
+				return rulesReducer.reduceRules(originalRules.toRules(), inertWords, percent -> {
 					setWorkerProgress(percent);
 
 					sleepOnPause();

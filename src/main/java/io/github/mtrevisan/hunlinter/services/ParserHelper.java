@@ -27,16 +27,21 @@ package io.github.mtrevisan.hunlinter.services;
 import io.github.mtrevisan.hunlinter.gui.ProgressCallback;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.WorkerException;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
+import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
@@ -66,12 +71,22 @@ public final class ParserHelper{
 		return isComment(line, HYPHENATION_COMMENTS);
 	}
 
-	private static boolean isComment(String line, final char[] comments){
-		line = StringUtils.trim(line);
-		if(StringUtils.isBlank(line))
+	private static boolean isComment(final String line, final char[] comments){
+		if(line == null)
 			return true;
 
-		final char chr = line.charAt(0);
+		//find the first non-blank character without allocating the trimmed string (called once per dictionary line)
+		int start = 0;
+		final int length = line.length();
+		while(start < length && line.charAt(start) <= ' ')
+			start ++;
+		if(start == length)
+			return true;
+
+		final char chr = line.charAt(start);
+		if(Character.isWhitespace(chr) && StringUtils.isBlank(line))
+			return true;
+
 		for(final char comment : comments)
 			if(chr == comment)
 				return true;
@@ -123,6 +138,39 @@ public final class ParserHelper{
 		}
 	}
 
+	/**
+	 * Load only the requested lines of the dictionary (the other ones are not kept in memory).
+	 *
+	 * @param file	The dictionary file.
+	 * @param charset	The charset.
+	 * @param lineIndexes	The indexes of the lines to be loaded, with the same numbering used by
+	 * 	{@link #forEachDictionaryLine(File, Charset, BiConsumer, ProgressCallback)} (zero-based, header excluded).
+	 * @return	The map line index → line.
+	 */
+	public static Map<Integer, String> loadDictionaryLines(final File file, final Charset charset,
+			final Set<Integer> lineIndexes){
+		final Map<Integer, String> result = new HashMap<>(lineIndexes.size() * 2);
+		if(lineIndexes.isEmpty())
+			return result;
+
+		try(final BufferedReader reader = FileHelper.createReader(file.toPath(), charset)){
+			if(reader.readLine() == null)
+				throw new EOFException("Unexpected EOF while reading file");
+
+			int lineIndex = 0;
+			String line;
+			while(result.size() < lineIndexes.size() && (line = reader.readLine()) != null){
+				if(lineIndexes.contains(lineIndex))
+					result.put(lineIndex, line);
+				lineIndex ++;
+			}
+		}
+		catch(final IOException ioe){
+			throw new WorkerException(ioe);
+		}
+		return result;
+	}
+
 	public static void assertNotEOF(final Scanner scanner) throws EOFException{
 		if(!scanner.hasNextLine())
 			throw new EOFException("Unexpected EOF while reading file");
@@ -130,21 +178,31 @@ public final class ParserHelper{
 
 	public static void forEachDictionaryLine(final File file, final Charset charset, final BiConsumer<Integer, String> fun,
 			final ProgressCallback progressCallback){
-		final int totalLines = FileHelper.getLinesCount(file, charset);
-		int progress = 0;
-		int progressIndex = 0;
-		final int progressStep = (int)Math.ceil(totalLines / 100.f);
-		try(final Scanner scanner = FileHelper.createScanner(file.toPath(), charset)){
-			assertLinesCount(scanner);
+		//progress is based on the bytes read, so there's no need for a preliminary pass just to count the lines
+		final long fileSize = Math.max(1l, FileHelper.getFileSize(file));
+		try(final BufferedReader reader = FileHelper.createReader(file.toPath(), charset)){
+			final String header = reader.readLine();
+			if(header == null)
+				throw new EOFException("Unexpected EOF while reading file");
+			assertLinesCount(List.of(header));
 
-			while(scanner.hasNextLine()){
-				final String line = scanner.nextLine();
-
+			long readSoFar = StringHelper.rawBytesLength(header);
+			int lastPercent = 0;
+			int lineIndex = 0;
+			String line;
+			while((line = reader.readLine()) != null){
 				if(!isDictionaryComment(line))
-					fun.accept(progress, line);
+					fun.accept(lineIndex, line);
+				lineIndex ++;
 
-				if(progressCallback != null && ++ progress % progressStep == 0)
-					progressCallback.accept(++ progressIndex);
+				if(progressCallback != null){
+					readSoFar += StringHelper.rawBytesLength(line);
+					final int percent = (int)Math.min(readSoFar * 100l / fileSize, 99l);
+					if(percent > lastPercent){
+						lastPercent = percent;
+						progressCallback.accept(percent);
+					}
+				}
 			}
 
 			if(progressCallback != null)

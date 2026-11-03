@@ -48,6 +48,7 @@ import javax.swing.JScrollPane;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.HeadlessException;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -198,7 +199,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-	private void whatsNewButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
+	private void whatsNewButtonActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_whatsNewButtonActionPerformed
 		try{
 			final List<Pair<Version, String>> whatsNew = DownloaderHelper.extractNewerVersions();
 			final String message = whatsNew.stream()
@@ -222,7 +223,7 @@ public class FileDownloaderDialog extends JDialog implements PropertyChangeListe
 		catch(final VersionException | IOException | ParseException | URISyntaxException | HeadlessException ignored){}
 	}//GEN-LAST:event_whatsNewButtonActionPerformed
 
-   private void downloadButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
+   private void downloadButtonActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_downloadButtonActionPerformed
 		downloadButton.setEnabled(false);
 
 		task = new DownloadTask(localPath, remoteObject, this);

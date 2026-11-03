@@ -283,7 +283,12 @@ class WordGeneratorBase{
 				if(overriddenRule != null && affix.equals(overriddenRule.getEntries().getFirst().getFlag()))
 					rule = overriddenRule;
 
-				List<String> currentPostponedAffixes = postponedAffixes;
+				//a prefix and a suffix meet only if both of them allow the cross product (`Y`), as Hunspell does: the rule that is
+					// going to be applied after a rule of the other type has to be combinable too
+					if(rule != null && !rule.isCombinable() && hasAppliedRuleOfOtherType(dicEntry, rule.getType()))
+						continue;
+
+					List<String> currentPostponedAffixes = postponedAffixes;
 				if(dicEntry.getLastAppliedRule() != null
 						&& dicEntry.getLastAppliedRule().getType() == AffixType.SUFFIX ^ rule.getType() == AffixType.SUFFIX){
 					currentPostponedAffixes = new ArrayList<>(postponedAffixes);
@@ -297,6 +302,14 @@ class WordGeneratorBase{
 				inflections.addAll(prods);
 			}
 		return inflections;
+	}
+
+	private static boolean hasAppliedRuleOfOtherType(final DictionaryEntry dicEntry, final AffixType type){
+		final AffixEntry[] appliedRules = dicEntry.getAppliedRules();
+		for(int i = 0, length = (appliedRules != null? appliedRules.length: 0); i < length; i ++)
+			if(appliedRules[i].getType() != type)
+				return true;
+		return false;
 	}
 
 	private List<Inflection> applyAffixRule(final DictionaryEntry dicEntry, final String affix, final List<String> postponedAffixes,

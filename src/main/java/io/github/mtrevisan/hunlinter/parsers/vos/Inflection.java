@@ -29,6 +29,8 @@ import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -232,6 +234,28 @@ public class Inflection extends DictionaryEntry{
 			return word + POS_FIELD_PREFIX + StringUtils.join(pos, COMMA);
 		}
 		return word;
+	}
+
+	/**
+	 * Two inflections are true duplicates only if they have the same word AND the same morphological fields (all of them, not
+	 * only part-of-speech and affixes: ie. `vt:` and `cl:` too), independently of the order and of the repetitions of the fields.
+	 * The stem (`st:`) is NOT considered, since it identifies the lemma the inflection comes from, and two different lemmas may
+	 * produce the same inflection.
+	 *
+	 * @return	The word followed by the sorted distinct morphological fields.
+	 */
+	public final String toStringWithAllMorphologicalFields(){
+		if(morphologicalFields == null || morphologicalFields.isEmpty())
+			return word;
+
+		final String stemTag = MorphologicalTag.STEM.getCode();
+		final java.util.TreeSet<String> fields = new java.util.TreeSet<>();
+		for(int i = 0, length = morphologicalFields.size(); i < length; i ++){
+			final String field = morphologicalFields.get(i);
+			if(!field.startsWith(stemTag))
+				fields.add(field);
+		}
+		return (fields.isEmpty()? word: word + POS_FIELD_PREFIX + StringUtils.join(fields, COMMA));
 	}
 
 	public final void applyOutputConversionTable(final Function<String, String> outputConversionTable){

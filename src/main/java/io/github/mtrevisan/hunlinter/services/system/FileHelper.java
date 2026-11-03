@@ -376,6 +376,30 @@ public final class FileHelper{
 		return new Scanner(bomis, charset);
 	}
 
+	/** Fast line reader (BOM and gzip aware): several times faster than {@link Scanner#nextLine()}. */
+	public static BufferedReader createReader(final Path path, final Charset charset) throws IOException{
+		InputStream is = Files.newInputStream(path);
+		try{
+			if(isGZipped(path.toFile()))
+				is = new GZIPInputStream(is, 65_536);
+			final BOMInputStream bomis = BOMInputStream.builder()
+				.setInputStream(is)
+				.setByteOrderMarks(new ByteOrderMark[]{ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE,
+					ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE})
+				.get();
+			return new BufferedReader(new InputStreamReader(bomis, charset), 65_536);
+		}
+		catch(final IOException | RuntimeException e){
+			try{
+				is.close();
+			}
+			catch(final IOException suppressed){
+				e.addSuppressed(suppressed);
+			}
+			throw e;
+		}
+	}
+
 	public static int getLinesCount(final File file, final Charset charset){
 		int lines = 0;
 		try(final LineNumberReader reader = new LineNumberReader(new FileReader(file, charset))){

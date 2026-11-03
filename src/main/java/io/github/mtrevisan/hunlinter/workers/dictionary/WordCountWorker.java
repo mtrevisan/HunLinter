@@ -24,10 +24,6 @@
  */
 package io.github.mtrevisan.hunlinter.workers.dictionary;
 
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterInterface;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.BloomFilterParameters;
-import io.github.mtrevisan.hunlinter.datastructures.bloomfilter.ScalableInMemoryBloomFilter;
-import io.github.mtrevisan.hunlinter.languages.BaseBuilder;
 import io.github.mtrevisan.hunlinter.parsers.ParserManager;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.DictionaryParser;
 import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator;
@@ -41,10 +37,10 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -58,7 +54,6 @@ public class WordCountWorker extends WorkerDictionary{
 
 	private final AtomicInteger totalInflections = new AtomicInteger(0);
 	private final Set<String> totalUniqueInflections;
-	private final BloomFilterInterface<String> dictionary;
 
 
 	public WordCountWorker(final ParserManager parserManager, final Consumer<Exception> onCancelled){
@@ -70,17 +65,16 @@ public class WordCountWorker extends WorkerDictionary{
 		super(new WorkerDataParser<>(WORKER_NAME, dicParser));
 
 		getWorkerData()
-//			.withParallelProcessing()
-			.withCancelOnException();
+			.withParallelProcessing()
+			.withCancelOnException()
+			.withDataCancelledCallback(onCancelled);
 
 		Objects.requireNonNull(wordGenerator, "Word generator cannot be null");
 
 
-		final BloomFilterParameters dictionaryBaseData = BaseBuilder.getDictionaryBaseData(language);
-		dictionary = new ScalableInMemoryBloomFilter<>(dicParser.getCharset(), dictionaryBaseData);
-
-		totalUniqueInflections = new HashSet<>(50_000_000);
-//		totalUniqueInflections = ConcurrentHashMap.newKeySet(50_000_000);
+		//NOTE: every word ends up in the set anyway, so a bloom filter in front of it only adds hashing cost;
+		//not pre-sized to avoid reserving hundreds of MB up front, even for small dictionaries
+		totalUniqueInflections = ConcurrentHashMap.newKeySet();
 
 
 		final Consumer<IndexDataPair<String>> lineProcessor = indexData -> {
@@ -88,30 +82,9 @@ public class WordCountWorker extends WorkerDictionary{
 			final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry);
 
 			totalInflections.addAndGet(inflections.size());
-			for(int i = 0, length = inflections.size(); i < length; i ++){
-				final String word = inflections.get(i).getWord();
-
-				//bloom filter says it doesn't contain the word...
-				if(!dictionary.contains(word)){
-					//... so check also if it's present in the set...
-					if(totalUniqueInflections.add(word))
-						//... and if it's not, add it to the bloom filter
-						dictionary.add(word);
-				}
-				else
-					//bloom filter says it may contain the word, but it could be a false positive...
-					totalUniqueInflections.add(word);
-			}
+			for(int i = 0, length = inflections.size(); i < length; i ++)
+				totalUniqueInflections.add(inflections.get(i).getWord());
 		};
-		final Consumer<Exception> cancelled = exc -> {
-			dictionary.close();
-
-			if(onCancelled != null)
-				onCancelled.accept(exc);
-		};
-
-		getWorkerData()
-			.withDataCancelledCallback(cancelled);
 
 		final Function<Void, Void> step1 = ignored -> {
 			prepareProcessing("Execute " + workerData.getWorkerName());
@@ -126,9 +99,6 @@ public class WordCountWorker extends WorkerDictionary{
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
-			dictionary.close();
-
-
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total inflections: {}",
 				DictionaryParser.COUNTER_FORMATTER.format(totalInflections));
 			LOGGER.info(ParserManager.MARKER_APPLICATION, "Total unique inflections: {}, {}",

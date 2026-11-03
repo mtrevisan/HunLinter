@@ -925,6 +925,39 @@ class WordGeneratorAffixTest extends TestBase{
 
 
 	@Test
+	void crossProductPrefixAndSuffix() throws IOException{
+		//Hunspell (`expand_rootword`): a prefix and a suffix meet only if both of them allow the cross product
+		Assertions.assertEquals(java.util.Set.of("foo", "foos", "unfoo", "unfoos"), inflect("Y", "Y"));
+	}
+
+	@Test
+	void crossProductPrefixNotAllowed() throws IOException{
+		Assertions.assertEquals(java.util.Set.of("foo", "foos", "unfoo"), inflect("N", "Y"));
+	}
+
+	@Test
+	void crossProductSuffixNotAllowed() throws IOException{
+		Assertions.assertEquals(java.util.Set.of("foo", "foos", "unfoo"), inflect("Y", "N"));
+	}
+
+	private java.util.Set<String> inflect(String prefixCrossProduct, String suffixCrossProduct) throws IOException{
+		String language = "xxx";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"PFX P " + prefixCrossProduct + " 1",
+			"PFX P 0 un .",
+			"SFX S " + suffixCrossProduct + " 1",
+			"SFX S 0 s .");
+		loadData(affFile, language);
+
+		DictionaryEntry dicEntry = wordGenerator.createFromDictionaryLine("foo/PS");
+		return wordGenerator.applyAffixRules(dicEntry)
+			.stream()
+			.map(Inflection::getWord)
+			.collect(java.util.stream.Collectors.toSet());
+	}
+
+	@Test
 	void forbiddenWord() throws IOException{
 		String language = "xxx";
 		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",

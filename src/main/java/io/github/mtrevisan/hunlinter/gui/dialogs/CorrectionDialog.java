@@ -34,6 +34,7 @@ import javax.swing.JDialog;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -165,11 +166,11 @@ public class CorrectionDialog extends JDialog{
       pack();
    }// </editor-fold>//GEN-END:initComponents
 
-   private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+   private void btnCancelActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
       dispose();
    }//GEN-LAST:event_btnCancelActionPerformed
 
-   private void btnOkActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+   private void btnOkActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
       try{
 			final String incorrect = incorrectTextField.getText();
 			final String correct = correctTextField.getText();

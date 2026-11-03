@@ -40,14 +40,20 @@ import io.github.mtrevisan.hunlinter.services.RegexSequencer;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,7 +62,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -77,17 +86,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 	<li>for a transformation {@code (r, a)}, the words ending with {@code r} are <em>positive</em> if they have the fact,
  * 		<em>negative</em> otherwise: a condition is valid iff it matches no negative word (this is the oracle: a valid
  * 		line can only produce expected inflections);</li>
- * 	<li>valid conditions are generated from a reverse trie of the words (pure sub-trees and groups of pure siblings),
- * 		then enlarged by merging conditions that differ by a single token;</li>
- * 	<li>a greedy set cover picks the fewest conditions that cover every positive word, and redundant ones are dropped;</li>
+ * 	<li>valid conditions are generated from a reverse trie of the words (pure sub-trees and groups of pure siblings; the
+ * 		trie skeleton depends only on the removal, so it is built once and shared by all the transformations with that
+ * 		removal), then enlarged by merging conditions that differ by a single token, by widening each token to every
+ * 		character that does not let a negative word in, and by dropping the farthest token when it is not needed;</li>
+ * 	<li>the candidates dominated by another one are dropped, then a set cover picks the fewest conditions that cover every
+ * 		positive word (exact branch-and-bound on small instances, greedy otherwise, always with a deterministic limit on
+ * 		the work done), a local search replaces pairs of conditions with a single one, and redundant ones are dropped;</li>
  * 	<li>each condition is finally written in the shortest form (positive or negated group, useless leading wildcard
  * 		removed).</li>
  * </ol>
+ * Every limit is a count of operations (never a time), so the output does not depend on the load of the machine.
  * Everything is computed on suffix-oriented data, as the {@link RulesReducer} does (prefixes are reversed by
  * {@link #collectInflectionsByFlag(List, String, AffixType)} and restored by
  * {@link #convertFormat(String, boolean, List)}).
  */
 public class RulesReducer{
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RulesReducer.class);
 
 	private static final String NON_SEPARABLE = "Cannot separate the word `{}` from the other words ending with `{}`: "
 		+ "no condition can select it for the transformation `{}` -> `{}`";
@@ -96,6 +112,13 @@ public class RulesReducer{
 	private static final String TOKEN_SEPARATOR = "\u0001";
 	/** Safety limit on the number of candidate conditions generated for a single transformation. */
 	private static final int MAX_POOL_SIZE = 20_000;
+	/** Limit on the number of word checks spent enlarging the pool of candidates of a single transformation. */
+	private static final long EXPAND_MAX_WORD_CHECKS = 20_000_000L;
+	/** Above these thresholds the exact set cover is not attempted (greedy + local search only). */
+	private static final int EXACT_MAX_POSITIVES = 60;
+	private static final int EXACT_MAX_POOL = 2_000;
+	/** Limit on the number of nodes visited by the exact branch-and-bound set cover (the best solution found is used). */
+	private static final long EXACT_MAX_NODES = 500_000L;
 
 
 	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
@@ -155,16 +178,29 @@ public class RulesReducer{
 			final Inflection inflection = inflections.get(i);
 			final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 			if(lastAppliedRule != null && lastAppliedRule.getFlag().equals(flag)){
-				final String word = lastAppliedRule.undoRule(inflection.getWord());
-				final LineEntry newEntry = createAffixEntry(inflection, word, type);
+				//the rules applied after this one (of the other type, as the apheresis prefix applied to a suffixed word) change the
+				// word too: they have to be undone first, otherwise the word this rule was applied to is not the right one
+				final AffixEntry[] appliedRules = inflection.getAppliedRules();
+				int ruleIndex = appliedRules.length - 1;
+				while(ruleIndex >= 0 && appliedRules[ruleIndex] != lastAppliedRule)
+					ruleIndex --;
+				String producedWord = inflection.getWord();
+				for(int j = appliedRules.length - 1; j > ruleIndex; j --)
+					producedWord = appliedRules[j].undoRule(producedWord);
+				final String word = lastAppliedRule.undoRule(producedWord);
+				final LineEntry newEntry = createAffixEntry(producedWord, lastAppliedRule, word, type);
 				filteredRules.add(newEntry);
 			}
 		}
 		return filteredRules;
 	}
 
-	private LineEntry createAffixEntry(final Inflection inflection, String word, final AffixType type){
-		String producedWord = inflection.getWord();
+	/**
+	 * @param producedWord	The word produced by the rule (without the effect of the rules applied after it).
+	 * @param lastAppliedRule	The rule that produced the word.
+	 * @param word	The word the rule was applied to.
+	 */
+	private LineEntry createAffixEntry(String producedWord, final AffixEntry lastAppliedRule, String word, final AffixType type){
 		if(type == AffixType.PREFIX){
 			producedWord = StringUtils.reverse(producedWord);
 			word = StringUtils.reverse(word);
@@ -175,7 +211,6 @@ public class RulesReducer{
 		final int wordLength = word.length();
 		final String removal = (lastCommonLetter < wordLength? word.substring(lastCommonLetter): StringUtils.EMPTY);
 		String addition = (lastCommonLetter < producedWord.length()? producedWord.substring(lastCommonLetter): StringUtils.EMPTY);
-		final AffixEntry lastAppliedRule = inflection.getLastAppliedRule(type);
 		if(lastAppliedRule != null)
 			addition += lastAppliedRule.toString(strategy);
 		final String condition = (lastCommonLetter < wordLength? removal: StringUtils.EMPTY);
@@ -395,6 +430,63 @@ public class RulesReducer{
 	}
 
 
+	//-- facts collection --
+
+	/**
+	 * Thread-safe accumulator of the plain rules, that keeps one record for each transformation (removal and addition)
+	 * instead of one for each word and inflection, and shares the words among the records. A flag applied to every inflection
+	 * of every word (as the clitics of the verbs) generates tens of millions of plain rules: keeping each one of them in memory
+	 * is not feasible.
+	 */
+	public static final class FactCollector{
+
+		private final Map<String, Fact> facts = new ConcurrentHashMap<>();
+		private final Map<String, String> words = new ConcurrentHashMap<>();
+
+
+		/** @param plainRules	The plain rules of a dictionary line, as returned by {@link #collectInflectionsByFlag(List, String, AffixType)}. */
+		public final void add(final Collection<LineEntry> plainRules){
+			if(plainRules == null)
+				return;
+
+			for(final LineEntry entry : plainRules)
+				for(final String addition : entry.addition){
+					final Fact fact = facts.computeIfAbsent(entry.removal + TOKEN_SEPARATOR + addition,
+						k -> new Fact(entry.removal, addition));
+					for(final String word : entry.from)
+						fact.words.add(words.computeIfAbsent(word, k -> k));
+				}
+		}
+
+		public final boolean isEmpty(){
+			return facts.isEmpty();
+		}
+
+		/** @return	The accumulated facts as plain rules (one for each transformation, with all the words that undergo it). */
+		public final List<LineEntry> toRules(){
+			final List<LineEntry> rules = new ArrayList<>(facts.size());
+			for(final Fact fact : facts.values())
+				rules.add(new LineEntry(fact.removal, fact.addition, fact.removal, fact.words));
+			return rules;
+		}
+
+	}
+
+	private static final class Fact{
+
+		final String removal;
+		final String addition;
+		final Set<String> words = ConcurrentHashMap.newKeySet();
+
+
+		Fact(final String removal, final String addition){
+			this.removal = removal;
+			this.addition = addition;
+		}
+
+	}
+
+
 	//-- reduction --
 
 	public final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules){
@@ -425,9 +517,12 @@ public class RulesReducer{
 
 		//every word (lemma or inflection) that carries the flag but undergoes no transformation
 		final Set<String> inert = new HashSet<>(0);
+		final AffixType lastFoldType = (affixData.isComplexPrefixes()? AffixType.SUFFIX: AffixType.PREFIX);
 		for(int i = 0, length = inflections.size(); i < length; i ++){
 			final Inflection inflection = inflections.get(i);
-			if(inflection.hasContinuationFlag(flag)){
+			//a word that already has a rule of the last fold applied (the prefix, for the languages without complex prefixes) is
+			// never inflected again: the flags it carries are just inherited by the rule, they do not apply to it
+			if(inflection.hasContinuationFlag(flag) && inflection.getLastAppliedRule(lastFoldType) == null){
 				final String word = (type == AffixType.PREFIX? StringUtils.reverse(inflection.getWord()): inflection.getWord());
 				if(!applied.contains(word))
 					inert.add(word);
@@ -472,30 +567,40 @@ public class RulesReducer{
 		if(progressCallback != null)
 			progressCallback.accept(5);
 
-		//2. words ending with a given removal (in reversed-lexicographic order, that is the order of the trie)
-		final Map<String, List<String>> wordsByRemoval = new HashMap<>();
+		//2. the trie of the words ending with a given removal (in reversed-lexicographic order, that is the order of the trie):
+		// it does not depend on the addition, so it is built once for all the transformations that share the removal
+		final Map<String, Skeleton> skeletonByRemoval = new HashMap<>();
 		for(final Transformation transformation : positivesByTransformation.keySet())
-			wordsByRemoval.computeIfAbsent(transformation.removal, removal -> {
+			skeletonByRemoval.computeIfAbsent(transformation.removal, removal -> {
 				final List<String> words = new ArrayList<>();
 				for(final String word : allWords)
 					if(word.endsWith(removal))
 						words.add(word);
-				return words;
+				return Skeleton.of(words, removal.length());
 			});
 		if(progressCallback != null)
 			progressCallback.accept(10);
 
-		//3. solve each transformation independently
-		final List<Line> lines = new ArrayList<>();
-		int done = 0;
-		final int total = positivesByTransformation.size();
-		for(final Map.Entry<Transformation, Set<String>> entry : positivesByTransformation.entrySet()){
-			final Transformation transformation = entry.getKey();
-			lines.addAll(solve(transformation, entry.getValue(), wordsByRemoval.get(transformation.removal)));
-
-			if(progressCallback != null)
-				progressCallback.accept(10 + 85 * (++ done) / total);
-		}
+		//3. solve each transformation independently, in parallel
+		final List<Transformation> transformations = new ArrayList<>(positivesByTransformation.keySet());
+		final int total = transformations.size();
+		final AtomicInteger done = new AtomicInteger(0);
+		final List<Line> lines = IntStream.range(0, total)
+			.parallel()
+			.mapToObj(i -> {
+				final Transformation transformation = transformations.get(i);
+				final List<Line> sub = solve(transformation, positivesByTransformation.get(transformation),
+					skeletonByRemoval.get(transformation.removal));
+				if(progressCallback != null){
+					final int value = 10 + 85 * done.incrementAndGet() / total;
+					synchronized(progressCallback){
+						progressCallback.accept(value);
+					}
+				}
+				return sub;
+			})
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
 
 		//4. express the lines as entries
 		result.addAll(toEntries(lines));
@@ -511,41 +616,54 @@ public class RulesReducer{
 	/**
 	 * @param transformation	The transformation shared by all the words in {@code positives}.
 	 * @param positives	The words that undergo the transformation.
-	 * @param words	All the words ending with the removal of the transformation, in reversed-lexicographic order.
+	 * @param skeleton	The trie of all the words ending with the removal of the transformation.
 	 * @return	The minimal set of lines that apply the transformation to all the positives and to no other word.
 	 */
 	private static List<Line> solve(final Transformation transformation, final Set<String> positives,
-			final List<String> words){
+			final Skeleton skeleton){
 		final String removal = transformation.removal;
-		final int removalLength = removal.length();
+		final List<String> words = skeleton.words;
 
-		//build the reverse trie; positive words get their index in the order of insertion (that is the order of the trie, so
-		// the positives of any sub-tree are contiguous)
-		final Node root = new Node();
-		final List<String> positiveList = new ArrayList<>(positives.size());
-		for(final String word : words){
-			final boolean positive = positives.contains(word);
-			final int index = (positive? positiveList.size(): -1);
-			if(positive)
-				positiveList.add(word);
-
-			Node node = root;
-			node.add(index);
-			for(int i = word.length() - removalLength - 1; i >= 0; i --){
-				node = node.children.computeIfAbsent(word.charAt(i), k -> new Node());
-				node.add(index);
-			}
-			if(positive)
-				node.exactPositive = word;
-		}
-		final int positiveCount = positiveList.size();
+		//positive words get their index in the order of the trie, so the positives of any sub-tree are contiguous
+		final Context context = new Context(words, positives, removal.length());
+		final int positiveCount = context.positiveCount;
 
 		//generate the candidate conditions
 		final Map<String, Candidate> pool = new LinkedHashMap<>();
-		collectCandidates(root, new ArrayList<>(), transformation, removal, pool);
+		collectCandidates(skeleton.root, new ArrayList<>(), transformation, context, pool);
 		mergeCandidates(pool);
+		//enlarge the pool with the conditions that the trie cannot produce
+		expandCandidates(pool, context);
+		//a candidate that is dominated (superset coverage at same or lower cost) can never be optimal
+		pruneDominated(pool);
 
-		//greedy set cover
+		//choose the cover: exact branch-and-bound for small instances, greedy otherwise
+		final List<Candidate> selected;
+		if(positiveCount <= EXACT_MAX_POSITIVES && pool.size() <= EXACT_MAX_POOL)
+			selected = improveWithExact(pool.values(), positiveCount, transformation);
+		else
+			selected = greedyCover(pool.values(), positiveCount);
+
+		//try to replace pairs of selected candidates with a single pool candidate
+		localSearch2Opt(selected, pool.values());
+
+		//remove redundant conditions
+		removeRedundant(selected, positiveCount);
+
+		final List<Line> lines = new ArrayList<>(selected.size());
+		for(final Candidate candidate : selected)
+			lines.add(finalizeLine(candidate, transformation, positives, words));
+		return lines;
+	}
+
+
+	//-- set cover helpers --
+
+	/** Greedy set cover with a rarity-based tie-break: prefer covering elements that few other candidates can cover. */
+	private static List<Candidate> greedyCover(final Collection<Candidate> candidates, final int positiveCount){
+		final List<Candidate> pool = new ArrayList<>(candidates);
+		final int[] coverCount = countCoverage(pool, positiveCount);
+
 		final List<Candidate> selected = new ArrayList<>();
 		final BitSet uncovered = new BitSet(positiveCount);
 		uncovered.set(0, positiveCount);
@@ -553,24 +671,284 @@ public class RulesReducer{
 		while(!uncovered.isEmpty()){
 			Candidate best = null;
 			int bestGain = 0;
-			for(final Candidate candidate : pool.values()){
+			long bestRarity = Long.MAX_VALUE;
+			for(final Candidate candidate : pool){
 				gainMask.clear();
 				gainMask.or(candidate.coverage);
 				gainMask.and(uncovered);
 				final int gain = gainMask.cardinality();
-				if(gain > 0 && (best == null || gain > bestGain || gain == bestGain && candidate.isBetterThan(best))){
+				if(gain <= 0)
+					continue;
+
+				if(gain > bestGain){
 					best = candidate;
 					bestGain = gain;
+					bestRarity = raritySum(gainMask, coverCount);
+				}
+				else if(gain == bestGain){
+					final long rarity = raritySum(gainMask, coverCount);
+					if(rarity < bestRarity || rarity == bestRarity && candidate.isBetterThan(best)){
+						best = candidate;
+						bestRarity = rarity;
+					}
 				}
 			}
 			if(best == null)
-				throw new IllegalStateException("Cannot cover the words " + uncovered + " for " + transformation);
+				throw new IllegalStateException("Cannot cover the words " + uncovered);
 
 			selected.add(best);
 			uncovered.andNot(best.coverage);
 		}
+		return selected;
+	}
 
-		//remove the redundant conditions
+	/**
+	 * Exact set cover via branch-and-bound on the uncovered set. Starts from the greedy solution and only accepts
+	 * improvements. Returns the best solution found within the (deterministic) limit on the visited nodes, or the greedy one.
+	 */
+	private static List<Candidate> improveWithExact(final Collection<Candidate> candidates, final int positiveCount,
+			final Transformation transformation){
+		final List<Candidate> greedy = greedyCover(candidates, positiveCount);
+		if(positiveCount <= 1 || candidates.size() <= greedy.size())
+			return greedy;
+
+		final ExactSearch search = new ExactSearch(candidates, positiveCount, greedy);
+		final BitSet uncovered = new BitSet(positiveCount);
+		uncovered.set(0, positiveCount);
+		search.search(uncovered);
+		if(search.limitReached)
+			LOGGER.debug("Exact set cover stopped after {} nodes for the transformation `{}`, the best solution found ({} rules) is used",
+				search.nodes, transformation, search.best.size());
+		return search.best;
+	}
+
+	/** Branch-and-bound over the candidates, with the covering structure computed once. */
+	private static final class ExactSearch{
+
+		/** Candidates, sorted by decreasing coverage, then by key (this order is the tie-break of the search). */
+		private final List<Candidate> pool;
+		/** For each positive word, the indices (in {@link #pool}) of the candidates that cover it. */
+		private final int[][] coveringByElement;
+		private final int maxCardinality;
+		private final List<Candidate> chosen = new ArrayList<>();
+		List<Candidate> best;
+		private int bestSize;
+		long nodes;
+		boolean limitReached;
+
+
+		ExactSearch(final Collection<Candidate> candidates, final int positiveCount, final List<Candidate> greedy){
+			pool = new ArrayList<>(candidates);
+			//large coverage first: better first solution, more pruning
+			pool.sort((a, b) -> {
+				final int cmp = Integer.compare(b.coverage.cardinality(), a.coverage.cardinality());
+				return (cmp != 0? cmp: a.key.compareTo(b.key));
+			});
+			maxCardinality = Math.max(1, pool.getFirst().coverage.cardinality());
+
+			final int[] counts = new int[positiveCount];
+			for(final Candidate candidate : pool)
+				for(int i = candidate.coverage.nextSetBit(0); i >= 0; i = candidate.coverage.nextSetBit(i + 1))
+					counts[i] ++;
+			coveringByElement = new int[positiveCount][];
+			for(int i = 0; i < positiveCount; i ++)
+				coveringByElement[i] = new int[counts[i]];
+			final int[] fill = new int[positiveCount];
+			for(int index = 0, size = pool.size(); index < size; index ++){
+				final BitSet coverage = pool.get(index).coverage;
+				for(int i = coverage.nextSetBit(0); i >= 0; i = coverage.nextSetBit(i + 1))
+					coveringByElement[i][fill[i] ++] = index;
+			}
+
+			best = new ArrayList<>(greedy);
+			bestSize = greedy.size();
+		}
+
+		void search(final BitSet uncovered){
+			if(uncovered.isEmpty()){
+				if(chosen.size() < bestSize){
+					bestSize = chosen.size();
+					best = new ArrayList<>(chosen);
+				}
+				return;
+			}
+			//each candidate covers at most `maxCardinality` words
+			final int remaining = uncovered.cardinality();
+			if(chosen.size() + (remaining + maxCardinality - 1) / maxCardinality >= bestSize)
+				return;
+			if(++ nodes > EXACT_MAX_NODES){
+				limitReached = true;
+				return;
+			}
+
+			//pivot: uncovered element covered by the fewest candidates
+			int pivot = -1;
+			int pivotCount = Integer.MAX_VALUE;
+			for(int i = uncovered.nextSetBit(0); i >= 0; i = uncovered.nextSetBit(i + 1)){
+				final int count = coveringByElement[i].length;
+				if(count < pivotCount){
+					pivotCount = count;
+					pivot = i;
+					if(count == 1)
+						break;
+				}
+			}
+			if(pivot < 0 || pivotCount == 0)
+				return;
+
+			//candidates covering the pivot, ordered by decreasing gain (then by the order of the pool)
+			final long[] uncoveredBits = uncovered.toLongArray();
+			final int[] covering = coveringByElement[pivot];
+			final long[] ordered = new long[covering.length];
+			for(int j = 0; j < covering.length; j ++){
+				final int gain = andCount(pool.get(covering[j]).bits(), uncoveredBits);
+				ordered[j] = ((long)(Integer.MAX_VALUE - gain) << 32) | covering[j];
+			}
+			Arrays.sort(ordered);
+
+			final BitSet newUncovered = new BitSet(uncovered.size());
+			for(final long key : ordered){
+				final Candidate candidate = pool.get((int)(key & 0xFFFF_FFFFL));
+				newUncovered.clear();
+				newUncovered.or(uncovered);
+				newUncovered.andNot(candidate.coverage);
+				chosen.add(candidate);
+				search(newUncovered);
+				chosen.removeLast();
+				if(limitReached)
+					return;
+			}
+		}
+
+	}
+
+	/** @return	for each element, the number of candidates that cover it. */
+	private static int[] countCoverage(final Collection<Candidate> pool, final int positiveCount){
+		final int[] counts = new int[positiveCount];
+		for(final Candidate candidate : pool)
+			for(int i = candidate.coverage.nextSetBit(0); i >= 0; i = candidate.coverage.nextSetBit(i + 1))
+				counts[i] ++;
+		return counts;
+	}
+
+	/** @return	sum of the per-element cover counts over the given mask: lower = covers "harder" elements. */
+	private static long raritySum(final BitSet mask, final int[] coverCount){
+		long sum = 0;
+		for(int i = mask.nextSetBit(0); i >= 0; i = mask.nextSetBit(i + 1))
+			sum += coverCount[i];
+		return sum;
+	}
+
+	/**
+	 * Removes candidates dominated by another one (coverage subset, cost not smaller). A dominated candidate can
+	 * never be part of an optimal solution, so removing it is safe.
+	 * <p>
+	 * A candidate that dominates another one covers (among the others) the first element of the dominated one, so only the
+	 * kept candidates that cover that element are compared.
+	 */
+	private static void pruneDominated(final Map<String, Candidate> pool){
+		if(pool.size() < 2)
+			return;
+
+		final List<Candidate> sorted = new ArrayList<>(pool.values());
+		//largest coverage first, then cheapest
+		sorted.sort((a, b) -> {
+			final int cmp = Integer.compare(b.coverage.cardinality(), a.coverage.cardinality());
+			if(cmp != 0)
+				return cmp;
+			final int cost = Integer.compare(a.size, b.size);
+			if(cost != 0)
+				return cost;
+			return a.key.compareTo(b.key);
+		});
+
+		final List<Candidate> kept = new ArrayList<>(sorted.size());
+		final Map<Integer, List<Candidate>> keptByElement = new HashMap<>();
+		for(final Candidate candidate : sorted){
+			final int first = candidate.coverage.nextSetBit(0);
+			boolean dominated = false;
+			final List<Candidate> competitors = keptByElement.get(first);
+			if(competitors != null)
+				for(final Candidate better : competitors)
+					if(better.size <= candidate.size && better.tokens.size() <= candidate.tokens.size()
+							&& isSubset(candidate.bits(), better.bits())){
+						dominated = true;
+						break;
+					}
+			if(!dominated){
+				kept.add(candidate);
+				final BitSet coverage = candidate.coverage;
+				for(int i = coverage.nextSetBit(0); i >= 0; i = coverage.nextSetBit(i + 1))
+					keptByElement.computeIfAbsent(i, k -> new ArrayList<>()).add(candidate);
+			}
+		}
+
+		if(kept.size() < pool.size()){
+			pool.clear();
+			for(final Candidate candidate : kept)
+				pool.put(candidate.key, candidate);
+		}
+	}
+
+	/** @return	Whether every bit set in {@code subset} is set in {@code superset}. */
+	private static boolean isSubset(final long[] subset, final long[] superset){
+		for(int i = 0; i < subset.length; i ++){
+			final long other = (i < superset.length? superset[i]: 0L);
+			if((subset[i] & ~other) != 0L)
+				return false;
+		}
+		return true;
+	}
+
+	/** @return	The number of bits set in both the arrays. */
+	private static int andCount(final long[] a, final long[] b){
+		int count = 0;
+		for(int i = 0, length = Math.min(a.length, b.length); i < length; i ++)
+			count += Long.bitCount(a[i] & b[i]);
+		return count;
+	}
+
+	/**
+	 * Replaces two selected conditions with a single pool candidate that covers their union, as long as it strictly
+	 * reduces the number of selected rules.
+	 */
+	private static void localSearch2Opt(final List<Candidate> selected, final Collection<Candidate> pool){
+		if(selected.size() < 2)
+			return;
+
+		final List<Candidate> poolList = new ArrayList<>(pool);
+		boolean improved = true;
+		while(improved){
+			improved = false;
+
+			final Set<Candidate> inSelection = Collections.newSetFromMap(new IdentityHashMap<>());
+			inSelection.addAll(selected);
+			outer:
+			for(int i = 0; i < selected.size(); i ++){
+				final long[] first = selected.get(i).bits();
+				for(int j = i + 1; j < selected.size(); j ++){
+					final long[] second = selected.get(j).bits();
+					final long[] union = new long[Math.max(first.length, second.length)];
+					for(int k = 0; k < union.length; k ++)
+						union[k] = (k < first.length? first[k]: 0L) | (k < second.length? second[k]: 0L);
+					for(final Candidate candidate : poolList){
+						if(inSelection.contains(candidate))
+							continue;
+						if(isSubset(union, candidate.bits())){
+							selected.remove(j);
+							selected.remove(i);
+							selected.add(candidate);
+							improved = true;
+							break outer;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/** Removes selected candidates whose coverage is fully covered by the others. */
+	private static void removeRedundant(final List<Candidate> selected, final int positiveCount){
 		for(int i = selected.size() - 1; i >= 0; i --){
 			final BitSet others = new BitSet(positiveCount);
 			for(int j = 0; j < selected.size(); j ++)
@@ -581,39 +959,39 @@ public class RulesReducer{
 			if(own.isEmpty())
 				selected.remove(i);
 		}
-
-		final List<Line> lines = new ArrayList<>(selected.size());
-		for(final Candidate candidate : selected)
-			lines.add(finalizeLine(candidate, transformation, positives, words));
-		return lines;
 	}
+
+
+	//-- candidate generation --
 
 	/**
 	 * Visit the trie: a sub-tree with no negative words is a valid condition by itself; otherwise the children without
 	 * negative words are grouped into a single token, and the children with both kinds of words are explored further.
 	 */
 	private static void collectCandidates(final Node node, final List<Character> path, final Transformation transformation,
-			final String removal, final Map<String, Candidate> pool){
-		if(node.positives == 0)
+			final Context context, final Map<String, Candidate> pool){
+		final int positives = context.positives(node);
+		if(positives == 0)
 			return;
 
-		if(node.negatives == 0){
-			addCandidate(pool, tokensOf(path, null), node.coverage());
+		if(positives == node.size()){
+			addCandidate(pool, tokensOf(path, null), context.coverage(node));
 			return;
 		}
 
-		if(node.exactPositive != null)
+		if(node.exact >= 0 && context.positive[node.exact])
 			//any condition that matches the word matches every other word ending with it too
-			throw new LinterException(NON_SEPARABLE, node.exactPositive, removal, transformation.removal,
-				transformation.addition);
+			throw new LinterException(NON_SEPARABLE, context.words.get(node.exact), transformation.removal,
+				transformation.removal, transformation.addition);
 
 		final Set<Character> pure = new TreeSet<>();
 		final BitSet pureCoverage = new BitSet();
 		for(final Map.Entry<Character, Node> child : node.children.entrySet()){
 			final Node n = child.getValue();
-			if(n.positives > 0 && n.negatives == 0){
+			final int childPositives = context.positives(n);
+			if(childPositives > 0 && childPositives == n.size()){
 				pure.add(child.getKey());
-				pureCoverage.or(n.coverage());
+				pureCoverage.or(context.coverage(n));
 			}
 		}
 		if(!pure.isEmpty())
@@ -621,9 +999,10 @@ public class RulesReducer{
 
 		for(final Map.Entry<Character, Node> child : node.children.entrySet()){
 			final Node n = child.getValue();
-			if(n.positives > 0 && n.negatives > 0){
+			final int childPositives = context.positives(n);
+			if(childPositives > 0 && childPositives < n.size()){
 				path.add(child.getKey());
-				collectCandidates(n, path, transformation, removal, pool);
+				collectCandidates(n, path, transformation, context, pool);
 				path.removeLast();
 			}
 		}
@@ -703,11 +1082,130 @@ public class RulesReducer{
 	}
 
 	/**
+	 * Enlarges the pool with valid conditions the trie cannot produce, until no new condition is found or the work limit is
+	 * reached (the limit counts word checks, so the result is deterministic):
+	 * <ul>
+	 * 	<li><em>widening</em>: a token is extended to every character that does not let a negative word in (the characters
+	 * 		are independent of each other, so they can all be added at once);</li>
+	 * 	<li><em>shortening</em>: the farthest token is dropped, if no negative word matches the shorter condition.</li>
+	 * </ul>
+	 * Both produce conditions that select a superset of the words selected by the original one, still without negative
+	 * words.
+	 */
+	private static void expandCandidates(final Map<String, Candidate> pool, final Context context){
+		final int wordCount = context.words.size();
+		long budget = EXPAND_MAX_WORD_CHECKS;
+		final Deque<Candidate> queue = new ArrayDeque<>(pool.values());
+		while(!queue.isEmpty() && pool.size() < MAX_POOL_SIZE && budget > 0){
+			final Candidate candidate = queue.poll();
+
+			for(int i = 0, length = candidate.tokens.size(); i < length && budget > 0; i ++){
+				budget -= wordCount;
+				final Candidate widened = widen(candidate, i, context);
+				if(widened != null && !pool.containsKey(widened.key)){
+					pool.put(widened.key, widened);
+					queue.add(widened);
+				}
+			}
+
+			if(!candidate.tokens.isEmpty() && budget > 0){
+				budget -= wordCount;
+				final Candidate shortened = shorten(candidate, context);
+				if(shortened != null && !pool.containsKey(shortened.key)){
+					pool.put(shortened.key, shortened);
+					queue.add(shortened);
+				}
+			}
+		}
+	}
+
+	/** @return	The candidate with the token at `position` extended to all the admissible characters, or null if there is none. */
+	private static Candidate widen(final Candidate candidate, final int position, final Context context){
+		final List<String> tokens = candidate.tokens;
+		final int length = tokens.size();
+		final String token = tokens.get(position);
+
+		//characters that can follow (at this position) a word that matches all the other tokens, with the positives they select
+		final Map<Character, BitSet> admissible = new TreeMap<>();
+		final Set<Character> blocked = new HashSet<>();
+		for(int w = 0, count = context.words.size(); w < count; w ++){
+			final String word = context.words.get(w);
+			final int base = word.length() - context.removalLength - 1;
+			if(base - (length - 1) < 0)
+				continue;
+
+			boolean matches = true;
+			for(int i = 0; matches && i < length; i ++)
+				if(i != position && tokens.get(i).indexOf(word.charAt(base - i)) < 0)
+					matches = false;
+			if(!matches)
+				continue;
+
+			final char chr = word.charAt(base - position);
+			if(token.indexOf(chr) >= 0)
+				continue;
+
+			if(context.positive[w])
+				admissible.computeIfAbsent(chr, k -> new BitSet())
+					.set(context.prefix[w]);
+			else
+				blocked.add(chr);
+		}
+		blocked.forEach(admissible::remove);
+		if(admissible.isEmpty())
+			return null;
+
+		final Set<Character> chars = new TreeSet<>();
+		for(final char chr : token.toCharArray())
+			chars.add(chr);
+		chars.addAll(admissible.keySet());
+		final StringBuilder sb = new StringBuilder(chars.size());
+		for(final Character chr : chars)
+			sb.append(chr);
+
+		final BitSet coverage = (BitSet)candidate.coverage.clone();
+		for(final BitSet added : admissible.values())
+			coverage.or(added);
+		final List<String> newTokens = new ArrayList<>(tokens);
+		newTokens.set(position, sb.toString());
+		return new Candidate(newTokens, coverage);
+	}
+
+	/** @return	The candidate without the farthest token, or null if it would select a negative word. */
+	private static Candidate shorten(final Candidate candidate, final Context context){
+		final List<String> tokens = candidate.tokens.subList(0, candidate.tokens.size() - 1);
+		final int length = tokens.size();
+
+		final BitSet coverage = new BitSet();
+		for(int w = 0, count = context.words.size(); w < count; w ++){
+			final String word = context.words.get(w);
+			final int base = word.length() - context.removalLength - 1;
+			if(base - (length - 1) < 0)
+				continue;
+
+			boolean matches = true;
+			for(int i = 0; matches && i < length; i ++)
+				if(tokens.get(i).indexOf(word.charAt(base - i)) < 0)
+					matches = false;
+			if(!matches)
+				continue;
+
+			if(!context.positive[w])
+				return null;
+			coverage.set(context.prefix[w]);
+		}
+		return new Candidate(new ArrayList<>(tokens), coverage);
+	}
+
+
+	//-- finalization --
+
+	/**
 	 * Writes the condition in the shortest form: any group is positive or negated, whichever has the fewest characters
 	 * (all with respect to the words that can reach that position), and a useless leading wildcard is removed.
 	 */
 	private static Line finalizeLine(final Candidate candidate, final Transformation transformation,
-			final Set<String> positives, final List<String> words){
+		final Set<String> positives, final List<String> words){
 		final String removal = transformation.removal;
 		final int removalLength = removal.length();
 
@@ -764,13 +1262,13 @@ public class RulesReducer{
 	}
 
 	private static boolean matches(final String word, final List<String> tokens, final List<Set<Character>> negated,
-			final int removalLength){
+		final int removalLength){
 		return matchesAllBut(word, tokens, negated, removalLength, -1);
 	}
 
 	/** The token at index `skip` just has to exist as a character. */
 	private static boolean matchesAllBut(final String word, final List<String> tokens, final List<Set<Character>> negated,
-			final int removalLength, final int skip){
+		final int removalLength, final int skip){
 		final int base = word.length() - removalLength - 1;
 		for(int i = 0, length = tokens.size(); i < length; i ++){
 			final int index = base - i;
@@ -884,34 +1382,96 @@ public class RulesReducer{
 
 	}
 
-	/** Node of the reverse trie of the words (the path from the root is the suffix before the removal, reversed). */
+	/**
+	 * Reverse trie of all the words that end with a given removal (the path from the root is the suffix before the removal,
+	 * reversed). It does not depend on which words undergo a transformation, so it is shared by all the transformations with
+	 * the same removal.
+	 */
+	private static final class Skeleton{
+
+		final List<String> words;
+		final Node root;
+
+
+		static Skeleton of(final List<String> words, final int removalLength){
+			final Node root = new Node();
+			for(int index = 0, size = words.size(); index < size; index ++){
+				final String word = words.get(index);
+				Node node = root;
+				node.visit(index);
+				for(int i = word.length() - removalLength - 1; i >= 0; i --){
+					node = node.children.computeIfAbsent(word.charAt(i), k -> new Node());
+					node.visit(index);
+				}
+				node.exact = index;
+			}
+			return new Skeleton(words, root);
+		}
+
+		private Skeleton(final List<String> words, final Node root){
+			this.words = words;
+			this.root = root;
+		}
+
+	}
+
+	/**
+	 * Node of the reverse trie. The words are in the order of the trie, so the words below a node are the contiguous range
+	 * {@code [first, last)}.
+	 */
 	private static final class Node{
 
 		final Map<Character, Node> children = new TreeMap<>();
-		int positives;
-		int negatives;
-		/** Indices (contiguous) of the positive words below this node. */
-		int firstPositive = -1;
-		int lastPositive = -1;
-		/** The positive word that ends exactly at this node (if any). */
-		String exactPositive;
+		int first = -1;
+		int last;
+		/** Index of the word that ends exactly at this node (if any). */
+		int exact = -1;
 
 
-		void add(final int positiveIndex){
-			if(positiveIndex < 0)
-				negatives ++;
-			else{
-				positives ++;
-				if(firstPositive < 0)
-					firstPositive = positiveIndex;
-				lastPositive = positiveIndex;
-			}
+		void visit(final int wordIndex){
+			if(first < 0)
+				first = wordIndex;
+			last = wordIndex + 1;
 		}
 
-		BitSet coverage(){
+		int size(){
+			return last - first;
+		}
+
+	}
+
+	/** The words (in the order of the trie) of a transformation, and which ones undergo it. */
+	private static final class Context{
+
+		final List<String> words;
+		final int removalLength;
+		final boolean[] positive;
+		/** {@code prefix[i]} is the number of positive words before the i-th one, that is the index of that word among the positives. */
+		final int[] prefix;
+		final int positiveCount;
+
+
+		Context(final List<String> words, final Set<String> positives, final int removalLength){
+			this.words = words;
+			this.removalLength = removalLength;
+			final int size = words.size();
+			positive = new boolean[size];
+			prefix = new int[size + 1];
+			for(int i = 0; i < size; i ++){
+				positive[i] = positives.contains(words.get(i));
+				prefix[i + 1] = prefix[i] + (positive[i]? 1: 0);
+			}
+			positiveCount = prefix[size];
+		}
+
+		int positives(final Node node){
+			return (node.first < 0? 0: prefix[node.last] - prefix[node.first]);
+		}
+
+		BitSet coverage(final Node node){
 			final BitSet coverage = new BitSet();
-			if(positives > 0)
-				coverage.set(firstPositive, lastPositive + 1);
+			if(node.first >= 0 && positives(node) > 0)
+				coverage.set(prefix[node.first], prefix[node.last]);
 			return coverage;
 		}
 
@@ -924,6 +1484,7 @@ public class RulesReducer{
 		final BitSet coverage;
 		final String key;
 		final int size;
+		private long[] bits;
 
 
 		Candidate(final List<String> tokens, final BitSet coverage){
@@ -934,6 +1495,13 @@ public class RulesReducer{
 			for(final String token : tokens)
 				length += token.length();
 			size = length;
+		}
+
+		/** @return	The coverage as an array of words (to be called once the coverage is not modified anymore). */
+		long[] bits(){
+			if(bits == null)
+				bits = coverage.toLongArray();
+			return bits;
 		}
 
 		String keyWithout(final int index){
@@ -978,8 +1546,13 @@ public class RulesReducer{
 			final StringBuilder sb = new StringBuilder();
 			for(int i = tokens.size() - 1; i >= 0; i --){
 				final Set<Character> excluded = negated.get(i);
-				if(excluded != null)
-					sb.append(RegexHelper.makeNotGroup(excluded, comparator));
+				if(excluded != null){
+					//empty excluded means "any character at this position": use the Hunspell wildcard
+					if(excluded.isEmpty())
+						sb.append('.');
+					else
+						sb.append(RegexHelper.makeNotGroup(excluded, comparator));
+				}
 				else{
 					final Set<Character> admitted = new LinkedHashSet<>();
 					for(final char chr : tokens.get(i).toCharArray())
@@ -990,7 +1563,6 @@ public class RulesReducer{
 			sb.append(removal);
 			return sb.toString();
 		}
-
 	}
 
 }

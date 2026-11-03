@@ -39,6 +39,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListSelectionListener;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
@@ -178,7 +179,7 @@ public class DictionarySortDialog extends JDialog{
 		setCellRenderer(dicCellRenderer);
 	}
 
-   private void btnNextUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
+   private void btnNextUnsortedAreaActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_btnNextUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);
@@ -194,7 +195,7 @@ public class DictionarySortDialog extends JDialog{
 		entriesList.ensureIndexIsVisible(boundaryIndex);
    }//GEN-LAST:event_btnNextUnsortedAreaActionPerformed
 
-   private void btnPreviousUnsortedAreaActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
+   private void btnPreviousUnsortedAreaActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_btnPreviousUnsortedAreaActionPerformed
 		final int lineIndex = entriesList.getFirstVisibleIndex();
 		//make line completely visible
 		entriesList.ensureIndexIsVisible(lineIndex);

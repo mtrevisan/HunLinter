@@ -983,7 +983,11 @@ public class MainFrame extends JFrame implements ActionListener, PropertyChangeL
 					if(stateValue == SwingWorker.StateValue.STARTED)
 						workersProgress.update(worker, worker.getWorkerName(), worker.getProgress());
 					else if(stateValue == SwingWorker.StateValue.DONE){
-						workersProgress.finish(worker);
+						if(worker.isCancelled())
+							//remove the progress of the cancelled worker from the overall progress
+							workersProgress.cancel(worker);
+						else
+							workersProgress.finish(worker);
 						WorkerManager.callOnEnd(worker.getWorkerName());
 					}
 				}

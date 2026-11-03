@@ -135,6 +135,23 @@ public class WorkersProgressPopup{
 			rebuild();
 	}
 
+	/**
+	 * The worker has been cancelled: its row is removed and its progress no longer contributes to the overall progress (it does NOT
+	 * count as completed), so the main progress bar is recomputed from the remaining workers of the batch (and can go back).
+	 */
+	public final void cancel(final Object worker){
+		if(rows.remove(worker) == null)
+			return;
+
+		displayedProgress = getOverallProgress();
+		refreshMainProgressBar();
+
+		if(rows.isEmpty())
+			popup.setVisible(false);
+		else
+			rebuild();
+	}
+
 	/** @return	The overall progress [0, 100]: the average of the progresses of all the workers of the current batch. */
 	public final int getOverallProgress(){
 		final int total = rows.size() + finishedInBatch;

@@ -68,6 +68,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -162,8 +163,8 @@ public class ThesaurusLayeredPane extends JLayeredPane{
 		final Font currentFont = FontHelper.getCurrentFont();
 
 		synonymsTextField.setFont(currentFont);
-      synonymsTextField.addKeyListener(new java.awt.event.KeyAdapter() {
-         public void keyReleased(final java.awt.event.KeyEvent evt) {
+      synonymsTextField.addKeyListener(new KeyAdapter(){
+         public void keyReleased(final KeyEvent evt){
             synonymsTextFieldKeyReleased(evt);
          }
       });
@@ -247,7 +248,7 @@ public class ThesaurusLayeredPane extends JLayeredPane{
       debouncer.call(this);
    }//GEN-LAST:event_synonymsTextFieldKeyReleased
 
-   private void addButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+   private void addButtonActionPerformed(final ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
       try{
 			addButton.setEnabled(false);
 

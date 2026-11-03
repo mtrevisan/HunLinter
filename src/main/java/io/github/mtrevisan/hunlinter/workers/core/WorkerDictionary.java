@@ -29,24 +29,21 @@ import io.github.mtrevisan.hunlinter.parsers.exceptions.ParserException;
 import io.github.mtrevisan.hunlinter.parsers.exceptions.WriterException;
 import io.github.mtrevisan.hunlinter.services.ParserHelper;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
-import io.github.mtrevisan.hunlinter.services.system.JavaHelper;
 import io.github.mtrevisan.hunlinter.services.text.StringHelper;
 import io.github.mtrevisan.hunlinter.workers.exceptions.LinterException;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
@@ -76,21 +73,29 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 	}
 
 
+	/**
+	 * Stream the file one line at a time (no intermediate list of raw lines is kept), so that only the entries to be
+	 * processed are held in memory.
+	 */
 	@SuppressWarnings("OverlyBroadThrowsClause")
 	private List<IndexDataPair<String>> loadFile(final Path path, final Charset charset) throws IOException{
-		//read entire file in memory
-		final List<String> lines = Files.readAllLines(path, charset);
-		if(!workerData.isNoHeader())
-			ParserHelper.assertLinesCount(lines);
+		final ArrayList<IndexDataPair<String>> entries = new ArrayList<>();
+		try(final BufferedReader reader = FileHelper.createReader(path, charset)){
+			int lineIndex = 0;
+			if(!workerData.isNoHeader()){
+				assertHeader(reader.readLine());
+				lineIndex = 1;
+			}
 
-		final List<IndexDataPair<String>> entries = new ArrayList<>(lines.size());
-		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
-			final String line = lines.get(lineIndex);
-			if(ParserHelper.isDictionaryComment(line))
-				continue;
+			String line;
+			while((line = reader.readLine()) != null){
+				if(!ParserHelper.isDictionaryComment(line))
+					entries.add(IndexDataPair.of(lineIndex, line));
 
-			entries.add(IndexDataPair.of(lineIndex, line));
+				lineIndex ++;
+			}
 		}
+		entries.trimToSize();
 		return entries;
 	}
 
@@ -101,72 +106,88 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 			.forEach(innerProcessor);
 	}
 
+	/**
+	 * Always read one line at a time: memory usage is constant regardless of the file size, and there is no need to
+	 * estimate the available memory.
+	 */
 	private void processLinesSequential(final Path path, final Charset charset,
 			final Consumer<IndexDataPair<String>> dataProcessor) throws IOException{
-		final long fileSize = path.toFile().length();
-		final long availableMemory = JavaHelper.estimateAvailableMemory();
+		final long fileSize = Math.max(1l, FileHelper.getFileSize(path.toFile()));
 
-		//choose between load all file in memory and read one line at a time:
-		if((fileSize << 1) < availableMemory)
-			processLinesSequentialByLine(path, charset, dataProcessor);
-		else
-			processLinesSequentialBySize(path, charset, dataProcessor, fileSize);
-	}
+		try(final BufferedReader reader = FileHelper.createReader(path, charset)){
+			long readSoFar = 0l;
+			if(!workerData.isNoHeader()){
+				final String header = reader.readLine();
+				assertHeader(header);
+				readSoFar = StringHelper.rawBytesLength(header);
+			}
 
-	@SuppressWarnings("OverlyBroadThrowsClause")
-	private void processLinesSequentialByLine(final Path path, final Charset charset, final Consumer<IndexDataPair<String>> dataProcessor)
-			throws IOException{
-		//read entire file in memory
-		final List<String> lines = FileHelper.readAllLines(path, charset);
-		if(!workerData.isNoHeader())
-			ParserHelper.assertLinesCount(lines);
+			final ProgressTracker tracker = new ProgressTracker(fileSize);
+			final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor);
 
-		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessorByLines(dataProcessor, lines.size());
+			int lineIndex = (workerData.isNoHeader()? 0: 1);
+			String line;
+			while((line = reader.readLine()) != null){
+				readSoFar += StringHelper.rawBytesLength(line);
+				if(!ParserHelper.isDictionaryComment(line)){
+					innerProcessor.accept(IndexDataPair.of(lineIndex, line));
 
-		for(int lineIndex = (workerData.isNoHeader()? 0: 1); lineIndex < lines.size(); lineIndex ++){
-			final String line = lines.get(lineIndex);
-			if(ParserHelper.isDictionaryComment(line))
-				continue;
+					tracker.update(readSoFar);
+				}
 
-			innerProcessor.accept(IndexDataPair.of(lineIndex, line));
+				lineIndex ++;
+			}
 		}
 	}
 
-	private void processLinesSequentialBySize(final Path path, final Charset charset,
-			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize) throws IOException{
-		//read one line at a time
-		try(final Scanner scanner = FileHelper.createScanner(path, charset)){
-			long lineSize = 0l;
-			if(!workerData.isNoHeader()){
-				final String line = ParserHelper.assertLinesCount(scanner);
-				lineSize = StringHelper.rawBytesLength(line);
-			}
+	private static void assertHeader(final String header) throws EOFException{
+		if(header == null)
+			throw new EOFException("Unexpected EOF while reading file");
 
-			final BiConsumer<IndexDataPair<String>, Long> innerProcessor = createInnerProcessorBySize(dataProcessor, fileSize);
+		ParserHelper.assertLinesCount(List.of(header));
+	}
 
-			int lineIndex = (workerData.isNoHeader()? 0: 1);
-			while(scanner.hasNextLine()){
-				final String line = scanner.nextLine();
-				lineSize += StringHelper.rawBytesLength(line);
-				if(ParserHelper.isDictionaryComment(line))
-					continue;
+	private final class ProgressTracker{
+		private final long total;
+		private int lastPercent;
 
-				innerProcessor.accept(IndexDataPair.of(lineIndex ++, line), lineSize);
+		private ProgressTracker(final long total){
+			this.total = total;
+		}
+
+		/** Single-threaded: report only when the percentage actually changes. */
+		private void update(final long current){
+			final int percent = (int)Math.min(current * 100l / total, 100l);
+			if(percent > lastPercent){
+				lastPercent = percent;
+				setWorkerProgress(percent);
 			}
 		}
 	}
 
 	private Consumer<IndexDataPair<String>> createInnerProcessorByLines(final Consumer<IndexDataPair<String>> dataProcessor,
-			final long totalEntries){
-		final AtomicInteger progress = new AtomicInteger(1);
-		final AtomicInteger progressIndex = new AtomicInteger(1);
-		final int progressStep = (int)Math.ceil(totalEntries / 100.f);
+			final int totalEntries){
+		final AtomicInteger processed = new AtomicInteger();
+		final AtomicInteger reported = new AtomicInteger();
+		final int progressStep = Math.max(1, (int)Math.ceil(totalEntries / 100.f));
+		final Consumer<IndexDataPair<String>> innerProcessor = createInnerProcessor(dataProcessor);
+		return data -> {
+			innerProcessor.accept(data);
+
+			//touch the shared counter only (no lock, no event) and report only increasing percentages
+			final int done = processed.incrementAndGet();
+			if(done % progressStep == 0){
+				final int percent = Math.min(done / progressStep, 100);
+				if(reported.getAndUpdate(previous -> Math.max(previous, percent)) < percent)
+					setWorkerProgress(percent);
+			}
+		};
+	}
+
+	private Consumer<IndexDataPair<String>> createInnerProcessor(final Consumer<IndexDataPair<String>> dataProcessor){
 		return data -> {
 			try{
 				dataProcessor.accept(data);
-
-				if(progress.incrementAndGet() % progressStep == 0)
-					setWorkerProgress(progressIndex.incrementAndGet());
 
 				sleepOnPause();
 			}
@@ -177,30 +198,6 @@ public class WorkerDictionary extends WorkerAbstract<WorkerDataParser<Dictionary
 
 				if(workerData.isCancelOnException())
 					throw le;
-			}
-		};
-	}
-
-	private BiConsumer<IndexDataPair<String>, Long> createInnerProcessorBySize(
-			final Consumer<IndexDataPair<String>> dataProcessor, final long fileSize){
-		final AtomicLong progress = new AtomicLong(1);
-		final AtomicInteger progressIndex = new AtomicInteger(1);
-		final int progressStep = (int)Math.ceil(fileSize / 100.f);
-		return (data, readSoFar) -> {
-			try{
-				dataProcessor.accept(data);
-
-				if((int)(progress.get() / progressStep) < (int)(progress.addAndGet(readSoFar) / progressStep))
-					setWorkerProgress(progressIndex.incrementAndGet());
-
-				sleepOnPause();
-			}
-			catch(final LinterException e){
-				throw e;
-			}
-			catch(final RuntimeException re){
-				throw new LinterException(re)
-					.withIndexDataPair(data);
 			}
 		};
 	}
