@@ -168,6 +168,10 @@ public class AffixEntry{
 		return appending;
 	}
 
+	public final String getCondition(){
+		return condition;
+	}
+
 	private static String expandAliases(final String part, final List<String> aliases){
 		return (aliases != null && !aliases.isEmpty() && NumberUtils.isCreatable(part)? aliases.get(Integer.parseInt(part) - 1): part);
 	}

@@ -130,7 +130,7 @@ public class RulesReducerWorker extends WorkerDictionary{
 			LOGGER.info(ParserManager.MARKER_RULE_REDUCER_STATUS, "Extracting minimal rules (step 2/3)…");
 
 			try{
-				return rulesReducer.reduceRules(originalRules.toRules(), inertWords, percent -> {
+				return rulesReducer.reduceRules(originalRules.toRules(), inertWords, flag, percent -> {
 					setWorkerProgress(percent);
 
 					sleepOnPause();

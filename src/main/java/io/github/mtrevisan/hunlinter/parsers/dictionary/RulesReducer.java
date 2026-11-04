@@ -53,7 +53,6 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -119,6 +118,8 @@ public class RulesReducer{
 	private static final int EXACT_MAX_POOL = 2_000;
 	/** Limit on the number of nodes visited by the exact branch-and-bound set cover (the best solution found is used). */
 	private static final long EXACT_MAX_NODES = 500_000L;
+	/** Limit on the number of word checks spent merging the selected conditions of a single transformation. */
+	private static final long BOX_MAX_WORD_CHECKS = 50_000_000L;
 
 
 	private static final String NON_EXISTENT_RULE = "Non-existent rule `{}`, cannot reduce";
@@ -366,18 +367,27 @@ public class RulesReducer{
 				final List<Inflection> originalInflections = wordGenerator.applyAffixRules(dicEntry);
 				final List<Inflection> inflections = wordGenerator.applyAffixRulesWithoutOutputConversion(dicEntry, overriddenParent);
 
-				final Collection<DictionaryEntry> originalInflectionsWhole = new HashSet<>(originalInflections.size());
+				final Map<DictionaryEntry, Integer> originalInflectionsWhole = new HashMap<>(originalInflections.size());
 				for(int j = 0, length2 = originalInflections.size(); j < length2; j ++)
-					originalInflectionsWhole.add(new DictionaryEntry(originalInflections.get(j)));
-				final Collection<DictionaryEntry> inflectionsWhole = new HashSet<>(inflections.size());
+					originalInflectionsWhole.merge(new DictionaryEntry(originalInflections.get(j)), 1, Integer::sum);
+				final Map<DictionaryEntry, Integer> inflectionsWhole = new HashMap<>(inflections.size());
 				for(int j = 0, length2 = inflections.size(); j < length2; j ++)
-					inflectionsWhole.add(new DictionaryEntry(inflections.get(j)));
-				if(!originalInflectionsWhole.equals(inflectionsWhole))
+					inflectionsWhole.merge(new DictionaryEntry(inflections.get(j)), 1, Integer::sum);
+				//the same inflections, none of them produced more times than before (the original rules may produce the same one more than once)
+				if(!originalInflectionsWhole.keySet().equals(inflectionsWhole.keySet()) || !hasNoMoreOccurrences(inflectionsWhole, originalInflectionsWhole))
 					throw new LinterException(VERY_BAD_ERROR, line, originalInflectionsWhole, inflectionsWhole);
 
 				if(progressCallback != null && progress.incrementAndGet() % progressStep == 0)
 					progressCallback.accept(progressIndex.incrementAndGet());
 			});
+	}
+
+	private static boolean hasNoMoreOccurrences(final Map<DictionaryEntry, Integer> counts,
+			final Map<DictionaryEntry, Integer> limits){
+		for(final Map.Entry<DictionaryEntry, Integer> count : counts.entrySet())
+			if(count.getValue() > limits.getOrDefault(count.getKey(), 0))
+				return false;
+		return true;
 	}
 
 	/**
@@ -544,6 +554,19 @@ public class RulesReducer{
 	 */
 	public final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final Collection<String> inertWords,
 			final ProgressCallback progressCallback){
+		return reduceRules(plainRules, inertWords, null, progressCallback);
+	}
+
+	/**
+	 * Same as {@link #reduceRules(Collection, Collection, ProgressCallback)}, but when the flag is given the reduced conditions
+	 * never accept a character, at any position, that the original conditions of the same transformation do not accept (nor are
+	 * shorter than them), so the set of words a reduced rule can be applied to is never larger than the original one.
+	 *
+	 * @param flag	The flag being reduced (<code>null</code> to leave the conditions unconstrained).
+	 */
+	public final List<LineEntry> reduceRules(final Collection<LineEntry> plainRules, final Collection<String> inertWords,
+			final String flag, final ProgressCallback progressCallback){
+		final Map<Transformation, Constraint> constraints = (flag != null? extractConstraints(flag): Collections.emptyMap());
 		final List<LineEntry> result = new ArrayList<>(0);
 		if(plainRules == null || plainRules.isEmpty())
 			return result;
@@ -590,7 +613,7 @@ public class RulesReducer{
 			.mapToObj(i -> {
 				final Transformation transformation = transformations.get(i);
 				final List<Line> sub = solve(transformation, positivesByTransformation.get(transformation),
-					skeletonByRemoval.get(transformation.removal));
+					skeletonByRemoval.get(transformation.removal), constraints.get(transformation));
 				if(progressCallback != null){
 					final int value = 10 + 85 * done.incrementAndGet() / total;
 					synchronized(progressCallback){
@@ -620,39 +643,44 @@ public class RulesReducer{
 	 * @return	The minimal set of lines that apply the transformation to all the positives and to no other word.
 	 */
 	private static List<Line> solve(final Transformation transformation, final Set<String> positives,
-			final Skeleton skeleton){
+			final Skeleton skeleton, final Constraint constraint){
 		final String removal = transformation.removal;
 		final List<String> words = skeleton.words;
 
 		//positive words get their index in the order of the trie, so the positives of any sub-tree are contiguous
-		final Context context = new Context(words, positives, removal.length());
+		final Context context = new Context(words, positives, removal.length(), constraint);
 		final int positiveCount = context.positiveCount;
 
 		//generate the candidate conditions
-		final Map<String, Candidate> pool = new LinkedHashMap<>();
+		Map<String, Candidate> pool = new LinkedHashMap<>();
 		collectCandidates(skeleton.root, new ArrayList<>(), transformation, context, pool);
+		pool = padCandidates(pool, context);
+		//the candidates from the trie are a partition of the positives: it is the (always valid) starting solution
+		final List<Candidate> partition = new ArrayList<>(pool.values());
 		mergeCandidates(pool);
 		//enlarge the pool with the conditions that the trie cannot produce
 		expandCandidates(pool, context);
-		//a candidate that is dominated (superset coverage at same or lower cost) can never be optimal
+		//a candidate that is dominated (same coverage at same or higher cost) can never be optimal
 		pruneDominated(pool);
 
-		//choose the cover: exact branch-and-bound for small instances, greedy otherwise
-		final List<Candidate> selected;
+		//choose the cover, in which every positive word is selected by exactly one condition (a word selected by two lines of
+		// the same transformation would be inflected twice): exact branch-and-bound for small instances, starting from the
+		// partition of the trie
+		List<Candidate> selected = partition;
 		if(positiveCount <= EXACT_MAX_POSITIVES && pool.size() <= EXACT_MAX_POOL)
-			selected = improveWithExact(pool.values(), positiveCount, transformation);
-		else
-			selected = greedyCover(pool.values(), positiveCount);
+			selected = improveWithExact(pool.values(), positiveCount, transformation, partition);
 
-		//try to replace pairs of selected candidates with a single pool candidate
-		localSearch2Opt(selected, pool.values());
+		//try to replace the selected candidates that are inside a single pool candidate with it
+		localSearchMerge(selected, pool.values());
+		//try to replace groups of selected candidates with their bounding box
+		mergeByBoundingBox(selected, context);
 
 		//remove redundant conditions
 		removeRedundant(selected, positiveCount);
 
 		final List<Line> lines = new ArrayList<>(selected.size());
 		for(final Candidate candidate : selected)
-			lines.add(finalizeLine(candidate, transformation, positives, words));
+			lines.add(finalizeLine(candidate, transformation, positives, words, constraint));
 		return lines;
 	}
 
@@ -707,8 +735,8 @@ public class RulesReducer{
 	 * improvements. Returns the best solution found within the (deterministic) limit on the visited nodes, or the greedy one.
 	 */
 	private static List<Candidate> improveWithExact(final Collection<Candidate> candidates, final int positiveCount,
-			final Transformation transformation){
-		final List<Candidate> greedy = greedyCover(candidates, positiveCount);
+			final Transformation transformation, final List<Candidate> partition){
+		final List<Candidate> greedy = partition;
 		if(positiveCount <= 1 || candidates.size() <= greedy.size())
 			return greedy;
 
@@ -809,7 +837,13 @@ public class RulesReducer{
 			final BitSet newUncovered = new BitSet(uncovered.size());
 			for(final long key : ordered){
 				final Candidate candidate = pool.get((int)(key & 0xFFFF_FFFFL));
+				//the words must be selected exactly once: a candidate that selects an already covered word cannot be chosen
 				newUncovered.clear();
+				newUncovered.or(candidate.coverage);
+				newUncovered.andNot(uncovered);
+				if(!newUncovered.isEmpty())
+					continue;
+
 				newUncovered.or(uncovered);
 				newUncovered.andNot(candidate.coverage);
 				chosen.add(candidate);
@@ -871,7 +905,7 @@ public class RulesReducer{
 			if(competitors != null)
 				for(final Candidate better : competitors)
 					if(better.size <= candidate.size && better.tokens.size() <= candidate.tokens.size()
-							&& isSubset(candidate.bits(), better.bits())){
+							&& isSubset(candidate.bits(), better.bits()) && isSubset(better.bits(), candidate.bits())){
 						dominated = true;
 						break;
 					}
@@ -909,10 +943,11 @@ public class RulesReducer{
 	}
 
 	/**
-	 * Replaces two selected conditions with a single pool candidate that covers their union, as long as it strictly
+	 * Replaces the selected conditions that are inside a single pool candidate with it (every selected condition that shares a
+	 * word with the pool candidate must be inside it, so the words are still selected exactly once), as long as it strictly
 	 * reduces the number of selected rules.
 	 */
-	private static void localSearch2Opt(final List<Candidate> selected, final Collection<Candidate> pool){
+	private static void localSearchMerge(final List<Candidate> selected, final Collection<Candidate> pool){
 		if(selected.size() < 2)
 			return;
 
@@ -921,30 +956,126 @@ public class RulesReducer{
 		while(improved){
 			improved = false;
 
-			final Set<Candidate> inSelection = Collections.newSetFromMap(new IdentityHashMap<>());
-			inSelection.addAll(selected);
-			outer:
-			for(int i = 0; i < selected.size(); i ++){
-				final long[] first = selected.get(i).bits();
-				for(int j = i + 1; j < selected.size(); j ++){
-					final long[] second = selected.get(j).bits();
-					final long[] union = new long[Math.max(first.length, second.length)];
-					for(int k = 0; k < union.length; k ++)
-						union[k] = (k < first.length? first[k]: 0L) | (k < second.length? second[k]: 0L);
-					for(final Candidate candidate : poolList){
-						if(inSelection.contains(candidate))
-							continue;
-						if(isSubset(union, candidate.bits())){
-							selected.remove(j);
-							selected.remove(i);
-							selected.add(candidate);
-							improved = true;
-							break outer;
-						}
+			for(final Candidate candidate : poolList){
+				final long[] bits = candidate.bits();
+				final List<Candidate> inside = new ArrayList<>();
+				boolean valid = true;
+				for(final Candidate chosen : selected){
+					if(andCount(chosen.bits(), bits) == 0)
+						continue;
+					if(!isSubset(chosen.bits(), bits)){
+						valid = false;
+						break;
 					}
+					inside.add(chosen);
+				}
+				if(valid && inside.size() > 1){
+					selected.removeAll(inside);
+					selected.add(candidate);
+					improved = true;
 				}
 			}
 		}
+	}
+
+	/**
+	 * Replaces groups of selected conditions with a single one, whose token at each position is the union of the tokens of the
+	 * group (the "bounding box" of the group), as long as the box selects no negative word and no word selected by a condition
+	 * outside the group (if it does select the words of another condition, that condition joins the group and the box is
+	 * recomputed). This finds, for instance, {@code [ab][cd]x} in place of {@code [a]cx}, {@code [b]dx} and {@code [ab]cx}, that the
+	 * trie and the single-token widening cannot reach.
+	 * <p>
+	 * The number of word checks is limited, so the result is deterministic.
+	 */
+	private static void mergeByBoundingBox(final List<Candidate> selected, final Context context){
+		final int cost = context.negativeIndex.length + context.positiveIndex.length;
+		long budget = BOX_MAX_WORD_CHECKS;
+		boolean improved = true;
+		while(improved && budget > 0){
+			improved = false;
+
+			outer:
+			for(int i = 0; i < selected.size(); i ++)
+				for(int j = i + 1; j < selected.size(); j ++){
+					if(budget <= 0)
+						break outer;
+
+					List<Candidate> group = new ArrayList<>(2);
+					group.add(selected.get(i));
+					group.add(selected.get(j));
+					Candidate merged = null;
+					while(merged == null && budget > 0){
+						final List<String> tokens = boundingBox(group, context.constraint.requiredLength());
+						if(tokens == null)
+							break;
+
+						budget -= cost;
+						final BitSet coverage = boxCoverage(tokens, context);
+						if(coverage == null)
+							break;
+
+						final List<Candidate> touched = new ArrayList<>(group.size());
+						for(final Candidate chosen : selected)
+							if(chosen.coverage.intersects(coverage))
+								touched.add(chosen);
+						if(touched.size() == group.size())
+							merged = new Candidate(tokens, coverage);
+						else
+							group = touched;
+					}
+					if(merged != null){
+						selected.removeAll(group);
+						selected.add(merged);
+						improved = true;
+						break outer;
+					}
+				}
+		}
+	}
+
+	/** @return	The tokens of the bounding box of the group, or null if it would be shorter than the original conditions. */
+	private static List<String> boundingBox(final List<Candidate> group, final int requiredLength){
+		int length = Integer.MAX_VALUE;
+		for(final Candidate candidate : group)
+			length = Math.min(length, candidate.tokens.size());
+		if(length < requiredLength)
+			return null;
+
+		final List<String> tokens = new ArrayList<>(length);
+		for(int i = 0; i < length; i ++){
+			final Set<Character> chars = new TreeSet<>();
+			for(final Candidate candidate : group)
+				for(final char chr : candidate.tokens.get(i).toCharArray())
+					chars.add(chr);
+			final StringBuilder sb = new StringBuilder(chars.size());
+			for(final Character chr : chars)
+				sb.append(chr);
+			tokens.add(sb.toString());
+		}
+		return tokens;
+	}
+
+	/** @return	The positives selected by the condition, or null if it selects a negative word. */
+	private static BitSet boxCoverage(final List<String> tokens, final Context context){
+		for(final int index : context.negativeIndex)
+			if(matchesTokens(context.words.get(index), tokens, context.removalLength))
+				return null;
+
+		final BitSet coverage = new BitSet();
+		for(final int index : context.positiveIndex)
+			if(matchesTokens(context.words.get(index), tokens, context.removalLength))
+				coverage.set(context.prefix[index]);
+		return coverage;
+	}
+
+	private static boolean matchesTokens(final String word, final List<String> tokens, final int removalLength){
+		final int base = word.length() - removalLength - 1;
+		for(int i = 0, length = tokens.size(); i < length; i ++){
+			final int index = base - i;
+			if(index < 0 || tokens.get(i).indexOf(word.charAt(index)) < 0)
+				return false;
+		}
+		return true;
 	}
 
 	/** Removes selected candidates whose coverage is fully covered by the others. */
@@ -1144,6 +1275,9 @@ public class RulesReducer{
 			final char chr = word.charAt(base - position);
 			if(token.indexOf(chr) >= 0)
 				continue;
+			//the original conditions do not accept this character here, so the widened one cannot either
+			if(!context.constraint.allows(position, chr))
+				continue;
 
 			if(context.positive[w])
 				admissible.computeIfAbsent(chr, k -> new BitSet())
@@ -1173,6 +1307,10 @@ public class RulesReducer{
 
 	/** @return	The candidate without the farthest token, or null if it would select a negative word. */
 	private static Candidate shorten(final Candidate candidate, final Context context){
+		//the original conditions are at least this long: a shorter one would accept words they do not
+		if(candidate.tokens.size() - 1 < context.constraint.requiredLength())
+			return null;
+
 		final List<String> tokens = candidate.tokens.subList(0, candidate.tokens.size() - 1);
 		final int length = tokens.size();
 
@@ -1205,7 +1343,8 @@ public class RulesReducer{
 	 * (all with respect to the words that can reach that position), and a useless leading wildcard is removed.
 	 */
 	private static Line finalizeLine(final Candidate candidate, final Transformation transformation,
-		final Set<String> positives, final List<String> words){
+		final Set<String> positives, final List<String> words, final Constraint constraint){
+		final Constraint limit = (constraint != null? constraint: Constraint.NONE);
 		final String removal = transformation.removal;
 		final int removalLength = removal.length();
 
@@ -1224,16 +1363,28 @@ public class RulesReducer{
 				for(final String word : words)
 					if(matchesAllBut(word, tokens, negated, removalLength, i))
 						observed.add(word.charAt(word.length() - removalLength - 1 - i));
+				//the characters of the token that actually occur at this position: the positive group needs no more than these
+				// (a token widened to every admissible character would otherwise lose against a negated group of the same size)
+				final Set<Character> present = new TreeSet<>(observed);
 				for(final char chr : token.toCharArray())
 					observed.remove(chr);
-				if(observed.size() < token.length())
+				present.removeAll(observed);
+				//a negated group accepts every other character: it is used only if the original conditions accept them all
+				if(observed.size() < present.size() && limit.acceptsAllBut(i, observed))
 					excluded = observed;
+				else if(!present.isEmpty() && present.size() < token.length()){
+					final StringBuilder sb = new StringBuilder(present.size());
+					for(final Character chr : present)
+						sb.append(chr);
+					tokens.set(i, sb.toString());
+				}
 			}
 			negated.set(i, excluded);
 		}
 
 		//drop the leading wildcard if it does not let any negative word in
-		while(!tokens.isEmpty() && negated.get(tokens.size() - 1) != null && negated.get(tokens.size() - 1).isEmpty()){
+		while(tokens.size() > limit.requiredLength() && negated.get(tokens.size() - 1) != null
+				&& negated.get(tokens.size() - 1).isEmpty()){
 			final List<String> shorter = tokens.subList(0, tokens.size() - 1);
 			final List<Set<Character>> shorterNegated = negated.subList(0, negated.size() - 1);
 			boolean valid = true;
@@ -1328,7 +1479,223 @@ public class RulesReducer{
 	}
 
 
+	//-- constraints from the original conditions --
+
+	/**
+	 * For each (minimal) transformation, which characters the original conditions accept at each position (from the nearest to
+	 * the removal), so the reduced conditions can be kept within them.
+	 */
+	private Map<Transformation, Constraint> extractConstraints(final String flag){
+		final RuleEntry rule = affixData.getData(flag);
+		final List<AffixEntry> originalEntries = (rule != null? rule.getEntries(): null);
+		if(originalEntries == null || originalEntries.isEmpty())
+			return Collections.emptyMap();
+
+		final boolean prefix = (rule.getType() == AffixType.PREFIX);
+		final Map<Transformation, List<List<Allowed>>> conditionsByTransformation = new HashMap<>();
+		for(final AffixEntry entry : originalEntries){
+			//the same transformation of the facts collected by `collectInflectionsByFlag`
+			String removal = entry.getRemoving();
+			String appending = entry.getAppending();
+			if(prefix){
+				removal = StringUtils.reverse(removal);
+				appending = StringUtils.reverse(appending);
+			}
+			final Transformation transformation = Transformation.of(removal, appending + entry.toString(strategy));
+
+			final List<Allowed> tokens = parseCondition(entry.getCondition());
+			if(prefix)
+				Collections.reverse(tokens);
+			//drop the part of the condition that is the removal
+			final int available = tokens.size() - transformation.removal.length();
+			final List<Allowed> positions = new ArrayList<>(Math.max(0, available));
+			for(int i = available - 1; i >= 0; i --)
+				positions.add(tokens.get(i));
+			conditionsByTransformation.computeIfAbsent(transformation, k -> new ArrayList<>(1))
+				.add(positions);
+		}
+
+		final Map<Transformation, Constraint> constraints = new HashMap<>(conditionsByTransformation.size());
+		for(final Map.Entry<Transformation, List<List<Allowed>>> conditions : conditionsByTransformation.entrySet()){
+			int length = 0;
+			for(final List<Allowed> positions : conditions.getValue())
+				length = Math.max(length, positions.size());
+			final List<Allowed> union = new ArrayList<>(length);
+			for(int i = 0; i < length; i ++){
+				Allowed allowed = null;
+				for(final List<Allowed> positions : conditions.getValue()){
+					final Allowed current = (i < positions.size()? positions.get(i): Allowed.ANY);
+					allowed = (allowed == null? current: allowed.union(current));
+				}
+				union.add(allowed);
+			}
+			constraints.put(conditions.getKey(), new Constraint(union));
+		}
+		return constraints;
+	}
+
+	/** @return	The characters accepted at each position of an affix condition (in the order of the condition). */
+	private static List<Allowed> parseCondition(final String condition){
+		final List<Allowed> tokens = new ArrayList<>(condition.length());
+		int i = 0;
+		while(i < condition.length()){
+			final char chr = condition.charAt(i);
+			if(chr == '['){
+				final int end = condition.indexOf(']', i + 1);
+				if(end >= 0){
+					final boolean negated = (i + 1 < end && condition.charAt(i + 1) == '^');
+					final Set<Character> chars = new TreeSet<>();
+					for(int j = i + 1 + (negated? 1: 0); j < end; j ++)
+						chars.add(condition.charAt(j));
+					tokens.add(new Allowed(negated, chars));
+					i = end + 1;
+					continue;
+				}
+			}
+
+			tokens.add(chr == '.'? Allowed.ANY: new Allowed(false, Set.of(chr)));
+			i ++;
+		}
+		return tokens;
+	}
+
+	/**
+	 * Keeps the candidates inside the original conditions: a candidate shorter than the original conditions would accept any
+	 * character in the missing positions, so it is extended with a token that accepts the characters allowed there (that occur in
+	 * the words, plus the ones of the positives it covers, so the coverage is never lost). A candidate is never longer than the
+	 * shortest positive word it covers.
+	 */
+	private static Map<String, Candidate> padCandidates(final Map<String, Candidate> pool, final Context context){
+		final int required = context.constraint.requiredLength();
+		if(required == 0)
+			return pool;
+
+		final String[] padTokens = new String[required];
+		final Map<String, Candidate> padded = new LinkedHashMap<>(pool.size());
+		for(final Candidate candidate : pool.values()){
+			int limit = required;
+			for(int i = candidate.coverage.nextSetBit(0); i >= 0; i = candidate.coverage.nextSetBit(i + 1))
+				limit = Math.min(limit, context.positiveWords.get(i).length() - context.removalLength);
+
+			final List<String> tokens = new ArrayList<>(candidate.tokens);
+			while(tokens.size() < limit){
+				final int position = tokens.size();
+				if(padTokens[position] == null)
+					padTokens[position] = padToken(position, context);
+				final Set<Character> chars = new TreeSet<>();
+				for(final char chr : padTokens[position].toCharArray())
+					chars.add(chr);
+				for(int i = candidate.coverage.nextSetBit(0); i >= 0; i = candidate.coverage.nextSetBit(i + 1)){
+					final String word = context.positiveWords.get(i);
+					chars.add(word.charAt(word.length() - context.removalLength - 1 - position));
+				}
+				final StringBuilder sb = new StringBuilder(chars.size());
+				for(final Character chr : chars)
+					sb.append(chr);
+				tokens.add(sb.toString());
+			}
+			addCandidate(padded, tokens, candidate.coverage);
+		}
+		return padded;
+	}
+
+	/** @return	The characters of the words at the given position that the original conditions accept there. */
+	private static String padToken(final int position, final Context context){
+		final Set<Character> chars = new TreeSet<>();
+		for(final String word : context.words){
+			final int index = word.length() - context.removalLength - 1 - position;
+			if(index >= 0 && context.constraint.allows(position, word.charAt(index)))
+				chars.add(word.charAt(index));
+		}
+		final StringBuilder sb = new StringBuilder(chars.size());
+		for(final Character chr : chars)
+			sb.append(chr);
+		return sb.toString();
+	}
+
+
 	//-- data holders --
+
+	/** The characters a position of a condition accepts: the listed ones, or all the others if negated. */
+	private static final class Allowed{
+
+		static final Allowed ANY = new Allowed(true, Set.of());
+
+		final boolean negated;
+		final Set<Character> chars;
+
+
+		Allowed(final boolean negated, final Set<Character> chars){
+			this.negated = negated;
+			this.chars = chars;
+		}
+
+		boolean isAny(){
+			return (negated && chars.isEmpty());
+		}
+
+		boolean contains(final char chr){
+			return (chars.contains(chr) != negated);
+		}
+
+		/** @return	What is accepted by this or by the other. */
+		Allowed union(final Allowed other){
+			final Set<Character> result = new TreeSet<>();
+			if(!negated && !other.negated){
+				result.addAll(chars);
+				result.addAll(other.chars);
+				return new Allowed(false, result);
+			}
+			if(negated && other.negated){
+				result.addAll(chars);
+				result.retainAll(other.chars);
+				return new Allowed(true, result);
+			}
+			final Allowed positive = (negated? other: this);
+			final Allowed negative = (negated? this: other);
+			result.addAll(negative.chars);
+			result.removeAll(positive.chars);
+			return new Allowed(true, result);
+		}
+
+	}
+
+	/** For each position (from the nearest to the removal) the characters accepted by the original conditions of a transformation. */
+	private static final class Constraint{
+
+		/** No limit at all. */
+		static final Constraint NONE = new Constraint(new ArrayList<>(0));
+
+		private final List<Allowed> positions;
+
+
+		Constraint(final List<Allowed> positions){
+			//a trailing position that accepts anything is the same as no position
+			int size = positions.size();
+			while(size > 0 && positions.get(size - 1).isAny())
+				size --;
+			this.positions = new ArrayList<>(positions.subList(0, size));
+		}
+
+		/** @return	The number of positions that limit the accepted characters. */
+		int requiredLength(){
+			return positions.size();
+		}
+
+		boolean allows(final int position, final char chr){
+			return (position >= positions.size() || positions.get(position).contains(chr));
+		}
+
+		/** @return	Whether every character but the excluded ones is accepted at the given position. */
+		boolean acceptsAllBut(final int position, final Set<Character> excluded){
+			if(position >= positions.size())
+				return true;
+
+			final Allowed allowed = positions.get(position);
+			return (allowed.negated && excluded.containsAll(allowed.chars));
+		}
+
+	}
 
 	/** Minimal transformation: the removal and the addition (with continuation flags, if any) share no prefix. */
 	private static final class Transformation implements Comparable<Transformation>{
@@ -1449,19 +1816,41 @@ public class RulesReducer{
 		/** {@code prefix[i]} is the number of positive words before the i-th one, that is the index of that word among the positives. */
 		final int[] prefix;
 		final int positiveCount;
+		/** The positive words, indexed as the positives. */
+		final List<String> positiveWords;
+		/** The indexes (in {@link #words}) of the negative and of the positive words. */
+		final int[] negativeIndex;
+		final int[] positiveIndex;
+		/** Which characters the original conditions accept at each position (never {@code null}). */
+		final Constraint constraint;
 
 
-		Context(final List<String> words, final Set<String> positives, final int removalLength){
+		Context(final List<String> words, final Set<String> positives, final int removalLength, final Constraint constraint){
 			this.words = words;
 			this.removalLength = removalLength;
+			this.constraint = (constraint != null? constraint: Constraint.NONE);
 			final int size = words.size();
 			positive = new boolean[size];
 			prefix = new int[size + 1];
+			positiveWords = new ArrayList<>(positives.size());
 			for(int i = 0; i < size; i ++){
 				positive[i] = positives.contains(words.get(i));
 				prefix[i + 1] = prefix[i] + (positive[i]? 1: 0);
+				if(positive[i])
+					positiveWords.add(words.get(i));
 			}
 			positiveCount = prefix[size];
+			final int[] negatives = new int[size - positiveCount];
+			final int[] positiveIndexes = new int[positiveCount];
+			int negativeFill = 0;
+			int positiveFill = 0;
+			for(int i = 0; i < size; i ++)
+				if(positive[i])
+					positiveIndexes[positiveFill ++] = i;
+				else
+					negatives[negativeFill ++] = i;
+			negativeIndex = negatives;
+			positiveIndex = positiveIndexes;
 		}
 
 		int positives(final Node node){

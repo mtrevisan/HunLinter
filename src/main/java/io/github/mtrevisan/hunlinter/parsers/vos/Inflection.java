@@ -26,10 +26,9 @@ package io.github.mtrevisan.hunlinter.parsers.vos;
 
 import io.github.mtrevisan.hunlinter.parsers.affix.strategies.FlagParsingStrategy;
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
+import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import io.github.mtrevisan.hunlinter.parsers.enums.MorphologicalTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
