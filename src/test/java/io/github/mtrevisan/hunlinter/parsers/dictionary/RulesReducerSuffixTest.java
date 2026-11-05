@@ -28,12 +28,14 @@ import io.github.mtrevisan.hunlinter.parsers.dictionary.generators.WordGenerator
 import io.github.mtrevisan.hunlinter.parsers.enums.AffixType;
 import io.github.mtrevisan.hunlinter.services.system.FileHelper;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @SuppressWarnings("ALL")
@@ -1116,6 +1118,50 @@ class RulesReducerSuffixTest{
 			.flatMap(List::stream)
 			.toList();
 		RulesReducerUtils.assertReduction(reducer, affFile, language, flag, originalRules, originalLines);
+	}
+
+	/** Without FULLSTRIP a word equal to the removal is never inflected, so it does not force a leading wildcard in the condition. */
+	@Test
+	void wordEqualToRemovalIsNotANegativeWithoutFullstrip() throws IOException{
+		List<LineEntry> reduced = reduceWithInertWord(false);
+
+		Assertions.assertEquals(1, reduced.size());
+		Assertions.assertEquals("ndo", reduced.get(0).condition);
+	}
+
+	/** With FULLSTRIP a word equal to the removal that is not inflected has to be excluded by the condition. */
+	@Test
+	void wordEqualToRemovalIsANegativeWithFullstrip() throws IOException{
+		List<LineEntry> reduced = reduceWithInertWord(true);
+
+		Assertions.assertEquals(1, reduced.size());
+		Assertions.assertNotEquals("ndo", reduced.get(0).condition);
+		Assertions.assertTrue(reduced.get(0).condition.endsWith("ndo"));
+		Assertions.assertFalse(reduced.get(0).from.contains("ndo"));
+	}
+
+	private static List<LineEntry> reduceWithInertWord(boolean fullstrip) throws IOException{
+		String language = "vec-IT";
+		File affFile = FileHelper.createDeleteOnExitFile(language, ".aff",
+			"SET UTF-8",
+			"LANG " + language,
+			"FLAG long",
+			(fullstrip? "FULLSTRIP": ""),
+			"SFX N0 Y 1",
+			"SFX N0 ndo r ndo"
+		);
+		Pair<RulesReducer, WordGenerator> pair = RulesReducerUtils.createReducer(affFile, language);
+		RulesReducer reducer = pair.getLeft();
+		WordGenerator wordGenerator = pair.getRight();
+		String flag = "N0";
+		List<LineEntry> plainRules = Stream.of("kando", "kuando")
+			.map(word -> word + "/" + flag)
+			.map(wordGenerator::createFromDictionaryLine)
+			.map(wordGenerator::applyAffixRules)
+			.map(inflections -> reducer.collectInflectionsByFlag(inflections, flag, AffixType.SUFFIX))
+			.flatMap(List::stream)
+			.toList();
+		return reducer.reduceRules(plainRules, List.of("ndo"), null);
 	}
 
 }

@@ -586,12 +586,21 @@ public class RulesReducer{
 
 		//2. the trie of the words ending with a given removal (in reversed-lexicographic order, that is the order of the trie):
 		// it does not depend on the addition, so it is built once for all the transformations that share the removal
+		//without FULLSTRIP, a rule is never applied to a word that is equal to its removal, so such a word is not a negative word
+		// (a condition that matches it is equivalent to the same condition preceded by a wildcard, but shorter)
+		final boolean fullstrip = affixData.isFullstrip();
+		final Map<String, Set<String>> positivesByRemoval = new HashMap<>();
+		if(!fullstrip)
+			for(final Map.Entry<Transformation, Set<String>> entry : positivesByTransformation.entrySet())
+				positivesByRemoval.computeIfAbsent(entry.getKey().removal, k -> new HashSet<>())
+					.addAll(entry.getValue());
 		final Map<String, Skeleton> skeletonByRemoval = new HashMap<>();
 		for(final Transformation transformation : positivesByTransformation.keySet())
 			skeletonByRemoval.computeIfAbsent(transformation.removal, removal -> {
+				final Set<String> positiveWords = positivesByRemoval.getOrDefault(removal, Collections.emptySet());
 				final List<String> words = new ArrayList<>();
 				for(final String word : allWords)
-					if(word.endsWith(removal))
+					if(word.endsWith(removal) && (fullstrip || word.length() > removal.length() || positiveWords.contains(word)))
 						words.add(word);
 				return Skeleton.of(words, removal.length());
 			});
