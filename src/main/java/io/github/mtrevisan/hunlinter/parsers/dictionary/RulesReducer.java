@@ -282,12 +282,17 @@ public class RulesReducer{
 
 	/** @return	The part that is actually added to the word, that is without the continuation flags and the morphological fields. */
 	private static String addedPart(final String addition){
+		return addition.substring(0, surfaceEnd(addition));
+	}
+
+	/** @return	The index where the continuation flags and the morphological fields start (the length if there are none). */
+	private static int surfaceEnd(final String addition){
 		for(int i = 0; i < addition.length(); i ++){
 			final char chr = addition.charAt(i);
 			if(chr == '/' || chr == '\t')
-				return addition.substring(0, i);
+				return i;
 		}
-		return addition;
+		return addition.length();
 	}
 
 	/** @return	The position, in the `.aff` file, of the first rule that does a given transformation. */
@@ -308,19 +313,8 @@ public class RulesReducer{
 	 * @return	An identifier of the transformation, independent of the common prefix of removal and addition.
 	 */
 	private static String orderKey(final String removal, final String addition){
-		int surfaceEnd = addition.length();
-		for(int i = 0; i < addition.length(); i ++){
-			final char chr = addition.charAt(i);
-			if(chr == '/' || chr == '\t'){
-				surfaceEnd = i;
-				break;
-			}
-		}
-		int lcp = 0;
-		final int maxLcp = Math.min(removal.length(), surfaceEnd);
-		while(lcp < maxLcp && removal.charAt(lcp) == addition.charAt(lcp))
-			lcp ++;
-		return removal.substring(lcp) + TOKEN_SEPARATOR + addition.substring(lcp);
+		final Transformation transformation = Transformation.of(removal, addition);
+		return transformation.removal + TOKEN_SEPARATOR + transformation.addition;
 	}
 
 	private static List<String> composeAffixRules(final String flag, final AffixType type,
@@ -1165,6 +1159,13 @@ public class RulesReducer{
 	/**
 	 * Two conditions of the same length that differ in exactly one token select the union of the words they select
 	 * (still no negative word), so they are replaced by a condition whose token is the union of the two.
+	 * <p>
+	 * Possible future improvement (not needed so far): the closure is computed eagerly, to a fixed point, and stops silently at
+	 * {@link #MAX_POOL_SIZE}, so on a very large pool the merges that are missed depend on the iteration order. A complete closure
+	 * would generate the merged candidates lazily, on demand, from a priority queue (e.g. ordered by coverage gained per token),
+	 * instead of materializing them all. It must be designed together with {@link #pruneDominated(Map)}: a dominated candidate
+	 * has to be discarded as soon as it is generated, otherwise the lazy generation just moves the explosion of the pool
+	 * elsewhere. Do it only with a real flag in which the pool limit gives a worse result than the exact one.
 	 */
 	private static void mergeCandidates(final Map<String, Candidate> pool){
 		boolean changed;
@@ -1706,16 +1707,8 @@ public class RulesReducer{
 
 		static Transformation of(final String removal, final String addition){
 			//the continuation flags (and morphological fields) start after the surface of the addition
-			int surfaceEnd = addition.length();
-			for(int i = 0; i < addition.length(); i ++){
-				final char chr = addition.charAt(i);
-				if(chr == '/' || chr == '\t'){
-					surfaceEnd = i;
-					break;
-				}
-			}
 			int lcp = 0;
-			final int maxLcp = Math.min(removal.length(), surfaceEnd);
+			final int maxLcp = Math.min(removal.length(), surfaceEnd(addition));
 			while(lcp < maxLcp && removal.charAt(lcp) == addition.charAt(lcp))
 				lcp ++;
 			return new Transformation(removal.substring(lcp), addition.substring(lcp));

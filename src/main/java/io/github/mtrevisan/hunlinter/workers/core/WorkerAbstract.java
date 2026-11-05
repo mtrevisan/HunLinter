@@ -65,6 +65,9 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 
 	private Function<?, ?> processor;
 
+	private volatile int progressFrom = 0;
+	private volatile int progressTo = 100;
+
 
 	WorkerAbstract(final WD workerData){
 		Objects.requireNonNull(workerData, "Worker data cannot be null");
@@ -127,10 +130,23 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 		return null;
 	}
 
+	/**
+	 * Restrict the progress reported by the following steps to the given window of the overall progress, so that a multi-step worker
+	 * doesn't restart from zero (and, thus, appear stuck) at each step.
+	 * <p>Call it before {@link #prepareProcessing(String)}/{@link #resetProcessing(String, Object...)} of the step.</p>
+	 *
+	 * @param from	The overall progress at the beginning of the step [0, 100].
+	 * @param to	The overall progress at the end of the step [0, 100].
+	 */
+	protected final void setProgressRange(final int from, final int to){
+		progressFrom = from;
+		progressTo = to;
+	}
+
 	protected final void finalizeProcessing(final String message){
 		watch.stop();
 
-		setWorkerProgress(100);
+		setProgress(100);
 		LOGGER.info(ParserManager.MARKER_APPLICATION, "{} (in {})", message, watch.toStringMinuteSeconds());
 	}
 
@@ -176,7 +192,10 @@ public abstract class WorkerAbstract<WD extends WorkerData> extends SwingWorker<
 	}
 
 	protected final void setWorkerProgress(final int progress){
-		setProgress(Math.min(progress, 100));
+		final int from = progressFrom;
+		final int scaled = from + (int)((progressTo - from) * (long)Math.max(0, Math.min(progress, 100)) / 100);
+		//NOTE: SwingWorker.setProgress is thread-safe and ignores unchanged values
+		setProgress(scaled);
 	}
 
 	@Override

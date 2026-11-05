@@ -117,6 +117,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 		};
 
 		final Function<Void, Void> step1 = ignored -> {
+			setProgressRange(0, 10);
 			prepareProcessing("Execute " + workerData.getWorkerName() + " (step 1/3)");
 
 			processLines(dataProcessor);
@@ -124,6 +125,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			return null;
 		};
 		final Function<Void, Void> step2 = ignored -> {
+			setProgressRange(10, 90);
 			resetProcessing("Reading dictionary file (step 2/3)");
 
 			collectWords(dicParser, wordGenerator, extractSearchedWords(theParser));
@@ -131,6 +133,7 @@ public class ThesaurusLinterWorker extends WorkerThesaurus{
 			return null;
 		};
 		final Function<Void, List<IndexDataPair<ThesaurusEntry>>> step3 = ignored -> {
+			setProgressRange(90, 100);
 			resetProcessing("Execute " + workerData.getWorkerName() + " (step 3/3)");
 
 			processLines(dictionaryProcessor);
