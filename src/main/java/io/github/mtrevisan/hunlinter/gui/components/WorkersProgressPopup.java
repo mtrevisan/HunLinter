@@ -101,11 +101,11 @@ public class WorkersProgressPopup{
 	public final void update(final Object worker, final String name, final int progress){
 		Row row = rows.get(worker);
 		if(row == null){
-			//a new batch starts when nothing was running
-			if(rows.isEmpty()){
-				finishedInBatch = 0;
-				displayedProgress = 0;
-			}
+			//each time a worker starts the overall progress restarts from zero (already running workers count from their current progress)
+			finishedInBatch = 0;
+			displayedProgress = 0;
+			for(final Row r : rows.values())
+				r.base = r.progress;
 
 			row = new Row(name, () -> {
 				popup.setVisible(false);
@@ -160,7 +160,7 @@ public class WorkersProgressPopup{
 
 		long sum = 100l * finishedInBatch;
 		for(final Row row : rows.values())
-			sum += row.progress;
+			sum += row.getRelativeProgress();
 		return (int)(sum / total);
 	}
 
@@ -171,7 +171,7 @@ public class WorkersProgressPopup{
 
 	private void refreshMainProgressBar(){
 		//NOTE: the value never decreases inside a batch (a worker joining later, or a worker restarting its progress for a further step,
-		//would otherwise make the bar jump back); it restarts from zero only when a new batch begins
+		//would otherwise make the bar jump back); it restarts from zero each time a worker starts
 		displayedProgress = Math.max(displayedProgress, getOverallProgress());
 		mainProgressBar.setValue(displayedProgress);
 		mainProgressBar.setToolTipText(rows.size() > 1
@@ -221,6 +221,8 @@ public class WorkersProgressPopup{
 		private final JPanel panel = new JPanel();
 		private final JProgressBar bar = new JProgressBar(0, 100);
 		private int progress;
+		/** The progress of the worker when the current batch started (the overall progress counts from here). */
+		private int base;
 
 
 		private Row(final String name, final Runnable cancelAction){
@@ -248,6 +250,10 @@ public class WorkersProgressPopup{
 
 			panel.add(label);
 			panel.add(barRow);
+		}
+
+		private int getRelativeProgress(){
+			return (base >= 100? 100: Math.max(0, progress - base) * 100 / (100 - base));
 		}
 
 		private void setProgress(final int progress){
